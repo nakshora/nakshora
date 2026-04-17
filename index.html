@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nakshora | The Master Framework Showcase</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Supplementary layout styles to accommodate the Sidebar + Main Content */
+        body { display: flex; flex-direction: column; background: var(--nk-gray-50); }
+        .main-wrapper { display: flex; width: 100%; }
+        .content-area { flex-grow: 1; margin-left: 250px; width: calc(100% - 250px); }
+        @media (max-width: 768px) {
+            .nk-sidebar { display: none; }
+            .content-area { margin-left: 0; width: 100%; }
+        }
+        .demo-box { height: 100px; border-radius: var(--nk-radius-md); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav class="nk-navbar">
+        <a href="#" class="nk-navbar-brand nk-text-gradient">NAKSHORA</a>
+        <div class="nk-navbar-menu">
+            <a href="#typography" class="nk-navbar-item">Typography</a>
+            <a href="#grid" class="nk-navbar-item">Grid</a>
+            <a href="#components" class="nk-navbar-item">Components</a>
+            <button class="nk-btn nk-btn-primary nk-p-2 nk-text-sm">V1.0.0 Stable</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="nk-sidebar">
+            <h3 class="nk-p-4 nk-text-sm nk-gray-400">CORE ENGINE</h3>
+            <a href="#typography" class="nk-sidebar-link">Fluid Typography</a>
+            <a href="#colors" class="nk-sidebar-link">Infinite Palette</a>
+            <a href="#luxury" class="nk-sidebar-link">Luxury Themes</a>
+            <a href="#grid" class="nk-sidebar-link">12-Column Grid</a>
+            <a href="#spacing" class="nk-sidebar-link">Utility Spacing</a>
+            <a href="#forms" class="nk-sidebar-link">Form Controls</a>
+        </aside>
+
+        <main class="content-area">
+            
+            <section id="typography" class="nk-p-15 nk-flex-col nk-flex-center text-center">
+                <span class="nk-text-sm nk-secondary-500 nk-m-2" style="letter-spacing: 3px; font-weight: 700;">FLUID ENGINE ACTIVE</span>
+                <h1 class="nk-text-5xl nk-text-gradient-neon nk-m-0">Responsive Without Media Queries.</h1>
+                <p class="nk-text-xl nk-gray-500 nk-m-6 nk-auto-center" style="max-width: 700px;">
+                    This text uses <code class="nk-gray-800">clamp()</code> logic. Resize your browser to see the font size transition perfectly between 
+                    <span class="nk-primary-600">mobile</span> and <span class="nk-primary-600">desktop</span> scales.
+                </p>
+                <div class="nk-flex nk-gap-4">
+                    <button class="nk-btn nk-btn-neon nk-shadow-xl">Explore Engine</button>
+                    <button class="nk-btn nk-btn-outline">Documentation</button>
+                </div>
+            </section>
+
+            <section id="grid" class="nk-p-10 nk-gray-100">
+                <h2 class="nk-text-2xl nk-m-8">The 12-Column Grid</h2>
+                <div class="nk-grid">
+                    <div class="nk-col-12 demo-box nk-primary-500 nk-shadow-sm">.nk-col-12</div>
+                    <div class="nk-col-6 demo-box nk-secondary-500 nk-shadow-sm">.nk-col-6</div>
+                    <div class="nk-col-6 demo-box nk-secondary-500 nk-shadow-sm">.nk-col-6</div>
+                    <div class="nk-col-4 demo-box nk-success-500 nk-shadow-sm">.nk-col-4</div>
+                    <div class="nk-col-4 demo-box nk-info-500 nk-shadow-sm">.nk-col-4</div>
+                    <div class="nk-col-4 demo-box nk-warning-500 nk-shadow-sm">.nk-col-4</div>
+                </div>
+            </section>
+
+            <section id="luxury" class="nk-p-10">
+                <h2 class="nk-text-2xl nk-m-8">Luxury Palette Themes</h2>
+                <div class="nk-grid">
+                    <div class="nk-col-4 nk-card nk-p-6" style="background: var(--nk-lux-neon-bg); color: white; border: 1px solid var(--nk-lux-neon-primary);">
+                        <h4 class="nk-m-2" style="color: var(--nk-lux-neon-primary);">Midnight Neon</h4>
+                        <p class="nk-text-sm">High-contrast dark mode for elite interfaces.</p>
+                    </div>
+                    <div class="nk-col-4 nk-card nk-p-6" style="background: var(--nk-lux-earth-bg); border-left: 5px solid var(--nk-lux-earth-primary);">
+                        <h4 class="nk-m-2" style="color: var(--nk-lux-earth-primary);">Earthy Forest</h4>
+                        <p class="nk-text-sm">Organic tones for sustainable brands.</p>
+                    </div>
+                    <div class="nk-col-4 nk-card nk-p-6" style="background: var(--nk-lux-gold-bg); color: var(--nk-lux-gold-primary); border: 1px solid var(--nk-lux-gold-secondary);">
+                        <h4 class="nk-m-2">Royal Gold</h4>
+                        <p class="nk-text-sm" style="color: white;">Premium luxury for financial apps.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="nk-p-20" style="background: linear-gradient(45deg, var(--nk-primary-500), var(--nk-secondary-500));">
+                <div class="nk-grid">
+                    <div class="nk-col-6 nk-glass nk-p-10">
+                        <h3 class="nk-m-2">.nk-glass</h3>
+                        <p>Standard white glass with 10px blur and border-stroke.</p>
+                    </div>
+                    <div class="nk-col-6 nk-glass-dark nk-p-10" style="color: white;">
+                        <h3 class="nk-m-2">.nk-glass-dark</h3>
+                        <p>Dark glass for cyberpunk aesthetics and high-end overlays.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="components" class="nk-p-10">
+                <h2 class="nk-text-2xl nk-m-8">The Component Library</h2>
+                
+                <div class="nk-card nk-p-8 nk-m-6">
+                    <h3 class="nk-text-lg nk-m-4">Buttons & States</h3>
+                    <div class="nk-flex nk-wrap nk-gap-4">
+                        <button class="nk-btn nk-btn-primary">Primary</button>
+                        <button class="nk-btn nk-btn-secondary">Secondary</button>
+                        <button class="nk-btn nk-btn-success">Success</button>
+                        <button class="nk-btn nk-btn-outline">Outline</button>
+                        <button class="nk-btn nk-btn-primary loading">Loading State</button>
+                    </div>
+                </div>
+
+                <div id="forms" class="nk-card nk-p-8 nk-m-6">
+                    <h3 class="nk-text-lg nk-m-4">Next-Gen Form Controls</h3>
+                    <div class="nk-grid">
+                        <div class="nk-col-6">
+                            <div class="nk-form-group">
+                                <input type="text" id="user" class="nk-input" placeholder=" ">
+                                <label for="user" class="nk-label">Username</label>
+                            </div>
+                        </div>
+                        <div class="nk-col-6">
+                            <div class="nk-form-group">
+                                <input type="password" id="pass" class="nk-input" placeholder=" ">
+                                <label for="pass" class="nk-label">Security Key</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nk-grid">
+                    <div class="nk-col-6">
+                        <div class="nk-card">
+                            <div class="nk-card-header">Card with Header</div>
+                            <div class="nk-card-body">
+                                <p>This uses the standard shadow-md and radius-lg variables from the Master Engine.</p>
+                            </div>
+                            <div class="nk-card-footer nk-flex nk-justify-end">
+                                <button class="nk-btn nk-btn-outline nk-p-1">Cancel</button>
+                                <button class="nk-btn nk-btn-primary nk-p-1 nk-m-2">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nk-col-6">
+                        <div class="nk-card nk-card-overlay">
+                            <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=800&q=80" alt="Abstract">
+                            <div class="nk-card-overlay-content">
+                                <h3 class="nk-m-0">Image Overlay</h3>
+                                <p class="nk-text-sm">Perfect for portfolio thumbnails.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="nk-p-20 nk-gray-900" style="color: white;">
+                <div class="nk-auto-center text-center">
+                    <h2 class="nk-text-3xl nk-m-4">Ready to build?</h2>
+                    <p class="nk-gray-400 nk-m-8">Nakshora v1.0.0 &copy; 2026. The world's most responsive framework.</p>
+                    <div class="nk-flex nk-flex-center nk-gap-8">
+                        <span class="nk-p-2 nk-gray-800 nk-radius-pill nk-text-xs">MIT License</span>
+                        <span class="nk-p-2 nk-gray-800 nk-radius-pill nk-text-xs">v1.0.0 Stable</span>
+                    </div>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+</body>
+</html>
