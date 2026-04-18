@@ -1,0 +1,25 @@
+# Nakshora CSS Framework
+
+The World's Most Comprehensive CSS Framework. Built by Rizwan Rahim Chowdhury.
+A utility-first framework featuring unique themes like Neon Cyber, Pastel Dream, and Brutalist.
+
+## Core Principles
+- **Fluid Typography:** Uses `clamp()` for responsive text sizing.
+- **Modern Breakpoints:** Includes high-end resolutions (`uhd:`, `k8:`).
+- **CSS Variables:** Driven by `:root` custom properties for easy theming.
+- **Design Paradigms:** Native support for Glassmorphism, Neumorphism, and Brutalism.
+
+## Key Themes
+- **Neon Cyber:** High-saturation, futuristic colors.
+- **Pastel Dream:** Soft, muted tones for elegant designs.
+- **Ultra Minimalist:** Clean grayscale and "Minimal Ice" palettes.
+- **Nature Inspired:** Earthy, organic tones.
+- **Brutalist:** Raw, high-contrast primary colors.
+
+## Usage
+CDN: https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css
+
+## Important Classes
+- Layout: `.flex`, `.grid`, `.grid-cols-12`, `.gap-*`
+- Design: `.card-neon`, `.btn-neon`, `.glass-light`, `.brutalist-card`
+- Animation: `.animate-neonGlow`, `.hover-lift`
