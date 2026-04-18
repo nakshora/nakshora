@@ -1,0 +1,20 @@
+{
+  "name": "nakshora",
+  "version": "1.0.0",
+  "description": "The World's Most Comprehensive CSS Framework featuring Neon, Pastel, and Brutalist themes.",
+  "main": "min.main.css",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nakshora/nakshora"
+  },
+  "keywords": [
+    "css",
+    "framework",
+    "neon",
+    "brutalist",
+    "utility-first",
+    "responsive"
+  ],
+  "author": "Rizwan Rahim Chowdhury",
+  "license": "MIT"
+}
