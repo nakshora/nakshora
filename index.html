@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>Nakshora - Modern Open Source CSS Framework for Beautiful Responsive UI</title>
+  <meta name="description" content="Nakshora is a modern open source CSS framework for building responsive, aesthetic, and production-ready interfaces with utility classes, components, neon themes, pastel palettes, brutalist design, glassmorphism, neumorphism, and more." />
+  <meta name="keywords" content="Nakshora, Nakshora CSS, CSS framework, utility first CSS framework, open source CSS framework, responsive CSS framework, glassmorphism CSS, brutalist CSS, neon UI framework, pastel UI framework, CSS components, frontend framework, jsdelivr CSS CDN" />
+  <meta name="author" content="Rizwan Rahim Chowdhury" />
+  <meta name="creator" content="Rizwan Rahim Chowdhury" />
+  <meta name="publisher" content="Nakshora" />
+  <meta name="application-name" content="Nakshora" />
+  <meta name="apple-mobile-web-app-title" content="Nakshora" />
+  <meta name="generator" content="Nakshora" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="bingbot" content="index, follow" />
+  <meta name="theme-color" content="#00ffff" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://nakshora.github.io/" />
+
+  <!-- Force sitename / brand -->
+  <meta name="site_name" content="Nakshora" />
+  <meta property="og:site_name" content="Nakshora" />
+  <meta property="article:publisher" content="Nakshora" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Nakshora - Modern Open Source CSS Framework" />
+  <meta property="og:description" content="Build stunning responsive interfaces with Nakshora, a modern CSS framework featuring utilities, components, neon cyber themes, pastel palettes, brutalist UI, glassmorphism, neumorphism, gradients, animations, and more." />
+  <meta property="og:url" content="https://nakshora.github.io/" />
+  <meta property="og:image" content="https://nakshora.github.io/og-image.png" />
+  <meta property="og:image:alt" content="Nakshora CSS Framework preview image" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Nakshora - Modern Open Source CSS Framework" />
+  <meta name="twitter:description" content="A powerful CSS framework with utility classes, components, multiple design systems, responsive tools, and beautiful UI effects." />
+  <meta name="twitter:image" content="https://nakshora.github.io/og-image.png" />
+  <meta name="twitter:image:alt" content="Nakshora CSS Framework preview image" />
+  <meta name="twitter:site" content="@nakshora" />
+  <meta name="twitter:creator" content="@nakshora" />
+
+  <!-- Favicons -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css" />
+
+  <!-- Performance hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Nakshora",
+    "alternateName": "Nakshora CSS Framework",
+    "url": "https://nakshora.github.io/",
+    "description": "Nakshora is a modern open source CSS framework for building responsive, aesthetic, and production-ready user interfaces.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Nakshora",
+      "url": "https://nakshora.github.io/"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://nakshora.github.io/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Nakshora",
+    "url": "https://nakshora.github.io/",
+    "logo": "https://nakshora.github.io/logo.png",
+    "founder": {
+      "@type": "Person",
+      "name": "Rizwan Rahim Chowdhury"
+    },
+    "sameAs": [
+      "https://github.com/nakshora"
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Nakshora",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "softwareVersion": "1.0.0",
+    "url": "https://nakshora.github.io/",
+    "downloadUrl": "https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css",
+    "license": "https://opensource.org/licenses/MIT",
+    "creator": {
+      "@type": "Person",
+      "name": "Rizwan Rahim Chowdhury"
+    },
+    "description": "Nakshora is a modern open source CSS framework with utility classes, UI components, responsive design tools, color systems, glassmorphism, neumorphism, brutalist design utilities, gradients, and animations.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
+  <style>
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(168, 85, 247, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(0, 255, 255, 0.15), transparent 30%),
+        radial-gradient(circle at bottom center, rgba(255, 0, 128, 0.12), transparent 35%),
+        hsl(0, 0%, 5%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(168, 85, 247, 0.14),
+        rgba(255, 0, 128, 0.10),
+        rgba(0, 255, 255, 0.10)
+      );
+      pointer-events: none;
+    }
+
+    .section-title {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 0.5rem;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 60%;
+      height: 3px;
+      background: linear-gradient(90deg, hsl(280, 100%, 55%), hsl(180, 100%, 55%));
+      border-radius: 9999px;
+    }
+
+    .logo-dot {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      border-radius: 9999px;
+      background: hsl(180, 100%, 55%);
+      box-shadow: 0 0 10px hsl(180, 100%, 55%), 0 0 20px hsl(180, 100%, 55%);
+    }
+
+    .showcase-box {
+      min-height: 180px;
+    }
+
+    .footer-link:hover,
+    .nav-link:hover {
+      color: hsl(180, 100%, 55%);
+    }
+
+    .code-inline {
+      font-family: monospace;
+      background: rgba(255,255,255,0.08);
+      padding: 0.2rem 0.45rem;
+      border-radius: 0.4rem;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 99999;
+      background: #000;
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+    }
+
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+    }
+
+    .hero-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero-kpis {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="text-mono-white">
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header>
+    <nav class="navbar-glass sticky top-0 z-sticky" aria-label="Primary Navigation">
+      <div class="container flex items-center justify-between w-full">
+        <a href="#home" class="flex items-center gap-3 no-underline text-mono-white" aria-label="Nakshora home">
+          <span class="logo-dot" aria-hidden="true"></span>
+          <span class="text-xl font-bold text-glow-neon-cyan">Nakshora</span>
+        </a>
+
+        <div class="hidden md:flex items-center gap-6">
+          <a href="#about" class="nav-link no-underline text-mono-100">About</a>
+          <a href="#features" class="nav-link no-underline text-mono-100">Features</a>
+          <a href="#components" class="nav-link no-underline text-mono-100">Components</a>
+          <a href="#showcase" class="nav-link no-underline text-mono-100">Showcase</a>
+          <a href="#docs" class="nav-link no-underline text-mono-100">Docs</a>
+          <a href="#contact" class="btn btn-neon btn-sm no-underline">Get Started</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <!-- Hero -->
+    <section id="home" class="relative min-h-screen flex items-center overflow-hidden" aria-labelledby="hero-title">
+      <div class="hero-overlay"></div>
+
+      <div class="container relative z-10 py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div class="animate-slideInLeft">
+            <div class="badge badge-neon badge-pill mb-4">Nakshora CSS Framework v1.0.0</div>
+
+            <h1 id="hero-title" class="text-5xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
+              Nakshora - the modern open source CSS framework for stunning responsive interfaces
+            </h1>
+
+            <p class="text-lg md:text-xl text-mono-200 leading-relaxed mb-8 max-w-2xl">
+              Nakshora helps developers build beautiful websites, landing pages, dashboards, portfolios, admin panels, and web applications with utility classes, production-ready components, responsive layouts, neon cyber themes, pastel palettes, brutalist styles, glassmorphism, neumorphism, gradients, and animations.
+            </p>
+
+            <div class="flex flex-wrap gap-4 mb-8">
+              <a href="#components" class="btn btn-neon btn-lg no-underline" aria-label="Explore Nakshora components">Explore Components</a>
+              <a href="#docs" class="btn btn-glass btn-lg no-underline" aria-label="Read Nakshora documentation">Read Documentation</a>
+            </div>
+
+            <div class="glass rounded-xl p-4 max-w-3xl mb-8">
+              <p class="text-sm text-mono-100 mb-2 font-semibold">Nakshora CDN</p>
+              <code class="text-neon-cyan-300 text-sm">
+                https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css
+              </code>
+            </div>
+
+            <div class="hero-kpis">
+              <div class="glass rounded-xl p-4 text-center">
+                <p class="text-3xl font-black text-neon-cyan-400">5+</p>
+                <p class="text-sm text-mono-300">Design systems</p>
+              </div>
+              <div class="glass rounded-xl p-4 text-center">
+                <p class="text-3xl font-black text-neon-pink-400">100+</p>
+                <p class="text-sm text-mono-300">Utility patterns</p>
+              </div>
+              <div class="glass rounded-xl p-4 text-center">
+                <p class="text-3xl font-black text-neon-purple-400">1 CDN</p>
+                <p class="text-sm text-mono-300">Instant setup</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="animate-slideInRight">
+            <article class="card-neon rounded-2xl p-8 shadow-2xl" aria-label="Nakshora live interface preview">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-neon-cyan-400">Live UI Preview</h2>
+                <span class="badge badge-neon badge-pill">Framework Demo</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div class="glass rounded-xl p-4">
+                  <p class="text-sm text-mono-200 mb-2">Neon Button</p>
+                  <button class="btn btn-neon w-full" aria-label="Neon button example">Launch</button>
+                </div>
+                <div class="glass rounded-xl p-4">
+                  <p class="text-sm text-mono-200 mb-2">Brutal Button</p>
+                  <button class="btn btn-brutal w-full" aria-label="Brutalist button example">Impact</button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4">
+                <div class="glass rounded-xl p-4">
+                  <p class="text-sm text-mono-200 mb-3">Progress</p>
+                  <div class="progress progress-neon" aria-label="Progress example">
+                    <div class="progress-bar" style="width: 78%;"></div>
+                  </div>
+                </div>
+
+                <div class="glass rounded-xl p-4">
+                  <p class="text-sm text-mono-200 mb-3">Status</p>
+                  <div class="flex gap-2 flex-wrap">
+                    <span class="badge badge-neon">Neon</span>
+                    <span class="badge badge-pill bg-pastel-sky-500 text-mono-white">Pastel</span>
+                    <span class="badge badge-pill bg-forest-500 text-mono-white">Nature</span>
+                  </div>
+                </div>
+
+                <div class="glass rounded-xl p-4">
+                  <p class="text-sm text-mono-200 mb-3">Loading</p>
+                  <div class="flex items-center gap-4">
+                    <div class="spinner-neon" aria-hidden="true"></div>
+                    <div>
+                      <p class="font-semibold text-mono-white">Rendering aesthetic interface...</p>
+                      <p class="text-sm text-mono-300">Powered by Nakshora utilities</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="py-20" aria-labelledby="about-title">
+      <div class="container">
+        <div class="mb-10 text-center">
+          <h2 id="about-title" class="section-title text-4xl font-bold mb-4">What is Nakshora?</h2>
+          <p class="text-mono-300 text-lg max-w-3xl mx-auto">
+            Nakshora is a utility-first open source CSS framework created to help developers build fast, beautiful, scalable, and expressive interfaces with one consistent design toolkit.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold text-neon-purple-300 mb-3">Utility First Architecture</h3>
+            <p class="text-mono-200 leading-relaxed">
+              Compose layouts and styles directly in HTML using practical utility classes for spacing, colors, typography, flexbox, grid, borders, shadows, positioning, sizing, and effects.
+            </p>
+          </article>
+
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold text-neon-pink-300 mb-3">Multiple Aesthetic Systems</h3>
+            <p class="text-mono-200 leading-relaxed">
+              Build futuristic neon cyber interfaces, elegant pastel websites, clean minimalist products, organic nature-inspired layouts, or bold brutalist experiences inside the same framework.
+            </p>
+          </article>
+
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold text-neon-cyan-300 mb-3">Production Ready CSS Components</h3>
+            <p class="text-mono-200 leading-relaxed">
+              Nakshora includes buttons, cards, navbars, hero sections, forms, progress bars, alerts, modals, tabs, accordions, dropdowns, tooltips, skeleton loaders, and spinners.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20" aria-labelledby="features-title">
+      <div class="container">
+        <div class="mb-12 text-center">
+          <h2 id="features-title" class="section-title text-4xl font-bold mb-4">Core Features of Nakshora CSS Framework</h2>
+          <p class="text-mono-300 text-lg max-w-3xl mx-auto">
+            Nakshora combines modern frontend utility design, visual creativity, and developer productivity in a single lightweight CDN-first CSS framework.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <article class="glass rounded-xl p-6 hover:shadow-xl transition-all">
+            <div class="text-4xl mb-4" aria-hidden="true">🎨</div>
+            <h3 class="text-xl font-bold mb-2 text-neon-purple-300">Rich Color Palettes</h3>
+            <p class="text-mono-300">Includes neon, pastel, mono, nature, and brutalist systems for different product identities and UI moods.</p>
+          </article>
+
+          <article class="glass rounded-xl p-6 hover:shadow-xl transition-all">
+            <div class="text-4xl mb-4" aria-hidden="true">📱</div>
+            <h3 class="text-xl font-bold mb-2 text-neon-cyan-300">Responsive Breakpoints</h3>
+            <p class="text-mono-300">Supports xs, sm, md, lg, xl, xxl, ultra, uhd, and 8K-ready utilities for adaptive layouts.</p>
+          </article>
+
+          <article class="glass rounded-xl p-6 hover:shadow-xl transition-all">
+            <div class="text-4xl mb-4" aria-hidden="true">✨</div>
+            <h3 class="text-xl font-bold mb-2 text-neon-pink-300">Modern Visual Effects</h3>
+            <p class="text-mono-300">Glassmorphism, neumorphism, glow effects, gradients, blur utilities, transitions, and animations are built in.</p>
+          </article>
+
+          <article class="glass rounded-xl p-6 hover:shadow-xl transition-all">
+            <div class="text-4xl mb-4" aria-hidden="true">🧩</div>
+            <h3 class="text-xl font-bold mb-2 text-neon-orange-300">Ready to Use Components</h3>
+            <p class="text-mono-300">Use prebuilt UI blocks including forms, buttons, cards, navigation, feedback elements, and interface patterns.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Color System -->
+    <section class="py-20" aria-labelledby="color-title">
+      <div class="container">
+        <div class="mb-12 text-center">
+          <h2 id="color-title" class="section-title text-4xl font-bold mb-4">Nakshora Color System</h2>
+          <p class="text-mono-300 text-lg max-w-3xl mx-auto">
+            Nakshora ships with multiple color families so designers and developers can create websites with a unique mood, brand expression, and visual personality.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <article class="rounded-xl overflow-hidden shadow-xl">
+            <div class="bg-neon-purple-500 h-20"></div>
+            <div class="bg-neon-pink-500 h-20"></div>
+            <div class="bg-neon-cyan-500 h-20"></div>
+            <div class="bg-mono-900 p-4">
+              <h3 class="font-bold text-neon-cyan-300 mb-1">Neon Cyber Palette</h3>
+              <p class="text-sm text-mono-300">Futuristic, vibrant, glowing, creative, and energetic.</p>
+            </div>
+          </article>
+
+          <article class="rounded-xl overflow-hidden shadow-xl">
+            <div class="bg-pastel-lavender-400 h-20"></div>
+            <div class="bg-pastel-rose-400 h-20"></div>
+            <div class="bg-pastel-mint-400 h-20"></div>
+            <div class="bg-mono-900 p-4">
+              <h3 class="font-bold text-mono-white mb-1">Pastel Dream Palette</h3>
+              <p class="text-sm text-mono-300">Soft, gentle, friendly, elegant, and calming.</p>
+            </div>
+          </article>
+
+          <article class="rounded-xl overflow-hidden shadow-xl">
+            <div class="bg-mono-100 h-20"></div>
+            <div class="bg-mono-400 h-20"></div>
+            <div class="bg-mono-900 h-20"></div>
+            <div class="bg-mono-900 p-4">
+              <h3 class="font-bold text-mono-white mb-1">Ultra Minimal Palette</h3>
+              <p class="text-sm text-mono-300">Clean, timeless, modern, and professional.</p>
+            </div>
+          </article>
+
+          <article class="rounded-xl overflow-hidden shadow-xl">
+            <div class="bg-forest-500 h-20"></div>
+            <div class="bg-ocean-500 h-20"></div>
+            <div class="bg-sunset-500 h-20"></div>
+            <div class="bg-mono-900 p-4">
+              <h3 class="font-bold text-mono-white mb-1">Nature Inspired Palette</h3>
+              <p class="text-sm text-mono-300">Organic, grounded, vibrant, fresh, and natural.</p>
+            </div>
+          </article>
+
+          <article class="rounded-xl overflow-hidden shadow-xl">
+            <div class="bg-brutal-red-500 h-20"></div>
+            <div class="bg-brutal-yellow-500 h-20"></div>
+            <div class="bg-brutal-blue-500 h-20"></div>
+            <div class="bg-mono-900 p-4">
+              <h3 class="font-bold text-mono-white mb-1">Brutalist Palette</h3>
+              <p class="text-sm text-mono-300">Loud, bold, raw, high-contrast, and striking.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Components -->
+    <section id="components" class="py-20" aria-labelledby="components-title">
+      <div class="container">
+        <div class="mb-12 text-center">
+          <h2 id="components-title" class="section-title text-4xl font-bold mb-4">Nakshora Components Showcase</h2>
+          <p class="text-mono-300 text-lg max-w-3xl mx-auto">
+            Nakshora includes reusable CSS components that help developers launch polished interfaces faster.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold mb-5 text-neon-cyan-300">Buttons</h3>
+            <div class="flex flex-wrap gap-4">
+              <button class="btn btn-neon">Neon Button</button>
+              <button class="btn btn-glass">Glass Button</button>
+              <button class="btn btn-brutal">Brutal Button</button>
+              <button class="btn btn-neon btn-sm">Small</button>
+              <button class="btn btn-glass btn-lg">Large</button>
+            </div>
+          </article>
+
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold mb-5 text-neon-pink-300">Badges</h3>
+            <div class="flex flex-wrap gap-3 items-center">
+              <span class="badge">Default</span>
+              <span class="badge badge-neon">Neon</span>
+              <span class="badge badge-pill bg-pastel-lavender-500 text-mono-white">Pill</span>
+              <span class="badge badge-pill bg-forest-500 text-mono-white">Nature</span>
+              <span class="badge badge-pill bg-brutal-yellow-500 text-mono-black">Brutal</span>
+            </div>
+          </article>
+
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold mb-5 text-neon-purple-300">Form Elements</h3>
+            <div class="flex flex-col gap-4">
+              <label class="hidden" for="default-input">Default input</label>
+              <input id="default-input" class="input" type="text" placeholder="Default input" />
+
+              <label class="hidden" for="glass-input">Glass input</label>
+              <input id="glass-input" class="input-glass" type="email" placeholder="Glass input" />
+
+              <label class="hidden" for="brutal-input">Brutalist input</label>
+              <input id="brutal-input" class="brutal-input" type="text" placeholder="Brutalist input" />
+
+              <div class="flex items-center justify-between">
+                <label class="text-mono-200" for="toggle-demo">Enable feature</label>
+                <div id="toggle-demo" class="toggle active" aria-label="Toggle demo"></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold mb-5 text-neon-orange-300">Feedback UI</h3>
+            <div class="alert alert-success">Framework loaded successfully.</div>
+            <div class="alert alert-warning">Experimental aesthetic mode enabled.</div>
+            <div class="progress progress-neon mt-4">
+              <div class="progress-bar" style="width: 64%;"></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Showcase -->
+    <section id="showcase" class="py-20" aria-labelledby="showcase-title">
+      <div class="container">
+        <div class="mb-12 text-center">
+          <h2 id="showcase-title" class="section-title text-4xl font-bold mb-4">Design Showcase with Nakshora</h2>
+          <p class="text-mono-300 text-lg max-w-3xl mx-auto">
+            One framework can support multiple product styles, creative directions, and brand identities.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <article class="card-neon rounded-2xl showcase-box">
+            <h3 class="text-2xl font-bold text-neon-cyan-400 mb-3">Neon Interface Design</h3>
+            <p class="text-mono-200 mb-4">
+              Ideal for futuristic dashboards, SaaS products, gaming interfaces, developer tools, creative agencies, and digital portfolios.
+            </p>
+            <div class="flex gap-3">
+              <span class="badge badge-neon">Glow</span>
+              <span class="badge bg-mono-800 text-neon-cyan-400">Cyber</span>
+            </div>
+          </article>
+
+          <article class="card rounded-2xl showcase-box bg-mono-white text-mono-900">
+            <h3 class="text-2xl font-bold mb-3">Minimal Product Interface</h3>
+            <p class="text-mono-700 mb-4">
+              Perfect for startup websites, SaaS dashboards, product pages, business tools, admin interfaces, and clean web apps.
+            </p>
+            <div class="tabs">
+              <div class="tab active">Overview</div>
+              <div class="tab">Analytics</div>
+            </div>
+          </article>
+
+          <article class="card-brutal rounded-xl showcase-box">
+            <h3 class="text-2xl brutal-heading mb-3">Brutalist Expression</h3>
+            <p class="text-mono-black mb-4 font-semibold">
+              Great for edgy portfolios, campaign pages, experimental websites, art direction projects, and high-attention branding.
+            </p>
+            <button class="btn btn-brutal">Be Loud</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Utility Demo -->
+    <section class="py-20" aria-labelledby="utilities-title">
+      <div class="container">
+        <div class="mb-12 text-center">
+          <h2 id="utilities-title" class="section-title text-4xl font-bold mb-4">Utility Classes in Nakshora</h2>
+          <p class="text-mono-300 text-lg max-w-3xl mx-auto">
+            Nakshora is more than a component framework. It offers a rich utility class system for precise layout control and expressive styling.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <article class="glass rounded-xl p-6 text-center transform hover:scale-105 transition-all">
+            <div class="w-16 h-16 rounded-full bg-gradient-neon mx-auto mb-4 shadow-xl"></div>
+            <h3 class="font-bold mb-2">Transform Utilities</h3>
+            <p class="text-mono-300 text-sm">Scale, rotate, animate, and transition interface elements with simple classes.</p>
+          </article>
+
+          <article class="glass rounded-xl p-6 text-center">
+            <div class="w-16 h-16 rounded-xl bg-gradient-pastel mx-auto mb-4 shadow-lg"></div>
+            <h3 class="font-bold mb-2">Gradient Utilities</h3>
+            <p class="text-mono-300 text-sm">Use aesthetic background gradients for hero sections, cards, call-to-actions, and visual blocks.</p>
+          </article>
+
+          <article class="glass rounded-xl p-6 text-center">
+            <div class="w-16 h-16 rounded-xl bg-ocean-500 glow-neon-cyan mx-auto mb-4"></div>
+            <h3 class="font-bold mb-2">Glow Utilities</h3>
+            <p class="text-mono-300 text-sm">Highlight key interface elements with neon glow shadows and glowing text styles.</p>
+          </article>
+
+          <article class="glass rounded-xl p-6 text-center">
+            <div class="w-16 h-16 rounded-xl bg-mono-100 mx-auto mb-4 neu-light"></div>
+            <h3 class="font-bold mb-2">Effect Utilities</h3>
+            <p class="text-mono-300 text-sm">Combine glassmorphism, neumorphism, blur, shadows, and depth-based visual effects.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Docs -->
+    <section id="docs" class="py-20" aria-labelledby="docs-title">
+      <div class="container">
+        <div class="mb-12 text-center">
+          <h2 id="docs-title" class="section-title text-4xl font-bold mb-4">How to Use Nakshora CSS Framework</h2>
+          <p class="text-mono-300 text-lg max-w-3xl mx-auto">
+            Start using Nakshora instantly with the jsDelivr CDN and build modern UI with utility classes and components.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold mb-4 text-neon-cyan-300">1. Add the Nakshora CDN</h3>
+            <div class="bg-mono-950 rounded-xl p-4 border border-mono-700">
+<pre class="text-sm text-mono-100 overflow-auto"><code>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css"&gt;</code></pre>
+            </div>
+          </article>
+
+          <article class="card-glass rounded-2xl">
+            <h3 class="text-2xl font-bold mb-4 text-neon-pink-300">2. Compose with Utility Classes</h3>
+            <div class="bg-mono-950 rounded-xl p-4 border border-mono-700">
+<pre class="text-sm text-mono-100 overflow-auto"><code>&lt;div class="bg-neon-purple-500 text-mono-white p-6 rounded-xl shadow-xl"&gt;
+  Hello Nakshora
+&lt;/div&gt;</code></pre>
+            </div>
+          </article>
+
+          <article class="card-glass rounded-2xl lg:col-span-2">
+            <h3 class="text-2xl font-bold mb-4 text-neon-orange-300">What Developers Get with Nakshora</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-mono-950 rounded-xl p-4 border border-mono-700">
+                <h4 class="font-bold mb-2">Utilities</h4>
+                <p class="text-mono-300 text-sm">Spacing, typography, display, flexbox, grid, width, height, borders, shadows, transforms, opacity, positioning, overflow, and transitions.</p>
+              </div>
+              <div class="bg-mono-950 rounded-xl p-4 border border-mono-700">
+                <h4 class="font-bold mb-2">Components</h4>
+                <p class="text-mono-300 text-sm">Buttons, cards, navbars, heroes, forms, modals, alerts, tabs, dropdowns, pagination, accordions, tooltips, loaders, and progress bars.</p>
+              </div>
+              <div class="bg-mono-950 rounded-xl p-4 border border-mono-700">
+                <h4 class="font-bold mb-2">Styles</h4>
+                <p class="text-mono-300 text-sm">Neon cyber, pastel, minimalist, nature-inspired, brutalist, glassmorphism, neumorphism, glow effects, gradients, and animation utilities.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="contact" class="py-20" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="bg-gradient-neon rounded-3xl p-8 md:p-12 shadow-2xl text-center">
+          <h2 id="cta-title" class="text-4xl md:text-5xl font-black mb-4 text-glow-neon-cyan">
+            Start Building with Nakshora
+          </h2>
+          <p class="text-lg md:text-xl text-mono-white opacity-90 max-w-3xl mx-auto mb-8">
+            Nakshora gives developers a modern CSS framework for fast layout creation, expressive visual design, responsive user interfaces, and reusable UI components.
+          </p>
+          <div class="flex flex-wrap justify-center gap-4">
+            <a class="btn btn-glass btn-lg no-underline" href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css" target="_blank" rel="noopener noreferrer">
+              Open Nakshora CDN
+            </a>
+            <a class="btn btn-brutal btn-lg no-underline" href="#home">
+              Back to Top
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="py-10 border-t border-mono-800" aria-label="Footer">
+    <div class="container">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="logo-dot" aria-hidden="true"></span>
+            <span class="text-xl font-bold text-glow-neon-cyan">Nakshora</span>
+          </div>
+          <p class="text-mono-400 text-sm">
+            Nakshora is a modern open source CSS framework for aesthetic, responsive, and expressive interfaces.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <p class="text-mono-400 text-sm">
+            Built with <span class="text-neon-pink-400">Nakshora Framework</span>
+          </p>
+          <p class="text-mono-500 text-sm mt-1">
+            CDN only • No npm required • Open source CSS framework
+          </p>
+        </div>
+
+        <div class="text-left md:text-right">
+          <a href="#about" class="footer-link no-underline text-mono-300 mr-4">About</a>
+          <a href="#components" class="footer-link no-underline text-mono-300 mr-4">Components</a>
+          <a href="#docs" class="footer-link no-underline text-mono-300">Docs</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
