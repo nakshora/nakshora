@@ -1,0 +1,75 @@
+{
+  "name": "@nakshora/vite-plugin",
+  "version": "3.0.0",
+  "description": "Nakshora plugin for Vite with HMR support",
+  "type": "module",
+  "main": "./dist/vite.cjs",
+  "module": "./dist/vite.esm.js",
+  "types": "./dist/vite.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.esm.js",
+      "require": "./dist/vite.cjs",
+      "default": "./dist/vite.esm.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "package.json",
+    "README.md"
+  ],
+  "keywords": [
+    "vite",
+    "plugin",
+    "css",
+    "nakshora",
+    "utility-first",
+    "hmr"
+  ],
+  "author": {
+    "name": "Rizwan Rahim Chowdhury",
+    "email": "rizwan@bsdc.info.bd"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nakshora/nakshora",
+    "directory": "packages/@nakshora/vite-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/nakshora/nakshora/issues"
+  },
+  "homepage": "https://nakshora.dev",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nakshora/core": "workspace:*",
+    "globby": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "sideEffects": false
+}

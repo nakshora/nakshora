@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/@changesets/types@latest/index.d.ts",
+  "changelog": [
+    "@changesets/changelog-github",
+    {
+      "repo": "nakshora/nakshora"
+    }
+  ],
+  "commit": false,
+  "fixed": [],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": ["@nakshora/ts-config", "@nakshora/scripts"],
+  "___experimentalUnsafeOptions_DO_NOT_USE_OR_YOU_WILL_REGRET_IT": {
+    "onlyUpdatePeerDependenciesWhenRangeMatches": true
+  },
+  "privatePackages": {
+    "skipChangeFiles": false
+  }
+}

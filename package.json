@@ -1,20 +1,88 @@
 {
   "name": "nakshora",
-  "version": "1.0.0",
-  "description": "The World's Most Comprehensive CSS Framework featuring Neon, Pastel, and Brutalist themes.",
-  "main": "min.main.css",
+  "version": "3.0.0",
+  "private": true,
+  "description": "The modern, ultra-fast, advanced CSS utility framework - Monorepo Root",
+  "homepage": "https://nakshora.dev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nakshora/nakshora"
+    "url": "https://github.com/nakshora/nakshora"
   },
+  "bugs": {
+    "url": "https://github.com/nakshora/nakshora/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Rizwan Rahim Chowdhury",
+    "email": "rizwan@bsdc.info.bd"
+  },
+  "maintainers": [
+    {
+      "name": "RRC Development",
+      "email": "rrc@bsdc.info.bd",
+      "url": "https://rrc.bsdc.info.bd"
+    }
+  ],
   "keywords": [
     "css",
     "framework",
-    "neon",
-    "brutalist",
     "utility-first",
-    "responsive"
+    "tailwind",
+    "responsive",
+    "jit",
+    "compiler",
+    "postcss",
+    "vite",
+    "cli",
+    "monorepo"
   ],
-  "author": "Rizwan Rahim Chowdhury",
-  "license": "MIT"
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "tools/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "build:core": "pnpm -F @nakshora/core build",
+    "build:cli": "pnpm -F @nakshora/cli build",
+    "build:postcss": "pnpm -F @nakshora/postcss build",
+    "build:vite": "pnpm -F @nakshora/vite-plugin build",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
+    "type-check": "tsc --noEmit",
+    "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
+    "dev": "pnpm -F @nakshora/cli build --watch",
+    "publish:packages": "changeset version && changeset publish",
+    "publish:github": "npm publish --registry https://npm.pkg.github.com --workspace-root",
+    "version": "changeset version",
+    "changeset": "changeset",
+    "changeset:add": "changeset add",
+    "release:preview": "changeset version --snapshot && changeset publish --snapshot"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "pnpm": {
+    "patchedDependencies": {},
+    "overrides": {
+      "typescript": "^5.3.3"
+    }
+  }
 }

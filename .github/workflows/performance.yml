@@ -1,0 +1,80 @@
+name: Performance Tracking
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.0.0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build packages
+        run: pnpm build
+
+      - name: ⚡ Run benchmarks
+        run: pnpm benchmark || echo "Benchmarks not configured yet"
+
+      - name: 📊 Measure bundle sizes
+        run: |
+          echo "# Performance Report - $(date)" > performance.md
+          echo "" >> performance.md
+          echo "## Bundle Sizes (ESM + Gzipped)" >> performance.md
+          echo "" >> performance.md
+          
+          for package in packages/@nakshora/*; do
+            if [ -d "$package/dist" ]; then
+              echo "### $(basename $package)" >> performance.md
+              find "$package/dist" -name "*.js" -o -name "*.css" | while read file; do
+                size=$(du -h "$file" | cut -f1)
+                gzip_size=$(gzip -c "$file" | du -h | cut -f1)
+                echo "- $(basename $file): $size (gzip: $gzip_size)" >> performance.md
+              done
+              echo "" >> performance.md
+            fi
+          done
+          
+          cat performance.md >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Store benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-report
+          path: performance.md
+          retention-days: 90
+
+  lighthouse:
+    name: Lighthouse Check (if docs site exists)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        continue-on-error: true
+        if: hashFiles('./docs') != ''
+        with:
+          configPath: ./docs/lighthouse.config.js
+          uploadArtifacts: true

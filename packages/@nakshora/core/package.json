@@ -1,0 +1,74 @@
+{
+  "name": "@nakshora/core",
+  "version": "3.0.0",
+  "description": "Nakshora JIT CSS compiler and engine - the core of the framework",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.esm.js"
+    },
+    "./css": "./dist/core.css",
+    "./css/min": "./dist/core.min.css",
+    "./browser": "./dist/core.umd.js"
+  },
+  "files": [
+    "dist",
+    "src",
+    "package.json",
+    "README.md"
+  ],
+  "keywords": [
+    "css",
+    "framework",
+    "utility-first",
+    "jit",
+    "compiler",
+    "postcss",
+    "tailwind"
+  ],
+  "author": {
+    "name": "Rizwan Rahim Chowdhury",
+    "email": "rizwan@bsdc.info.bd"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nakshora/nakshora",
+    "directory": "packages/@nakshora/core"
+  },
+  "bugs": {
+    "url": "https://github.com/nakshora/nakshora/issues"
+  },
+  "homepage": "https://nakshora.dev",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "postcss": "^8.4.32"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "sideEffects": false
+}

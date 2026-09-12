@@ -1,0 +1,77 @@
+{
+  "name": "@nakshora/cli",
+  "version": "3.0.0",
+  "description": "Nakshora command-line interface for building CSS",
+  "type": "module",
+  "bin": {
+    "nakshora": "./dist/cli.js"
+  },
+  "main": "./dist/cli.cjs",
+  "module": "./dist/cli.esm.js",
+  "types": "./dist/cli.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.esm.js",
+      "require": "./dist/cli.cjs",
+      "default": "./dist/cli.esm.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "package.json",
+    "README.md"
+  ],
+  "keywords": [
+    "cli",
+    "css",
+    "framework",
+    "build-tool",
+    "nakshora"
+  ],
+  "author": {
+    "name": "Rizwan Rahim Chowdhury",
+    "email": "rizwan@bsdc.info.bd"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nakshora/nakshora",
+    "directory": "packages/@nakshora/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/nakshora/nakshora/issues"
+  },
+  "homepage": "https://nakshora.dev",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nakshora/core": "workspace:*",
+    "chalk": "^5.3.0",
+    "commander": "^11.0.0",
+    "fs-extra": "^11.0.0",
+    "globby": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.0",
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "sideEffects": false
+}

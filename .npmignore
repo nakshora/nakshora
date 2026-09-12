@@ -1,0 +1,59 @@
+# Files and directories to ignore when publishing to NPM
+
+# Source files (users don't need source, only dist)
+src/
+scripts/
+
+# Development files
+.git
+.gitignore
+.env
+.env.local
+.DS_Store
+
+# Build and dependency files
+node_modules/
+npm-debug.log
+yarn-error.log
+*.tgz
+
+# Testing
+__tests__/
+tests/
+*.test.ts
+*.test.js
+jest.config.js
+.jest/
+coverage/
+
+# Development configuration
+webpack.config.js
+tsconfig.json
+.eslintrc
+.prettierrc
+babel.config.js
+
+# Examples and docs (optional - remove if you want to include)
+examples/
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+azure-pipelines.yml
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Miscellaneous
+README.md (can be included by removing this line)
+CHANGELOG.md
+LICENSE (should be included - keep it out of ignore)
+.cursorrules
+llms.txt
