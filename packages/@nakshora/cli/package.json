@@ -1,6 +1,6 @@
 {
   "name": "@nakshora/cli",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "description": "Nakshora command-line interface — init, build, dev, inspect and AI export",
   "keywords": [
     "cli",
