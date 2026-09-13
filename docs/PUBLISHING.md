@@ -6,16 +6,17 @@ release.
 ## The system at a glance
 
 ```
-┌─────────────┐    ┌──────────────────┐    ┌─────────────────────────┐
-│  PR with    │    │ main push        │    │ artifacts               │
-│  changeset  │───▶│ changesets       │───▶│ npm (provenance)        │
-│  (.changeset│    │ action:          │    │ GitHub Packages         │
-│  /xxx.md)   │    │ version→publish  │    │ GitHub Release + tarballs
-└─────────────┘    └──────────────────┘    └─────────────────────────┘
+┌──────────────┐   ┌───────────────────────┐   ┌──────────────────────────┐
+│ Dev PR with  │──▶│ merge → main:         │──▶│ merge release PR:        │
+│ changeset    │   │ "Version Packages"    │   │ npm (provenance)         │
+│ (.changeset/ │   │ release PR opened     │   │ + tags + GitHub Releases │
+│  xxx.md)     │   │ (bumps + changelogs)  │   │ + GitHub Packages mirror │
+└──────────────┘   └───────────────────────┘   └──────────────────────────┘
 ```
 
-Built on [Changesets](https://github.com/changesets/changesets) + GitHub
-Actions. No manual `npm version` / `npm publish` steps.
+Built on [Changesets](https://github.com/changesets/changesets) (release-PR
+mode of `changesets/action@v1`) + GitHub Actions. No manual `npm version` /
+`npm publish` steps.
 
 ## Packages
 
@@ -44,25 +45,28 @@ creates `.changeset/<name>.md`:
 Add `wide:` breakpoint support to JIT mode.
 ```
 
-The **Test & Quality** workflow shows a Changesets status check on the PR
-(`Ready to publish` / `New version`).
+The release workflow runs a **Changesets status** check on the PR that
+validates the config and reports which packages will be bumped.
 
-## 2. Merge → automatic release
+## 2. Merge → automatic release (two merges)
 
-On merge to `main`, `.github/workflows/release.yml`:
+Changesets uses the **release-PR flow**:
 
-1. Runs the full quality gate (type-check, 53 tests, lint, format, build on
-   Node 18/20/22).
-2. `changesets/action`:
-   - no pending changesets → does nothing
-   - pending changesets → bumps versions (`pnpm version` script =
-     `changeset version`), writes `CHANGELOG.md` files, commits & pushes
-     (or opens a version PR depending on repo config)
-3. `pnpm publish:packages` (= `changeset publish`) publishes to **npmjs.com**
-   with **provenance** (`NPM_CONFIG_PROVENANCE=true`).
-4. Packs `.tgz` tarballs, publishes a mirror to **GitHub Packages**
+1. A dev PR with changesets merges into `main` → the release job runs the
+   changesets action, which bumps versions (`pnpm version` script =
+   `changeset version`), writes the `CHANGELOG.md` files, and opens a
+   **"Version Packages" release PR** (`changeset-release/main`).
+2. Merging that release PR into `main` triggers the action again; this time
+   there are no pending changesets but unpublished versions exist, so it runs
+   `pnpm publish:packages` (= `changeset publish`):
+   - publishes to **npmjs.com** with **provenance**
+     (`NPM_CONFIG_PROVENANCE=true`)
+   - pushes the version tags (`@nakshora/core@3.0.0`, …)
+   - creates a **GitHub Release per package** with its changelog
+3. A mirror is then published to **GitHub Packages**
    (`node scripts/publish-github.mjs`, scoped via a temporary `.npmrc`).
-5. Creates a **GitHub Release** (`v<version>`) with the changelog + tarballs.
+
+Both merges are normal PR merges — the whole pipeline is automatic.
 
 ## 3. Required secrets
 
@@ -103,14 +107,17 @@ pnpm changeset publish --snapshot
 
 The v2 pipeline had several broken pieces; all resolved in v3:
 
-| Old problem                                                                                | Fix                                                                        |
-| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
-| `npm publish --registry … --workspace-root` (invalid flag)                                 | removed; per-package publish via changesets + `scripts/publish-github.mjs` |
-| Double publish (changesets action + extra "Publish to NPM" step)                           | single publish path: `pnpm publish:packages` → `changeset publish`         |
-| `publishConfig.registry` pinned to npmjs, silently overriding the GitHub Packages registry | removed from package manifests; registry set per-invocation                |
-| Missing `pnpm-lock.yaml` → `--frozen-lockfile` CI failures                                 | lockfile committed; stale `package-lock.json` deleted                      |
-| Empty packages (no `dist/`) publishing                                                     | publish gated on `dist/` existing; CI builds first                         |
-| GitHub Release with nonexistent `dist/**` files                                            | release attaches packed `releases/*.tgz`                                   |
+| Old problem                                                                                | Fix                                                                                                |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `npm publish --registry … --workspace-root` (invalid flag)                                 | removed; per-package publish via changesets + `scripts/publish-github.mjs`                         |
+| Double publish (changesets action + extra "Publish to NPM" step)                           | single publish path: `pnpm publish:packages` → `changeset publish`                                 |
+| `publishConfig.registry` pinned to npmjs, silently overriding the GitHub Packages registry | removed from package manifests; registry set per-invocation                                        |
+| Missing `pnpm-lock.yaml` → `--frozen-lockfile` CI failures                                 | lockfile committed; stale `package-lock.json` deleted                                              |
+| Empty packages (no `dist/`) publishing                                                     | publish gated on `dist/` existing; CI builds first                                                 |
+| GitHub Release with nonexistent `dist/**` files                                            | releases are created by the changesets action with per-package changelogs                          |
+| `changesets/action@v1` `status:` input (removed upstream)                                  | PR check runs `changeset status` directly; release job uses the action's release-PR + publish flow |
+| `type-check` before `build` (TS2307 — workspace types live in `dist/`)                     | `pnpm type-check` builds first; CI build step precedes the check                                   |
+| `@changesets/config.json` `ignore` listing a nonexistent package (hard error)              | `ignore` now only contains packages that exist (`@nakshora/ts-config`)                             |
 
 ## 7. Versioning policy
 

@@ -204,7 +204,7 @@ JIT build + minify                       < 1
 
 ## 🚀 Automatic publishing
 
-Push a changeset to `main` → CI tests (Node 18/20/22) → bumps versions → **publishes to npm with provenance** → mirrors to **GitHub Packages** → creates a **GitHub Release** with changelog + tarballs.
+Add a changeset to your PR → merge → CI opens a **Version Packages** release PR → merge that → **npm publish (with provenance)** + version tags + **GitHub Releases** + **GitHub Packages** mirror. Two PR merges, zero manual publishing.
 
 ```bash
 pnpm changeset:add     # in your PR — that's the whole release process

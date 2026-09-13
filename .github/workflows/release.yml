@@ -1,19 +1,22 @@
 name: Release & Publish
 
-# Automatic publishing pipeline (Changesets-based):
+# Automatic publishing pipeline (Changesets-based).
 #
-#  1. Every PR gets a changesets status check ("Ready to publish" /
-#     "New version".)
-#  2. On merge to `main` with pending changesets:
-#       a. versions are bumped & committed (release PR flow when the merge
-#          itself carries them), or published directly,
-#       b. packages are published to npmjs.com with provenance,
-#       c. packages are also mirrored to GitHub Packages,
-#       d. a GitHub Release is created with the changelog + tarballs.
+# How the release flow works (changesets "release PR" mode):
 #
-#  Secrets required (repo Settings → Secrets):
-#    NPM_TOKEN   — read/write token from https://www.npmjs.com/settings/<user>/tokens
+#   1. Dev PRs carry changesets (`.changeset/*.md`, added via `pnpm changeset:add`).
+#      The "Changesets status" check validates them.
+#   2. Merging a changeset PR into `main` → the release job runs the
+#      changesets action, which bumps versions + changelogs and opens a
+#      "Version Packages" release PR (`changeset-release/main`).
+#   3. Merging that release PR into `main` → the action publishes all
+#      unpublished packages to npm (with provenance), pushes the version
+#      tags and creates a GitHub Release per package with its changelog.
+#   4. A mirror is published to GitHub Packages (npm registry).
 #
+# Secrets required (repo Settings → Secrets):
+#   NPM_TOKEN  — read/write token from https://www.npmjs.com/settings/<user>/tokens
+
 on:
   push:
     branches: [main]
@@ -24,10 +27,11 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
   contents: write
+  pull-requests: write
   id-token: write
 
 jobs:
-  # ── PR check: are there pending changesets? ──────────────────────────────
+  # ── PR check: validate + report changesets ───────────────────────────────
   changesets-check:
     name: Changesets status
     runs-on: ubuntu-latest
@@ -54,12 +58,18 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 📝 Check changesets status
-        uses: changesets/action@v1
-        with:
-          status: true
-          title: 'Changesets status'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ls .changeset/*.md >/dev/null 2>&1; then
+            echo "## 📝 This PR contains changesets" >> "$GITHUB_STEP_SUMMARY"
+            pnpm exec changeset status
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ Merging this PR into \`main\` will open/update the **Version Packages** release PR. Merging that release PR publishes to npm + GitHub Packages automatically." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## ⚠️ This PR has no changesets" >> "$GITHUB_STEP_SUMMARY"
+            pnpm exec changeset status || true
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Nothing to release from this PR. Add a changeset with \`pnpm changeset:add\` if it should be part of the next release." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   # ── Quality gate ─────────────────────────────────────────────────────────
   test:
@@ -93,6 +103,9 @@ jobs:
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🏗️ Build (types resolve from dist/)
+        run: pnpm build
+
       - name: 🔍 Type check
         run: pnpm type-check
 
@@ -105,10 +118,7 @@ jobs:
       - name: 🎨 Format check
         run: pnpm format:check
 
-      - name: 🏗️ Build
-        run: pnpm build
-
-  # ── Release: version → publish → GitHub Packages → release ───────────────
+  # ── Release: version (release PR) → publish → GitHub Packages ────────────
   release:
     name: Create Release & Publish
     needs: test
@@ -133,10 +143,6 @@ jobs:
           node-version: 22.x
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-          # NPM_TOKEN from npmjs.com — enables `changeset publish`
-          registry-url: https://registry.npmjs.org
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -144,22 +150,31 @@ jobs:
       - name: 🏗️ Build packages
         run: pnpm build
 
-      - name: 📝 Create Release PR or Publish
+      - name: 📝 Version (opens release PR) or Publish
         id: changesets
         uses: changesets/action@v1
         with:
-          # `pnpm publish:packages` → `changeset publish`
-          # (versions are bumped by the `pnpm version` script)
-          publish: pnpm publish:packages
+          # When changesets are pending: bumps versions + changelogs and
+          # opens the "Version Packages" release PR.
+          # When the release PR is merged (no pending changesets, but
+          # unpublished versions exist): runs the publish script.
           version: pnpm version
+          publish: pnpm publish:packages
           commit: 'chore(release): bump versions'
           title: 'chore(release): bump versions'
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
-      - name: 📦 Pack tarballs for the release
+      - name: 📤 Publish to GitHub Packages (mirror)
+        if: steps.changesets.outputs.published == 'true'
+        run: node scripts/publish-github.mjs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Pack tarballs (attached to npm dist-tags on demand)
         if: steps.changesets.outputs.published == 'true'
         run: |
           mkdir -p releases
@@ -169,51 +184,4 @@ jobs:
             fi
           done
           ls -lh releases/
-
-      - name: 📤 Publish to GitHub Packages (mirror)
-        if: steps.changesets.outputs.published == 'true'
-        run: node scripts/publish-github.mjs
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 📝 Prepare release notes & tag
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          VERSION=$(node -p "require('./packages/@nakshora/core/package.json').version")
-          echo "TAG=v${VERSION}" >> "$GITHUB_ENV"
-          if [ -f .changeset/CHANGELOG.md ]; then
-            cp .changeset/CHANGELOG.md release-notes.md
-          else
-            {
-              echo "## Nakshora v${VERSION}"
-              echo ""
-              echo "Published packages: \`@nakshora/core\`, \`@nakshora/cli\`, \`@nakshora/postcss\`, \`@nakshora/vite-plugin\`"
-              echo ""
-              echo "Per-package changelogs: see \`packages/@nakshora/*/CHANGELOG.md\`"
-            } > release-notes.md
-          fi
-
-      - name: 🏷️ Create GitHub Release
-        if: steps.changesets.outputs.published == 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          files: |
-            releases/*.tgz
-          body_path: release-notes.md
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 💬 Comment on Release PR
-        if: steps.changesets.outputs.hasChangesets == 'true' && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '✅ This PR is ready to be merged. Once merged into `main`, the release workflow will bump versions, publish to npm + GitHub Packages, and create a GitHub Release with changelog and tarballs.'
-            })
+        continue-on-error: true
