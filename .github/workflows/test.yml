@@ -9,22 +9,26 @@ concurrency:
   group: test-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CI: true
+
 jobs:
   test:
     name: Test on Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         node: [18.x, 20.x, 22.x]
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9.0.0
+          version: 9.15.0
 
       - name: 📦 Setup Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
@@ -42,9 +46,12 @@ jobs:
       - name: 🧪 Run tests
         run: pnpm test
 
-      - name: 📊 Upload coverage
-        if: matrix.node == '20.x'
-        uses: codecov/codecov-action@v3
+      - name: 📊 Test coverage
+        run: pnpm test:coverage
+
+      - name: 📤 Upload coverage
+        if: matrix.node == '22.x'
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage/coverage-final.json
           flags: unittests
@@ -54,20 +61,20 @@ jobs:
   lint:
     name: Lint & Format
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9.0.0
+          version: 9.15.0
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
@@ -83,20 +90,20 @@ jobs:
   build:
     name: Build & Verify
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9.0.0
+          version: 9.15.0
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
@@ -106,30 +113,35 @@ jobs:
       - name: 🏗️ Build all packages
         run: pnpm build
 
+      - name: 🔌 Verify CLI runs
+        run: |
+          node packages/@nakshora/cli/dist/cli.js --version
+          node packages/@nakshora/cli/dist/cli.js --help | head -20
+
       - name: 📤 Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: packages/*/dist
-          retention-days: 1
+          path: packages/@nakshora/*/dist
+          retention-days: 7
 
   size-check:
-    name: Bundle Size Check
+    name: Bundle Size & Benchmarks
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9.0.0
+          version: 9.15.0
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
@@ -139,12 +151,24 @@ jobs:
       - name: 🏗️ Build packages
         run: pnpm build
 
+      - name: ⚡ Run benchmarks
+        run: |
+          pnpm benchmark | tee $GITHUB_STEP_SUMMARY
+
       - name: 📊 Check bundle sizes
         run: |
-          echo "# Bundle Size Report" > $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## @nakshora/core" >> $GITHUB_STEP_SUMMARY
-          du -sh packages/@nakshora/core/dist/* >> $GITHUB_STEP_SUMMARY || echo "No dist files yet" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## @nakshora/cli" >> $GITHUB_STEP_SUMMARY
-          du -sh packages/@nakshora/cli/dist/* >> $GITHUB_STEP_SUMMARY || echo "No dist files yet" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Bundle Sizes"
+            echo ""
+            for package in packages/@nakshora/*; do
+              if [ -d "$package/dist" ]; then
+                echo "### $(basename $package)"
+                find "$package/dist" -maxdepth 1 -name "*.js" -o -name "*.cjs" -o -name "*.d.ts" -o -name "*.css" | sort | while read file; do
+                  size=$(du -h "$file" | cut -f1)
+                  gzip_size=$(gzip -c "$file" | du -h | cut -f1)
+                  echo "- $(basename $file): $size (gzip: $gzip_size)"
+                done
+                echo ""
+              fi
+            done
+          } >> $GITHUB_STEP_SUMMARY

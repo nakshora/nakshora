@@ -1,8 +1,23 @@
 name: Release & Publish
 
+# Automatic publishing pipeline (Changesets-based):
+#
+#  1. Every PR gets a changesets status check ("Ready to publish" /
+#     "New version".)
+#  2. On merge to `main` with pending changesets:
+#       a. versions are bumped & committed (release PR flow when the merge
+#          itself carries them), or published directly,
+#       b. packages are published to npmjs.com with provenance,
+#       c. packages are also mirrored to GitHub Packages,
+#       d. a GitHub Release is created with the changelog + tarballs.
+#
+#  Secrets required (repo Settings → Secrets):
+#    NPM_TOKEN   — read/write token from https://www.npmjs.com/settings/<user>/tokens
+#
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -10,16 +25,13 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   id-token: write
-  packages: write
 
 jobs:
-  test:
-    name: Test & Lint
+  # ── PR check: are there pending changesets? ──────────────────────────────
+  changesets-check:
+    name: Changesets status
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-    
+    if: github.event_name == 'pull_request'
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -27,9 +39,49 @@ jobs:
           fetch-depth: 0
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9.0.0
+          version: 9.15.0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 📝 Check changesets status
+        uses: changesets/action@v1
+        with:
+          status: true
+          title: 'Changesets status'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Quality gate ─────────────────────────────────────────────────────────
+  test:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    needs: changesets-check
+    if: ${{ !cancelled() }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
 
       - name: 📦 Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -47,21 +99,22 @@ jobs:
       - name: 🧪 Run tests
         run: pnpm test
 
-      - name: 📊 Test coverage
-        run: pnpm test:coverage
-
       - name: 🔎 Lint
         run: pnpm lint
+
+      - name: 🎨 Format check
+        run: pnpm format:check
 
       - name: 🏗️ Build
         run: pnpm build
 
+  # ── Release: version → publish → GitHub Packages → release ───────────────
   release:
-    name: Create Release
+    name: Create Release & Publish
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -70,16 +123,20 @@ jobs:
           fetch-depth: 0
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9.0.0
+          version: 9.15.0
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+          # NPM_TOKEN from npmjs.com — enables `changeset publish`
+          registry-url: https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -91,50 +148,66 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
+          # `pnpm publish:packages` → `changeset publish`
+          # (versions are bumped by the `pnpm version` script)
           publish: pnpm publish:packages
           version: pnpm version
-          commit: "chore(release): bump versions"
-          title: "chore(release): bump versions"
+          commit: 'chore(release): bump versions'
+          title: 'chore(release): bump versions'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: 📤 Publish to NPM
-        if: steps.changesets.outputs.published == 'true'
-        run: pnpm publish:packages
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
-      - name: 📦 Publish to GitHub Packages
+      - name: 📦 Pack tarballs for the release
         if: steps.changesets.outputs.published == 'true'
         run: |
+          mkdir -p releases
           for package in packages/@nakshora/*; do
-            if [ -f "$package/package.json" ]; then
-              cd "$package"
-              npm publish --registry https://npm.pkg.github.com --access public
-              cd - > /dev/null
+            if [ -f "$package/package.json" ] && [ -d "$package/dist" ]; then
+              (cd "$package" && npm pack --pack-destination "$GITHUB_WORKSPACE/releases")
             fi
           done
+          ls -lh releases/
+
+      - name: 📤 Publish to GitHub Packages (mirror)
+        if: steps.changesets.outputs.published == 'true'
+        run: node scripts/publish-github.mjs
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 📝 Prepare release notes & tag
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          VERSION=$(node -p "require('./packages/@nakshora/core/package.json').version")
+          echo "TAG=v${VERSION}" >> "$GITHUB_ENV"
+          if [ -f .changeset/CHANGELOG.md ]; then
+            cp .changeset/CHANGELOG.md release-notes.md
+          else
+            {
+              echo "## Nakshora v${VERSION}"
+              echo ""
+              echo "Published packages: \`@nakshora/core\`, \`@nakshora/cli\`, \`@nakshora/postcss\`, \`@nakshora/vite-plugin\`"
+              echo ""
+              echo "Per-package changelogs: see \`packages/@nakshora/*/CHANGELOG.md\`"
+            } > release-notes.md
+          fi
+
       - name: 🏷️ Create GitHub Release
         if: steps.changesets.outputs.published == 'true'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.TAG }}
           files: |
-            dist/**/*.js
-            dist/**/*.css
-            dist/**/*.d.ts
-          body_path: .changeset/CHANGELOG.md
+            releases/*.tgz
+          body_path: release-notes.md
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📊 Comment on Release PR
-        if: steps.changesets.outputs.hasChangesets == 'true'
+      - name: 💬 Comment on Release PR
+        if: steps.changesets.outputs.hasChangesets == 'true' && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
@@ -142,5 +215,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ This PR is ready to be merged. Once merged, it will trigger the release workflow to publish packages to NPM and create a GitHub release.'
+              body: '✅ This PR is ready to be merged. Once merged into `main`, the release workflow will bump versions, publish to npm + GitHub Packages, and create a GitHub Release with changelog and tarballs.'
             })

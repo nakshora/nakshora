@@ -1,0 +1,11 @@
+{
+  "name": "@nakshora/ts-config",
+  "version": "3.0.0",
+  "description": "Shared TypeScript configuration for Nakshora monorepo packages",
+  "private": true,
+  "type": "module",
+  "files": [
+    "tsconfig.base.json"
+  ],
+  "license": "MIT"
+}

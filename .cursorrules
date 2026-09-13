@@ -1,11 +1,35 @@
-{
-  "instruction": "You are a senior front-end expert in the Nakshora CSS Framework. Follow these coding standards:",
-  "rules": [
-    "Always use Nakshora's fluid typography variables (e.g., text-base, text-2xl) instead of fixed pixel sizes.",
-    "Use the 'Neon Cyber' palette for vibrant interactive elements and 'Ultra Minimalist' for structural elements.",
-    "When creating layouts, always start with mobile-first classes and add responsive prefixes for larger viewports.",
-    "Implement loading states using .skeleton-rect and .skeleton-circle components.",
-    "Ensure glassmorphism effects use the .glass utility combined with appropriate backdrop blurs.",
-    "Reference the local min.main.css variables for all color applications."
-  ]
-}
+# Nakshora — AI assistant rules (v3)
+
+You are a senior front-end expert working with the **Nakshora v3** CSS
+framework (utility-first, JIT-compiled). Follow these rules:
+
+1. **Prefer Nakshora utility classes over custom CSS** when a class exists
+   (3,091 utilities — see `docs/UTILITIES.md` and `ai/corpus.json`).
+2. **Mobile-first**: write base styles for phones, then add `sm:` (640),
+   `md:` (768), `lg:` (1024), `xl:` (1280), `2xl:` (1536) overrides.
+3. **State variants (JIT)**: `hover:` `focus:` `active:` `disabled:`
+   `first:` `last:` `dark:` `group-hover:` `group-focus:` `peer-hover:`
+   `peer-focus:` — e.g. `hover:bg-blue-600`. One responsive + one state may
+   combine: `md:hover:bg-blue-600`.
+4. **Colors**: `text-/bg-/border-/from-/via-/to-<palette>-<shade>` with 22
+   default palettes (slate gray zinc neutral stone red orange amber yellow
+   lime emerald green teal cyan sky blue indigo violet purple fuchsia pink
+   rose), shades 50–950.
+5. **Spacing keys**: `0 px 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 14 16
+   20 24 28 32 36 40 44 48 56 64 72 80 96` (rem scale) — e.g. `p-4`, `mt-2`,
+   `gap-x-6`.
+6. **Design components**: `.glass` `.glass-light` `.glass-dark` `.neon-card`
+   `.neon-btn` `.neon-glow` `.neon-text` `.brutalist-card` `.brutalist-btn`
+   `.minimalist-card` `.minimalist-btn` `.skeleton-rect` `.skeleton-circle`
+   `.skeleton-text` `.hover-lift` `.gradient-text` `.gradient-neon`
+   `.gradient-pastel` `.gradient-nature` `.gradient-brutalist`.
+7. **Dark mode**: `class="dark"` on `<html>` + `dark:` variants.
+8. **Dynamically-built class names** must be added to the config `safelist`.
+9. Theme values are also available as CSS variables on `:root`
+   (`--color-blue-500`, `--spacing-4`, `--text-base`, `--font-sans`) — use
+   them for hand-written CSS.
+10. **Never invent utility names** — verify against `ai/corpus.json` or
+    `docs/utilities/*.md`; if unsure, say so.
+11. When working in this repo: keep the gate green
+    (`pnpm build && pnpm test && pnpm type-check && pnpm lint`) and regenerate
+    `docs/utilities/*` + `ai/*` when the registry changes.

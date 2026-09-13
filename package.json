@@ -2,7 +2,7 @@
   "name": "nakshora",
   "version": "3.0.0",
   "private": true,
-  "description": "The modern, ultra-fast, advanced CSS utility framework - Monorepo Root",
+  "description": "The modern, ultra-fast, utility-first CSS framework — pnpm monorepo root",
   "homepage": "https://nakshora.dev",
   "repository": {
     "type": "git",
@@ -37,52 +37,44 @@
     "monorepo"
   ],
   "type": "module",
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=9.0.0"
   },
-  "workspaces": [
-    "packages/*",
-    "tools/*"
-  ],
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm -r build && node scripts/generate-css.mjs",
     "build:core": "pnpm -F @nakshora/core build",
     "build:cli": "pnpm -F @nakshora/cli build",
     "build:postcss": "pnpm -F @nakshora/postcss build",
     "build:vite": "pnpm -F @nakshora/vite-plugin build",
+    "dev": "pnpm -F @nakshora/cli build:watch",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
-    "type-check": "tsc --noEmit",
-    "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev": "pnpm -F @nakshora/cli build --watch",
-    "publish:packages": "changeset version && changeset publish",
-    "publish:github": "npm publish --registry https://npm.pkg.github.com --workspace-root",
-    "version": "changeset version",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}\"",
+    "type-check": "pnpm -r type-check",
+    "benchmark": "node scripts/benchmark.mjs",
+    "ai:export": "pnpm build:cli && node packages/@nakshora/cli/dist/cli.js export:ai --out ai/corpus.json",
+    "clean": "pnpm -r exec rm -rf dist && rm -rf node_modules",
     "changeset": "changeset",
     "changeset:add": "changeset add",
-    "release:preview": "changeset version --snapshot && changeset publish --snapshot"
+    "version": "changeset version",
+    "publish:packages": "changeset publish",
+    "publish:github": "node scripts/publish-github.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "eslint": "^8.56.0",
-    "prettier": "^3.1.1",
-    "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
-  },
-  "pnpm": {
-    "patchedDependencies": {},
-    "overrides": {
-      "typescript": "^5.3.3"
-    }
+    "@eslint/js": "^9.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.1.0"
   }
 }
