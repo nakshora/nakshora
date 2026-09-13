@@ -59,14 +59,16 @@ jobs:
 
       - name: 📝 Check changesets status
         run: |
+          # ensure the base ref is present (PR checkouts have no local `main`)
+          git fetch -q origin main || true
           if ls .changeset/*.md >/dev/null 2>&1; then
             echo "## 📝 This PR contains changesets" >> "$GITHUB_STEP_SUMMARY"
-            pnpm exec changeset status
+            pnpm exec changeset status --since=origin/main
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "✅ Merging this PR into \`main\` will open/update the **Version Packages** release PR. Merging that release PR publishes to npm + GitHub Packages automatically." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "## ⚠️ This PR has no changesets" >> "$GITHUB_STEP_SUMMARY"
-            pnpm exec changeset status || true
+            pnpm exec changeset status --since=origin/main || true
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "Nothing to release from this PR. Add a changeset with \`pnpm changeset:add\` if it should be part of the next release." >> "$GITHUB_STEP_SUMMARY"
           fi
