@@ -19,10 +19,9 @@
 // Reporting:
 //   Every package outcome is emitted as a GitHub Actions annotation
 //   (::notice / ::warning / ::error) and written to the job summary, so the
-//   result is visible without opening the raw log. After publishing, the script
+//   result is readable without opening the raw log. After publishing, the script
 //   verifies each package through the GitHub REST API and flips any package that
-//   came back private to public (GitHub Packages does not always inherit the
-//   repository's visibility).
+//   came back private to public.
 //
 // Usage: node scripts/publish-github.mjs
 
@@ -54,9 +53,7 @@ const packagesDir = join(root, 'packages', '@nakshora');
 const [owner] = (process.env.GITHUB_REPOSITORY ?? 'nakshora/nakshora').split('/');
 
 // ── reporting helpers ───────────────────────────────────────────────────────
-const summaryLines = [];
 function summary(line) {
-  summaryLines.push(line);
   if (process.env.GITHUB_STEP_SUMMARY) {
     try {
       appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${line}\n`);
@@ -96,8 +93,14 @@ function run(cmd, args, cwd) {
   }
 }
 
+/**
+ * "This version is already on the registry" — npmjs.com and GitHub Packages
+ * word it differently:
+ *   npmjs:          cannot publish over the previously published versions
+ *   GH Packages:    409 Conflict - Cannot publish over existing version
+ */
 function isAlreadyPublished(output) {
-  return /cannot publish over the previously published|already published|EPUBLISHCONFLICT/i.test(
+  return /cannot publish over (the previously published|existing version)|already published|EPUBLISHCONFLICT|E409/i.test(
     output,
   );
 }
@@ -142,12 +145,36 @@ async function ghApi(path, { method = 'GET', body } = {}) {
 /** GitHub Packages lives under /orgs/{org} or /users/{user}. */
 async function ownerKind() {
   const { status, json } = await ghApi(`/orgs/${owner}`);
-  if (status === 200 && json?.type === 'Organization') return 'orgs';
-  return 'users';
+  return status === 200 && json?.type === 'Organization' ? 'orgs' : 'users';
 }
 
-async function getPackage(kind, name) {
-  return ghApi(`/${kind}/${owner}/packages/npm/${encodeURIComponent(name)}`);
+/**
+ * The REST API addresses npm packages WITHOUT the scope: `@google/zx` is
+ * `orgs/google/packages/npm/zx`. Try the unscoped name first, then the encoded
+ * scoped forms, so either convention works.
+ */
+function nameCandidates(name) {
+  const unscoped = name.replace(/^@[^/]+\//, '');
+  return [unscoped, encodeURIComponent(name), name.replace('@', '%40')].filter(
+    (v, i, a) => a.indexOf(v) === i,
+  );
+}
+
+/** Find a package, returning { apiName, pkg } or null. */
+async function findPackage(kind, name) {
+  for (const apiName of nameCandidates(name)) {
+    const { status, json } = await ghApi(`/${kind}/${owner}/packages/npm/${apiName}`);
+    if (status === 200 && json) return { apiName, pkg: json };
+  }
+  return null;
+}
+
+/** Everything the token can see, for diagnostics. */
+async function listPackages(kind) {
+  const { status, json } = await ghApi(`/${kind}/${owner}/packages?package_type=npm&per_page=100`);
+  if (status !== 200 || !Array.isArray(json)) return `list returned HTTP ${status}`;
+  if (json.length === 0) return 'registry API lists **no packages** for this token';
+  return json.map((p) => `${p.name} (${p.visibility}, ${p.version_count} version(s))`).join(', ');
 }
 
 // ── main ────────────────────────────────────────────────────────────────────
@@ -183,8 +210,11 @@ try {
       ? readdirSync(packDir).filter((f) => f.endsWith('.tgz'))
       : [];
     if (pack.status !== 0 || tarballs.length !== 1) {
-      const msg = `failed to pack ${label} (exit ${pack.status}): ${diag(pack.output)}`;
-      annotate('error', 'GitHub Packages', msg);
+      annotate(
+        'error',
+        'GitHub Packages',
+        `failed to pack ${label} (exit ${pack.status}): ${diag(pack.output)}`,
+      );
       summary(`- ❌ \`${label}\` — pack failed`);
       failures++;
       continue;
@@ -213,13 +243,16 @@ try {
       annotate(
         'notice',
         'GitHub Packages',
-        `${label} reported as already published — ${diag(publish.output, 2)}`,
+        `${label} is already on the registry — ${diag(publish.output, 2)}`,
       );
-      summary(`- ⏭️ \`${label}\` — already published`);
+      summary(`- ⏭️ \`${label}\` — already on the registry`);
       published++;
     } else {
-      const msg = `failed to publish ${label} (exit ${publish.status}): ${diag(publish.output)}`;
-      annotate('error', 'GitHub Packages', msg);
+      annotate(
+        'error',
+        'GitHub Packages',
+        `failed to publish ${label} (exit ${publish.status}): ${diag(publish.output)}`,
+      );
       summary(`- ❌ \`${label}\` — publish failed`);
       failures++;
     }
@@ -228,18 +261,26 @@ try {
   // 3. Verify through the API and make sure each package is publicly visible.
   const kind = await ownerKind();
   summary('');
+  let listed = null;
   for (const { pkg } of targets) {
     const label = `${pkg.name}@${pkg.version}`;
-    const { status, json } = await getPackage(kind, pkg.name);
-    if (status !== 200 || !json) {
-      const msg = `verification failed — GET /${kind}/${owner}/packages/npm/${pkg.name} returned ${status}. The package is not visible to this token.`;
+    const found = await findPackage(kind, pkg.name);
+
+    if (!found) {
+      listed ??= await listPackages(kind);
+      const msg =
+        `${pkg.name} is not visible to this token (GET /${kind}/${owner}/packages/npm/{${nameCandidates(pkg.name).join('|')}} → 404); ${listed}. ` +
+        `If npm reported "Cannot publish over existing version" above, the package exists but is private and/or not linked to this repository — ` +
+        `an org owner has to open it at https://github.com/orgs/${owner}/packages and set visibility to public (Package settings → Danger Zone).`;
       annotate('error', 'GitHub Packages', msg);
-      summary(`- ⚠️ \`${label}\` — **not found in the registry API** (HTTP ${status})`);
+      summary(`- ⚠️ \`${label}\` — **not visible** via the registry API (private or unlinked)`);
       failures++;
       continue;
     }
-    if (json.visibility !== 'public') {
-      const patch = await ghApi(`/${kind}/${owner}/packages/npm/${encodeURIComponent(pkg.name)}`, {
+
+    const { apiName } = found;
+    if (found.pkg.visibility !== 'public') {
+      const patch = await ghApi(`/${kind}/${owner}/packages/npm/${apiName}`, {
         method: 'PATCH',
         body: { visibility: 'public' },
       });
@@ -247,23 +288,30 @@ try {
         annotate(
           'warning',
           'GitHub Packages',
-          `${pkg.name} was ${json.visibility} — set to public`,
+          `${pkg.name} was ${found.pkg.visibility} — set to public`,
         );
-        summary(`- 🔓 \`${label}\` — was **${json.visibility}**, now public`);
+        summary(
+          `- 🔓 \`${label}\` — was **${found.pkg.visibility}**, now public · ${patch.json?.html_url ?? ''}`,
+        );
       } else {
         annotate(
           'error',
           'GitHub Packages',
-          `${pkg.name} is ${json.visibility} and could not be made public (HTTP ${patch.status})`,
+          `${pkg.name} is ${found.pkg.visibility} and could not be made public (PATCH → HTTP ${patch.status})`,
         );
         summary(
-          `- ⚠️ \`${label}\` — still **${json.visibility}** (PATCH returned ${patch.status})`,
+          `- ⚠️ \`${label}\` — still **${found.pkg.visibility}** (PATCH returned ${patch.status})`,
         );
         failures++;
       }
     } else {
+      annotate(
+        'notice',
+        'GitHub Packages',
+        `${pkg.name} verified public (${found.pkg.version_count} version(s))`,
+      );
       summary(
-        `- 🔎 \`${label}\` — verified public · ${json.version_count} version(s) · ${json.html_url}`,
+        `- 🔎 \`${label}\` — verified **public** · ${found.pkg.version_count} version(s) · ${found.pkg.html_url}`,
       );
     }
   }
@@ -272,6 +320,8 @@ try {
   rmSync(packDir, { recursive: true, force: true });
 }
 
-console.log(`\nGitHub Packages: ${published} published, ${failures} failed/unverified`);
-summary(`\n**Result:** ${published} published · ${failures} failed/unverified`);
+console.log(
+  `\nGitHub Packages: ${published} published/already-there, ${failures} failed or not public`,
+);
+summary(`\n**Result:** ${published} published/already-there · ${failures} failed or not public`);
 process.exit(failures > 0 ? 1 : 0);
