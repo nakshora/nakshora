@@ -238,7 +238,7 @@ pnpm build && pnpm test && pnpm lint
 
 ## 👥 Community
 
-- **Website** — [nakshora.dev](https://nakshora.dev)
+- **Website** — [nakshora.dev](https://nakshora.bsdc.info.bd)
 - **GitHub** — [nakshora/nakshora](https://github.com/nakshora/nakshora)
 - **Issues** — [report bugs & request features](https://github.com/nakshora/nakshora/issues)
 - **Contributing** — [DEVELOPMENT.md](docs/DEVELOPMENT.md) · [CONTRIBUTING.md](CONTRIBUTING.md)
