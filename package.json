@@ -67,6 +67,7 @@
     "publish:github": "node scripts/publish-github.mjs"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^2.27.0",
     "@eslint/js": "^9.0.0",
     "@vitest/coverage-v8": "^2.1.0",
