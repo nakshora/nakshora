@@ -15,7 +15,11 @@ name: Release & Publish
 #   4. A mirror is published to GitHub Packages (npm registry).
 #
 # Secrets required (repo Settings → Secrets):
-#   NPM_TOKEN  — read/write token from https://www.npmjs.com/settings/<user>/tokens
+#   NPM_TOKEN  — npm Granular Access Token with *Read and write* access to the
+#                @nakshora org (https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new).
+#                Without it the release PR is still opened, but publishing fails.
+#                (Alternative: npm trusted publishing — the changesets action
+#                falls back to the workflow's OIDC identity when NPM_TOKEN is absent.)
 
 on:
   push:
@@ -28,6 +32,11 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
+  # `packages: write` is required by the GitHub Packages mirror step — when a
+  # workflow declares `permissions:` explicitly, every scope it omits is `none`.
+  packages: write
+  # OIDC token for npm provenance (and for npm trusted publishing, which the
+  # changesets action falls back to when NPM_TOKEN is absent).
   id-token: write
 
 jobs:
@@ -152,6 +161,32 @@ jobs:
       - name: 🏗️ Build packages
         run: pnpm build
 
+      - name: 🔐 Preflight — npm credentials
+        id: preflight
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${NPM_TOKEN:-}" ]; then
+            echo "npm_token=present" >> "$GITHUB_OUTPUT"
+            echo "✅ NPM_TOKEN is set (${#NPM_TOKEN} characters)."
+            echo "✅ \`NPM_TOKEN\` is set — publishing to npmjs.com can proceed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "npm_token=missing" >> "$GITHUB_OUTPUT"
+            echo "::warning title=NPM_TOKEN missing::NPM_TOKEN is not set in Settings → Secrets and variables → Actions. The Version Packages release PR can still be opened, but publishing to npm will fail until the token exists."
+            {
+              echo "⚠️ \`NPM_TOKEN\` is **not** set."
+              echo ""
+              echo "Add it in *Settings → Secrets and variables → Actions → New repository secret*: an npm **Granular Access Token** with *Read and write* permission for the \`@nakshora\` org/packages. Versioning (the release PR) does not need it — publishing does."
+            } >> "$GITHUB_STEP_SUMMARY"
+            # Publish phase (release PR merged ⇒ no pending changesets) cannot
+            # succeed without credentials — fail fast with an actionable error
+            # instead of a confusing registry 401/ENEEDAUTH later on.
+            if ! ls .changeset/*.md >/dev/null 2>&1; then
+              echo "::error title=Cannot publish — NPM_TOKEN missing::No pending changesets (publish phase) but NPM_TOKEN is not set. Add the secret, then re-run this job."
+              exit 1
+            fi
+          fi
+
       - name: 📝 Version (opens release PR) or Publish
         id: changesets
         uses: changesets/action@v1
@@ -160,7 +195,12 @@ jobs:
           # opens the "Version Packages" release PR.
           # When the release PR is merged (no pending changesets, but
           # unpublished versions exist): runs the publish script.
-          version: pnpm version
+          #
+          # NOTE: this must be `pnpm changeset version`, NOT `pnpm version`.
+          # pnpm intercepts the bare `version` command and prints its own
+          # version manifest instead of running the root `version` script, so
+          # nothing was ever bumped and the release PR was never opened.
+          version: pnpm changeset version
           publish: pnpm publish:packages
           commit: 'chore(release): bump versions'
           title: 'chore(release): bump versions'
@@ -176,14 +216,39 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📦 Pack tarballs (attached to npm dist-tags on demand)
+      - name: 📦 Pack release tarballs
         if: steps.changesets.outputs.published == 'true'
         run: |
           mkdir -p releases
           for package in packages/@nakshora/*; do
-            if [ -f "$package/package.json" ] && [ -d "$package/dist" ]; then
-              (cd "$package" && npm pack --pack-destination "$GITHUB_WORKSPACE/releases")
-            fi
+            [ -f "$package/package.json" ] || continue
+            [ -d "$package/dist" ] || continue
+            # `pnpm pack` (not `npm pack`) so `workspace:*` dependencies are
+            # rewritten to real versions in the packed manifest.
+            (cd "$package" && pnpm pack --pack-destination "$GITHUB_WORKSPACE/releases")
           done
           ls -lh releases/
         continue-on-error: true
+
+      - name: 📎 Attach tarballs to the GitHub Releases
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for tarball in releases/*.tgz; do
+            [ -e "$tarball" ] || continue
+            tag=$(tar -xzOf "$tarball" package/package.json |
+              node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);console.log(j.name+'@'+j.version)})")
+            gh release upload "$tag" "$tarball" --clobber ||
+              echo "::warning::could not attach $tarball to release $tag"
+          done
+        continue-on-error: true
+
+      - name: 🗃️ Upload tarballs as workflow artifacts
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-tarballs
+          path: releases/*.tgz
+          retention-days: 90
+          if-no-files-found: warn
