@@ -125,7 +125,10 @@ jobs:
     name: Create Release & Publish
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # `!cancelled()` is required: without a status function in `if`, a
+    # transitively-skipped needs job (the PR-only changesets check) would
+    # propagate a skip even on a push to main.
+    if: ${{ !cancelled() && needs.test.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
     steps:
       - name: 📥 Checkout code
