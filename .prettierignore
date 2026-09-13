@@ -1,0 +1,12 @@
+dist
+node_modules
+coverage
+pnpm-lock.yaml
+min.main.css
+minified-version
+img
+ai/corpus.json
+ai/corpus.jsonl
+llms-full.md
+*.tgz
+CHANGELOG.md

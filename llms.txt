@@ -1,25 +1,61 @@
-# Nakshora CSS Framework
+# Nakshora
 
-The World's Most Comprehensive CSS Framework. Built by Rizwan Rahim Chowdhury.
-A utility-first framework featuring unique themes like Neon Cyber, Pastel Dream, and Brutalist.
+> The modern, ultra-fast, utility-first CSS framework with a JIT compiler. Built by Rizwan Rahim Chowdhury (RRC Development). MIT licensed.
 
-## Core Principles
-- **Fluid Typography:** Uses `clamp()` for responsive text sizing.
-- **Modern Breakpoints:** Includes high-end resolutions (`uhd:`, `k8:`).
-- **CSS Variables:** Driven by `:root` custom properties for easy theming.
-- **Design Paradigms:** Native support for Glassmorphism, Neumorphism, and Brutalism.
+Nakshora compiles only the CSS your project actually uses: 3,091 utilities across 29 categories (layout, spacing, sizing, flexbox, grid, typography, 22 color palettes × 11 shades, backgrounds, borders, effects, transforms, transitions, animations), plus built-in design-paradigm components (glassmorphism, neon cyber, brutalism, minimalism, skeletons) and five theme presets. Zero runtime JS — pure CSS output.
 
-## Key Themes
-- **Neon Cyber:** High-saturation, futuristic colors.
-- **Pastel Dream:** Soft, muted tones for elegant designs.
-- **Ultra Minimalist:** Clean grayscale and "Minimal Ice" palettes.
-- **Nature Inspired:** Earthy, organic tones.
-- **Brutalist:** Raw, high-contrast primary colors.
+## Packages
 
-## Usage
-CDN: https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css
+- `@nakshora/core` — JIT CSS compiler & engine (zero dependencies)
+- `@nakshora/cli` — CLI: `nakshora init / build / dev / inspect / export:ai`
+- `@nakshora/postcss` — PostCSS plugin (`@nakshora source;` / `@nakshora utilities;`)
+- `@nakshora/vite-plugin` — Vite plugin (virtual module `import 'nakshora'`, HMR)
 
-## Important Classes
-- Layout: `.flex`, `.grid`, `.grid-cols-12`, `.gap-*`
-- Design: `.card-neon`, `.btn-neon`, `.glass-light`, `.brutalist-card`
-- Animation: `.animate-neonGlow`, `.hover-lift`
+## Quick start
+
+```bash
+npm install -D @nakshora/vite-plugin
+```
+
+```js
+// vite.config.js
+import { nakshora } from '@nakshora/vite-plugin';
+export default { plugins: [nakshora({ content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,vue}'] })] };
+```
+
+```js
+// src/main.js
+import 'nakshora';
+```
+
+```html
+<button class="px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+  Click me
+</button>
+```
+
+## Class grammar
+
+- Color: `<util>-<palette>-<shade>` — `text-blue-500`, `bg-slate-900`, `border-rose-200`, `from-indigo-400` (22 palettes: slate gray zinc neutral stone red orange amber yellow lime emerald green teal cyan sky blue indigo violet purple fuchsia pink rose; shades 50–950)
+- Spacing: key ∈ `0 px 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 14 16 20 24 28 32 36 40 44 48 56 64 72 80 96` (rem scale) — `p-4`, `mt-2`, `mx-6`, `gap-y-8`
+- Responsive (mobile-first): `sm:` 640 · `md:` 768 · `lg:` 1024 · `xl:` 1280 · `2xl:` 1536 — `md:grid-cols-2`
+- State variants (JIT mode): `hover:` `focus:` `focus-visible:` `focus-within:` `active:` `visited:` `disabled:` `first:` `last:` `group-hover:` `group-focus:` `peer-hover:` `peer-focus:` `dark:` — combine one responsive + one state: `md:hover:bg-blue-600`
+- Design components: `.glass` `.glass-light` `.glass-dark` `.neon-card` `.neon-btn` `.neon-glow` `.neon-text` `.brutalist-card` `.brutalist-btn` `.minimalist-card` `.minimalist-btn` `.skeleton-rect` `.skeleton-circle` `.skeleton-text` `.hover-lift` `.gradient-text` `.gradient-neon` `.gradient-pastel` `.gradient-nature` `.gradient-brutalist`
+- Dark mode: `class="dark"` on `<html>` + `dark:` variants
+
+## Key behavior
+
+- JIT mode (default when `content` is configured) emits only used classes; full mode emits all base + responsive utilities (~740 KB min).
+- `safelist: []` for dynamically-built class names.
+- Theme overrides deep-merge: `theme: { colors: { brand: { 500: '#6d28d9' } } }`.
+- Every token is exposed as a CSS variable on `:root` (`--color-blue-500`, `--spacing-4`, …).
+
+## Resources
+
+- Full documentation: [docs/](https://github.com/nakshora/nakshora/tree/main/docs)
+- Full docs for LLMs: [llms-full.md](https://github.com/nakshora/nakshora/blob/main/llms-full.md)
+- Utility corpus (machine format): [ai/corpus.json](https://github.com/nakshora/nakshora/blob/main/ai/corpus.json)
+- SFT dataset: [ai/sft-train.jsonl](https://github.com/nakshora/nakshora/blob/main/ai/sft-train.jsonl)
+- npm: https://www.npmjs.com/package/@nakshora/core
+- Repo: https://github.com/nakshora/nakshora
+- Site: https://nakshora.dev

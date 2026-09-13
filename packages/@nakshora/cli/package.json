@@ -1,40 +1,21 @@
 {
   "name": "@nakshora/cli",
-  "version": "3.0.0",
-  "description": "Nakshora command-line interface for building CSS",
-  "type": "module",
-  "bin": {
-    "nakshora": "./dist/cli.js"
-  },
-  "main": "./dist/cli.cjs",
-  "module": "./dist/cli.esm.js",
-  "types": "./dist/cli.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/cli.d.ts",
-      "import": "./dist/cli.esm.js",
-      "require": "./dist/cli.cjs",
-      "default": "./dist/cli.esm.js"
-    }
-  },
-  "files": [
-    "dist",
-    "src",
-    "package.json",
-    "README.md"
-  ],
+  "version": "2.0.4",
+  "description": "Nakshora command-line interface — init, build, dev, inspect and AI export",
   "keywords": [
     "cli",
     "css",
     "framework",
     "build-tool",
+    "jit",
     "nakshora"
   ],
+  "license": "MIT",
   "author": {
     "name": "Rizwan Rahim Chowdhury",
     "email": "rizwan@bsdc.info.bd"
   },
-  "license": "MIT",
+  "homepage": "https://nakshora.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/nakshora/nakshora",
@@ -43,7 +24,27 @@
   "bugs": {
     "url": "https://github.com/nakshora/nakshora/issues"
   },
-  "homepage": "https://nakshora.dev",
+  "type": "module",
+  "bin": {
+    "nakshora": "./dist/cli.js"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "engines": {
     "node": ">=18.0.0"
   },
@@ -52,26 +53,22 @@
     "build:watch": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@nakshora/core": "workspace:*",
     "chalk": "^5.3.0",
-    "commander": "^11.0.0",
-    "fs-extra": "^11.0.0",
+    "commander": "^12.0.0",
     "globby": "^14.0.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
   "devDependencies": {
-    "@types/fs-extra": "^11.0.0",
     "@types/node": "^20.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "sideEffects": false
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.0"
+  }
 }

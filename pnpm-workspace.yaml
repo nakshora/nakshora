@@ -3,36 +3,7 @@
 
 packages:
   # Core packages
-  - 'packages/@nakshora/core'
-  - 'packages/@nakshora/cli'
-  - 'packages/@nakshora/postcss'
-  - 'packages/@nakshora/vite-plugin'
-  
-  # Shared tools
-  - 'tools/ts-config'
-  - 'tools/scripts'
+  - 'packages/@nakshora/*'
 
-# Catalog for dependency management
-# Enables version pinning and deduplication
-catalog:
-  typescript:
-    typescript: "^5.3.3"
-  
-  testing:
-    vitest: "^1.0.4"
-    "@vitest/coverage-v8": "^1.0.0"
-  
-  linting:
-    eslint: "^8.56.0"
-    "@typescript-eslint/eslint-plugin": "^7.0.0"
-    "@typescript-eslint/parser": "^7.0.0"
-    prettier: "^3.1.1"
-  
-  build:
-    tsup: "^8.0.0"
-    esbuild: "^0.19.0"
-    postcss: "^8.4.32"
-  
-  core:
-    postcss: "^8.4.32"
-    "@changesets/cli": "^2.27.0"
+  # Shared tools
+  - 'tools/*'

@@ -1,0 +1,161 @@
+# Configuration Reference
+
+Every configuration option Nakshora understands, with defaults.
+
+Config files: `nakshora.config.{ts,js,mjs,cjs,json}` — auto-discovered by the
+CLI (walking up from cwd), loadable from JS APIs, or passed inline to the
+plugins. TypeScript configs require Node ≥ 22.18.
+
+## Top-level options
+
+```js
+export default {
+  content: './**/*.{html,js,ts,jsx,tsx,vue,astro,svelte,md}', // JIT mode
+  purge: [], // legacy alias of content (string[])
+  safelist: [], // classes always included (may include variants)
+  theme: {}, // theme overrides (deep-merged)
+  variants: {}, // variant toggles
+  corePlugins: {}, // group toggles
+  important: false, // true | '#scope'
+  plugins: [], // Plugin objects
+  extractorPattern: undefined, // custom class-extractor regex
+};
+```
+
+### `content` — JIT sources
+
+Accepts a string or array. Entries are:
+
+- **glob patterns** → matching files are read and scanned for classes
+- **existing file paths** → read
+- **anything else** → treated as raw content (template strings)
+
+When `content` is set, builds run in **JIT mode**: only classes found in the
+content (plus `safelist`) are compiled — including all state variants.
+Without `content`, builds run in **full mode** (all base + responsive
+utilities; state variants are emitted in JIT mode only).
+
+### `safelist`
+
+Classes always emitted in JIT mode. Full variant syntax allowed:
+
+```js
+safelist: ['lg:flex', 'hover:bg-brand-500', 'dark:text-white'];
+```
+
+Useful for class names built dynamically at runtime.
+
+### `theme` — all sections
+
+Deep-merged over the defaults — override only what you change.
+
+| Section                    | Default keys                                       | Notes                                                                   |
+| -------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------- |
+| `colors`                   | 22 palettes × shades 50–950                        | `brand: {500: '#hex'}` or `blue: {500: '#hex'}` (single-shade override) |
+| `spacing`                  | `0 px 0.5 1 … 96`                                  | key → CSS length                                                        |
+| `typography.fontSize`      | `xs sm base lg xl 2xl 3xl 4xl 5xl 6xl 7xl 8xl 9xl` | value or `[size, lineHeight]`                                           |
+| `typography.fontWeight`    | `thin … black`                                     | 100–900                                                                 |
+| `typography.lineHeight`    | `none tight snug base relaxed loose`               |                                                                         |
+| `typography.letterSpacing` | `tighter tight normal wide wider widest`           |                                                                         |
+| `fontFamily`               | `sans, mono`                                       |                                                                         |
+| `breakpoints`              | `xs:0 sm:640 md:768 lg:1024 xl:1280 2xl:1536`      | px; add your own (`wide: 1800`)                                         |
+| `shadows`                  | `none sm base md lg xl 2xl inner glow`             |                                                                         |
+| `borderRadius`             | `none xs sm md lg xl 2xl 3xl full`                 |                                                                         |
+| `zIndex`                   | `auto hide 0 10 20 30 40 50`                       |                                                                         |
+| `opacity`                  | `0 5 10 20 … 100`                                  |                                                                         |
+| `duration`                 | `0 75 100 150 200 300 500 700 1000`                | ms                                                                      |
+| `easing`                   | `linear in out in-out back`                        |                                                                         |
+| `animation`                | `spin ping pulse bounce fade slide shimmer`        | name → shorthand                                                        |
+| `keyframes`                | matches the animation names                        | name → keyframe body                                                    |
+
+```js
+theme: {
+  colors: { brand: { 500: '#6d28d9' } },
+  breakpoints: { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536, wide: 1800 },
+  animation: { wiggle: 'wiggle 1s ease-in-out infinite' },
+  keyframes: {
+    wiggle: '0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); }',
+  },
+}
+```
+
+### `variants` — toggles (all default `true`)
+
+```
+hover, focus, focusVisible, focusWithin, active, visited, disabled,
+firstChild, lastChild, group, groupHover, groupFocus,
+peer, peerHover, peerFocus, dark, responsive
+```
+
+```js
+variants: { visited: false, focusWithin: false } // shrink full builds / disable
+```
+
+### `corePlugins` — group toggles
+
+Disable whole utility groups to shrink builds:
+
+```
+base, variables, animations, components, backgrounds, borderColor,
+borderRadius, borders, cursors, display, effects, filters, flex, gap,
+grid, inset, margin, opacity, padding, position, sizing, shadows,
+textColor, textDecoration, transforms, transitions, typography, whitespace, zIndex, overflow, visibility, gradients, plugin
+```
+
+```js
+corePlugins: { transforms: false, whitespace: false }
+```
+
+### `important`
+
+```js
+important: true; // every declaration gets !important
+important: '#app'; // every rule is scoped: #app .flex { … }
+```
+
+### `extractorPattern`
+
+Custom regex (with the `g` flag) for class extraction in JIT mode:
+
+```js
+extractorPattern: '[[\\w\\\\:/.-]+';
+```
+
+## Plugins
+
+Plugins extend the framework programmatically.
+
+```js
+{
+  name: 'my-plugin',
+  config(cfg) { /* mutate/extend config before generation */ },
+  handler(api) {
+    api.addUtilities({ '.my-cool': { color: 'hotpink' } }, 'myGroup');
+    api.addComponents({ '.my-component': { padding: '1rem' } });
+    api.addBase({ 'h1': { margin: '1rem 0' } });
+  }
+}
+```
+
+- `addUtilities(declarations, group)` — utilities participate in responsive
+  - variant expansion (JIT).
+- `addComponents(declarations)` — emitted after the built-in components.
+- `addBase(declarations)` — appended to the base layer.
+
+## Presets
+
+Built-in presets export `colors` (+ typography, shadows, …):
+
+```js
+import {
+  neonTheme,
+  pastelTheme,
+  brutalistTheme,
+  minimalistTheme,
+  natureTheme,
+} from '@nakshora/core';
+
+export default { theme: { colors: neonTheme.colors, typography: neonTheme.typography } };
+```
+
+See [Themes](./THEMES.md).

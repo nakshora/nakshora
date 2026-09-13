@@ -1,0 +1,101 @@
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { resolveContent } from '../src/content';
+import { findConfigFile, loadConfigFile } from '../src/config-loader';
+import { runBuild, summarize } from '../src/build';
+
+let tmp: string;
+
+beforeAll(() => {
+  tmp = mkdtempSync(join(tmpdir(), 'nakshora-cli-'));
+  mkdirSync(join(tmp, 'src'), { recursive: true });
+  writeFileSync(
+    join(tmp, 'src', 'index.html'),
+    '<div class="flex items-center gap-4 p-4 bg-blue-500 hover:bg-blue-600 md:grid md:grid-cols-2">hi</div>',
+  );
+  writeFileSync(
+    join(tmp, 'nakshora.config.json'),
+    JSON.stringify({
+      content: ['./src/**/*.{html,js,ts}'],
+      safelist: ['lg:flex'],
+      theme: { colors: { brand: { 500: '#123456' } } },
+    }),
+  );
+});
+
+afterAll(() => rmSync(tmp, { recursive: true, force: true }));
+
+describe('content resolution', () => {
+  it('resolves glob patterns to file contents', async () => {
+    const chunks = await resolveContent(['./src/**/*.{html,js,ts}'], tmp);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0]).toContain('bg-blue-500');
+  });
+
+  it('keeps raw strings as-is', async () => {
+    const chunks = await resolveContent(['<div class="p-9">raw</div>'], tmp);
+    expect(chunks[0]).toBe('<div class="p-9">raw</div>');
+  });
+});
+
+describe('config loader', () => {
+  it('finds the nearest config file', () => {
+    const found = findConfigFile(join(tmp, 'src'));
+    expect(found).toBe(join(tmp, 'nakshora.config.json'));
+  });
+
+  it('loads JSON configs', async () => {
+    const cfg = await loadConfigFile(join(tmp, 'nakshora.config.json'));
+    expect(cfg.content).toBeDefined();
+    expect((cfg.theme as Record<string, unknown>).colors).toBeDefined();
+  });
+});
+
+describe('runBuild', () => {
+  it('builds JIT CSS from config content globs', async () => {
+    const out = join(tmp, 'dist', 'out.css');
+    const result = await runBuild({
+      config: { content: ['./src/**/*.html'], safelist: ['lg:flex'] },
+      output: out,
+      cwd: tmp,
+      minify: false,
+    });
+    const css = readFileSync(out, 'utf-8');
+    expect(css).toContain('.bg-blue-500 { background-color: #3b82f6; }');
+    expect(css).toContain('.hover\\:bg-blue-600:hover');
+    expect(css).toContain('.md\\:grid-cols-2');
+    expect(css).toContain('.lg\\:flex { display: flex; }');
+    expect(css).toContain('.neon-card'); // design components are always included
+    expect(result.classes).toBeGreaterThan(5);
+    expect(result.sizeBytes).toBeGreaterThan(0);
+  });
+
+  it('splices generated CSS into @nakshora at-rules', async () => {
+    const input = join(tmp, 'input.css');
+    const out = join(tmp, 'dist', 'spliced.css');
+    writeFileSync(input, '@nakshora source;\n@nakshora utilities;\nbody { color: red; }\n');
+    await runBuild({
+      config: { content: ['./src/**/*.html'] },
+      input,
+      output: out,
+      cwd: tmp,
+      mode: 'full',
+    });
+    const css = readFileSync(out, 'utf-8');
+    expect(css).toContain('@nakshora'.length > 0 ? 'box-sizing: border-box' : 'x');
+    expect(css).toContain('body { color: red; }');
+    expect(css).not.toContain('@nakshora');
+  });
+
+  it('prints a summary line', async () => {
+    const result = await runBuild({
+      config: { content: ['./src/**/*.html'] },
+      output: join(tmp, 'dist', 's.css'),
+      cwd: tmp,
+    });
+    const line = summarize(result, join(tmp, 'dist', 's.css'));
+    expect(line).toMatch(/classes/);
+  });
+});

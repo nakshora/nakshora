@@ -1,28 +1,7 @@
 {
   "name": "@nakshora/core",
-  "version": "3.0.0",
-  "description": "Nakshora JIT CSS compiler and engine - the core of the framework",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.esm.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.esm.js"
-    },
-    "./css": "./dist/core.css",
-    "./css/min": "./dist/core.min.css",
-    "./browser": "./dist/core.umd.js"
-  },
-  "files": [
-    "dist",
-    "src",
-    "package.json",
-    "README.md"
-  ],
+  "version": "2.0.4",
+  "description": "Nakshora JIT CSS compiler and engine — the core of the framework",
   "keywords": [
     "css",
     "framework",
@@ -30,13 +9,16 @@
     "jit",
     "compiler",
     "postcss",
-    "tailwind"
+    "tailwind",
+    "responsive",
+    "nakshora"
   ],
+  "license": "MIT",
   "author": {
     "name": "Rizwan Rahim Chowdhury",
     "email": "rizwan@bsdc.info.bd"
   },
-  "license": "MIT",
+  "homepage": "https://nakshora.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/nakshora/nakshora",
@@ -45,30 +27,42 @@
   "bugs": {
     "url": "https://github.com/nakshora/nakshora/issues"
   },
-  "homepage": "https://nakshora.dev",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && node scripts/generate-css.mjs",
     "build:watch": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit"
   },
-  "dependencies": {
-    "postcss": "^8.4.32"
+  "publishConfig": {
+    "access": "public"
   },
+  "sideEffects": false,
   "devDependencies": {
     "@types/node": "^20.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "sideEffects": false
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.0"
+  }
 }
