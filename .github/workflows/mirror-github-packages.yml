@@ -1,0 +1,65 @@
+name: GitHub Packages Mirror
+
+# Publishes (or re-verifies) the GitHub Packages mirror of every public
+# Nakshora package.
+#
+# The release workflow already runs `scripts/publish-github.mjs` right after
+# `changeset publish`. This workflow exists for two reasons:
+#
+#   1. **Repair / re-run on demand** — `workflow_dispatch` lets a maintainer
+#      re-publish the mirror (e.g. after a permissions or visibility problem)
+#      without cutting a new npm version.
+#   2. **Verification** — the script re-checks every package through the GitHub
+#      REST API after publishing, flips private packages to public and reports
+#      each outcome as a job annotation + summary, so a silent mirror failure
+#      can never pass unnoticed again.
+#
+# It also runs on pushes to `main` that touch the mirror script or this file.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/publish-github.mjs'
+      - '.github/workflows/mirror-github-packages.yml'
+
+concurrency:
+  group: gh-packages-mirror
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  mirror:
+    name: Publish & verify mirror
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build packages
+        run: pnpm build
+
+      - name: 📤 Publish + verify the GitHub Packages mirror
+        run: node scripts/publish-github.mjs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
