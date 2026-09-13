@@ -1,6 +1,6 @@
 {
   "name": "@nakshora/core",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "description": "Nakshora JIT CSS compiler and engine — the core of the framework",
   "keywords": [
     "css",
