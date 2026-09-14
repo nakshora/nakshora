@@ -16,4 +16,16 @@ export { findConfigFile, loadConfigFile, resolveConfig } from './config-loader';
 export { resolveContent, resolveSources } from './content';
 export { createWatcher } from './watch';
 export type { WatcherHandle } from './watch';
+export { LanguageService, extractColor } from './language-service';
+export type {
+  Region,
+  Token,
+  CompletionItem,
+  Hover,
+  Diagnostic,
+  ColorInformation,
+  LanguageServiceOptions,
+} from './language-service';
+export { startLanguageServer } from './language-server';
+export type { LspOptions } from './language-server';
 export { version } from '@nakshora/core';

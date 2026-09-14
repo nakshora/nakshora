@@ -132,7 +132,7 @@ npx nakshora doctor             # verify the result
 | `tailwindcss` in `postcss.config.js` | `@nakshora/postcss` ([POSTCSS.md](./POSTCSS.md))                |
 | `@tailwindcss/vite`                  | `@nakshora/vite-plugin` ([VITE.md](./VITE.md))                  |
 | `tailwindcss` CLI (`-i/-o/-w/-m`)    | `nakshora build/dev` (`-o`, `--watch`, `--minify`, `--content`) |
-| Tailwind IntelliSense                | `nakshora inspect <class>`, `ai/corpus.json` for editors        |
+| Tailwind IntelliSense                | `nakshora lsp` language server ([EDITORS.md](./EDITORS.md))     |
 
 Uninstall `tailwindcss` afterwards; `nakshora doctor` warns while both are
 installed because the two PostCSS plugins would fight over `@apply`.

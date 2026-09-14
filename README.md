@@ -156,13 +156,13 @@ Compiled (JIT) — only what you used:
 
 ## 📚 Documentation
 
-| Start here                                      | Reference                                                                                      |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| [Getting Started](docs/GETTING_STARTED.md)      | [Utilities (11,417, by category)](docs/UTILITIES.md)                                           |
-| [⭐ Full Setup Guide](docs/SETUP.md)            | [Variants](docs/VARIANTS.md) · [Responsive](docs/RESPONSIVE.md)                                |
-| [Installation](docs/INSTALLATION.md)            | [Configuration](docs/CONFIGURATION.md) · [JIT Compiler](docs/JIT.md)                           |
-| [Migration (v1/v2/Tailwind)](docs/MIGRATION.md) | [Themes & Presets](docs/THEMES.md) · [Design Components](docs/utilities/13-components.md)      |
-|                                                 | [CLI](docs/CLI.md) · [PostCSS](docs/POSTCSS.md) · [Vite](docs/VITE.md) · [JS API](docs/API.md) |
+| Start here                                      | Reference                                                                                                                   |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| [Getting Started](docs/GETTING_STARTED.md)      | [Utilities (11,417, by category)](docs/UTILITIES.md)                                                                        |
+| [⭐ Full Setup Guide](docs/SETUP.md)            | [Variants](docs/VARIANTS.md) · [Responsive](docs/RESPONSIVE.md)                                                             |
+| [Installation](docs/INSTALLATION.md)            | [Configuration](docs/CONFIGURATION.md) · [JIT Compiler](docs/JIT.md)                                                        |
+| [Migration (v1/v2/Tailwind)](docs/MIGRATION.md) | [Themes & Presets](docs/THEMES.md) · [Design Components](docs/utilities/13-components.md)                                   |
+|                                                 | [CLI](docs/CLI.md) · [Editors](docs/EDITORS.md) · [PostCSS](docs/POSTCSS.md) · [Vite](docs/VITE.md) · [JS API](docs/API.md) |
 
 Operations: [Publishing](docs/PUBLISHING.md) · [Performance](docs/PERFORMANCE.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Development](docs/DEVELOPMENT.md) · [Examples](docs/EXAMPLES.md) · [Legacy v2 docs](docs/archive)
 

@@ -38,6 +38,9 @@ describe('documentation claims match the code', () => {
       expect(text, `${file} stale count`).not.toMatch(/\b3,091\b|\b6,313\b/);
     }
     expect(read('README.md')).toContain(`${categories} categories`);
+    const editors = read('docs/EDITORS.md');
+    expect(editors).toContain(`${fmt(catalog)} by default`);
+    expect(editors).toContain(`all ${gen.getVariantDefinitions().length} variants`);
     expect(read('README.md')).toContain(`${palettes} color palettes`);
     expect(read('docs/utilities/README.md')).toContain(`Total generated utilities: **${catalog}**`);
     expect(Object.keys(DEFAULT_SCREENS).length).toBe(10);

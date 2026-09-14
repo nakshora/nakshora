@@ -1,5 +1,6 @@
 import { NakshoraConfig } from '@nakshora/core';
 export { version } from '@nakshora/core';
+import { Connection } from 'vscode-languageserver/node';
 
 interface BuildInput {
     /** Explicit input CSS file (may contain `@nakshora source` / `@nakshora utilities`); `-` = stdin */
@@ -152,4 +153,103 @@ interface WatcherHandle {
  */
 declare function createWatcher(paths: string[], onChange: () => void): WatcherHandle;
 
-export { type BuildInput, type BuildResult, type Finding, type Level, type MigrateResult, type MigrateRunOptions, TAILWIND_RENAMES, V1_RENAMES, type WatcherHandle, collectWatchPaths, createWatcher, diagnose, findConfigFile, formatFindings, generatedSourceMap, loadConfigFile, migrateSource, migrateTailwindConfig, resolveConfig, resolveContent, resolveSources, runBuild, runMigrate, summarize };
+interface Region {
+    /** offset of the first character of the class list */
+    start: number;
+    /** offset one past the last character */
+    end: number;
+    kind: 'attribute' | 'apply' | 'call';
+}
+interface Token {
+    text: string;
+    start: number;
+    end: number;
+    region: Region;
+}
+interface CompletionItem {
+    label: string;
+    /** `variant` items insert `name:`; `class` items insert the class */
+    kind: 'class' | 'variant' | 'component';
+    detail?: string;
+    /** replacement range for the segment being completed */
+    start: number;
+    end: number;
+}
+interface Hover {
+    css: string;
+    start: number;
+    end: number;
+}
+interface Diagnostic {
+    code: 'unknownClass' | 'invalidApply' | 'cssConflict';
+    severity: 'error' | 'warning' | 'information';
+    message: string;
+    start: number;
+    end: number;
+}
+interface ColorInformation {
+    start: number;
+    end: number;
+    /** 0–1 components */
+    red: number;
+    green: number;
+    blue: number;
+    alpha: number;
+}
+interface LanguageServiceOptions {
+    config?: Partial<NakshoraConfig>;
+    /** extra attribute names treated as class lists (default: class, className, class:list) */
+    classAttributes?: string[];
+    /** extra call names whose string arguments are class lists */
+    classFunctions?: string[];
+    /** maximum completion items returned (default 300) */
+    completionLimit?: number;
+}
+declare class LanguageService {
+    private generator;
+    private catalog;
+    private catalogIndex;
+    private components;
+    private variants;
+    private attributes;
+    private functions;
+    private limit;
+    private attributeRe;
+    private callRe;
+    constructor(options?: LanguageServiceOptions);
+    /** Swap the configuration (config file changed). */
+    reload(config?: Partial<NakshoraConfig>): void;
+    private index;
+    /** Class-list regions of a document. `languageId` selects the scanners. */
+    regions(text: string, languageId?: string): Region[];
+    /** Every class token of every region. */
+    tokens(text: string, languageId?: string): Token[];
+    /** The token under `offset` (or the empty token at the caret inside a region). */
+    tokenAt(text: string, offset: number, languageId?: string): Token | null;
+    complete(text: string, offset: number, languageId?: string): {
+        items: CompletionItem[];
+        incomplete: boolean;
+    };
+    /** CSS of the candidate under `offset` (null when unknown). */
+    hover(text: string, offset: number, languageId?: string): Hover | null;
+    compile(candidate: string): string;
+    diagnostics(text: string, languageId?: string): Diagnostic[];
+    colors(text: string, languageId?: string): ColorInformation[];
+    private isComponent;
+}
+/** First colour in a CSS value, as 0–1 rgba (null when none / currentColor). */
+declare function extractColor(value: string): {
+    red: number;
+    green: number;
+    blue: number;
+    alpha: number;
+} | null;
+
+interface LspOptions {
+    /** explicit config path (else discovered from the workspace root) */
+    config?: string;
+    connection?: Connection;
+}
+declare function startLanguageServer(options?: LspOptions): Connection;
+
+export { type BuildInput, type BuildResult, type ColorInformation, type CompletionItem, type Diagnostic, type Finding, type Hover, LanguageService, type LanguageServiceOptions, type Level, type LspOptions, type MigrateResult, type MigrateRunOptions, type Region, TAILWIND_RENAMES, type Token, V1_RENAMES, type WatcherHandle, collectWatchPaths, createWatcher, diagnose, extractColor, findConfigFile, formatFindings, generatedSourceMap, loadConfigFile, migrateSource, migrateTailwindConfig, resolveConfig, resolveContent, resolveSources, runBuild, runMigrate, startLanguageServer, summarize };

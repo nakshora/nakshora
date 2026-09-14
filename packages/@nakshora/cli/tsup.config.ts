@@ -10,6 +10,8 @@ export default defineConfig([
     target: 'es2022',
     platform: 'node',
     banner: { js: '#!/usr/bin/env node' },
+    // the language server is imported lazily; keep one file (no hashed chunks in git)
+    splitting: false,
     noExternal: [/@nakshora\/core/],
   },
   {

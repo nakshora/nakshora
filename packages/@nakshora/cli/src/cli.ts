@@ -371,6 +371,15 @@ program
   });
 
 // `nakshora --version` handled by commander; bare `nakshora` shows help
+program
+  .command('lsp')
+  .description('start the Nakshora language server (LSP over stdio) for editor integrations')
+  .option('-c, --config <path>', 'config file (default: discovered from the workspace root)')
+  .action(async (opts: { config?: string }) => {
+    const { startLanguageServer } = await import('./language-server');
+    startLanguageServer({ config: opts.config });
+  });
+
 program.action(() => {
   program.outputHelp();
 });

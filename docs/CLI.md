@@ -101,6 +101,13 @@ Codemods (dry run by default, `--write` applies):
   (`card-neon` → `neon-card`, `btn-neon` → `neon-btn`, `uhd:` → `4xl:`,
   `k8:` → `5xl:`), variant prefixes preserved.
 
+### `nakshora lsp`
+
+Starts the language server (LSP over stdio): completion, hover, diagnostics
+and colour swatches for any editor. `-c <path>` pins the config; otherwise
+it is discovered from the workspace root. Setup per editor in
+[EDITORS.md](./EDITORS.md).
+
 ### `nakshora inspect`
 
 Print the full generated CSS to stdout (handy for debugging what the config

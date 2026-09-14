@@ -1,328 +1,15 @@
 #!/usr/bin/env node
-
-// src/cli.ts
-import { Command } from "commander";
-import { existsSync as existsSync6, mkdirSync as mkdirSync2, readFileSync as readFileSync6, realpathSync, writeFileSync as writeFileSync3 } from "fs";
-import { dirname as dirname5, isAbsolute as isAbsolute4, join as join6, resolve as resolve6 } from "path";
-import { fileURLToPath } from "url";
-import chalk from "chalk";
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 
 // ../core/dist/index.js
-var defaultColors = {
-  inherit: "inherit",
-  current: "currentColor",
-  transparent: "transparent",
-  black: "#000",
-  white: "#fff",
-  slate: {
-    50: "#f8fafc",
-    100: "#f1f5f9",
-    200: "#e2e8f0",
-    300: "#cbd5e1",
-    400: "#94a3b8",
-    500: "#64748b",
-    600: "#475569",
-    700: "#334155",
-    800: "#1e293b",
-    900: "#0f172a",
-    950: "#020617"
-  },
-  gray: {
-    50: "#f9fafb",
-    100: "#f3f4f6",
-    200: "#e5e7eb",
-    300: "#d1d5db",
-    400: "#9ca3af",
-    500: "#6b7280",
-    600: "#4b5563",
-    700: "#374151",
-    800: "#1f2937",
-    900: "#111827",
-    950: "#030712"
-  },
-  zinc: {
-    50: "#fafafa",
-    100: "#f4f4f5",
-    200: "#e4e4e7",
-    300: "#d4d4d8",
-    400: "#a1a1aa",
-    500: "#71717a",
-    600: "#52525b",
-    700: "#3f3f46",
-    800: "#27272a",
-    900: "#18181b",
-    950: "#09090b"
-  },
-  neutral: {
-    50: "#fafafa",
-    100: "#f5f5f5",
-    200: "#e5e5e5",
-    300: "#d4d4d4",
-    400: "#a3a3a3",
-    500: "#737373",
-    600: "#525252",
-    700: "#404040",
-    800: "#262626",
-    900: "#171717",
-    950: "#0a0a0a"
-  },
-  stone: {
-    50: "#fafaf9",
-    100: "#f5f5f4",
-    200: "#e7e5e4",
-    300: "#d6d3d1",
-    400: "#a8a29e",
-    500: "#78716c",
-    600: "#57534e",
-    700: "#44403c",
-    800: "#292524",
-    900: "#1c1917",
-    950: "#0c0a09"
-  },
-  red: {
-    50: "#fef2f2",
-    100: "#fee2e2",
-    200: "#fecaca",
-    300: "#fca5a5",
-    400: "#f87171",
-    500: "#ef4444",
-    600: "#dc2626",
-    700: "#b91c1c",
-    800: "#991b1b",
-    900: "#7f1d1d",
-    950: "#450a0a"
-  },
-  orange: {
-    50: "#fff7ed",
-    100: "#ffedd5",
-    200: "#fed7aa",
-    300: "#fdba74",
-    400: "#fb923c",
-    500: "#f97316",
-    600: "#ea580c",
-    700: "#c2410c",
-    800: "#9a3412",
-    900: "#7c2d12",
-    950: "#431407"
-  },
-  amber: {
-    50: "#fffbeb",
-    100: "#fef3c7",
-    200: "#fde68a",
-    300: "#fcd34d",
-    400: "#fbbf24",
-    500: "#f59e0b",
-    600: "#d97706",
-    700: "#b45309",
-    800: "#92400e",
-    900: "#78350f",
-    950: "#451a03"
-  },
-  yellow: {
-    50: "#fefce8",
-    100: "#fef9c3",
-    200: "#fef08a",
-    300: "#fde047",
-    400: "#facc15",
-    500: "#eab308",
-    600: "#ca8a04",
-    700: "#a16207",
-    800: "#854d0e",
-    900: "#713f12",
-    950: "#422006"
-  },
-  lime: {
-    50: "#f7fee7",
-    100: "#ecfccb",
-    200: "#d9f99d",
-    300: "#bef264",
-    400: "#a3e635",
-    500: "#84cc16",
-    600: "#65a30d",
-    700: "#4d7c0f",
-    800: "#3f6212",
-    900: "#365314",
-    950: "#1a2e05"
-  },
-  emerald: {
-    50: "#ecfdf5",
-    100: "#d1fae5",
-    200: "#a7f3d0",
-    300: "#6ee7b7",
-    400: "#34d399",
-    500: "#10b981",
-    600: "#059669",
-    700: "#047857",
-    800: "#065f46",
-    900: "#064e3b",
-    950: "#022c22"
-  },
-  green: {
-    50: "#f0fdf4",
-    100: "#dcfce7",
-    200: "#bbf7d0",
-    300: "#86efac",
-    400: "#4ade80",
-    500: "#22c55e",
-    600: "#16a34a",
-    700: "#15803d",
-    800: "#166534",
-    900: "#14532d",
-    950: "#052e16"
-  },
-  teal: {
-    50: "#f0fdfa",
-    100: "#ccfbf1",
-    200: "#99f6e4",
-    300: "#5eead4",
-    400: "#2dd4bf",
-    500: "#14b8a6",
-    600: "#0d9488",
-    700: "#0f766e",
-    800: "#115e59",
-    900: "#134e4a",
-    950: "#042f2e"
-  },
-  cyan: {
-    50: "#ecfeff",
-    100: "#cffafe",
-    200: "#a5f3fc",
-    300: "#67e8f9",
-    400: "#22d3ee",
-    500: "#06b6d4",
-    600: "#0891b2",
-    700: "#0e7490",
-    800: "#155e75",
-    900: "#164e63",
-    950: "#083344"
-  },
-  sky: {
-    50: "#f0f9ff",
-    100: "#e0f2fe",
-    200: "#bae6fd",
-    300: "#7dd3fc",
-    400: "#38bdf8",
-    500: "#0ea5e9",
-    600: "#0284c7",
-    700: "#0369a1",
-    800: "#075985",
-    900: "#0c4a6e",
-    950: "#082f49"
-  },
-  blue: {
-    50: "#eff6ff",
-    100: "#dbeafe",
-    200: "#bfdbfe",
-    300: "#93c5fd",
-    400: "#60a5fa",
-    500: "#3b82f6",
-    600: "#2563eb",
-    700: "#1d4ed8",
-    800: "#1e40af",
-    900: "#1e3a8a",
-    950: "#172554"
-  },
-  indigo: {
-    50: "#eef2ff",
-    100: "#e0e7ff",
-    200: "#c7d2fe",
-    300: "#a5b4fc",
-    400: "#818cf8",
-    500: "#6366f1",
-    600: "#4f46e5",
-    700: "#4338ca",
-    800: "#3730a3",
-    900: "#312e81",
-    950: "#1e1b4b"
-  },
-  violet: {
-    50: "#f5f3ff",
-    100: "#ede9fe",
-    200: "#ddd6fe",
-    300: "#c4b5fd",
-    400: "#a78bfa",
-    500: "#8b5cf6",
-    600: "#7c3aed",
-    700: "#6d28d9",
-    800: "#5b21b6",
-    900: "#4c1d95",
-    950: "#2e1065"
-  },
-  purple: {
-    50: "#faf5ff",
-    100: "#f3e8ff",
-    200: "#e9d5ff",
-    300: "#d8b4fe",
-    400: "#c084fc",
-    500: "#a855f7",
-    600: "#9333ea",
-    700: "#7e22ce",
-    800: "#6b21a8",
-    900: "#581c87",
-    950: "#3b0764"
-  },
-  fuchsia: {
-    50: "#fdf4ff",
-    100: "#fae8ff",
-    200: "#f5d0fe",
-    300: "#f0abfc",
-    400: "#e879f9",
-    500: "#d946ef",
-    600: "#c026d3",
-    700: "#a21caf",
-    800: "#86198f",
-    900: "#701a75",
-    950: "#4a044e"
-  },
-  pink: {
-    50: "#fdf2f8",
-    100: "#fce7f3",
-    200: "#fbcfe8",
-    300: "#f9a8d4",
-    400: "#f472b6",
-    500: "#ec4899",
-    600: "#db2777",
-    700: "#be185d",
-    800: "#9d174d",
-    900: "#831843",
-    950: "#500724"
-  },
-  rose: {
-    50: "#fff1f2",
-    100: "#ffe4e6",
-    200: "#fecdd3",
-    300: "#fda4af",
-    400: "#fb7185",
-    500: "#f43f5e",
-    600: "#e11d48",
-    700: "#be123c",
-    800: "#9f1239",
-    900: "#881337",
-    950: "#4c0519"
-  }
-};
-var defaultVariants = {
-  hover: true,
-  focus: true,
-  focusVisible: true,
-  focusWithin: true,
-  active: true,
-  visited: true,
-  disabled: true,
-  firstChild: true,
-  lastChild: true,
-  group: true,
-  groupHover: true,
-  groupFocus: true,
-  peer: true,
-  peerHover: true,
-  peerFocus: true,
-  dark: true,
-  responsive: true,
-  maxResponsive: true,
-  containerQueries: true,
-  arbitraryVariants: true
-};
 function deepMerge(base, override) {
   if (base === null || override === null || typeof base !== "object" || typeof override !== "object" || Array.isArray(base) || Array.isArray(override)) {
     return override === void 0 ? base : override;
@@ -335,281 +22,6 @@ function deepMerge(base, override) {
   }
   return result;
 }
-var componentCss = {
-  glass: `
-.glass {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-  border-radius: 0.75rem;
-  color: #f8fafc;
-}
-
-.glass-light {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 8px 32px rgba(31, 41, 55, 0.12);
-  border-radius: 0.75rem;
-  color: #1f2937;
-}
-
-.glass-dark {
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  border-radius: 0.75rem;
-  color: #f8fafc;
-}
-`,
-  neon: `
-.neon-card {
-  background: #0a1929;
-  border: 1px solid rgba(0, 217, 255, 0.4);
-  border-radius: 0.75rem;
-  box-shadow: 0 0 12px rgba(0, 217, 255, 0.35), inset 0 0 18px rgba(0, 217, 255, 0.08);
-  color: #e0f7ff;
-  transition: box-shadow 200ms ease, border-color 200ms ease;
-}
-.neon-card:hover {
-  box-shadow: 0 0 24px rgba(0, 217, 255, 0.6), inset 0 0 24px rgba(0, 217, 255, 0.12);
-  border-color: rgba(0, 217, 255, 0.8);
-}
-
-.neon-btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #00d9ff 0%, #ff006e 100%);
-  color: #050d1a;
-  font-weight: 700;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  box-shadow: 0 0 18px rgba(0, 217, 255, 0.45);
-  transition: box-shadow 200ms ease, transform 200ms ease;
-}
-.neon-btn:hover {
-  box-shadow: 0 0 32px rgba(255, 0, 110, 0.6);
-  transform: translateY(-1px);
-}
-
-.neon-glow {
-  box-shadow: 0 0 10px rgba(0, 217, 255, 0.6), 0 0 30px rgba(0, 217, 255, 0.3);
-}
-
-.neon-text {
-  color: #00d9ff;
-  text-shadow: 0 0 8px rgba(0, 217, 255, 0.8), 0 0 24px rgba(0, 217, 255, 0.4);
-}
-`,
-  brutalist: `
-.brutalist-card {
-  background: #fff;
-  border: 3px solid #000;
-  border-radius: 0;
-  box-shadow: 8px 8px 0 #000;
-  color: #000;
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-.brutalist-card:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 12px 12px 0 #f43f5e;
-}
-
-.brutalist-btn {
-  display: inline-block;
-  padding: 0.75rem 1.75rem;
-  background: #facc15;
-  border: 3px solid #000;
-  border-radius: 0;
-  box-shadow: 5px 5px 0 #000;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: transform 100ms ease, box-shadow 100ms ease;
-}
-.brutalist-btn:hover {
-  background: #f43f5e;
-  color: #fff;
-}
-.brutalist-btn:active {
-  transform: translate(5px, 5px);
-  box-shadow: 0 0 0 #000;
-}
-`,
-  minimalist: `
-.minimalist-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  color: #1f2937;
-  transition: box-shadow 200ms ease, border-color 200ms ease;
-}
-.minimalist-card:hover {
-  border-color: #9ca3af;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.minimalist-btn {
-  display: inline-block;
-  padding: 0.5rem 1.25rem;
-  background: #111827;
-  color: #f9fafb;
-  border: 1px solid #111827;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
-}
-.minimalist-btn:hover {
-  background: #f9fafb;
-  color: #111827;
-}
-`,
-  skeletons: `
-.skeleton-rect {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-  background-size: 200% 100%;
-  border-radius: 0.375rem;
-  animation: shimmer 1.5s linear infinite;
-}
-
-.skeleton-circle {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-  background-size: 200% 100%;
-  border-radius: 9999px;
-  animation: shimmer 1.5s linear infinite;
-}
-
-.skeleton-text {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-  background-size: 200% 100%;
-  border-radius: 0.25rem;
-  height: 1em;
-  animation: shimmer 1.5s linear infinite;
-}
-`,
-  helpers: `
-.hover-lift {
-  transition: transform 200ms ease, box-shadow 200ms ease;
-}
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.2);
-}
-
-.gradient-text {
-  background-image: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-.gradient-neon {
-  background: linear-gradient(135deg, #0a1929 0%, #16213e 45%, #0f3460 100%);
-}
-.gradient-pastel {
-  background: linear-gradient(135deg, #fdf2f8 0%, #eff6ff 50%, #ecfdf5 100%);
-}
-.gradient-nature {
-  background: linear-gradient(135deg, #14532d 0%, #166534 50%, #365314 100%);
-}
-.gradient-brutalist {
-  background: linear-gradient(135deg, #facc15 0%, #f43f5e 100%);
-}
-`
-};
-var componentNames = Object.keys(componentCss);
-var HEX = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i;
-var SHORT_HEX = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i;
-var VALUE = `(?:\\d+|\\d*\\.\\d+)%?`;
-var SEP = `(?:\\s*,\\s*|\\s+)`;
-var ALPHA_SEP = `\\s*[,/]\\s*`;
-var CUSTOM_PROPERTY = `var\\(--(?:[^ )]*?)(?:,(?:[^ )]*?|var\\(--[^ )]*?\\)))?\\)`;
-var RGB = new RegExp(
-  `^(rgba?)\\(\\s*(${VALUE}|${CUSTOM_PROPERTY})(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${ALPHA_SEP}(${VALUE}|${CUSTOM_PROPERTY}))?\\s*\\)$`
-);
-var HSL = new RegExp(
-  `^(hsla?)\\(\\s*((?:${VALUE})(?:deg|rad|grad|turn)?|${CUSTOM_PROPERTY})(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${ALPHA_SEP}(${VALUE}|${CUSTOM_PROPERTY}))?\\s*\\)$`
-);
-var NAMED_COLORS = {
-  black: [0, 0, 0],
-  white: [255, 255, 255],
-  red: [255, 0, 0],
-  green: [0, 128, 0],
-  blue: [0, 0, 255],
-  yellow: [255, 255, 0],
-  cyan: [0, 255, 255],
-  magenta: [255, 0, 255],
-  gray: [128, 128, 128],
-  grey: [128, 128, 128],
-  silver: [192, 192, 192],
-  maroon: [128, 0, 0],
-  olive: [128, 128, 0],
-  lime: [0, 255, 0],
-  aqua: [0, 255, 255],
-  teal: [0, 128, 128],
-  navy: [0, 0, 128],
-  fuchsia: [255, 0, 255],
-  purple: [128, 0, 128],
-  orange: [255, 165, 0],
-  hotpink: [255, 105, 180],
-  rebeccapurple: [102, 51, 153],
-  tomato: [255, 99, 71],
-  gold: [255, 215, 0],
-  coral: [255, 127, 80],
-  salmon: [250, 128, 114],
-  crimson: [220, 20, 60],
-  indigo: [75, 0, 130],
-  violet: [238, 130, 238],
-  pink: [255, 192, 203],
-  brown: [165, 42, 42],
-  tan: [210, 180, 140],
-  khaki: [240, 230, 140],
-  turquoise: [64, 224, 208],
-  skyblue: [135, 206, 235],
-  steelblue: [70, 130, 180],
-  slategray: [112, 128, 144],
-  darkgray: [169, 169, 169],
-  lightgray: [211, 211, 211],
-  whitesmoke: [245, 245, 245],
-  ivory: [255, 255, 240],
-  beige: [245, 245, 220],
-  wheat: [245, 222, 179],
-  chocolate: [210, 105, 30],
-  firebrick: [178, 34, 34],
-  darkred: [139, 0, 0],
-  darkgreen: [0, 100, 0],
-  darkblue: [0, 0, 139],
-  royalblue: [65, 105, 225],
-  dodgerblue: [30, 144, 255],
-  deepskyblue: [0, 191, 255],
-  limegreen: [50, 205, 50],
-  forestgreen: [34, 139, 34],
-  seagreen: [46, 139, 87],
-  springgreen: [0, 255, 127],
-  orangered: [255, 69, 0],
-  darkorange: [255, 140, 0],
-  plum: [221, 160, 221],
-  orchid: [218, 112, 214],
-  lavender: [230, 230, 250],
-  mintcream: [245, 255, 250],
-  azure: [240, 255, 255],
-  aliceblue: [240, 248, 255],
-  honeydew: [240, 255, 240],
-  linen: [250, 240, 230],
-  snow: [255, 250, 250],
-  seashell: [255, 245, 238],
-  transparent: [0, 0, 0]
-};
 function parseColor(value, { loose = false } = {}) {
   if (typeof value !== "string") return null;
   value = value.trim();
@@ -677,42 +89,6 @@ function escapeClassName(className) {
   );
   return output.replace(/\\,/g, "\\2c ");
 }
-var MATH_FUNCTIONS = [
-  "calc",
-  "min",
-  "max",
-  "clamp",
-  "mod",
-  "rem",
-  "sin",
-  "cos",
-  "tan",
-  "asin",
-  "acos",
-  "atan",
-  "atan2",
-  "pow",
-  "sqrt",
-  "hypot",
-  "log",
-  "exp",
-  "round"
-];
-var AUTO_VAR_INJECTION_EXCEPTIONS = /* @__PURE__ */ new Set([
-  "scroll-timeline-name",
-  "timeline-scope",
-  "view-timeline-name",
-  "font-palette",
-  "anchor-name",
-  "anchor-scope",
-  "position-anchor",
-  "position-try-options",
-  "scroll-timeline",
-  "animation-timeline",
-  "view-timeline",
-  "position-try"
-]);
-var CSS_FUNCTIONS = ["min", "max", "clamp", "calc"];
 function isCSSFunction(value) {
   return CSS_FUNCTIONS.some((fn) => new RegExp(`^${fn}\\(.*\\)`).test(value));
 }
@@ -834,181 +210,6 @@ function normalizeAttributeSelectors(value) {
     return `="${match.slice(1)}"`;
   });
 }
-var LENGTH_UNITS = [
-  "cm",
-  "mm",
-  "Q",
-  "in",
-  "pc",
-  "pt",
-  "px",
-  "em",
-  "ex",
-  "ch",
-  "rem",
-  "lh",
-  "rlh",
-  "vw",
-  "vh",
-  "vmin",
-  "vmax",
-  "vb",
-  "vi",
-  "svw",
-  "svh",
-  "lvw",
-  "lvh",
-  "dvw",
-  "dvh",
-  "cqw",
-  "cqh",
-  "cqi",
-  "cqb",
-  "cqmin",
-  "cqmax"
-];
-var LENGTH_RE = new RegExp(
-  `^[+-]?[0-9]*\\.?[0-9]+(?:[eE][+-]?[0-9]+)?(?:${LENGTH_UNITS.join("|")})$`
-);
-var typeCheckers = {
-  any: () => true,
-  url: (v) => v.startsWith("url("),
-  number: (v) => !isNaN(Number(v)) || isCSSFunction(v),
-  integer: (v) => /^-?\d+$/.test(v),
-  percentage: (v) => v.endsWith("%") && !isNaN(Number(v.slice(0, -1))) || isCSSFunction(v),
-  length: (v) => v === "0" || LENGTH_RE.test(v) || isCSSFunction(v),
-  "line-width": (v) => ["thin", "medium", "thick"].includes(v),
-  shadow: (v) => {
-    const SHADOW_KEYWORDS2 = /* @__PURE__ */ new Set(["inset", "inherit", "initial", "revert", "unset"]);
-    return splitAtTopLevelOnly(normalizeValue(v), ",").every((shadow) => {
-      const parts = shadow.trim().split(/ +(?![^(]*\))/g);
-      let lengths = 0;
-      let seenKeyword = false;
-      for (const part of parts) {
-        if (!seenKeyword && SHADOW_KEYWORDS2.has(part)) seenKeyword = true;
-        else if (/^-?(\d+|\.\d+)(.*?)$/.test(part)) lengths++;
-      }
-      return lengths >= 2;
-    });
-  },
-  color: (v) => {
-    let colors = 0;
-    const ok = splitAtTopLevelOnly(v, "_").every((part) => {
-      part = normalizeValue(part);
-      if (part.startsWith("var(")) return true;
-      if (parseColor(part, { loose: true }) !== null) return colors++, true;
-      return false;
-    });
-    return ok && colors > 0;
-  },
-  image: (v) => {
-    let images = 0;
-    const ok = splitAtTopLevelOnly(v, ",").every((part) => {
-      part = normalizeValue(part);
-      if (part.startsWith("var(")) return true;
-      if (part.startsWith("url(") || typeCheckers.gradient(part) || ["element(", "image(", "cross-fade(", "image-set("].some((fn) => part.startsWith(fn))) {
-        images++;
-        return true;
-      }
-      return false;
-    });
-    return ok && images > 0;
-  },
-  gradient: (v) => {
-    v = normalizeValue(v);
-    return [
-      "conic-gradient",
-      "linear-gradient",
-      "radial-gradient",
-      "repeating-conic-gradient",
-      "repeating-linear-gradient",
-      "repeating-radial-gradient"
-    ].some((t) => v.startsWith(`${t}(`));
-  },
-  position: (v) => {
-    let positions = 0;
-    const ok = splitAtTopLevelOnly(v, "_").every((part) => {
-      part = normalizeValue(part);
-      if (part.startsWith("var(")) return true;
-      if (["center", "top", "right", "bottom", "left"].includes(part) || typeCheckers.length(part) || typeCheckers.percentage(part)) {
-        positions++;
-        return true;
-      }
-      return false;
-    });
-    return ok && positions > 0;
-  },
-  "family-name": (v) => {
-    let fonts = 0;
-    const ok = splitAtTopLevelOnly(v, ",").every((part) => {
-      part = normalizeValue(part);
-      if (part.startsWith("var(")) return true;
-      if (part.includes(" ") && !/(['"])([^"']+)\1/g.test(part)) return false;
-      if (/^\d/g.test(part)) return false;
-      fonts++;
-      return true;
-    });
-    return ok && fonts > 0;
-  },
-  "generic-name": (v) => [
-    "serif",
-    "sans-serif",
-    "monospace",
-    "cursive",
-    "fantasy",
-    "system-ui",
-    "ui-serif",
-    "ui-sans-serif",
-    "ui-monospace",
-    "ui-rounded",
-    "math",
-    "emoji",
-    "fangsong"
-  ].includes(v),
-  "absolute-size": (v) => [
-    "xx-small",
-    "x-small",
-    "small",
-    "medium",
-    "large",
-    "x-large",
-    "xx-large",
-    "xxx-large"
-  ].includes(v),
-  "relative-size": (v) => ["larger", "smaller"].includes(v),
-  size: (v) => typeCheckers["bg-size"](v),
-  "bg-size": (v) => {
-    const parts = splitAtTopLevelOnly(normalizeValue(v), ",");
-    return parts.every(
-      (p) => splitAtTopLevelOnly(p.trim(), " ").every(
-        (s) => ["auto", "cover", "contain"].includes(s) || typeCheckers.length(s) || typeCheckers.percentage(s)
-      )
-    );
-  },
-  angle: (v) => /^[+-]?[0-9]*\.?[0-9]+(deg|rad|grad|turn)$/.test(v) || v === "0" || isCSSFunction(v),
-  time: (v) => /^[+-]?[0-9]*\.?[0-9]+(ms|s)$/.test(v) || isCSSFunction(v),
-  lookup: () => false
-};
-var TYPE_HINTS = /* @__PURE__ */ new Set([
-  "color",
-  "url",
-  "image",
-  "length",
-  "percentage",
-  "position",
-  "family-name",
-  "generic-name",
-  "number",
-  "line-width",
-  "absolute-size",
-  "relative-size",
-  "shadow",
-  "size",
-  "angle",
-  "time",
-  "integer",
-  "any"
-]);
 function splitTypeHint(raw) {
   const m = /^([a-z-]+):(.+)$/s.exec(raw);
   if (m && TYPE_HINTS.has(m[1])) return { hint: m[1], value: m[2] };
@@ -1040,8 +241,6 @@ function negateValue(value) {
   if (/^(calc|min|max|clamp|var)\(/.test(value)) return `calc(${value} * -1)`;
   return null;
 }
-var SPECIALS = /([[\]'"`])([^[\]'"`])?/g;
-var ALLOWED_CLASS_CHARACTERS = /[^"'`\s<>\]]+/;
 function any(sources) {
   return `(?:${sources.map(toSource).join("|")})`;
 }
@@ -1181,7 +380,6 @@ function splitAtTopLevelDot(input) {
   parts.push(input.slice(last));
   return parts;
 }
-var cache = /* @__PURE__ */ new Map();
 function createExtractor(options = {}) {
   const prefix = options.prefix ?? "";
   const separator = options.separator ?? ":";
@@ -1440,30 +638,6 @@ function kebabProp(prop) {
   if (prop.startsWith("--")) return prop;
   return prop.replace(/^(Webkit|Moz|Ms|O)(?=[A-Z])/, (m) => `-${m.toLowerCase()}`).replace(/([a-z\d])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();
 }
-var UNITLESS = /* @__PURE__ */ new Set([
-  "box-flex",
-  "box-flex-group",
-  "column-count",
-  "flex",
-  "flex-grow",
-  "flex-positive",
-  "flex-shrink",
-  "flex-negative",
-  "font-weight",
-  "line-clamp",
-  "line-height",
-  "opacity",
-  "order",
-  "orphans",
-  "tab-size",
-  "widows",
-  "z-index",
-  "zoom",
-  "fill-opacity",
-  "stroke-dashoffset",
-  "stroke-opacity",
-  "stroke-width"
-]);
 function numberToCss(prop, value) {
   if (value === 0 || prop.startsWith("--") || UNITLESS.has(prop)) return String(value);
   return `${value}px`;
@@ -1630,821 +804,6 @@ function formatBytes(bytes) {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
-var tailwindDefaults = {
-  animation: {
-    none: "none",
-    spin: "spin 1s linear infinite",
-    ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
-    pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-    bounce: "bounce 1s infinite"
-  },
-  aspectRatio: {
-    auto: "auto",
-    square: "1 / 1",
-    video: "16 / 9"
-  },
-  backgroundImage: {
-    none: "none",
-    "gradient-to-t": "linear-gradient(to top, var(--tw-gradient-stops))",
-    "gradient-to-tr": "linear-gradient(to top right, var(--tw-gradient-stops))",
-    "gradient-to-r": "linear-gradient(to right, var(--tw-gradient-stops))",
-    "gradient-to-br": "linear-gradient(to bottom right, var(--tw-gradient-stops))",
-    "gradient-to-b": "linear-gradient(to bottom, var(--tw-gradient-stops))",
-    "gradient-to-bl": "linear-gradient(to bottom left, var(--tw-gradient-stops))",
-    "gradient-to-l": "linear-gradient(to left, var(--tw-gradient-stops))",
-    "gradient-to-tl": "linear-gradient(to top left, var(--tw-gradient-stops))"
-  },
-  backgroundPosition: {
-    bottom: "bottom",
-    center: "center",
-    left: "left",
-    "left-bottom": "left bottom",
-    "left-top": "left top",
-    right: "right",
-    "right-bottom": "right bottom",
-    "right-top": "right top",
-    top: "top"
-  },
-  backgroundSize: {
-    auto: "auto",
-    cover: "cover",
-    contain: "contain"
-  },
-  blur: {
-    "0": "0",
-    none: "",
-    sm: "4px",
-    DEFAULT: "8px",
-    md: "12px",
-    lg: "16px",
-    xl: "24px",
-    "2xl": "40px",
-    "3xl": "64px"
-  },
-  borderRadius: {
-    none: "0px",
-    sm: "0.125rem",
-    DEFAULT: "0.25rem",
-    md: "0.375rem",
-    lg: "0.5rem",
-    xl: "0.75rem",
-    "2xl": "1rem",
-    "3xl": "1.5rem",
-    full: "9999px"
-  },
-  borderWidth: {
-    "0": "0px",
-    "2": "2px",
-    "4": "4px",
-    "8": "8px",
-    DEFAULT: "1px"
-  },
-  boxShadow: {
-    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-    DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-    md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-    lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-    xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-    "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
-    none: "none"
-  },
-  brightness: {
-    "0": "0",
-    "50": ".5",
-    "75": ".75",
-    "90": ".9",
-    "95": ".95",
-    "100": "1",
-    "105": "1.05",
-    "110": "1.1",
-    "125": "1.25",
-    "150": "1.5",
-    "200": "2"
-  },
-  contrast: {
-    "0": "0",
-    "50": ".5",
-    "75": ".75",
-    "100": "1",
-    "125": "1.25",
-    "150": "1.5",
-    "200": "2"
-  },
-  cursor: {
-    auto: "auto",
-    default: "default",
-    pointer: "pointer",
-    wait: "wait",
-    text: "text",
-    move: "move",
-    help: "help",
-    "not-allowed": "not-allowed",
-    none: "none",
-    "context-menu": "context-menu",
-    progress: "progress",
-    cell: "cell",
-    crosshair: "crosshair",
-    "vertical-text": "vertical-text",
-    alias: "alias",
-    copy: "copy",
-    "no-drop": "no-drop",
-    grab: "grab",
-    grabbing: "grabbing",
-    "all-scroll": "all-scroll",
-    "col-resize": "col-resize",
-    "row-resize": "row-resize",
-    "n-resize": "n-resize",
-    "e-resize": "e-resize",
-    "s-resize": "s-resize",
-    "w-resize": "w-resize",
-    "ne-resize": "ne-resize",
-    "nw-resize": "nw-resize",
-    "se-resize": "se-resize",
-    "sw-resize": "sw-resize",
-    "ew-resize": "ew-resize",
-    "ns-resize": "ns-resize",
-    "nesw-resize": "nesw-resize",
-    "nwse-resize": "nwse-resize",
-    "zoom-in": "zoom-in",
-    "zoom-out": "zoom-out"
-  },
-  dropShadow: {
-    sm: "0 1px 1px rgb(0 0 0 / 0.05)",
-    DEFAULT: ["0 1px 2px rgb(0 0 0 / 0.1)", "0 1px 1px rgb(0 0 0 / 0.06)"],
-    md: ["0 4px 3px rgb(0 0 0 / 0.07)", "0 2px 2px rgb(0 0 0 / 0.06)"],
-    lg: ["0 10px 8px rgb(0 0 0 / 0.04)", "0 4px 3px rgb(0 0 0 / 0.1)"],
-    xl: ["0 20px 13px rgb(0 0 0 / 0.03)", "0 8px 5px rgb(0 0 0 / 0.08)"],
-    "2xl": "0 25px 25px rgb(0 0 0 / 0.15)",
-    none: "0 0 #0000"
-  },
-  flex: {
-    "1": "1 1 0%",
-    auto: "1 1 auto",
-    initial: "0 1 auto",
-    none: "none"
-  },
-  flexGrow: {
-    "0": "0",
-    DEFAULT: "1"
-  },
-  flexShrink: {
-    "0": "0",
-    DEFAULT: "1"
-  },
-  fontFamily: {
-    sans: [
-      "ui-sans-serif",
-      "system-ui",
-      "sans-serif",
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-      '"Noto Color Emoji"'
-    ],
-    serif: ["ui-serif", "Georgia", "Cambria", '"Times New Roman"', "Times", "serif"],
-    mono: [
-      "ui-monospace",
-      "SFMono-Regular",
-      "Menlo",
-      "Monaco",
-      "Consolas",
-      '"Liberation Mono"',
-      '"Courier New"',
-      "monospace"
-    ]
-  },
-  fontSize: {
-    xs: [
-      "0.75rem",
-      {
-        lineHeight: "1rem"
-      }
-    ],
-    sm: [
-      "0.875rem",
-      {
-        lineHeight: "1.25rem"
-      }
-    ],
-    base: [
-      "1rem",
-      {
-        lineHeight: "1.5rem"
-      }
-    ],
-    lg: [
-      "1.125rem",
-      {
-        lineHeight: "1.75rem"
-      }
-    ],
-    xl: [
-      "1.25rem",
-      {
-        lineHeight: "1.75rem"
-      }
-    ],
-    "2xl": [
-      "1.5rem",
-      {
-        lineHeight: "2rem"
-      }
-    ],
-    "3xl": [
-      "1.875rem",
-      {
-        lineHeight: "2.25rem"
-      }
-    ],
-    "4xl": [
-      "2.25rem",
-      {
-        lineHeight: "2.5rem"
-      }
-    ],
-    "5xl": [
-      "3rem",
-      {
-        lineHeight: "1"
-      }
-    ],
-    "6xl": [
-      "3.75rem",
-      {
-        lineHeight: "1"
-      }
-    ],
-    "7xl": [
-      "4.5rem",
-      {
-        lineHeight: "1"
-      }
-    ],
-    "8xl": [
-      "6rem",
-      {
-        lineHeight: "1"
-      }
-    ],
-    "9xl": [
-      "8rem",
-      {
-        lineHeight: "1"
-      }
-    ]
-  },
-  fontWeight: {
-    thin: "100",
-    extralight: "200",
-    light: "300",
-    normal: "400",
-    medium: "500",
-    semibold: "600",
-    bold: "700",
-    extrabold: "800",
-    black: "900"
-  },
-  gradientColorStopPositions: {
-    "0%": "0%",
-    "5%": "5%",
-    "10%": "10%",
-    "15%": "15%",
-    "20%": "20%",
-    "25%": "25%",
-    "30%": "30%",
-    "35%": "35%",
-    "40%": "40%",
-    "45%": "45%",
-    "50%": "50%",
-    "55%": "55%",
-    "60%": "60%",
-    "65%": "65%",
-    "70%": "70%",
-    "75%": "75%",
-    "80%": "80%",
-    "85%": "85%",
-    "90%": "90%",
-    "95%": "95%",
-    "100%": "100%"
-  },
-  grayscale: {
-    "0": "0",
-    DEFAULT: "100%"
-  },
-  gridAutoColumns: {
-    auto: "auto",
-    min: "min-content",
-    max: "max-content",
-    fr: "minmax(0, 1fr)"
-  },
-  gridAutoRows: {
-    auto: "auto",
-    min: "min-content",
-    max: "max-content",
-    fr: "minmax(0, 1fr)"
-  },
-  gridColumn: {
-    auto: "auto",
-    "span-1": "span 1 / span 1",
-    "span-2": "span 2 / span 2",
-    "span-3": "span 3 / span 3",
-    "span-4": "span 4 / span 4",
-    "span-5": "span 5 / span 5",
-    "span-6": "span 6 / span 6",
-    "span-7": "span 7 / span 7",
-    "span-8": "span 8 / span 8",
-    "span-9": "span 9 / span 9",
-    "span-10": "span 10 / span 10",
-    "span-11": "span 11 / span 11",
-    "span-12": "span 12 / span 12",
-    "span-full": "1 / -1"
-  },
-  gridColumnEnd: {
-    "1": "1",
-    "2": "2",
-    "3": "3",
-    "4": "4",
-    "5": "5",
-    "6": "6",
-    "7": "7",
-    "8": "8",
-    "9": "9",
-    "10": "10",
-    "11": "11",
-    "12": "12",
-    "13": "13",
-    auto: "auto"
-  },
-  gridColumnStart: {
-    "1": "1",
-    "2": "2",
-    "3": "3",
-    "4": "4",
-    "5": "5",
-    "6": "6",
-    "7": "7",
-    "8": "8",
-    "9": "9",
-    "10": "10",
-    "11": "11",
-    "12": "12",
-    "13": "13",
-    auto: "auto"
-  },
-  gridRow: {
-    auto: "auto",
-    "span-1": "span 1 / span 1",
-    "span-2": "span 2 / span 2",
-    "span-3": "span 3 / span 3",
-    "span-4": "span 4 / span 4",
-    "span-5": "span 5 / span 5",
-    "span-6": "span 6 / span 6",
-    "span-7": "span 7 / span 7",
-    "span-8": "span 8 / span 8",
-    "span-9": "span 9 / span 9",
-    "span-10": "span 10 / span 10",
-    "span-11": "span 11 / span 11",
-    "span-12": "span 12 / span 12",
-    "span-full": "1 / -1"
-  },
-  gridRowEnd: {
-    "1": "1",
-    "2": "2",
-    "3": "3",
-    "4": "4",
-    "5": "5",
-    "6": "6",
-    "7": "7",
-    "8": "8",
-    "9": "9",
-    "10": "10",
-    "11": "11",
-    "12": "12",
-    "13": "13",
-    auto: "auto"
-  },
-  gridRowStart: {
-    "1": "1",
-    "2": "2",
-    "3": "3",
-    "4": "4",
-    "5": "5",
-    "6": "6",
-    "7": "7",
-    "8": "8",
-    "9": "9",
-    "10": "10",
-    "11": "11",
-    "12": "12",
-    "13": "13",
-    auto: "auto"
-  },
-  gridTemplateColumns: {
-    "1": "repeat(1, minmax(0, 1fr))",
-    "2": "repeat(2, minmax(0, 1fr))",
-    "3": "repeat(3, minmax(0, 1fr))",
-    "4": "repeat(4, minmax(0, 1fr))",
-    "5": "repeat(5, minmax(0, 1fr))",
-    "6": "repeat(6, minmax(0, 1fr))",
-    "7": "repeat(7, minmax(0, 1fr))",
-    "8": "repeat(8, minmax(0, 1fr))",
-    "9": "repeat(9, minmax(0, 1fr))",
-    "10": "repeat(10, minmax(0, 1fr))",
-    "11": "repeat(11, minmax(0, 1fr))",
-    "12": "repeat(12, minmax(0, 1fr))",
-    none: "none",
-    subgrid: "subgrid"
-  },
-  gridTemplateRows: {
-    "1": "repeat(1, minmax(0, 1fr))",
-    "2": "repeat(2, minmax(0, 1fr))",
-    "3": "repeat(3, minmax(0, 1fr))",
-    "4": "repeat(4, minmax(0, 1fr))",
-    "5": "repeat(5, minmax(0, 1fr))",
-    "6": "repeat(6, minmax(0, 1fr))",
-    "7": "repeat(7, minmax(0, 1fr))",
-    "8": "repeat(8, minmax(0, 1fr))",
-    "9": "repeat(9, minmax(0, 1fr))",
-    "10": "repeat(10, minmax(0, 1fr))",
-    "11": "repeat(11, minmax(0, 1fr))",
-    "12": "repeat(12, minmax(0, 1fr))",
-    none: "none",
-    subgrid: "subgrid"
-  },
-  hueRotate: {
-    "0": "0deg",
-    "15": "15deg",
-    "30": "30deg",
-    "60": "60deg",
-    "90": "90deg",
-    "180": "180deg"
-  },
-  invert: {
-    "0": "0",
-    DEFAULT: "100%"
-  },
-  keyframes: {
-    spin: {
-      to: {
-        transform: "rotate(360deg)"
-      }
-    },
-    ping: {
-      "75%, 100%": {
-        transform: "scale(2)",
-        opacity: "0"
-      }
-    },
-    pulse: {
-      "50%": {
-        opacity: ".5"
-      }
-    },
-    bounce: {
-      "0%, 100%": {
-        transform: "translateY(-25%)",
-        animationTimingFunction: "cubic-bezier(0.8,0,1,1)"
-      },
-      "50%": {
-        transform: "none",
-        animationTimingFunction: "cubic-bezier(0,0,0.2,1)"
-      }
-    }
-  },
-  letterSpacing: {
-    tighter: "-0.05em",
-    tight: "-0.025em",
-    normal: "0em",
-    wide: "0.025em",
-    wider: "0.05em",
-    widest: "0.1em"
-  },
-  lineHeight: {
-    "3": ".75rem",
-    "4": "1rem",
-    "5": "1.25rem",
-    "6": "1.5rem",
-    "7": "1.75rem",
-    "8": "2rem",
-    "9": "2.25rem",
-    "10": "2.5rem",
-    none: "1",
-    tight: "1.25",
-    snug: "1.375",
-    normal: "1.5",
-    relaxed: "1.625",
-    loose: "2"
-  },
-  listStyleType: {
-    none: "none",
-    disc: "disc",
-    decimal: "decimal"
-  },
-  objectPosition: {
-    bottom: "bottom",
-    center: "center",
-    left: "left",
-    "left-bottom": "left bottom",
-    "left-top": "left top",
-    right: "right",
-    "right-bottom": "right bottom",
-    "right-top": "right top",
-    top: "top"
-  },
-  opacity: {
-    "0": "0",
-    "5": "0.05",
-    "10": "0.1",
-    "15": "0.15",
-    "20": "0.2",
-    "25": "0.25",
-    "30": "0.3",
-    "35": "0.35",
-    "40": "0.4",
-    "45": "0.45",
-    "50": "0.5",
-    "55": "0.55",
-    "60": "0.6",
-    "65": "0.65",
-    "70": "0.7",
-    "75": "0.75",
-    "80": "0.8",
-    "85": "0.85",
-    "90": "0.9",
-    "95": "0.95",
-    "100": "1"
-  },
-  order: {
-    "1": "1",
-    "2": "2",
-    "3": "3",
-    "4": "4",
-    "5": "5",
-    "6": "6",
-    "7": "7",
-    "8": "8",
-    "9": "9",
-    "10": "10",
-    "11": "11",
-    "12": "12",
-    first: "-9999",
-    last: "9999",
-    none: "0"
-  },
-  outlineOffset: {
-    "0": "0px",
-    "1": "1px",
-    "2": "2px",
-    "4": "4px",
-    "8": "8px"
-  },
-  outlineWidth: {
-    "0": "0px",
-    "1": "1px",
-    "2": "2px",
-    "4": "4px",
-    "8": "8px"
-  },
-  ringWidth: {
-    "0": "0px",
-    "1": "1px",
-    "2": "2px",
-    "4": "4px",
-    "8": "8px",
-    DEFAULT: "3px"
-  },
-  rotate: {
-    "0": "0deg",
-    "1": "1deg",
-    "2": "2deg",
-    "3": "3deg",
-    "6": "6deg",
-    "12": "12deg",
-    "45": "45deg",
-    "90": "90deg",
-    "180": "180deg"
-  },
-  saturate: {
-    "0": "0",
-    "50": ".5",
-    "100": "1",
-    "150": "1.5",
-    "200": "2"
-  },
-  scale: {
-    "0": "0",
-    "50": ".5",
-    "75": ".75",
-    "90": ".9",
-    "95": ".95",
-    "100": "1",
-    "105": "1.05",
-    "110": "1.1",
-    "125": "1.25",
-    "150": "1.5"
-  },
-  sepia: {
-    "0": "0",
-    DEFAULT: "100%"
-  },
-  skew: {
-    "0": "0deg",
-    "1": "1deg",
-    "2": "2deg",
-    "3": "3deg",
-    "6": "6deg",
-    "12": "12deg"
-  },
-  spacing: {
-    "0": "0px",
-    "1": "0.25rem",
-    "2": "0.5rem",
-    "3": "0.75rem",
-    "4": "1rem",
-    "5": "1.25rem",
-    "6": "1.5rem",
-    "7": "1.75rem",
-    "8": "2rem",
-    "9": "2.25rem",
-    "10": "2.5rem",
-    "11": "2.75rem",
-    "12": "3rem",
-    "14": "3.5rem",
-    "16": "4rem",
-    "20": "5rem",
-    "24": "6rem",
-    "28": "7rem",
-    "32": "8rem",
-    "36": "9rem",
-    "40": "10rem",
-    "44": "11rem",
-    "48": "12rem",
-    "52": "13rem",
-    "56": "14rem",
-    "60": "15rem",
-    "64": "16rem",
-    "72": "18rem",
-    "80": "20rem",
-    "96": "24rem",
-    px: "1px",
-    "0.5": "0.125rem",
-    "1.5": "0.375rem",
-    "2.5": "0.625rem",
-    "3.5": "0.875rem"
-  },
-  textDecorationThickness: {
-    "0": "0px",
-    "1": "1px",
-    "2": "2px",
-    "4": "4px",
-    "8": "8px",
-    auto: "auto",
-    "from-font": "from-font"
-  },
-  transformOrigin: {
-    center: "center",
-    top: "top",
-    "top-right": "top right",
-    right: "right",
-    "bottom-right": "bottom right",
-    bottom: "bottom",
-    "bottom-left": "bottom left",
-    left: "left",
-    "top-left": "top left"
-  },
-  transitionDuration: {
-    "0": "0s",
-    "75": "75ms",
-    "100": "100ms",
-    "150": "150ms",
-    "200": "200ms",
-    "300": "300ms",
-    "500": "500ms",
-    "700": "700ms",
-    "1000": "1000ms",
-    DEFAULT: "150ms"
-  },
-  transitionProperty: {
-    none: "none",
-    all: "all",
-    DEFAULT: "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
-    colors: "color, background-color, border-color, text-decoration-color, fill, stroke",
-    opacity: "opacity",
-    shadow: "box-shadow",
-    transform: "transform"
-  },
-  transitionTimingFunction: {
-    DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
-    linear: "linear",
-    in: "cubic-bezier(0.4, 0, 1, 1)",
-    out: "cubic-bezier(0, 0, 0.2, 1)",
-    "in-out": "cubic-bezier(0.4, 0, 0.2, 1)"
-  },
-  willChange: {
-    auto: "auto",
-    scroll: "scroll-position",
-    contents: "contents",
-    transform: "transform"
-  },
-  zIndex: {
-    "0": "0",
-    "10": "10",
-    "20": "20",
-    "30": "30",
-    "40": "40",
-    "50": "50",
-    auto: "auto"
-  }
-};
-var DEFAULT_SCREENS = {
-  xxs: "200px",
-  xs: "400px",
-  sm: "640px",
-  md: "768px",
-  lg: "1024px",
-  xl: "1280px",
-  "2xl": "1536px",
-  "3xl": "1920px",
-  "4xl": "2560px",
-  "5xl": "5000px"
-};
-var SCREEN_GUIDE = {
-  xxs: "tiny / folded screens, wearables",
-  xs: "small phones",
-  sm: "large phones",
-  md: "tablets",
-  lg: "laptops",
-  xl: "desktops",
-  "2xl": "large desktops",
-  "3xl": "Full HD (1080p) monitors, TVs",
-  "4xl": "QHD / 2K monitors",
-  "5xl": "4K+, video walls, ultra-wide"
-};
-var DEFAULT_CONTAINER_MIN_SCREEN = "sm";
-var DEFAULT_CONTAINER_MAX_SCREEN = "2xl";
-var FRACTIONS = {
-  "1/2": "50%",
-  "1/3": "33.333333%",
-  "2/3": "66.666667%",
-  "1/4": "25%",
-  "2/4": "50%",
-  "3/4": "75%",
-  "1/5": "20%",
-  "2/5": "40%",
-  "3/5": "60%",
-  "4/5": "80%",
-  "1/6": "16.666667%",
-  "2/6": "33.333333%",
-  "3/6": "50%",
-  "4/6": "66.666667%",
-  "5/6": "83.333333%",
-  "1/12": "8.333333%",
-  "2/12": "16.666667%",
-  "3/12": "25%",
-  "4/12": "33.333333%",
-  "5/12": "41.666667%",
-  "6/12": "50%",
-  "7/12": "58.333333%",
-  "8/12": "66.666667%",
-  "9/12": "75%",
-  "10/12": "83.333333%",
-  "11/12": "91.666667%"
-};
-var FRACTIONS_SMALL = Object.fromEntries(
-  Object.entries(FRACTIONS).filter(
-    ([k]) => !k.endsWith("/5") && !k.endsWith("/6") && !k.endsWith("/12")
-  )
-);
-var FRACTIONS_SIXTHS = Object.fromEntries(
-  Object.entries(FRACTIONS).filter(([k]) => !k.endsWith("/12"))
-);
-var NAKSHORA_EXTRAS = {
-  boxShadow: { glow: "0 0 20px 0 rgba(59, 130, 246, 0.5)" },
-  borderRadius: { xs: "0.125rem" },
-  zIndex: { hide: "-1" },
-  transitionTimingFunction: { back: "cubic-bezier(0.68, -0.55, 0.265, 1.55)" },
-  animation: {
-    fade: "fade 300ms ease-out",
-    slide: "slide 300ms ease-out",
-    shimmer: "shimmer 1.5s linear infinite"
-  },
-  keyframes: {
-    fade: { from: { opacity: "0" }, to: { opacity: "1" } },
-    slide: {
-      from: { transform: "translateY(1rem)", opacity: "0" },
-      to: { transform: "translateY(0)", opacity: "1" }
-    },
-    shimmer: {
-      from: { "background-position": "200% 0" },
-      to: { "background-position": "-200% 0" }
-    }
-  },
-  lineHeight: { base: "1.5" },
-  scale: { 175: "1.75", 200: "2" },
-  rotate: { 135: "135deg", 225: "225deg", 270: "270deg", 315: "315deg", 360: "360deg" },
-  textDecorationThickness: { thin: "1px" }
-};
 function isObj(v) {
   return v !== null && typeof v === "object" && !Array.isArray(v);
 }
@@ -2910,797 +1269,6 @@ function screenToPx(value) {
   const n = parseFloat(m[1]);
   return m[2] === "rem" || m[2] === "em" ? n * 16 : n;
 }
-var STATIC_UTILITIES = [
-  {
-    p: "accessibility",
-    c: "sr-only",
-    d: [
-      ["position", "absolute"],
-      ["width", "1px"],
-      ["height", "1px"],
-      ["padding", "0"],
-      ["margin", "-1px"],
-      ["overflow", "hidden"],
-      ["clip", "rect(0, 0, 0, 0)"],
-      ["white-space", "nowrap"],
-      ["border-width", "0"]
-    ]
-  },
-  {
-    p: "accessibility",
-    c: "not-sr-only",
-    d: [
-      ["position", "static"],
-      ["width", "auto"],
-      ["height", "auto"],
-      ["padding", "0"],
-      ["margin", "0"],
-      ["overflow", "visible"],
-      ["clip", "auto"],
-      ["white-space", "normal"]
-    ]
-  },
-  { p: "pointerEvents", c: "pointer-events-none", d: [["pointer-events", "none"]] },
-  { p: "pointerEvents", c: "pointer-events-auto", d: [["pointer-events", "auto"]] },
-  { p: "visibility", c: "visible", d: [["visibility", "visible"]] },
-  { p: "visibility", c: "invisible", d: [["visibility", "hidden"]] },
-  { p: "visibility", c: "collapse", d: [["visibility", "collapse"]] },
-  { p: "position", c: "static", d: [["position", "static"]] },
-  { p: "position", c: "fixed", d: [["position", "fixed"]] },
-  { p: "position", c: "absolute", d: [["position", "absolute"]] },
-  { p: "position", c: "relative", d: [["position", "relative"]] },
-  { p: "position", c: "sticky", d: [["position", "sticky"]] },
-  { p: "isolation", c: "isolate", d: [["isolation", "isolate"]] },
-  { p: "isolation", c: "isolation-auto", d: [["isolation", "auto"]] },
-  { p: "float", c: "float-start", d: [["float", "inline-start"]] },
-  { p: "float", c: "float-end", d: [["float", "inline-end"]] },
-  { p: "float", c: "float-right", d: [["float", "right"]] },
-  { p: "float", c: "float-left", d: [["float", "left"]] },
-  { p: "float", c: "float-none", d: [["float", "none"]] },
-  { p: "clear", c: "clear-start", d: [["clear", "inline-start"]] },
-  { p: "clear", c: "clear-end", d: [["clear", "inline-end"]] },
-  { p: "clear", c: "clear-left", d: [["clear", "left"]] },
-  { p: "clear", c: "clear-right", d: [["clear", "right"]] },
-  { p: "clear", c: "clear-both", d: [["clear", "both"]] },
-  { p: "clear", c: "clear-none", d: [["clear", "none"]] },
-  { p: "boxSizing", c: "box-border", d: [["box-sizing", "border-box"]] },
-  { p: "boxSizing", c: "box-content", d: [["box-sizing", "content-box"]] },
-  {
-    p: "lineClamp",
-    c: "line-clamp-none",
-    d: [
-      ["overflow", "visible"],
-      ["display", "block"],
-      ["-webkit-box-orient", "horizontal"],
-      ["-webkit-line-clamp", "none"]
-    ]
-  },
-  { p: "display", c: "block", d: [["display", "block"]] },
-  { p: "display", c: "inline-block", d: [["display", "inline-block"]] },
-  { p: "display", c: "inline", d: [["display", "inline"]] },
-  { p: "display", c: "flex", d: [["display", "flex"]] },
-  { p: "display", c: "inline-flex", d: [["display", "inline-flex"]] },
-  { p: "display", c: "table", d: [["display", "table"]] },
-  { p: "display", c: "inline-table", d: [["display", "inline-table"]] },
-  { p: "display", c: "table-caption", d: [["display", "table-caption"]] },
-  { p: "display", c: "table-cell", d: [["display", "table-cell"]] },
-  { p: "display", c: "table-column", d: [["display", "table-column"]] },
-  { p: "display", c: "table-column-group", d: [["display", "table-column-group"]] },
-  { p: "display", c: "table-footer-group", d: [["display", "table-footer-group"]] },
-  { p: "display", c: "table-header-group", d: [["display", "table-header-group"]] },
-  { p: "display", c: "table-row-group", d: [["display", "table-row-group"]] },
-  { p: "display", c: "table-row", d: [["display", "table-row"]] },
-  { p: "display", c: "flow-root", d: [["display", "flow-root"]] },
-  { p: "display", c: "grid", d: [["display", "grid"]] },
-  { p: "display", c: "inline-grid", d: [["display", "inline-grid"]] },
-  { p: "display", c: "contents", d: [["display", "contents"]] },
-  { p: "display", c: "list-item", d: [["display", "list-item"]] },
-  { p: "display", c: "hidden", d: [["display", "none"]] },
-  { p: "tableLayout", c: "table-auto", d: [["table-layout", "auto"]] },
-  { p: "tableLayout", c: "table-fixed", d: [["table-layout", "fixed"]] },
-  { p: "captionSide", c: "caption-top", d: [["caption-side", "top"]] },
-  { p: "captionSide", c: "caption-bottom", d: [["caption-side", "bottom"]] },
-  { p: "borderCollapse", c: "border-collapse", d: [["border-collapse", "collapse"]] },
-  { p: "borderCollapse", c: "border-separate", d: [["border-collapse", "separate"]] },
-  {
-    p: "transform",
-    c: "transform",
-    d: [
-      [
-        "transform",
-        "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
-      ]
-    ],
-    df: "transform"
-  },
-  {
-    p: "transform",
-    c: "transform-cpu",
-    d: [
-      [
-        "transform",
-        "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
-      ]
-    ]
-  },
-  {
-    p: "transform",
-    c: "transform-gpu",
-    d: [
-      [
-        "transform",
-        "translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
-      ]
-    ]
-  },
-  { p: "transform", c: "transform-none", d: [["transform", "none"]] },
-  { p: "touchAction", c: "touch-auto", d: [["touch-action", "auto"]] },
-  { p: "touchAction", c: "touch-none", d: [["touch-action", "none"]] },
-  {
-    p: "touchAction",
-    c: "touch-pan-x",
-    d: [
-      ["--tw-pan-x", "pan-x"],
-      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
-    ],
-    df: "touch-action"
-  },
-  {
-    p: "touchAction",
-    c: "touch-pan-left",
-    d: [
-      ["--tw-pan-x", "pan-left"],
-      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
-    ],
-    df: "touch-action"
-  },
-  {
-    p: "touchAction",
-    c: "touch-pan-right",
-    d: [
-      ["--tw-pan-x", "pan-right"],
-      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
-    ],
-    df: "touch-action"
-  },
-  {
-    p: "touchAction",
-    c: "touch-pan-y",
-    d: [
-      ["--tw-pan-y", "pan-y"],
-      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
-    ],
-    df: "touch-action"
-  },
-  {
-    p: "touchAction",
-    c: "touch-pan-up",
-    d: [
-      ["--tw-pan-y", "pan-up"],
-      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
-    ],
-    df: "touch-action"
-  },
-  {
-    p: "touchAction",
-    c: "touch-pan-down",
-    d: [
-      ["--tw-pan-y", "pan-down"],
-      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
-    ],
-    df: "touch-action"
-  },
-  {
-    p: "touchAction",
-    c: "touch-pinch-zoom",
-    d: [
-      ["--tw-pinch-zoom", "pinch-zoom"],
-      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
-    ],
-    df: "touch-action"
-  },
-  { p: "touchAction", c: "touch-manipulation", d: [["touch-action", "manipulation"]] },
-  { p: "userSelect", c: "select-none", d: [["user-select", "none"]] },
-  { p: "userSelect", c: "select-text", d: [["user-select", "text"]] },
-  { p: "userSelect", c: "select-all", d: [["user-select", "all"]] },
-  { p: "userSelect", c: "select-auto", d: [["user-select", "auto"]] },
-  { p: "resize", c: "resize-none", d: [["resize", "none"]] },
-  { p: "resize", c: "resize-y", d: [["resize", "vertical"]] },
-  { p: "resize", c: "resize-x", d: [["resize", "horizontal"]] },
-  { p: "resize", c: "resize", d: [["resize", "both"]] },
-  { p: "scrollSnapType", c: "snap-none", d: [["scroll-snap-type", "none"]] },
-  {
-    p: "scrollSnapType",
-    c: "snap-x",
-    d: [["scroll-snap-type", "x var(--tw-scroll-snap-strictness)"]],
-    df: "scroll-snap-type"
-  },
-  {
-    p: "scrollSnapType",
-    c: "snap-y",
-    d: [["scroll-snap-type", "y var(--tw-scroll-snap-strictness)"]],
-    df: "scroll-snap-type"
-  },
-  {
-    p: "scrollSnapType",
-    c: "snap-both",
-    d: [["scroll-snap-type", "both var(--tw-scroll-snap-strictness)"]],
-    df: "scroll-snap-type"
-  },
-  { p: "scrollSnapType", c: "snap-mandatory", d: [["--tw-scroll-snap-strictness", "mandatory"]] },
-  { p: "scrollSnapType", c: "snap-proximity", d: [["--tw-scroll-snap-strictness", "proximity"]] },
-  { p: "scrollSnapAlign", c: "snap-start", d: [["scroll-snap-align", "start"]] },
-  { p: "scrollSnapAlign", c: "snap-end", d: [["scroll-snap-align", "end"]] },
-  { p: "scrollSnapAlign", c: "snap-center", d: [["scroll-snap-align", "center"]] },
-  { p: "scrollSnapAlign", c: "snap-align-none", d: [["scroll-snap-align", "none"]] },
-  { p: "scrollSnapStop", c: "snap-normal", d: [["scroll-snap-stop", "normal"]] },
-  { p: "scrollSnapStop", c: "snap-always", d: [["scroll-snap-stop", "always"]] },
-  { p: "listStylePosition", c: "list-inside", d: [["list-style-position", "inside"]] },
-  { p: "listStylePosition", c: "list-outside", d: [["list-style-position", "outside"]] },
-  { p: "appearance", c: "appearance-none", d: [["appearance", "none"]] },
-  { p: "appearance", c: "appearance-auto", d: [["appearance", "auto"]] },
-  { p: "breakBefore", c: "break-before-auto", d: [["break-before", "auto"]] },
-  { p: "breakBefore", c: "break-before-avoid", d: [["break-before", "avoid"]] },
-  { p: "breakBefore", c: "break-before-all", d: [["break-before", "all"]] },
-  { p: "breakBefore", c: "break-before-avoid-page", d: [["break-before", "avoid-page"]] },
-  { p: "breakBefore", c: "break-before-page", d: [["break-before", "page"]] },
-  { p: "breakBefore", c: "break-before-left", d: [["break-before", "left"]] },
-  { p: "breakBefore", c: "break-before-right", d: [["break-before", "right"]] },
-  { p: "breakBefore", c: "break-before-column", d: [["break-before", "column"]] },
-  { p: "breakInside", c: "break-inside-auto", d: [["break-inside", "auto"]] },
-  { p: "breakInside", c: "break-inside-avoid", d: [["break-inside", "avoid"]] },
-  { p: "breakInside", c: "break-inside-avoid-page", d: [["break-inside", "avoid-page"]] },
-  { p: "breakInside", c: "break-inside-avoid-column", d: [["break-inside", "avoid-column"]] },
-  { p: "breakAfter", c: "break-after-auto", d: [["break-after", "auto"]] },
-  { p: "breakAfter", c: "break-after-avoid", d: [["break-after", "avoid"]] },
-  { p: "breakAfter", c: "break-after-all", d: [["break-after", "all"]] },
-  { p: "breakAfter", c: "break-after-avoid-page", d: [["break-after", "avoid-page"]] },
-  { p: "breakAfter", c: "break-after-page", d: [["break-after", "page"]] },
-  { p: "breakAfter", c: "break-after-left", d: [["break-after", "left"]] },
-  { p: "breakAfter", c: "break-after-right", d: [["break-after", "right"]] },
-  { p: "breakAfter", c: "break-after-column", d: [["break-after", "column"]] },
-  { p: "gridAutoFlow", c: "grid-flow-row", d: [["grid-auto-flow", "row"]] },
-  { p: "gridAutoFlow", c: "grid-flow-col", d: [["grid-auto-flow", "column"]] },
-  { p: "gridAutoFlow", c: "grid-flow-dense", d: [["grid-auto-flow", "dense"]] },
-  { p: "gridAutoFlow", c: "grid-flow-row-dense", d: [["grid-auto-flow", "row dense"]] },
-  { p: "gridAutoFlow", c: "grid-flow-col-dense", d: [["grid-auto-flow", "column dense"]] },
-  { p: "flexDirection", c: "flex-row", d: [["flex-direction", "row"]] },
-  { p: "flexDirection", c: "flex-row-reverse", d: [["flex-direction", "row-reverse"]] },
-  { p: "flexDirection", c: "flex-col", d: [["flex-direction", "column"]] },
-  { p: "flexDirection", c: "flex-col-reverse", d: [["flex-direction", "column-reverse"]] },
-  { p: "flexWrap", c: "flex-wrap", d: [["flex-wrap", "wrap"]] },
-  { p: "flexWrap", c: "flex-wrap-reverse", d: [["flex-wrap", "wrap-reverse"]] },
-  { p: "flexWrap", c: "flex-nowrap", d: [["flex-wrap", "nowrap"]] },
-  { p: "placeContent", c: "place-content-center", d: [["place-content", "center"]] },
-  { p: "placeContent", c: "place-content-start", d: [["place-content", "start"]] },
-  { p: "placeContent", c: "place-content-end", d: [["place-content", "end"]] },
-  { p: "placeContent", c: "place-content-between", d: [["place-content", "space-between"]] },
-  { p: "placeContent", c: "place-content-around", d: [["place-content", "space-around"]] },
-  { p: "placeContent", c: "place-content-evenly", d: [["place-content", "space-evenly"]] },
-  { p: "placeContent", c: "place-content-baseline", d: [["place-content", "baseline"]] },
-  { p: "placeContent", c: "place-content-stretch", d: [["place-content", "stretch"]] },
-  { p: "placeItems", c: "place-items-start", d: [["place-items", "start"]] },
-  { p: "placeItems", c: "place-items-end", d: [["place-items", "end"]] },
-  { p: "placeItems", c: "place-items-center", d: [["place-items", "center"]] },
-  { p: "placeItems", c: "place-items-baseline", d: [["place-items", "baseline"]] },
-  { p: "placeItems", c: "place-items-stretch", d: [["place-items", "stretch"]] },
-  { p: "alignContent", c: "content-normal", d: [["align-content", "normal"]] },
-  { p: "alignContent", c: "content-center", d: [["align-content", "center"]] },
-  { p: "alignContent", c: "content-start", d: [["align-content", "flex-start"]] },
-  { p: "alignContent", c: "content-end", d: [["align-content", "flex-end"]] },
-  { p: "alignContent", c: "content-between", d: [["align-content", "space-between"]] },
-  { p: "alignContent", c: "content-around", d: [["align-content", "space-around"]] },
-  { p: "alignContent", c: "content-evenly", d: [["align-content", "space-evenly"]] },
-  { p: "alignContent", c: "content-baseline", d: [["align-content", "baseline"]] },
-  { p: "alignContent", c: "content-stretch", d: [["align-content", "stretch"]] },
-  { p: "alignItems", c: "items-start", d: [["align-items", "flex-start"]] },
-  { p: "alignItems", c: "items-end", d: [["align-items", "flex-end"]] },
-  { p: "alignItems", c: "items-center", d: [["align-items", "center"]] },
-  { p: "alignItems", c: "items-baseline", d: [["align-items", "baseline"]] },
-  { p: "alignItems", c: "items-stretch", d: [["align-items", "stretch"]] },
-  { p: "justifyContent", c: "justify-normal", d: [["justify-content", "normal"]] },
-  { p: "justifyContent", c: "justify-start", d: [["justify-content", "flex-start"]] },
-  { p: "justifyContent", c: "justify-end", d: [["justify-content", "flex-end"]] },
-  { p: "justifyContent", c: "justify-center", d: [["justify-content", "center"]] },
-  { p: "justifyContent", c: "justify-between", d: [["justify-content", "space-between"]] },
-  { p: "justifyContent", c: "justify-around", d: [["justify-content", "space-around"]] },
-  { p: "justifyContent", c: "justify-evenly", d: [["justify-content", "space-evenly"]] },
-  { p: "justifyContent", c: "justify-stretch", d: [["justify-content", "stretch"]] },
-  { p: "justifyItems", c: "justify-items-start", d: [["justify-items", "start"]] },
-  { p: "justifyItems", c: "justify-items-end", d: [["justify-items", "end"]] },
-  { p: "justifyItems", c: "justify-items-center", d: [["justify-items", "center"]] },
-  { p: "justifyItems", c: "justify-items-stretch", d: [["justify-items", "stretch"]] },
-  {
-    p: "space",
-    c: "space-y-reverse",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["--tw-space-y-reverse", "1"]]
-  },
-  {
-    p: "space",
-    c: "space-x-reverse",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["--tw-space-x-reverse", "1"]]
-  },
-  {
-    p: "divideWidth",
-    c: "divide-y-reverse",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["--tw-divide-y-reverse", "1"]],
-    df: "border-width"
-  },
-  {
-    p: "divideWidth",
-    c: "divide-x-reverse",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["--tw-divide-x-reverse", "1"]],
-    df: "border-width"
-  },
-  {
-    p: "divideStyle",
-    c: "divide-solid",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["border-style", "solid"]]
-  },
-  {
-    p: "divideStyle",
-    c: "divide-dashed",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["border-style", "dashed"]]
-  },
-  {
-    p: "divideStyle",
-    c: "divide-dotted",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["border-style", "dotted"]]
-  },
-  {
-    p: "divideStyle",
-    c: "divide-double",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["border-style", "double"]]
-  },
-  {
-    p: "divideStyle",
-    c: "divide-none",
-    s: " > :not([hidden]) ~ :not([hidden])",
-    d: [["border-style", "none"]]
-  },
-  { p: "placeSelf", c: "place-self-auto", d: [["place-self", "auto"]] },
-  { p: "placeSelf", c: "place-self-start", d: [["place-self", "start"]] },
-  { p: "placeSelf", c: "place-self-end", d: [["place-self", "end"]] },
-  { p: "placeSelf", c: "place-self-center", d: [["place-self", "center"]] },
-  { p: "placeSelf", c: "place-self-stretch", d: [["place-self", "stretch"]] },
-  { p: "alignSelf", c: "self-auto", d: [["align-self", "auto"]] },
-  { p: "alignSelf", c: "self-start", d: [["align-self", "flex-start"]] },
-  { p: "alignSelf", c: "self-end", d: [["align-self", "flex-end"]] },
-  { p: "alignSelf", c: "self-center", d: [["align-self", "center"]] },
-  { p: "alignSelf", c: "self-stretch", d: [["align-self", "stretch"]] },
-  { p: "alignSelf", c: "self-baseline", d: [["align-self", "baseline"]] },
-  { p: "justifySelf", c: "justify-self-auto", d: [["justify-self", "auto"]] },
-  { p: "justifySelf", c: "justify-self-start", d: [["justify-self", "start"]] },
-  { p: "justifySelf", c: "justify-self-end", d: [["justify-self", "end"]] },
-  { p: "justifySelf", c: "justify-self-center", d: [["justify-self", "center"]] },
-  { p: "justifySelf", c: "justify-self-stretch", d: [["justify-self", "stretch"]] },
-  { p: "overflow", c: "overflow-auto", d: [["overflow", "auto"]] },
-  { p: "overflow", c: "overflow-hidden", d: [["overflow", "hidden"]] },
-  { p: "overflow", c: "overflow-clip", d: [["overflow", "clip"]] },
-  { p: "overflow", c: "overflow-visible", d: [["overflow", "visible"]] },
-  { p: "overflow", c: "overflow-scroll", d: [["overflow", "scroll"]] },
-  { p: "overflow", c: "overflow-x-auto", d: [["overflow-x", "auto"]] },
-  { p: "overflow", c: "overflow-y-auto", d: [["overflow-y", "auto"]] },
-  { p: "overflow", c: "overflow-x-hidden", d: [["overflow-x", "hidden"]] },
-  { p: "overflow", c: "overflow-y-hidden", d: [["overflow-y", "hidden"]] },
-  { p: "overflow", c: "overflow-x-clip", d: [["overflow-x", "clip"]] },
-  { p: "overflow", c: "overflow-y-clip", d: [["overflow-y", "clip"]] },
-  { p: "overflow", c: "overflow-x-visible", d: [["overflow-x", "visible"]] },
-  { p: "overflow", c: "overflow-y-visible", d: [["overflow-y", "visible"]] },
-  { p: "overflow", c: "overflow-x-scroll", d: [["overflow-x", "scroll"]] },
-  { p: "overflow", c: "overflow-y-scroll", d: [["overflow-y", "scroll"]] },
-  { p: "overscrollBehavior", c: "overscroll-auto", d: [["overscroll-behavior", "auto"]] },
-  { p: "overscrollBehavior", c: "overscroll-contain", d: [["overscroll-behavior", "contain"]] },
-  { p: "overscrollBehavior", c: "overscroll-none", d: [["overscroll-behavior", "none"]] },
-  { p: "overscrollBehavior", c: "overscroll-y-auto", d: [["overscroll-behavior-y", "auto"]] },
-  { p: "overscrollBehavior", c: "overscroll-y-contain", d: [["overscroll-behavior-y", "contain"]] },
-  { p: "overscrollBehavior", c: "overscroll-y-none", d: [["overscroll-behavior-y", "none"]] },
-  { p: "overscrollBehavior", c: "overscroll-x-auto", d: [["overscroll-behavior-x", "auto"]] },
-  { p: "overscrollBehavior", c: "overscroll-x-contain", d: [["overscroll-behavior-x", "contain"]] },
-  { p: "overscrollBehavior", c: "overscroll-x-none", d: [["overscroll-behavior-x", "none"]] },
-  { p: "scrollBehavior", c: "scroll-auto", d: [["scroll-behavior", "auto"]] },
-  { p: "scrollBehavior", c: "scroll-smooth", d: [["scroll-behavior", "smooth"]] },
-  {
-    p: "textOverflow",
-    c: "truncate",
-    d: [
-      ["overflow", "hidden"],
-      ["text-overflow", "ellipsis"],
-      ["white-space", "nowrap"]
-    ]
-  },
-  { p: "textOverflow", c: "overflow-ellipsis", d: [["text-overflow", "ellipsis"]] },
-  { p: "textOverflow", c: "text-ellipsis", d: [["text-overflow", "ellipsis"]] },
-  { p: "textOverflow", c: "text-clip", d: [["text-overflow", "clip"]] },
-  { p: "hyphens", c: "hyphens-none", d: [["hyphens", "none"]] },
-  { p: "hyphens", c: "hyphens-manual", d: [["hyphens", "manual"]] },
-  { p: "hyphens", c: "hyphens-auto", d: [["hyphens", "auto"]] },
-  { p: "whitespace", c: "whitespace-normal", d: [["white-space", "normal"]] },
-  { p: "whitespace", c: "whitespace-nowrap", d: [["white-space", "nowrap"]] },
-  { p: "whitespace", c: "whitespace-pre", d: [["white-space", "pre"]] },
-  { p: "whitespace", c: "whitespace-pre-line", d: [["white-space", "pre-line"]] },
-  { p: "whitespace", c: "whitespace-pre-wrap", d: [["white-space", "pre-wrap"]] },
-  { p: "whitespace", c: "whitespace-break-spaces", d: [["white-space", "break-spaces"]] },
-  { p: "textWrap", c: "text-wrap", d: [["text-wrap", "wrap"]] },
-  { p: "textWrap", c: "text-nowrap", d: [["text-wrap", "nowrap"]] },
-  { p: "textWrap", c: "text-balance", d: [["text-wrap", "balance"]] },
-  { p: "textWrap", c: "text-pretty", d: [["text-wrap", "pretty"]] },
-  {
-    p: "wordBreak",
-    c: "break-normal",
-    d: [
-      ["overflow-wrap", "normal"],
-      ["word-break", "normal"]
-    ]
-  },
-  { p: "wordBreak", c: "break-words", d: [["overflow-wrap", "break-word"]] },
-  { p: "wordBreak", c: "break-all", d: [["word-break", "break-all"]] },
-  { p: "wordBreak", c: "break-keep", d: [["word-break", "keep-all"]] },
-  { p: "borderStyle", c: "border-solid", d: [["border-style", "solid"]] },
-  { p: "borderStyle", c: "border-dashed", d: [["border-style", "dashed"]] },
-  { p: "borderStyle", c: "border-dotted", d: [["border-style", "dotted"]] },
-  { p: "borderStyle", c: "border-double", d: [["border-style", "double"]] },
-  { p: "borderStyle", c: "border-hidden", d: [["border-style", "hidden"]] },
-  { p: "borderStyle", c: "border-none", d: [["border-style", "none"]] },
-  { p: "boxDecorationBreak", c: "decoration-slice", d: [["box-decoration-break", "slice"]] },
-  { p: "boxDecorationBreak", c: "decoration-clone", d: [["box-decoration-break", "clone"]] },
-  { p: "boxDecorationBreak", c: "box-decoration-slice", d: [["box-decoration-break", "slice"]] },
-  { p: "boxDecorationBreak", c: "box-decoration-clone", d: [["box-decoration-break", "clone"]] },
-  { p: "backgroundAttachment", c: "bg-fixed", d: [["background-attachment", "fixed"]] },
-  { p: "backgroundAttachment", c: "bg-local", d: [["background-attachment", "local"]] },
-  { p: "backgroundAttachment", c: "bg-scroll", d: [["background-attachment", "scroll"]] },
-  { p: "backgroundClip", c: "bg-clip-border", d: [["background-clip", "border-box"]] },
-  { p: "backgroundClip", c: "bg-clip-padding", d: [["background-clip", "padding-box"]] },
-  { p: "backgroundClip", c: "bg-clip-content", d: [["background-clip", "content-box"]] },
-  { p: "backgroundClip", c: "bg-clip-text", d: [["background-clip", "text"]] },
-  { p: "backgroundRepeat", c: "bg-repeat", d: [["background-repeat", "repeat"]] },
-  { p: "backgroundRepeat", c: "bg-no-repeat", d: [["background-repeat", "no-repeat"]] },
-  { p: "backgroundRepeat", c: "bg-repeat-x", d: [["background-repeat", "repeat-x"]] },
-  { p: "backgroundRepeat", c: "bg-repeat-y", d: [["background-repeat", "repeat-y"]] },
-  { p: "backgroundRepeat", c: "bg-repeat-round", d: [["background-repeat", "round"]] },
-  { p: "backgroundRepeat", c: "bg-repeat-space", d: [["background-repeat", "space"]] },
-  { p: "backgroundOrigin", c: "bg-origin-border", d: [["background-origin", "border-box"]] },
-  { p: "backgroundOrigin", c: "bg-origin-padding", d: [["background-origin", "padding-box"]] },
-  { p: "backgroundOrigin", c: "bg-origin-content", d: [["background-origin", "content-box"]] },
-  { p: "objectFit", c: "object-contain", d: [["object-fit", "contain"]] },
-  { p: "objectFit", c: "object-cover", d: [["object-fit", "cover"]] },
-  { p: "objectFit", c: "object-fill", d: [["object-fit", "fill"]] },
-  { p: "objectFit", c: "object-none", d: [["object-fit", "none"]] },
-  { p: "objectFit", c: "object-scale-down", d: [["object-fit", "scale-down"]] },
-  { p: "textAlign", c: "text-left", d: [["text-align", "left"]] },
-  { p: "textAlign", c: "text-center", d: [["text-align", "center"]] },
-  { p: "textAlign", c: "text-right", d: [["text-align", "right"]] },
-  { p: "textAlign", c: "text-justify", d: [["text-align", "justify"]] },
-  { p: "textAlign", c: "text-start", d: [["text-align", "start"]] },
-  { p: "textAlign", c: "text-end", d: [["text-align", "end"]] },
-  { p: "verticalAlign", c: "align-baseline", d: [["vertical-align", "baseline"]] },
-  { p: "verticalAlign", c: "align-top", d: [["vertical-align", "top"]] },
-  { p: "verticalAlign", c: "align-middle", d: [["vertical-align", "middle"]] },
-  { p: "verticalAlign", c: "align-bottom", d: [["vertical-align", "bottom"]] },
-  { p: "verticalAlign", c: "align-text-top", d: [["vertical-align", "text-top"]] },
-  { p: "verticalAlign", c: "align-text-bottom", d: [["vertical-align", "text-bottom"]] },
-  { p: "verticalAlign", c: "align-sub", d: [["vertical-align", "sub"]] },
-  { p: "verticalAlign", c: "align-super", d: [["vertical-align", "super"]] },
-  { p: "textTransform", c: "uppercase", d: [["text-transform", "uppercase"]] },
-  { p: "textTransform", c: "lowercase", d: [["text-transform", "lowercase"]] },
-  { p: "textTransform", c: "capitalize", d: [["text-transform", "capitalize"]] },
-  { p: "textTransform", c: "normal-case", d: [["text-transform", "none"]] },
-  { p: "fontStyle", c: "italic", d: [["font-style", "italic"]] },
-  { p: "fontStyle", c: "not-italic", d: [["font-style", "normal"]] },
-  { p: "fontVariantNumeric", c: "normal-nums", d: [["font-variant-numeric", "normal"]] },
-  {
-    p: "fontVariantNumeric",
-    c: "ordinal",
-    d: [
-      ["--tw-ordinal", "ordinal"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  {
-    p: "fontVariantNumeric",
-    c: "slashed-zero",
-    d: [
-      ["--tw-slashed-zero", "slashed-zero"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  {
-    p: "fontVariantNumeric",
-    c: "lining-nums",
-    d: [
-      ["--tw-numeric-figure", "lining-nums"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  {
-    p: "fontVariantNumeric",
-    c: "oldstyle-nums",
-    d: [
-      ["--tw-numeric-figure", "oldstyle-nums"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  {
-    p: "fontVariantNumeric",
-    c: "proportional-nums",
-    d: [
-      ["--tw-numeric-spacing", "proportional-nums"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  {
-    p: "fontVariantNumeric",
-    c: "tabular-nums",
-    d: [
-      ["--tw-numeric-spacing", "tabular-nums"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  {
-    p: "fontVariantNumeric",
-    c: "diagonal-fractions",
-    d: [
-      ["--tw-numeric-fraction", "diagonal-fractions"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  {
-    p: "fontVariantNumeric",
-    c: "stacked-fractions",
-    d: [
-      ["--tw-numeric-fraction", "stacked-fractions"],
-      [
-        "font-variant-numeric",
-        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
-      ]
-    ],
-    df: "font-variant-numeric"
-  },
-  { p: "textDecoration", c: "underline", d: [["text-decoration-line", "underline"]] },
-  { p: "textDecoration", c: "overline", d: [["text-decoration-line", "overline"]] },
-  { p: "textDecoration", c: "line-through", d: [["text-decoration-line", "line-through"]] },
-  { p: "textDecoration", c: "no-underline", d: [["text-decoration-line", "none"]] },
-  { p: "textDecorationStyle", c: "decoration-solid", d: [["text-decoration-style", "solid"]] },
-  { p: "textDecorationStyle", c: "decoration-double", d: [["text-decoration-style", "double"]] },
-  { p: "textDecorationStyle", c: "decoration-dotted", d: [["text-decoration-style", "dotted"]] },
-  { p: "textDecorationStyle", c: "decoration-dashed", d: [["text-decoration-style", "dashed"]] },
-  { p: "textDecorationStyle", c: "decoration-wavy", d: [["text-decoration-style", "wavy"]] },
-  {
-    p: "fontSmoothing",
-    c: "antialiased",
-    d: [
-      ["-webkit-font-smoothing", "antialiased"],
-      ["-moz-osx-font-smoothing", "grayscale"]
-    ]
-  },
-  {
-    p: "fontSmoothing",
-    c: "subpixel-antialiased",
-    d: [
-      ["-webkit-font-smoothing", "auto"],
-      ["-moz-osx-font-smoothing", "auto"]
-    ]
-  },
-  { p: "backgroundBlendMode", c: "bg-blend-normal", d: [["background-blend-mode", "normal"]] },
-  { p: "backgroundBlendMode", c: "bg-blend-multiply", d: [["background-blend-mode", "multiply"]] },
-  { p: "backgroundBlendMode", c: "bg-blend-screen", d: [["background-blend-mode", "screen"]] },
-  { p: "backgroundBlendMode", c: "bg-blend-overlay", d: [["background-blend-mode", "overlay"]] },
-  { p: "backgroundBlendMode", c: "bg-blend-darken", d: [["background-blend-mode", "darken"]] },
-  { p: "backgroundBlendMode", c: "bg-blend-lighten", d: [["background-blend-mode", "lighten"]] },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-color-dodge",
-    d: [["background-blend-mode", "color-dodge"]]
-  },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-color-burn",
-    d: [["background-blend-mode", "color-burn"]]
-  },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-hard-light",
-    d: [["background-blend-mode", "hard-light"]]
-  },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-soft-light",
-    d: [["background-blend-mode", "soft-light"]]
-  },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-difference",
-    d: [["background-blend-mode", "difference"]]
-  },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-exclusion",
-    d: [["background-blend-mode", "exclusion"]]
-  },
-  { p: "backgroundBlendMode", c: "bg-blend-hue", d: [["background-blend-mode", "hue"]] },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-saturation",
-    d: [["background-blend-mode", "saturation"]]
-  },
-  { p: "backgroundBlendMode", c: "bg-blend-color", d: [["background-blend-mode", "color"]] },
-  {
-    p: "backgroundBlendMode",
-    c: "bg-blend-luminosity",
-    d: [["background-blend-mode", "luminosity"]]
-  },
-  { p: "mixBlendMode", c: "mix-blend-normal", d: [["mix-blend-mode", "normal"]] },
-  { p: "mixBlendMode", c: "mix-blend-multiply", d: [["mix-blend-mode", "multiply"]] },
-  { p: "mixBlendMode", c: "mix-blend-screen", d: [["mix-blend-mode", "screen"]] },
-  { p: "mixBlendMode", c: "mix-blend-overlay", d: [["mix-blend-mode", "overlay"]] },
-  { p: "mixBlendMode", c: "mix-blend-darken", d: [["mix-blend-mode", "darken"]] },
-  { p: "mixBlendMode", c: "mix-blend-lighten", d: [["mix-blend-mode", "lighten"]] },
-  { p: "mixBlendMode", c: "mix-blend-color-dodge", d: [["mix-blend-mode", "color-dodge"]] },
-  { p: "mixBlendMode", c: "mix-blend-color-burn", d: [["mix-blend-mode", "color-burn"]] },
-  { p: "mixBlendMode", c: "mix-blend-hard-light", d: [["mix-blend-mode", "hard-light"]] },
-  { p: "mixBlendMode", c: "mix-blend-soft-light", d: [["mix-blend-mode", "soft-light"]] },
-  { p: "mixBlendMode", c: "mix-blend-difference", d: [["mix-blend-mode", "difference"]] },
-  { p: "mixBlendMode", c: "mix-blend-exclusion", d: [["mix-blend-mode", "exclusion"]] },
-  { p: "mixBlendMode", c: "mix-blend-hue", d: [["mix-blend-mode", "hue"]] },
-  { p: "mixBlendMode", c: "mix-blend-saturation", d: [["mix-blend-mode", "saturation"]] },
-  { p: "mixBlendMode", c: "mix-blend-color", d: [["mix-blend-mode", "color"]] },
-  { p: "mixBlendMode", c: "mix-blend-luminosity", d: [["mix-blend-mode", "luminosity"]] },
-  { p: "mixBlendMode", c: "mix-blend-plus-darker", d: [["mix-blend-mode", "plus-darker"]] },
-  { p: "mixBlendMode", c: "mix-blend-plus-lighter", d: [["mix-blend-mode", "plus-lighter"]] },
-  {
-    p: "outlineStyle",
-    c: "outline-none",
-    d: [
-      ["outline", "2px solid transparent"],
-      ["outline-offset", "2px"]
-    ]
-  },
-  { p: "outlineStyle", c: "outline", d: [["outline-style", "solid"]] },
-  { p: "outlineStyle", c: "outline-dashed", d: [["outline-style", "dashed"]] },
-  { p: "outlineStyle", c: "outline-dotted", d: [["outline-style", "dotted"]] },
-  { p: "outlineStyle", c: "outline-double", d: [["outline-style", "double"]] },
-  { p: "ringWidth", c: "ring-inset", d: [["--tw-ring-inset", "inset"]], df: "ring-width" },
-  {
-    p: "filter",
-    c: "filter",
-    d: [
-      [
-        "filter",
-        "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
-      ]
-    ],
-    df: "filter"
-  },
-  { p: "filter", c: "filter-none", d: [["filter", "none"]] },
-  {
-    p: "backdropFilter",
-    c: "backdrop-filter",
-    d: [
-      [
-        "-webkit-backdrop-filter",
-        "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
-      ],
-      [
-        "backdrop-filter",
-        "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
-      ]
-    ],
-    df: "backdrop-filter"
-  },
-  {
-    p: "backdropFilter",
-    c: "backdrop-filter-none",
-    d: [
-      ["-webkit-backdrop-filter", "none"],
-      ["backdrop-filter", "none"]
-    ]
-  },
-  { p: "contain", c: "contain-none", d: [["contain", "none"]] },
-  { p: "contain", c: "contain-content", d: [["contain", "content"]] },
-  { p: "contain", c: "contain-strict", d: [["contain", "strict"]] },
-  {
-    p: "contain",
-    c: "contain-size",
-    d: [
-      ["--tw-contain-size", "size"],
-      [
-        "contain",
-        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
-      ]
-    ],
-    df: "contain"
-  },
-  {
-    p: "contain",
-    c: "contain-inline-size",
-    d: [
-      ["--tw-contain-size", "inline-size"],
-      [
-        "contain",
-        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
-      ]
-    ],
-    df: "contain"
-  },
-  {
-    p: "contain",
-    c: "contain-layout",
-    d: [
-      ["--tw-contain-layout", "layout"],
-      [
-        "contain",
-        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
-      ]
-    ],
-    df: "contain"
-  },
-  {
-    p: "contain",
-    c: "contain-paint",
-    d: [
-      ["--tw-contain-paint", "paint"],
-      [
-        "contain",
-        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
-      ]
-    ],
-    df: "contain"
-  },
-  {
-    p: "contain",
-    c: "contain-style",
-    d: [
-      ["--tw-contain-style", "style"],
-      [
-        "contain",
-        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
-      ]
-    ],
-    df: "contain"
-  },
-  { p: "forcedColorAdjust", c: "forced-color-adjust-auto", d: [["forced-color-adjust", "auto"]] },
-  { p: "forcedColorAdjust", c: "forced-color-adjust-none", d: [["forced-color-adjust", "none"]] }
-];
-var TRANSFORM_VALUE = "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))";
-var FILTER_VALUE = "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)";
-var BACKDROP_VALUE = "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)";
-var CHILD_SELECTOR = " > :not([hidden]) ~ :not([hidden])";
 function transformThemeValue(themeKey, value) {
   if (typeof value === "function") value = value({});
   if (themeKey === "fontSize" || themeKey === "outline") {
@@ -4576,8 +2144,6 @@ function buildFunctionalUtilities(theme, options) {
   });
   return list;
 }
-var SHADOW_KEYWORDS = /* @__PURE__ */ new Set(["inset", "inherit", "initial", "revert", "unset"]);
-var SHADOW_LENGTH = /^-?(\d+|\.\d+)(.*?)$/;
 function parseBoxShadowValue(input) {
   return splitComma(input).map((shadow) => {
     const value = shadow.trim();
@@ -4618,333 +2184,6 @@ function colorizeShadow(value) {
     return [s.keyword, s.x, s.y, s.blur, s.spread, "var(--tw-shadow-color)", ...s.unknown ?? []].filter(Boolean).join(" ");
   }).join(", ");
 }
-var CORE_PLUGIN_ORDER = [
-  "preflight",
-  "container",
-  "accessibility",
-  "pointerEvents",
-  "visibility",
-  "position",
-  "inset",
-  "isolation",
-  "zIndex",
-  "order",
-  "gridColumn",
-  "gridColumnStart",
-  "gridColumnEnd",
-  "gridRow",
-  "gridRowStart",
-  "gridRowEnd",
-  "float",
-  "clear",
-  "margin",
-  "boxSizing",
-  "lineClamp",
-  "display",
-  "aspectRatio",
-  "size",
-  "height",
-  "maxHeight",
-  "minHeight",
-  "width",
-  "minWidth",
-  "maxWidth",
-  "flex",
-  "flexShrink",
-  "flexGrow",
-  "flexBasis",
-  "tableLayout",
-  "captionSide",
-  "borderCollapse",
-  "borderSpacing",
-  "transformOrigin",
-  "translate",
-  "rotate",
-  "skew",
-  "scale",
-  "transform",
-  "animation",
-  "cursor",
-  "touchAction",
-  "userSelect",
-  "resize",
-  "scrollSnapType",
-  "scrollSnapAlign",
-  "scrollSnapStop",
-  "scrollMargin",
-  "scrollPadding",
-  "listStylePosition",
-  "listStyleType",
-  "listStyleImage",
-  "appearance",
-  "columns",
-  "breakBefore",
-  "breakInside",
-  "breakAfter",
-  "gridAutoColumns",
-  "gridAutoFlow",
-  "gridAutoRows",
-  "gridTemplateColumns",
-  "gridTemplateRows",
-  "flexDirection",
-  "flexWrap",
-  "placeContent",
-  "placeItems",
-  "alignContent",
-  "alignItems",
-  "justifyContent",
-  "justifyItems",
-  "gap",
-  "space",
-  "divideWidth",
-  "divideStyle",
-  "divideColor",
-  "divideOpacity",
-  "placeSelf",
-  "alignSelf",
-  "justifySelf",
-  "overflow",
-  "overscrollBehavior",
-  "scrollBehavior",
-  "textOverflow",
-  "hyphens",
-  "whitespace",
-  "textWrap",
-  "wordBreak",
-  "borderRadius",
-  "borderWidth",
-  "borderStyle",
-  "borderColor",
-  "borderOpacity",
-  "backgroundColor",
-  "backgroundOpacity",
-  "backgroundImage",
-  "gradientColorStops",
-  "boxDecorationBreak",
-  "backgroundSize",
-  "backgroundAttachment",
-  "backgroundClip",
-  "backgroundPosition",
-  "backgroundRepeat",
-  "backgroundOrigin",
-  "fill",
-  "stroke",
-  "strokeWidth",
-  "objectFit",
-  "objectPosition",
-  "padding",
-  "textAlign",
-  "textIndent",
-  "verticalAlign",
-  "fontFamily",
-  "fontSize",
-  "fontWeight",
-  "textTransform",
-  "fontStyle",
-  "fontVariantNumeric",
-  "lineHeight",
-  "letterSpacing",
-  "textColor",
-  "textOpacity",
-  "textDecoration",
-  "textDecorationColor",
-  "textDecorationStyle",
-  "textDecorationThickness",
-  "textUnderlineOffset",
-  "fontSmoothing",
-  "placeholderColor",
-  "placeholderOpacity",
-  "caretColor",
-  "accentColor",
-  "opacity",
-  "backgroundBlendMode",
-  "mixBlendMode",
-  "boxShadow",
-  "boxShadowColor",
-  "outlineStyle",
-  "outlineWidth",
-  "outlineOffset",
-  "outlineColor",
-  "ringWidth",
-  "ringColor",
-  "ringOpacity",
-  "ringOffsetWidth",
-  "ringOffsetColor",
-  "blur",
-  "brightness",
-  "contrast",
-  "dropShadow",
-  "grayscale",
-  "hueRotate",
-  "invert",
-  "saturate",
-  "sepia",
-  "filter",
-  "backdropBlur",
-  "backdropBrightness",
-  "backdropContrast",
-  "backdropGrayscale",
-  "backdropHueRotate",
-  "backdropInvert",
-  "backdropOpacity",
-  "backdropSaturate",
-  "backdropSepia",
-  "backdropFilter",
-  "transitionProperty",
-  "transitionDelay",
-  "transitionDuration",
-  "transitionTimingFunction",
-  "willChange",
-  "contain",
-  "content",
-  "forcedColorAdjust",
-  // Nakshora built-ins that Tailwind ships as plugins
-  "containerQueries"
-];
-var DEFAULTS_GROUPS = {
-  "border-spacing": { "--tw-border-spacing-x": "0", "--tw-border-spacing-y": "0" },
-  transform: {
-    "--tw-translate-x": "0",
-    "--tw-translate-y": "0",
-    "--tw-rotate": "0",
-    "--tw-skew-x": "0",
-    "--tw-skew-y": "0",
-    "--tw-scale-x": "1",
-    "--tw-scale-y": "1"
-  },
-  "touch-action": { "--tw-pan-x": " ", "--tw-pan-y": " ", "--tw-pinch-zoom": " " },
-  "scroll-snap-type": { "--tw-scroll-snap-strictness": "proximity" },
-  "gradient-color-stops": {
-    "--tw-gradient-from-position": " ",
-    "--tw-gradient-via-position": " ",
-    "--tw-gradient-to-position": " "
-  },
-  "font-variant-numeric": {
-    "--tw-ordinal": " ",
-    "--tw-slashed-zero": " ",
-    "--tw-numeric-figure": " ",
-    "--tw-numeric-spacing": " ",
-    "--tw-numeric-fraction": " "
-  },
-  "box-shadow": {
-    "--tw-ring-offset-shadow": "0 0 #0000",
-    "--tw-ring-shadow": "0 0 #0000",
-    "--tw-shadow": "0 0 #0000",
-    "--tw-shadow-colored": "0 0 #0000"
-  },
-  "ring-width": {
-    "--tw-ring-inset": " ",
-    "--tw-ring-offset-width": "0px",
-    "--tw-ring-offset-color": "#fff",
-    "--tw-ring-color": "rgb(59 130 246 / 0.5)",
-    "--tw-ring-offset-shadow": "0 0 #0000",
-    "--tw-ring-shadow": "0 0 #0000",
-    "--tw-shadow": "0 0 #0000",
-    "--tw-shadow-colored": "0 0 #0000"
-  },
-  filter: {
-    "--tw-blur": " ",
-    "--tw-brightness": " ",
-    "--tw-contrast": " ",
-    "--tw-grayscale": " ",
-    "--tw-hue-rotate": " ",
-    "--tw-invert": " ",
-    "--tw-saturate": " ",
-    "--tw-sepia": " ",
-    "--tw-drop-shadow": " "
-  },
-  "backdrop-filter": {
-    "--tw-backdrop-blur": " ",
-    "--tw-backdrop-brightness": " ",
-    "--tw-backdrop-contrast": " ",
-    "--tw-backdrop-grayscale": " ",
-    "--tw-backdrop-hue-rotate": " ",
-    "--tw-backdrop-invert": " ",
-    "--tw-backdrop-opacity": " ",
-    "--tw-backdrop-saturate": " ",
-    "--tw-backdrop-sepia": " "
-  },
-  contain: {
-    "--tw-contain-size": " ",
-    "--tw-contain-layout": " ",
-    "--tw-contain-paint": " ",
-    "--tw-contain-style": " "
-  },
-  "border-width": {}
-};
-var CATALOG_CACHE = /* @__PURE__ */ new Map();
-var CATALOG_CACHE_MAX = 4;
-var PSEUDO_ELEMENTS = [
-  ["first-letter", "&::first-letter"],
-  ["first-line", "&::first-line"],
-  ["marker", ["& *::marker", "&::marker"], void 0, ["--tw-text-opacity"]],
-  ["selection", ["& *::selection", "&::selection"]],
-  ["file", "&::file-selector-button"],
-  ["placeholder", "&::placeholder"],
-  ["backdrop", "&::backdrop"],
-  ["before", "&::before", { content: "var(--tw-content)" }],
-  ["after", "&::after", { content: "var(--tw-content)" }]
-];
-var VISITED_STRIP = ["--tw-text-opacity", "--tw-border-opacity", "--tw-bg-opacity"];
-var PSEUDO_CLASSES = [
-  ["first", "&:first-child"],
-  ["last", "&:last-child"],
-  ["only", "&:only-child"],
-  ["odd", "&:nth-child(odd)"],
-  ["even", "&:nth-child(even)"],
-  ["first-of-type", "&:first-of-type"],
-  ["last-of-type", "&:last-of-type"],
-  ["only-of-type", "&:only-of-type"],
-  ["visited", "&:visited"],
-  ["target", "&:target"],
-  ["open", "&[open]"],
-  ["default", "&:default"],
-  ["checked", "&:checked"],
-  ["indeterminate", "&:indeterminate"],
-  ["placeholder-shown", "&:placeholder-shown"],
-  ["autofill", "&:autofill"],
-  ["optional", "&:optional"],
-  ["required", "&:required"],
-  ["valid", "&:valid"],
-  ["invalid", "&:invalid"],
-  ["in-range", "&:in-range"],
-  ["out-of-range", "&:out-of-range"],
-  ["read-only", "&:read-only"],
-  ["empty", "&:empty"],
-  ["focus-within", "&:focus-within"],
-  ["hover", "&:hover"],
-  ["focus", "&:focus"],
-  ["focus-visible", "&:focus-visible"],
-  ["active", "&:active"],
-  ["enabled", "&:enabled"],
-  ["disabled", "&:disabled"],
-  // Nakshora / v4 additions
-  ["inert", "&:is([inert], [inert] *)"],
-  ["nth-last-child", "&:nth-last-child"]
-];
-var LEGACY_VARIANT_KEYS = {
-  focusVisible: "focus-visible",
-  focusWithin: "focus-within",
-  firstChild: "first",
-  lastChild: "last",
-  groupHover: "group-hover",
-  groupFocus: "group-focus",
-  peerHover: "peer-hover",
-  peerFocus: "peer-focus"
-};
-var MEDIA_SORT = {
-  supports: 100,
-  motion: 200,
-  contrast: 300,
-  screen: 1e3,
-  container: 5e3,
-  orientation: 6e3,
-  dark: 6200,
-  forcedColors: 6300,
-  print: 6400,
-  starting: 6500,
-  arbitrary: 7e3
-};
 function minWidthCond(value, sortBase = MEDIA_SORT.screen) {
   const px = screenToPx(value);
   return {
@@ -4972,1135 +2211,6 @@ function maxWidthValue(minValue) {
   const v = n - step;
   return `${Number.isInteger(v) ? v : parseFloat(v.toFixed(4))}${unit}`;
 }
-var Engine = class {
-  theme;
-  options;
-  /** static class → defs (later wins for duplicates) */
-  /**
-   * class → every static rule registered for it. Core classes map to one rule;
-   * plugin components (e.g. typography's `.prose`) register dozens of rules
-   * for the same class (different selector suffixes / at-rules), all of which
-   * must be emitted.
-   */
-  staticMap = /* @__PURE__ */ new Map();
-  /** prefix → functional utilities */
-  functionalMap = /* @__PURE__ */ new Map();
-  functional;
-  statics;
-  variants = /* @__PURE__ */ new Map();
-  functionalVariants = [];
-  pluginIndex = /* @__PURE__ */ new Map();
-  screens;
-  cache = /* @__PURE__ */ new Map();
-  seq = 0;
-  constructor(options) {
-    this.options = options;
-    this.theme = options.theme;
-    CORE_PLUGIN_ORDER.forEach((p, i) => this.pluginIndex.set(p, i));
-    this.screens = Object.entries(this.theme.screens).sort(
-      (a, b) => screenToPx(a[1]) - screenToPx(b[1])
-    );
-    this.statics = [...STATIC_UTILITIES, ...NAKSHORA_STATIC, ...options.extraStatic ?? []].map(
-      (s, index) => ({ ...s, index })
-    );
-    for (const s of this.statics) {
-      if (!this.pluginIndex.has(s.p)) this.pluginIndex.set(s.p, this.pluginIndex.size + 1e3);
-      const list = this.staticMap.get(s.c);
-      if (list) list.push(s);
-      else this.staticMap.set(s.c, [s]);
-    }
-    this.functional = [
-      ...buildFunctionalUtilities(this.theme, { pluginEnabled: options.pluginEnabled }),
-      ...options.extraFunctional ?? []
-    ].map((f, index) => ({ ...f, index }));
-    for (const f of this.functional) {
-      if (!this.pluginIndex.has(f.plugin))
-        this.pluginIndex.set(f.plugin, this.pluginIndex.size + 1e3);
-      const list = this.functionalMap.get(f.prefix) ?? [];
-      list.push(f);
-      this.functionalMap.set(f.prefix, list);
-    }
-    this.buildVariants(options.extraVariants ?? []);
-  }
-  /** next free cascade weight (Tailwind variant bit) */
-  nextBit = 1;
-  /**
-   * Register a variant and reserve its cascade weights: one per static branch
-   * (`marker` → 2, `dark` with two formats → 2), or `slots + 1` for a
-   * functional variant (one per themed value, the last one for arbitrary
-   * values) — exactly what Tailwind's `Offsets.recordVariant` does.
-   */
-  registerVariant(input) {
-    const bit = this.nextBit;
-    const width = input.match ? (input.slots ?? 0) + 1 : input.branches?.length ?? 1;
-    this.nextBit += width;
-    const v = { ...input, sort: bit };
-    if (v.branches) v.branches = v.branches.map((b, i) => ({ ...b, bit: bit + i }));
-    this.variants.set(v.name, v);
-    if (v.match) this.functionalVariants.push(v);
-    this.functionalVariants.sort((a, b) => b.name.length - a.name.length);
-  }
-  // ───────────────────────── variant table ─────────────────────────
-  /**
-   * Variants in Tailwind 3.4's registration order — the order *is* the
-   * cascade: child → pseudo-elements → pseudo-classes → group-* → peer-* →
-   * has/aria/data → plugin variants (built-in `@container` first) → supports →
-   * motion/contrast → [dark when `class`] → screens (max-*, then min) →
-   * orientation → direction → [dark otherwise] → forced-colors → print.
-   * Nakshora extras (`inert`, `not-*`, `starting`) sit next to their
-   * closest relatives.
-   */
-  buildVariants(extra) {
-    const push = (v) => this.registerVariant(v);
-    push({
-      name: "*",
-      key: "child",
-      branches: [{ format: "& > *" }],
-      description: "direct children"
-    });
-    for (const [name, fmt, decls, stripAlpha] of PSEUDO_ELEMENTS) {
-      const formats = Array.isArray(fmt) ? fmt : [fmt];
-      push({
-        name,
-        key: name,
-        branches: formats.map((format) => ({ format, decls, stripAlpha })),
-        description: `::${name} pseudo-element`
-      });
-    }
-    const pseudoBranches = /* @__PURE__ */ new Map();
-    for (const [name, fmt] of PSEUDO_CLASSES) {
-      if (name === "nth-last-child") continue;
-      pseudoBranches.set(name, fmt);
-      push({
-        name,
-        key: name,
-        branches: [{ format: fmt, stripAlpha: name === "visited" ? VISITED_STRIP : void 0 }],
-        description: `${fmt.slice(1)} state`
-      });
-    }
-    push({
-      name: "not",
-      key: "not",
-      functional: true,
-      match: (value) => {
-        if (value.startsWith("[") && value.endsWith("]"))
-          return [{ format: `&:not(${normalizeValue(value.slice(1, -1))})` }];
-        const fmt = pseudoBranches.get(value);
-        if (!fmt) return null;
-        return [{ format: `&:not(${fmt.slice(1)})` }];
-      },
-      description: "negated state (`not-hover:`, `not-[\u2026]:`)"
-    });
-    for (const kind of ["group", "peer"]) {
-      const combinator = kind === "group" ? " &" : " ~ &";
-      for (const [name, fmt] of PSEUDO_CLASSES) {
-        if (name === "nth-last-child") continue;
-        const sel = fmt.slice(1);
-        push({
-          name: `${kind}-${name}`,
-          key: `${kind}-${name}`,
-          match: (_v, modifier) => [
-            { format: `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})${sel}${combinator}` }
-          ],
-          description: `${kind === "group" ? "parent .group" : "preceding .peer sibling"} ${sel}`
-        });
-      }
-      push({
-        name: kind,
-        key: kind,
-        functional: true,
-        match: (value, modifier) => {
-          if (!(value.startsWith("[") && value.endsWith("]"))) return null;
-          const base = `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})`;
-          const sel = normalizeValue(value.slice(1, -1));
-          if (sel.includes("&")) return [{ format: sel.replace(/&/g, base) + combinator }];
-          return [{ format: `${base}${sel}${combinator}` }];
-        },
-        description: `${kind} arbitrary state (\`${kind}-[\u2026]:\`)`
-      });
-    }
-    const hasFamily = (kind) => {
-      const name = kind ? `${kind}-has` : "has";
-      push({
-        name,
-        key: name,
-        functional: true,
-        match: (value, modifier) => {
-          if (!(value.startsWith("[") && value.endsWith("]"))) return null;
-          const has = `:has(${normalizeValue(value.slice(1, -1))})`;
-          if (!kind) return [{ format: `&${has}` }];
-          const base = `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})`;
-          return [{ format: `${base}${has}${kind === "group" ? " &" : " ~ &"}` }];
-        },
-        description: kind ? `${kind} :has() relational state` : ":has() relational state"
-      });
-    };
-    hasFamily("");
-    hasFamily("group");
-    hasFamily("peer");
-    for (const attr of ["aria", "data"]) {
-      const themed = Object.keys(this.theme[attr] ?? {});
-      for (const kind of ["", "group", "peer"]) {
-        const name = kind ? `${kind}-${attr}` : attr;
-        push({
-          name,
-          key: name,
-          functional: true,
-          slots: themed.length,
-          match: (value, modifier) => {
-            const selector = this.attrSelector(attr, value);
-            if (!selector) return null;
-            const slot = themed.indexOf(value);
-            const format = kind ? `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})${selector}${kind === "group" ? " &" : " ~ &"}` : `&${selector}`;
-            return { branches: [{ format }], slot: slot === -1 ? themed.length : slot };
-          },
-          description: `${kind ? `${kind} ` : ""}${attr} attribute state`
-        });
-      }
-    }
-    const containers = this.theme.containers;
-    const containerKeys = Object.keys(containers);
-    const containerHook = (value, modifier) => ({
-      id: "@container",
-      value,
-      modifier,
-      compare: compareContainers
-    });
-    const containerSize = (value) => {
-      if (value.startsWith("[") && value.endsWith("]")) return normalizeValue(value.slice(1, -1));
-      return containers[value] ?? null;
-    };
-    push({
-      name: "@max",
-      key: "containerQueries",
-      functional: true,
-      slots: containerKeys.length,
-      match: (value, modifier) => {
-        const size = containerSize(value);
-        if (size === null) return null;
-        const px = screenToPx(size);
-        const slot = containerKeys.indexOf(value);
-        return {
-          branches: [
-            {
-              atrules: [
-                {
-                  kind: "container",
-                  params: `${modifier ? `${modifier} ` : ""}(width < ${size})`,
-                  sort: MEDIA_SORT.container - (Number.isNaN(px) ? 0 : px / 10),
-                  max: px
-                }
-              ]
-            }
-          ],
-          slot: slot === -1 ? containerKeys.length : slot,
-          fn: {
-            ...containerHook(size, modifier),
-            id: "@container-max",
-            compare: (a, b) => -compareContainers(a, b)
-          }
-        };
-      },
-      description: "@container max-size query"
-    });
-    push({
-      name: "@",
-      key: "containerQueries",
-      functional: true,
-      slots: containerKeys.length,
-      match: (raw, modifier) => {
-        const value = raw.startsWith("min-") ? raw.slice(4) : raw;
-        const size = containerSize(value);
-        if (size === null) return null;
-        const px = screenToPx(size);
-        const slot = containerKeys.indexOf(value);
-        return {
-          branches: [
-            {
-              atrules: [
-                {
-                  kind: "container",
-                  params: `${modifier ? `${modifier} ` : ""}(min-width: ${size})`,
-                  sort: MEDIA_SORT.container + (Number.isNaN(px) ? 0 : px / 10),
-                  min: px
-                }
-              ]
-            }
-          ],
-          slot: slot === -1 ? containerKeys.length : slot,
-          fn: containerHook(size, modifier)
-        };
-      },
-      description: "@container size query"
-    });
-    for (const v of extra) push(v);
-    const media = (name, params, sort, description) => push({
-      name,
-      key: name,
-      branches: [{ atrules: [{ kind: "media", params, sort }] }],
-      description
-    });
-    const supportsThemed = Object.keys(this.theme.supports ?? {});
-    push({
-      name: "supports",
-      key: "supports",
-      functional: true,
-      slots: supportsThemed.length,
-      match: (value) => {
-        let check;
-        if (value.startsWith("[") && value.endsWith("]")) {
-          check = normalizeValue(value.slice(1, -1));
-        } else {
-          const themed = this.theme.supports[value];
-          if (themed === void 0) return null;
-          check = themed;
-        }
-        const isRaw = /^\w*\s*\(/.test(check);
-        if (isRaw)
-          check = check.replace(/\b(and|or|not)\b/g, " $1 ").replace(/\s+/g, " ").trim();
-        else check = check.includes(":") ? `(${check})` : `(${check}: var(--tw))`;
-        const slot = supportsThemed.indexOf(value);
-        return {
-          branches: [{ atrules: [{ kind: "supports", params: check, sort: MEDIA_SORT.supports }] }],
-          slot: slot === -1 ? supportsThemed.length : slot
-        };
-      },
-      description: "@supports feature query"
-    });
-    media(
-      "motion-safe",
-      "(prefers-reduced-motion: no-preference)",
-      MEDIA_SORT.motion,
-      "user allows motion"
-    );
-    media(
-      "motion-reduce",
-      "(prefers-reduced-motion: reduce)",
-      MEDIA_SORT.motion + 1,
-      "user prefers reduced motion"
-    );
-    media(
-      "contrast-more",
-      "(prefers-contrast: more)",
-      MEDIA_SORT.contrast,
-      "user prefers more contrast"
-    );
-    media(
-      "contrast-less",
-      "(prefers-contrast: less)",
-      MEDIA_SORT.contrast + 1,
-      "user prefers less contrast"
-    );
-    const dark = this.options.darkMode;
-    const legacyDark = dark === "class" || Array.isArray(dark) && dark[0] === "class";
-    const pushDark = () => {
-      if (dark === false) return;
-      const [mode, selector] = Array.isArray(dark) ? dark : [dark, void 0];
-      let branches;
-      if (mode === "media") {
-        branches = [
-          {
-            atrules: [
-              { kind: "media", params: "(prefers-color-scheme: dark)", sort: MEDIA_SORT.dark }
-            ]
-          }
-        ];
-      } else if (mode === "variant") {
-        const formats = Array.isArray(selector) ? selector : [selector ?? "&:is(.dark *)"];
-        branches = formats.map((format) => this.formatToBranch(format, MEDIA_SORT.dark));
-      } else if (mode === "selector") {
-        const sel = selector ?? ".dark";
-        branches = [{ format: `&:where(${sel}, ${sel} *)` }];
-      } else {
-        const sel = selector ?? ".dark";
-        branches = [{ format: `&:is(${sel} *)` }];
-      }
-      push({ name: "dark", key: "dark", branches, description: "dark mode" });
-    };
-    if (legacyDark) pushDark();
-    const minHook = (px) => ({
-      id: "min-screens",
-      value: px,
-      modifier: null,
-      compare: (a, b) => a.value - b.value
-    });
-    const maxHook = (px) => ({
-      id: "max-screens",
-      value: px,
-      modifier: null,
-      compare: (a, b) => b.value - a.value
-    });
-    for (const [name, value] of this.screens) {
-      push({
-        name: `max-${name}`,
-        key: "maxResponsive",
-        branches: [{ atrules: [maxWidthCond(maxWidthValue(value))] }],
-        fn: maxHook(screenToPx(value)),
-        description: `max-width ${maxWidthValue(value)}`
-      });
-    }
-    push({
-      name: "max",
-      key: "maxResponsive",
-      functional: true,
-      match: (value) => {
-        if (!(value.startsWith("[") && value.endsWith("]"))) return null;
-        const v = normalizeValue(value.slice(1, -1));
-        if (!typeCheckers.length(v)) return null;
-        return { branches: [{ atrules: [maxWidthCond(v)] }], fn: maxHook(screenToPx(v)) };
-      },
-      description: "arbitrary max-width"
-    });
-    for (const [name, value] of this.screens) {
-      push({
-        name,
-        key: "responsive",
-        branches: [{ atrules: [minWidthCond(value)] }],
-        fn: minHook(screenToPx(value)),
-        description: `min-width ${value}`
-      });
-    }
-    push({
-      name: "min",
-      key: "responsive",
-      functional: true,
-      match: (value) => {
-        if (!(value.startsWith("[") && value.endsWith("]"))) return null;
-        const v = normalizeValue(value.slice(1, -1));
-        if (!typeCheckers.length(v)) return null;
-        return { branches: [{ atrules: [minWidthCond(v)] }], fn: minHook(screenToPx(v)) };
-      },
-      description: "arbitrary min-width"
-    });
-    media("portrait", "(orientation: portrait)", MEDIA_SORT.orientation, "portrait orientation");
-    media(
-      "landscape",
-      "(orientation: landscape)",
-      MEDIA_SORT.orientation + 1,
-      "landscape orientation"
-    );
-    push({
-      name: "ltr",
-      key: "ltr",
-      branches: [{ format: '&:where([dir="ltr"], [dir="ltr"] *)' }],
-      description: "left-to-right documents"
-    });
-    push({
-      name: "rtl",
-      key: "rtl",
-      branches: [{ format: '&:where([dir="rtl"], [dir="rtl"] *)' }],
-      description: "right-to-left documents"
-    });
-    if (!legacyDark) pushDark();
-    media(
-      "forced-colors",
-      "(forced-colors: active)",
-      MEDIA_SORT.forcedColors,
-      "forced colours mode"
-    );
-    media("print", "print", MEDIA_SORT.print, "print media");
-    push({
-      name: "starting",
-      key: "starting",
-      branches: [{ atrules: [{ kind: "starting", params: "", sort: MEDIA_SORT.starting }] }],
-      description: "@starting-style (entry transitions)"
-    });
-  }
-  /** `@media (…) { &:not(.light *) }` / `&:is(.dark *)` / `@media (…)` → branch */
-  formatToBranch(format, sort) {
-    const f = format.trim();
-    const m = /^@([\w-]+)\s*([^{]*?)\s*(?:\{\s*(.*?)\s*\})?$/.exec(f);
-    if (!m) return { format: f };
-    const kind = m[1] === "media" ? "media" : m[1] === "supports" ? "supports" : m[1] === "container" ? "container" : "raw";
-    const inner = m[3];
-    return {
-      atrules: [{ kind, params: kind === "raw" ? `${m[1]} ${m[2]}` : m[2], sort }],
-      format: inner && inner !== "&" ? inner : void 0
-    };
-  }
-  attrSelector(kind, value) {
-    if (value.startsWith("[") && value.endsWith("]")) {
-      return `[${kind}-${normalizeAttributeSelectors(normalizeValue(value.slice(1, -1)))}]`;
-    }
-    const themed = this.theme[kind]?.[value];
-    if (themed === void 0) return null;
-    return `[${kind}-${themed}]`;
-  }
-  /** Public: variant definitions (docs / IntelliSense). */
-  getVariants() {
-    return [...this.variants.values()];
-  }
-  getScreens() {
-    return this.screens;
-  }
-  // ───────────────────────── catalog ─────────────────────────
-  /** Every value-bearing utility class the theme defines (no variants, no arbitrary values). */
-  /**
-   * Full catalog (one entry per value-bearing class). Memoised per *resolved
-   * theme + enabled core plugins* across Engine instances: the Vite/PostCSS
-   * plugins create a fresh generator per build, and the catalog (11k entries,
-   * ~35 ms) only depends on those inputs. Engines with plugin-added utilities
-   * are not shared (their extras are per instance). Entries are shared by
-   * reference — callers must treat them as read-only.
-   */
-  buildCatalog() {
-    if (this.catalogMemo) return this.catalogMemo;
-    const hasExtras = (this.options.extraStatic?.length ?? 0) > 0 || (this.options.extraFunctional?.length ?? 0) > 0;
-    const key = hasExtras ? null : this.catalogKey();
-    if (key !== null) {
-      const hit = CATALOG_CACHE.get(key);
-      if (hit) {
-        CATALOG_CACHE.delete(key);
-        CATALOG_CACHE.set(key, hit);
-        this.catalogMemo = hit;
-        return hit;
-      }
-    }
-    const built = this.buildCatalogUncached();
-    if (key !== null) {
-      CATALOG_CACHE.set(key, built);
-      if (CATALOG_CACHE.size > CATALOG_CACHE_MAX)
-        CATALOG_CACHE.delete(CATALOG_CACHE.keys().next().value);
-    }
-    this.catalogMemo = built;
-    return built;
-  }
-  catalogMemo = null;
-  /** Cache key: theme JSON + which core plugins are enabled. */
-  catalogKey() {
-    const plugins = /* @__PURE__ */ new Set();
-    for (const s of this.statics) plugins.add(s.p);
-    for (const f of this.functional) plugins.add(f.plugin);
-    plugins.add("container");
-    const enabled = [...plugins].sort().filter((p) => this.options.pluginEnabled(p));
-    return `${enabled.join(",")}\0${JSON.stringify(this.theme)}`;
-  }
-  buildCatalogUncached() {
-    const out = [];
-    const seenStatic = /* @__PURE__ */ new Set();
-    for (const s of this.statics) {
-      if (!this.options.pluginEnabled(s.p)) continue;
-      if (seenStatic.has(s.c)) continue;
-      seenStatic.add(s.c);
-      out.push({
-        class: s.c,
-        plugin: s.p,
-        decls: Object.fromEntries(s.d),
-        selector: s.s,
-        defaults: s.df,
-        description: s.d.map(([k, v]) => `${k}: ${v}`).join("; "),
-        sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 }
-      });
-    }
-    for (const f of this.functional) {
-      if (!this.options.pluginEnabled(f.plugin)) continue;
-      let vi = 0;
-      for (const [key, raw] of Object.entries(f.values)) {
-        vi++;
-        const cls = key === "DEFAULT" ? f.prefix : `${f.prefix}-${key}`;
-        const decls = f.build(raw, { modifier: null, key });
-        if (!decls) continue;
-        out.push({
-          class: cls,
-          plugin: f.plugin,
-          decls,
-          selector: f.selector,
-          defaults: f.defaults,
-          description: f.describe.replace("{value}", String(Array.isArray(raw) ? raw[0] : raw)),
-          sort: { plugin: this.pluginIndex.get(f.plugin) ?? 9999, utility: f.index, value: vi }
-        });
-        if (f.negative) {
-          const neg = this.negate(raw);
-          if (neg !== null) {
-            const nd = f.build(neg, { modifier: null, key });
-            if (nd)
-              out.push({
-                class: `-${cls}`,
-                plugin: f.plugin,
-                decls: nd,
-                selector: f.selector,
-                defaults: f.defaults,
-                description: f.describe.replace("{value}", neg),
-                sort: {
-                  plugin: this.pluginIndex.get(f.plugin) ?? 9999,
-                  utility: f.index,
-                  value: vi + 0.5
-                }
-              });
-          }
-        }
-      }
-    }
-    if (this.options.pluginEnabled("container")) {
-      out.push({
-        class: "container",
-        plugin: "container",
-        decls: { width: "100%" },
-        description: "responsive fixed-width container",
-        sort: { plugin: this.pluginIndex.get("container") ?? 1, utility: 0, value: 0 }
-      });
-    }
-    const seen = /* @__PURE__ */ new Map();
-    const result = [];
-    for (const e of out) {
-      const idx = seen.get(e.class);
-      if (idx !== void 0) result[idx] = e;
-      else {
-        seen.set(e.class, result.length);
-        result.push(e);
-      }
-    }
-    return result;
-  }
-  negate(raw) {
-    return negateValue(Array.isArray(raw) ? raw[0] : raw);
-  }
-  // ───────────────────────── compile ─────────────────────────
-  /** Compile one candidate into rules (empty when unknown). Cached. */
-  compile(candidate) {
-    const cached = this.cache.get(candidate);
-    if (cached) return cached;
-    const rules = this.compileUncached(candidate);
-    this.cache.set(candidate, rules);
-    return rules;
-  }
-  compileUncached(candidate) {
-    if (!candidate || candidate.length > 256) return [];
-    const parts = splitAtTopLevelOnly(candidate, ":");
-    let base = parts[parts.length - 1];
-    const variantNames = parts.slice(0, -1);
-    if (!base) return [];
-    let important = false;
-    if (base.startsWith("!")) {
-      important = true;
-      base = base.slice(1);
-    } else if (base.endsWith("!") && this.options.trailingImportant !== false) {
-      important = true;
-      base = base.slice(0, -1);
-    }
-    let negative = false;
-    if (base.startsWith("-")) {
-      negative = true;
-      base = base.slice(1);
-    }
-    if (!base || base.startsWith("-") || base.startsWith("!")) return [];
-    const resolved = this.resolveUtility(base, negative);
-    if (resolved.length === 0) return [];
-    const variantMatches = [];
-    for (let i = variantNames.length - 1; i >= 0; i--) {
-      const m = this.resolveVariant(variantNames[i]);
-      if (!m) return [];
-      variantMatches.push(m);
-    }
-    const rules = [];
-    const escaped = `.${escapeClassName(candidate)}`;
-    for (const u of resolved) {
-      const suffix = u.selector ?? "";
-      const isTemplate = suffix.includes("&");
-      let branches = [{ selector: escaped, atrules: [...u.atrules ?? []], decls: { ...u.decls } }];
-      const weights = [];
-      const hooks = [];
-      let parallel = 0;
-      for (const vm of variantMatches) {
-        if (vm.arbitrary) weights.push(vm.arbitrary);
-        else if (vm.functional || vm.branches.length === 1) weights.push(vm.sort);
-        if (vm.fn) hooks.push({ ...vm.fn, bit: vm.sort });
-        const next = [];
-        for (const b of branches) {
-          vm.branches.forEach((vb, bi) => {
-            if (!vm.arbitrary && !vm.functional && vm.branches.length > 1)
-              b.weights = [...b.weights ?? [], vb.bit ?? vm.sort + bi];
-            if (vm.functional && vm.branches.length > 1) parallel = Math.max(parallel, bi);
-            const selector = vb.format ? applyFormat(b.selector, vb.format) : b.selector;
-            let decls = vb.decls && !Object.keys(vb.decls).some((k) => k in b.decls) ? { ...vb.decls, ...b.decls } : b.decls;
-            if (vb.stripAlpha) decls = removeAlphaVariables(decls, vb.stripAlpha);
-            next.push({
-              selector,
-              atrules: [...b.atrules, ...vb.atrules ?? []],
-              decls,
-              weights: b.weights,
-              parallel: Math.max(b.parallel ?? 0, vm.functional ? bi : 0)
-            });
-          });
-        }
-        branches = next;
-      }
-      for (const b of branches) {
-        const withSuffix = suffix ? isTemplate ? suffix.replace(/&/g, b.selector) : splitAtTopLevelOnly(b.selector, ",").map((part) => part.trim() + suffix).join(", ") : b.selector;
-        let selector = finalizeSelector(withSuffix);
-        if (u.siblings?.length && variantMatches.length === 0) {
-          const ownParts = splitAtTopLevelOnly(selector, ",").map((p) => p.trim());
-          let i = 0;
-          selector = u.siblings.map((part) => part === "&" ? ownParts[i++] ?? "" : part).filter(Boolean).join(", ");
-        }
-        selector = this.wrapImportant(selector);
-        const bang = important || this.options.important === true;
-        const decls = bang ? Object.fromEntries(
-          Object.entries(b.decls).map(([k, v]) => [
-            k,
-            v.endsWith("!important") ? v : `${v} !important`
-          ])
-        ) : b.decls;
-        rules.push({
-          selector,
-          decls,
-          atrules: this.mergeAtRules(b.atrules),
-          sort: {
-            variant: variantMatches.length ? 1 : 0,
-            layer: u.component || u.plugin === "container" ? 0 : 1,
-            // a bit mask: the same variant applied twice (`hover:hover:x`) sets one bit
-            variants: [.../* @__PURE__ */ new Set([...weights, ...b.weights ?? []])].sort(compareWeights),
-            // outermost variant first — the order Tailwind walks `options`
-            hooks: hooks.length ? [...hooks].reverse() : void 0,
-            parallel: Math.max(parallel, b.parallel ?? 0),
-            plugin: u.sort.plugin,
-            utility: u.sort.utility,
-            value: u.sort.value,
-            property: u.sort.property,
-            seq: this.seq++
-          },
-          candidate,
-          plugin: u.plugin,
-          defaults: u.defaults,
-          animations: u.animations,
-          component: u.component
-        });
-      }
-    }
-    return dedupeRules(rules);
-  }
-  wrapImportant(selector) {
-    const imp = this.options.important;
-    if (typeof imp === "string" && imp.trim()) {
-      const scopes = imp.trim().split(",").map((s) => s.trim()).filter(Boolean);
-      return splitAtTopLevelOnly(selector, ",").map((s) => s.trim()).flatMap((sel) => scopes.map((scope) => sel.includes(scope) ? sel : `${scope} ${sel}`)).join(", ");
-    }
-    return selector;
-  }
-  /**
-   * Order at-rules outermost-first (the leftmost variant is the outermost
-   * wrapper, as in Tailwind) and — Nakshora policy — collapse every
-   * non-arbitrary `@media` condition into a single combined query
-   * (`print:md:` → `@media print and (min-width: 768px)`). Nested min-widths
-   * keep the largest, max-widths the smallest; the combined query sits where
-   * the outermost media query was. Arbitrary (`[@media(...)]:`) queries are
-   * never rewritten.
-   */
-  mergeAtRules(accumulated) {
-    if (accumulated.length <= 1) return accumulated;
-    const outerFirst = [...accumulated].reverse();
-    if (this.options.combineMedia === false) return outerFirst;
-    const mergeable = outerFirst.filter((a) => a.kind === "media" && !a.raw);
-    if (mergeable.length <= 1) return outerFirst;
-    const types = [];
-    const features = [];
-    let minCond;
-    let maxCond;
-    for (const m of mergeable) {
-      for (const part of m.params.split(/\s+and\s+/)) {
-        const p = part.trim();
-        if (/^(not\s+|only\s+)?(all|print|screen|speech)$/.test(p)) {
-          if (!types.includes(p)) types.push(p);
-        } else if (m.min !== void 0 && !Number.isNaN(m.min) && /^\(min-width: [^)]+\)$/.test(p)) {
-          if (!minCond || m.min > minCond.min) minCond = m;
-        } else if (m.max !== void 0 && !Number.isNaN(m.max) && /^\(max-width: [^)]+\)$/.test(p)) {
-          if (!maxCond || m.max < maxCond.max) maxCond = m;
-        } else if (!features.includes(p)) features.push(p);
-      }
-    }
-    const parts = [
-      ...types,
-      ...minCond ? [minCond.params] : [],
-      ...maxCond ? [maxCond.params] : [],
-      ...features
-    ];
-    const combined = {
-      kind: "media",
-      params: parts.join(" and "),
-      sort: Math.max(...mergeable.map((m) => m.sort)),
-      min: minCond?.min,
-      max: maxCond?.max
-    };
-    const out = [];
-    let placed = false;
-    for (const a of outerFirst) {
-      if (a.kind === "media" && !a.raw) {
-        if (!placed) {
-          out.push(combined);
-          placed = true;
-        }
-        continue;
-      }
-      out.push(a);
-    }
-    return out;
-  }
-  // ───────────────────────── variants ─────────────────────────
-  variantCache = /* @__PURE__ */ new Map();
-  resolveVariant(name) {
-    const cached = this.variantCache.get(name);
-    if (cached !== void 0) return cached;
-    const result = this.resolveVariantUncached(name);
-    this.variantCache.set(name, result);
-    return result;
-  }
-  variantAllowed(def) {
-    if (!this.options.variantEnabled(def.key)) return false;
-    if (def.key === "maxResponsive" && !this.options.variantEnabled("responsive")) return false;
-    if (def.name !== def.key && !this.options.variantEnabled(def.name)) return false;
-    if ((def.name.startsWith("group-") || def.name === "group") && !this.options.variantEnabled("group"))
-      return false;
-    if ((def.name.startsWith("peer-") || def.name === "peer") && !this.options.variantEnabled("peer"))
-      return false;
-    return true;
-  }
-  resolveVariantUncached(name) {
-    if (!name) return null;
-    if (name.startsWith("[") && name.endsWith("]")) {
-      if (!this.options.variantEnabled("arbitraryVariants")) return null;
-      const inner = normalizeValue(name.slice(1, -1));
-      if (inner.startsWith("@")) {
-        const m = /^@([a-zA-Z-]+)\s*(.*)$/.exec(inner);
-        if (!m) return null;
-        const kindName = m[1];
-        const params = m[2].trim();
-        const kind = kindName === "media" ? "media" : kindName === "supports" ? "supports" : kindName === "container" ? "container" : "raw";
-        const cond = {
-          kind,
-          params: kind === "raw" ? `${kindName} ${params}` : params,
-          sort: MEDIA_SORT.arbitrary,
-          raw: true
-        };
-        const mm = /^\((min|max)-width:\s*([^)]+)\)$/.exec(params);
-        if (mm && kind === "media") {
-          const px = screenToPx(mm[2]);
-          if (mm[1] === "min") cond.min = px;
-          else cond.max = px;
-        }
-        return {
-          branches: [{ atrules: [cond] }],
-          sort: 0,
-          arbitrary: name,
-          key: "arbitraryVariants"
-        };
-      }
-      if (!inner.includes("&")) return null;
-      return {
-        branches: [{ format: inner }],
-        sort: 0,
-        arbitrary: name,
-        key: "arbitraryVariants"
-      };
-    }
-    const def = this.variants.get(name);
-    if (def && def.branches && !def.functional) {
-      if (!this.variantAllowed(def)) return null;
-      return { branches: def.branches, sort: def.sort, key: def.key, fn: def.fn };
-    }
-    for (const fv of this.functionalVariants) {
-      let rest = null;
-      if (fv.name === "@max") {
-        if (name.startsWith("@max-")) rest = name.slice(5);
-      } else if (fv.name === "@") {
-        if (name.startsWith("@") && !name.startsWith("@max-")) rest = name.slice(1);
-      } else if (name === fv.name && !fv.functional) rest = "";
-      else if (name.startsWith(`${fv.name}-`)) rest = name.slice(fv.name.length + 1);
-      else if (name.startsWith(`${fv.name}/`)) rest = name.slice(fv.name.length);
-      if (rest === null) continue;
-      if (!this.variantAllowed(fv)) continue;
-      const slashSplit = splitModifier(rest);
-      const value = slashSplit.value;
-      let modifier = slashSplit.modifier;
-      if (modifier !== null && modifier.startsWith("[") && modifier.endsWith("]"))
-        modifier = normalizeValue(modifier.slice(1, -1));
-      const result = fv.match(value, modifier, { theme: this.theme });
-      if (!result) continue;
-      const r = Array.isArray(result) ? { branches: result } : result;
-      if (r.branches.length === 0) continue;
-      return {
-        branches: r.branches,
-        sort: fv.sort + Math.min(r.slot ?? fv.slots ?? 0, fv.slots ?? 0),
-        key: fv.key,
-        functional: true,
-        fn: r.fn
-      };
-    }
-    return null;
-  }
-  // ───────────────────────── utilities ─────────────────────────
-  resolveUtility(base, negative) {
-    const out = [];
-    if (base.startsWith("[") && base.endsWith("]") && !negative) {
-      if (this.options.arbitraryProperties === false) return [];
-      const inner = base.slice(1, -1);
-      const idx = inner.indexOf(":");
-      if (idx <= 0) return [];
-      const prop = inner.slice(0, idx).trim();
-      const value = normalizeValue(this.resolveThemeFn(inner.slice(idx + 1)), { property: prop });
-      if (!/^(--[\w-]+|[a-zA-Z][\w-]*)$/.test(prop) || !value || !isValidArbitraryValue(value))
-        return [];
-      return [
-        {
-          decls: { [prop]: value },
-          plugin: "arbitraryProperties",
-          sort: { plugin: 99999, utility: 0, value: 0, property: prop }
-        }
-      ];
-    }
-    if (!negative) {
-      for (const s of this.staticMap.get(base) ?? []) {
-        if (!this.options.pluginEnabled(s.p)) continue;
-        const decls = Object.fromEntries(s.d);
-        const animations = s.pc ? animationNames(decls.animation ?? decls["animation-name"]) : void 0;
-        out.push({
-          decls,
-          selector: s.s,
-          siblings: s.sl,
-          component: s.pc,
-          plugin: s.p,
-          defaults: s.df,
-          atrules: s.at?.map(parseAtRule),
-          animations: animations?.length ? animations : void 0,
-          sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 }
-        });
-      }
-      if (base === "container" && this.options.pluginEnabled("container"))
-        out.push(...this.containerRules());
-    }
-    const tryPrefix = (prefix, modifier) => {
-      const list = this.functionalMap.get(prefix);
-      if (!list) return;
-      const matches = [];
-      for (const u of list) {
-        if (!this.options.pluginEnabled(u.plugin)) continue;
-        const r = this.resolveFunctional(u, modifier, negative);
-        if (r) matches.push({ u, r: r.rules, types: r.types, arbitrary: r.arbitrary });
-      }
-      if (matches.length === 0) return;
-      const arbitrary = matches.filter((m) => m.arbitrary);
-      if (arbitrary.length > 1) {
-        const withoutAny = arbitrary.filter((m) => !m.types.includes("any"));
-        const pick = (ms) => {
-          if (ms.length === 1) return ms[0];
-          return ms.find((m) => m.u.preferOnConflict);
-        };
-        const chosen = pick(withoutAny) ?? pick(arbitrary);
-        if (!chosen) return;
-        out.push(...chosen.r);
-        for (const m of matches) if (!m.arbitrary) out.push(...m.r);
-        return;
-      }
-      for (const m of matches) out.push(...m.r);
-    };
-    tryPrefix(base, "DEFAULT");
-    for (const [prefix, modifier] of candidatePermutations(base)) tryPrefix(prefix, modifier);
-    return out;
-  }
-  resolveFunctional(u, modifier, negative) {
-    const sortBase = { plugin: this.pluginIndex.get(u.plugin) ?? 9999, utility: u.index };
-    let lastArgs = null;
-    const build = (value2, ctx) => {
-      lastArgs = [value2, ctx.modifier];
-      return u.build(value2, ctx);
-    };
-    const make = (decls2, value2, types2, arbitrary, animations2) => {
-      if (!decls2) return null;
-      const common = {
-        plugin: u.plugin,
-        defaults: u.defaults,
-        sort: { ...sortBase, value: value2 },
-        animations: animations2
-      };
-      if (u.buildAll && lastArgs) {
-        const shapes = u.buildAll(lastArgs[0], lastArgs[1]);
-        if (!shapes || shapes.length === 0) return null;
-        return {
-          rules: shapes.map((sh) => ({
-            ...common,
-            decls: sh.decls,
-            selector: sh.selector,
-            atrules: sh.atrules?.map(parseAtRule)
-          })),
-          types: types2,
-          arbitrary
-        };
-      }
-      const selector = u.selectorFor && lastArgs ? u.selectorFor(lastArgs[0], lastArgs[1]) ?? u.selector : u.selector;
-      return { rules: [{ ...common, decls: decls2, selector }], types: types2, arbitrary };
-    };
-    const keys = Object.keys(u.values);
-    let valueKey = modifier;
-    let mod = null;
-    if (u.modifier) {
-      const split = splitModifier(modifier);
-      if (split.modifier !== null) {
-        valueKey = split.value;
-        mod = split.modifier;
-      }
-    }
-    if (valueKey === "" && mod !== null) valueKey = "DEFAULT";
-    const direct = (key) => Object.prototype.hasOwnProperty.call(u.values, key) ? u.values[key] : void 0;
-    let themeValue = direct(modifier);
-    let usedKey = modifier;
-    if (themeValue === void 0 && mod !== null) {
-      themeValue = direct(valueKey);
-      usedKey = valueKey;
-    } else if (themeValue !== void 0) {
-      mod = null;
-    }
-    if (themeValue !== void 0) {
-      const idx = keys.indexOf(usedKey) + 1;
-      if (negative) {
-        if (!u.negative) return null;
-        const neg = this.negate(themeValue);
-        if (neg === null) return null;
-        return make(build(neg, { modifier: null, key: usedKey }), idx + 0.5, [], false);
-      }
-      const modValue2 = mod === null ? null : this.resolveModifier(u, mod);
-      if (mod !== null && modValue2 === null) return null;
-      if (u.modifier === "color" && modValue2 !== null) {
-        const color = String(
-          typeof themeValue === "function" ? themeValue({}) : themeValue
-        );
-        const withAlpha = withAlphaValue(color, modValue2, "");
-        if (withAlpha === "") return null;
-        return make(
-          build(withAlpha, { modifier: modValue2, key: usedKey }),
-          idx,
-          [],
-          false,
-          void 0
-        );
-      }
-      const decls2 = build(themeValue, { modifier: modValue2, key: usedKey });
-      const animations2 = u.plugin === "animation" && decls2 ? animationNames(decls2.animation) : void 0;
-      return make(decls2, idx, [], false, animations2);
-    }
-    const arb = mod !== null ? valueKey : modifier;
-    if (!(arb.startsWith("[") && arb.endsWith("]"))) return null;
-    const raw = arb.slice(1, -1);
-    if (!raw) return null;
-    const { hint } = splitTypeHint(raw);
-    const types = u.types.length ? u.types : ["any"];
-    if (hint && !types.includes(hint)) return null;
-    const coerced = coerceValue(
-      this.resolveThemeFn(raw),
-      types.filter((t) => t !== "lookup"),
-      {}
-    );
-    if (!coerced) return null;
-    const value = coerced.value;
-    if (!isValidArbitraryValue(value)) return null;
-    if (negative) {
-      if (!u.negative) return null;
-      const neg = negateValue(value);
-      if (neg === null) return null;
-      return make(build(neg, { modifier: null, key: arb }), 1e6, types, true);
-    }
-    const modValue = mod === null ? null : this.resolveModifier(u, mod);
-    if (mod !== null && modValue === null) return null;
-    if (u.modifier === "color" && modValue !== null) {
-      const withAlpha = withAlphaValue(value, modValue, "");
-      if (withAlpha === "") return null;
-      return make(build(withAlpha, { modifier: modValue, key: arb }), 1e6, types, true);
-    }
-    const decls = build(value, { modifier: modValue, key: arb });
-    const animations = u.plugin === "animation" && decls ? animationNames(decls.animation) : void 0;
-    return make(decls, 1e6, types, true, animations);
-  }
-  /** `/50` → `0.5` (opacity scale), `/[.3]` → `.3`; fontSize modifier → lineHeight */
-  resolveModifier(u, mod) {
-    if (mod.startsWith("[") && mod.endsWith("]")) return normalizeValue(mod.slice(1, -1)) || null;
-    if (u.modifier === "lineHeight") {
-      const lh = this.theme.lineHeight[mod];
-      return lh === void 0 ? null : String(lh);
-    }
-    if (u.modifier === "any") return mod;
-    if (u.modifier && typeof u.modifier === "object") {
-      const v = u.modifier[mod];
-      return v === void 0 ? null : String(v);
-    }
-    const op = this.theme.opacity[mod];
-    return op === void 0 ? null : String(op);
-  }
-  /** Replace `theme(path)` / `theme(path/alpha)` inside an arbitrary value. */
-  resolveThemeFn(value) {
-    if (!value.includes("theme(")) return value;
-    return value.replace(/theme\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g, (whole, inner) => {
-      const path = inner.trim().replace(/^['"]|['"]$/g, "");
-      const resolved = this.options.themeFn ? this.options.themeFn(path) : this.lookupTheme(path);
-      return resolved === void 0 ? whole : resolved;
-    });
-  }
-  /** Resolve `colors.red.500`, `spacing[2.5]`, `colors.red.500/50%` against the theme. */
-  lookupTheme(path) {
-    let alpha;
-    const slash = path.lastIndexOf("/");
-    if (slash !== -1 && !path.slice(slash).includes("]")) {
-      alpha = path.slice(slash + 1).trim();
-      path = path.slice(0, slash).trim();
-    }
-    const keys = splitPath(path);
-    let cur = this.theme;
-    for (const key of keys) {
-      if (cur === null || typeof cur !== "object") return void 0;
-      cur = cur[key];
-    }
-    if (cur === void 0) return void 0;
-    if (typeof cur === "function") cur = cur({});
-    if (Array.isArray(cur)) cur = keys[0] === "fontSize" ? cur[0] : cur.join(", ");
-    if (cur && typeof cur === "object") {
-      const d = cur.DEFAULT;
-      if (d === void 0) return void 0;
-      cur = d;
-    }
-    const str = String(cur);
-    return alpha !== void 0 ? withAlphaValue(str, alpha) : str;
-  }
-  /** `.container` rules (width + per-screen max-width up to `theme.container.maxScreen`). */
-  containerRules() {
-    const container = this.theme.container ?? {};
-    const plugin2 = this.pluginIndex.get("container") ?? 1;
-    const screens = container.screens ? Object.entries(container.screens).sort((a, b) => screenToPx(a[1]) - screenToPx(b[1])) : this.screens;
-    const minScreen = container.minScreen === void 0 ? DEFAULT_CONTAINER_MIN_SCREEN : container.minScreen;
-    const maxScreen = container.maxScreen === void 0 ? DEFAULT_CONTAINER_MAX_SCREEN : container.maxScreen;
-    const lower = minScreen === false || container.screens || this.theme.screens[minScreen] === void 0 ? 0 : screenToPx(this.theme.screens[minScreen]);
-    const limit = maxScreen === false || container.screens || this.theme.screens[maxScreen] === void 0 ? Infinity : screenToPx(this.theme.screens[maxScreen]);
-    const paddingFor = (screen) => {
-      const p = container.padding;
-      if (p === void 0) return {};
-      if (typeof p === "string")
-        return screen === "DEFAULT" ? { "padding-right": p, "padding-left": p } : {};
-      const v = p[screen];
-      return v === void 0 ? {} : { "padding-right": v, "padding-left": v };
-    };
-    const rules = [
-      {
-        decls: {
-          width: "100%",
-          ...container.center ? { "margin-right": "auto", "margin-left": "auto" } : {},
-          ...paddingFor("DEFAULT")
-        },
-        plugin: "container",
-        sort: { plugin: plugin2, utility: 0, value: 0 }
-      }
-    ];
-    if (!this.options.variantEnabled("responsive")) return rules;
-    let i = 1;
-    for (const [name, value] of screens) {
-      const px = screenToPx(value);
-      if (Number.isNaN(px) || px <= 0) continue;
-      if (px < lower || px > limit) continue;
-      rules.push({
-        decls: { "max-width": value, ...paddingFor(name) },
-        plugin: "container",
-        atrules: [minWidthCond(value)],
-        sort: { plugin: plugin2, utility: 0, value: i++ }
-      });
-    }
-    return rules;
-  }
-};
 function compareWeights(a, b) {
   if (typeof a === "number" && typeof b === "number") return b - a;
   if (typeof a === "number") return 1;
@@ -6269,7 +2379,6 @@ function isValidArbitraryValue(value) {
   }
   return depthParen === 0 && depthBracket === 0 && quote === null;
 }
-var MERGE_RE = /:merge\(((?:[^()]|\([^()]*\))*)\)/g;
 function applyFormat(current, format) {
   const merges = [...current.matchAll(MERGE_RE)];
   if (merges.length) {
@@ -6289,32 +2398,6 @@ function applyFormat(current, format) {
   }
   return format.replace(/&/g, current);
 }
-var PSEUDO_ELEMENT_PROPS = {
-  "::after": ["terminal", "jumpable"],
-  "::backdrop": ["terminal", "jumpable"],
-  "::before": ["terminal", "jumpable"],
-  "::cue": ["terminal"],
-  "::cue-region": ["terminal"],
-  "::first-letter": ["terminal", "jumpable"],
-  "::first-line": ["terminal", "jumpable"],
-  "::grammar-error": ["terminal"],
-  "::marker": ["terminal", "jumpable"],
-  "::part": ["terminal", "actionable"],
-  "::placeholder": ["terminal", "jumpable"],
-  "::selection": ["terminal", "jumpable"],
-  "::slotted": ["terminal"],
-  "::spelling-error": ["terminal"],
-  "::target-text": ["terminal"],
-  "::file-selector-button": ["terminal", "actionable"],
-  "::deep": ["actionable"],
-  "::v-deep": ["actionable"],
-  "::ng-deep": ["actionable"],
-  ":after": ["terminal", "jumpable"],
-  ":before": ["terminal", "jumpable"],
-  ":first-letter": ["terminal", "jumpable"],
-  ":first-line": ["terminal", "jumpable"]
-};
-var DEFAULT_PSEUDO_PROPS = ["terminal", "actionable"];
 function tokenizeSelector(sel) {
   const tokens = [];
   let i = 0;
@@ -6421,258 +2504,9 @@ function finalizeSelector(selector) {
     return [...keep, ...buffer].map((t) => t.text).join("").trim();
   }).join(", ");
 }
-var NAKSHORA_STATIC = [
-  { p: "animation", c: "animation-paused", d: [["animation-play-state", "paused"]] },
-  { p: "animation", c: "animation-running", d: [["animation-play-state", "running"]] },
-  { p: "whitespace", c: "break-spaces", d: [["white-space", "break-spaces"]] },
-  { p: "fontStretch", c: "font-stretch-normal", d: [["font-stretch", "normal"]] },
-  { p: "fontStretch", c: "font-stretch-ultra-condensed", d: [["font-stretch", "ultra-condensed"]] },
-  { p: "fontStretch", c: "font-stretch-extra-condensed", d: [["font-stretch", "extra-condensed"]] },
-  { p: "fontStretch", c: "font-stretch-condensed", d: [["font-stretch", "condensed"]] },
-  { p: "fontStretch", c: "font-stretch-semi-condensed", d: [["font-stretch", "semi-condensed"]] },
-  { p: "fontStretch", c: "font-stretch-semi-expanded", d: [["font-stretch", "semi-expanded"]] },
-  { p: "fontStretch", c: "font-stretch-expanded", d: [["font-stretch", "expanded"]] },
-  { p: "fontStretch", c: "font-stretch-extra-expanded", d: [["font-stretch", "extra-expanded"]] },
-  { p: "fontStretch", c: "font-stretch-ultra-expanded", d: [["font-stretch", "ultra-expanded"]] },
-  { p: "fieldSizing", c: "field-sizing-content", d: [["field-sizing", "content"]] },
-  { p: "fieldSizing", c: "field-sizing-fixed", d: [["field-sizing", "fixed"]] },
-  { p: "colorScheme", c: "scheme-normal", d: [["color-scheme", "normal"]] },
-  { p: "colorScheme", c: "scheme-dark", d: [["color-scheme", "dark"]] },
-  { p: "colorScheme", c: "scheme-light", d: [["color-scheme", "light"]] },
-  { p: "colorScheme", c: "scheme-light-dark", d: [["color-scheme", "light dark"]] },
-  { p: "colorScheme", c: "scheme-only-dark", d: [["color-scheme", "only dark"]] },
-  { p: "colorScheme", c: "scheme-only-light", d: [["color-scheme", "only light"]] }
-];
-var GROUP_CATEGORIES = {
-  layout: "Layout",
-  display: "Display",
-  position: "Position",
-  inset: "Inset (Offset)",
-  zIndex: "Stacking (Z-Index)",
-  overflow: "Overflow",
-  visibility: "Visibility",
-  sizing: "Sizing",
-  margin: "Margin",
-  padding: "Padding",
-  gap: "Gap",
-  flex: "Flexbox",
-  grid: "Grid",
-  typography: "Typography",
-  textDecoration: "Text Decoration",
-  textColor: "Text Colors",
-  backgroundColor: "Background Colors",
-  borderColor: "Border Colors",
-  gradients: "Gradient Stops",
-  borders: "Borders",
-  borderRadius: "Border Radius",
-  backgrounds: "Backgrounds",
-  shadows: "Shadows",
-  opacity: "Opacity",
-  filters: "Filters",
-  transforms: "Transforms",
-  transitions: "Transitions",
-  animations: "Animations",
-  cursors: "Cursors",
-  interactivity: "Interactivity",
-  svg: "SVG",
-  tables: "Tables",
-  accessibility: "Accessibility",
-  effects: "Effects",
-  whitespace: "Whitespace & Misc",
-  components: "Components",
-  plugin: "Plugins"
-};
-var PLUGIN_CATEGORY = {
-  container: "layout",
-  accessibility: "accessibility",
-  pointerEvents: "interactivity",
-  visibility: "visibility",
-  position: "position",
-  inset: "inset",
-  isolation: "layout",
-  zIndex: "zIndex",
-  order: "flex",
-  gridColumn: "grid",
-  gridColumnStart: "grid",
-  gridColumnEnd: "grid",
-  gridRow: "grid",
-  gridRowStart: "grid",
-  gridRowEnd: "grid",
-  float: "layout",
-  clear: "layout",
-  margin: "margin",
-  boxSizing: "layout",
-  lineClamp: "typography",
-  display: "display",
-  aspectRatio: "sizing",
-  size: "sizing",
-  height: "sizing",
-  maxHeight: "sizing",
-  minHeight: "sizing",
-  width: "sizing",
-  minWidth: "sizing",
-  maxWidth: "sizing",
-  flex: "flex",
-  flexShrink: "flex",
-  flexGrow: "flex",
-  flexBasis: "flex",
-  tableLayout: "tables",
-  captionSide: "tables",
-  borderCollapse: "tables",
-  borderSpacing: "tables",
-  transformOrigin: "transforms",
-  translate: "transforms",
-  rotate: "transforms",
-  skew: "transforms",
-  scale: "transforms",
-  transform: "transforms",
-  animation: "animations",
-  cursor: "cursors",
-  touchAction: "interactivity",
-  userSelect: "interactivity",
-  resize: "interactivity",
-  scrollSnapType: "interactivity",
-  scrollSnapAlign: "interactivity",
-  scrollSnapStop: "interactivity",
-  scrollMargin: "interactivity",
-  scrollPadding: "interactivity",
-  listStylePosition: "typography",
-  listStyleType: "typography",
-  listStyleImage: "typography",
-  appearance: "interactivity",
-  columns: "layout",
-  breakBefore: "layout",
-  breakInside: "layout",
-  breakAfter: "layout",
-  gridAutoColumns: "grid",
-  gridAutoFlow: "grid",
-  gridAutoRows: "grid",
-  gridTemplateColumns: "grid",
-  gridTemplateRows: "grid",
-  flexDirection: "flex",
-  flexWrap: "flex",
-  placeContent: "flex",
-  placeItems: "flex",
-  alignContent: "flex",
-  alignItems: "flex",
-  justifyContent: "flex",
-  justifyItems: "flex",
-  gap: "gap",
-  space: "margin",
-  divideWidth: "borders",
-  divideStyle: "borders",
-  divideColor: "borderColor",
-  divideOpacity: "borderColor",
-  placeSelf: "flex",
-  alignSelf: "flex",
-  justifySelf: "flex",
-  overflow: "overflow",
-  overscrollBehavior: "overflow",
-  scrollBehavior: "interactivity",
-  textOverflow: "typography",
-  hyphens: "typography",
-  whitespace: "whitespace",
-  textWrap: "typography",
-  wordBreak: "typography",
-  borderRadius: "borderRadius",
-  borderWidth: "borders",
-  borderStyle: "borders",
-  borderColor: "borderColor",
-  borderOpacity: "borderColor",
-  backgroundColor: "backgroundColor",
-  backgroundOpacity: "backgroundColor",
-  backgroundImage: "backgrounds",
-  gradientColorStops: "gradients",
-  boxDecorationBreak: "backgrounds",
-  backgroundSize: "backgrounds",
-  backgroundAttachment: "backgrounds",
-  backgroundClip: "backgrounds",
-  backgroundPosition: "backgrounds",
-  backgroundRepeat: "backgrounds",
-  backgroundOrigin: "backgrounds",
-  fill: "svg",
-  stroke: "svg",
-  strokeWidth: "svg",
-  objectFit: "sizing",
-  objectPosition: "sizing",
-  padding: "padding",
-  textAlign: "typography",
-  textIndent: "typography",
-  verticalAlign: "typography",
-  fontFamily: "typography",
-  fontSize: "typography",
-  fontWeight: "typography",
-  textTransform: "typography",
-  fontStyle: "typography",
-  fontVariantNumeric: "typography",
-  lineHeight: "typography",
-  letterSpacing: "typography",
-  textColor: "textColor",
-  textOpacity: "textColor",
-  textDecoration: "textDecoration",
-  textDecorationColor: "textDecoration",
-  textDecorationStyle: "textDecoration",
-  textDecorationThickness: "textDecoration",
-  textUnderlineOffset: "textDecoration",
-  fontSmoothing: "typography",
-  placeholderColor: "textColor",
-  placeholderOpacity: "textColor",
-  caretColor: "interactivity",
-  accentColor: "interactivity",
-  opacity: "opacity",
-  backgroundBlendMode: "effects",
-  mixBlendMode: "effects",
-  boxShadow: "shadows",
-  boxShadowColor: "shadows",
-  outlineStyle: "borders",
-  outlineWidth: "borders",
-  outlineOffset: "borders",
-  outlineColor: "borderColor",
-  ringWidth: "borders",
-  ringColor: "borderColor",
-  ringOpacity: "borderColor",
-  ringOffsetWidth: "borders",
-  ringOffsetColor: "borderColor",
-  blur: "filters",
-  brightness: "filters",
-  contrast: "filters",
-  dropShadow: "filters",
-  grayscale: "filters",
-  hueRotate: "filters",
-  invert: "filters",
-  saturate: "filters",
-  sepia: "filters",
-  filter: "filters",
-  backdropBlur: "filters",
-  backdropBrightness: "filters",
-  backdropContrast: "filters",
-  backdropGrayscale: "filters",
-  backdropHueRotate: "filters",
-  backdropInvert: "filters",
-  backdropOpacity: "filters",
-  backdropSaturate: "filters",
-  backdropSepia: "filters",
-  backdropFilter: "filters",
-  transitionProperty: "transitions",
-  transitionDelay: "transitions",
-  transitionDuration: "transitions",
-  transitionTimingFunction: "transitions",
-  willChange: "interactivity",
-  contain: "layout",
-  content: "typography",
-  containerQueries: "layout",
-  forcedColorAdjust: "accessibility",
-  fontStretch: "typography",
-  fieldSizing: "interactivity",
-  colorScheme: "interactivity",
-  arbitraryProperties: "plugin",
-  components: "components",
-  "plugin-components": "components"
-};
 function categoryForPlugin(plugin2) {
   return PLUGIN_CATEGORY[plugin2] ?? (GROUP_CATEGORIES[plugin2] ? plugin2 : "plugin");
 }
-var PLUGIN_COMPONENTS_GROUP = "plugin-components";
 function normalizePlugin(plugin2) {
   if (typeof plugin2 === "function") {
     if (plugin2.__isOptionsFunction) {
@@ -6694,14 +2528,6 @@ function normalizePlugin(plugin2) {
 function plugin(handler, config) {
   return { handler, config };
 }
-plugin.withOptions = function withOptions(pluginFunction, configFunction = () => ({})) {
-  const optionsFunction = (options) => ({
-    handler: pluginFunction(options),
-    config: configFunction(options)
-  });
-  optionsFunction.__isOptionsFunction = true;
-  return optionsFunction;
-};
 function cssInJsToRules(input) {
   const nodes = flattenNodes(cssInJsToNodes(input));
   const rules = [];
@@ -6909,14 +2735,6 @@ function createPluginAPI(collector, ctx) {
     return { format: f.includes("&") ? f : `${f} &` };
   }
 }
-var ApplyError = class extends Error {
-  constructor(message, candidate) {
-    super(message);
-    this.candidate = candidate;
-    this.name = "ApplyError";
-  }
-  candidate;
-};
 function replaceThemeFunctions(value, engine) {
   if (!value.includes("theme(") && !value.includes("screen(")) return value;
   let out = value.replace(/theme\(((?:[^()]|\([^()]*\))*)\)/g, (_whole, inner) => {
@@ -6998,7 +2816,6 @@ function expandRule(rule, engine, options) {
   }
   return collapseAdjacentRules(out);
 }
-var siblingSeq = 0;
 function expandApply(params, engine, parent, options) {
   let important = false;
   let list = params.trim();
@@ -7079,659 +2896,6 @@ function atParams(kind, params) {
   if (kind === "starting") return "";
   return params;
 }
-var version = "3.0.0";
-var STATE_VARIANTS = [
-  {
-    prefix: "hover",
-    suffix: ":hover",
-    ancestor: "",
-    configKey: "hover",
-    description: "applies on hover"
-  },
-  {
-    prefix: "focus",
-    suffix: ":focus",
-    ancestor: "",
-    configKey: "focus",
-    description: "applies on focus"
-  },
-  {
-    prefix: "focus-visible",
-    suffix: ":focus-visible",
-    ancestor: "",
-    configKey: "focusVisible",
-    description: "keyboard focus"
-  },
-  {
-    prefix: "focus-within",
-    suffix: ":focus-within",
-    ancestor: "",
-    configKey: "focusWithin",
-    description: "a descendant has focus"
-  },
-  {
-    prefix: "active",
-    suffix: ":active",
-    ancestor: "",
-    configKey: "active",
-    description: "while pressed"
-  },
-  {
-    prefix: "visited",
-    suffix: ":visited",
-    ancestor: "",
-    configKey: "visited",
-    description: "visited links"
-  },
-  {
-    prefix: "disabled",
-    suffix: ":disabled",
-    ancestor: "",
-    configKey: "disabled",
-    description: "disabled controls"
-  },
-  {
-    prefix: "first",
-    suffix: ":first-child",
-    ancestor: "",
-    configKey: "firstChild",
-    description: "first child"
-  },
-  {
-    prefix: "last",
-    suffix: ":last-child",
-    ancestor: "",
-    configKey: "lastChild",
-    description: "last child"
-  },
-  {
-    prefix: "group-hover",
-    suffix: "",
-    ancestor: ".group:hover",
-    configKey: "groupHover",
-    description: "parent .group hovered"
-  },
-  {
-    prefix: "group-focus",
-    suffix: "",
-    ancestor: ".group:focus",
-    configKey: "groupFocus",
-    description: "parent .group focused"
-  },
-  {
-    prefix: "peer-hover",
-    suffix: "",
-    ancestor: ".peer:hover ~",
-    configKey: "peerHover",
-    description: "preceding .peer hovered"
-  },
-  {
-    prefix: "peer-focus",
-    suffix: "",
-    ancestor: ".peer:focus ~",
-    configKey: "peerFocus",
-    description: "preceding .peer focused"
-  },
-  {
-    prefix: "dark",
-    suffix: "",
-    ancestor: ":is(.dark *)",
-    configKey: "dark",
-    description: "dark mode"
-  }
-];
-var VERSION = version;
-var CORE_SCREENS = ["sm", "md", "lg", "xl", "2xl"];
-var CSSGenerator = class {
-  config;
-  /** the fully resolved theme (Tailwind-shaped scales) */
-  theme;
-  engine;
-  variantCfg;
-  breakpoints;
-  catalog = null;
-  catalogByClass = null;
-  pluginBase;
-  pluginRawCss;
-  corePluginsEnabled;
-  constructor(config = {}) {
-    let draft = {};
-    for (const preset of config.presets ?? []) draft = mergePreset(draft, preset);
-    draft = mergePreset(draft, config);
-    const plugins = (draft.plugins ?? []).map((p) => normalizePlugin(p));
-    const pluginThemes = [];
-    for (const p of plugins) {
-      if (p.legacyConfig) p.legacyConfig(draft);
-      if (p.config) {
-        const { theme, ...rest } = p.config;
-        if (theme) pluginThemes.push(theme);
-        for (const [k, v] of Object.entries(rest))
-          if (draft[k] === void 0)
-            draft[k] = v;
-      }
-    }
-    const corePlugins = draft.corePlugins ?? {};
-    this.corePluginsEnabled = Array.isArray(corePlugins) ? (name) => corePlugins.includes(name) || ["base", "variables", "components", "animations"].includes(name) : (name) => corePlugins[name] !== false;
-    this.config = {
-      ...draft,
-      theme: draft.theme ?? {},
-      variants: { ...defaultVariants, ...draft.variants },
-      darkMode: draft.darkMode ?? "class",
-      content: draft.content,
-      purge: draft.purge ?? [],
-      safelist: draft.safelist ?? [],
-      blocklist: draft.blocklist ?? [],
-      plugins: draft.plugins ?? [],
-      important: draft.important ?? false,
-      corePlugins,
-      prefix: draft.prefix ?? "",
-      extractorPattern: draft.extractorPattern,
-      layers: draft.layers ?? false,
-      preflight: draft.preflight ?? true
-    };
-    this.variantCfg = this.config.variants;
-    this.theme = resolveTheme(this.config.theme, { pluginTheme: pluginThemes });
-    this.breakpoints = Object.entries(this.theme.screens).map(([name, value]) => ({ name, value, px: screenPx(value) })).filter((b) => !Number.isNaN(b.px) && b.px > 0).sort((a, b) => a.px - b.px);
-    const collector = {
-      statics: [],
-      functional: [],
-      variants: [],
-      base: [],
-      rawCss: []
-    };
-    const themeFn = (path, fallback) => {
-      if (path === void 0) return this.theme;
-      const v = lookup(this.theme, path);
-      return v === void 0 ? fallback : v;
-    };
-    for (const p of plugins) {
-      if (!p.handler) continue;
-      const api = createPluginAPI(collector, {
-        theme: this.theme,
-        themeFn,
-        configFn: (path, fallback) => {
-          if (path === void 0) return { ...this.config, theme: this.theme };
-          if (path === "prefix") return this.config.prefix;
-          if (path === "separator") return ":";
-          if (path === "darkMode") return this.config.darkMode;
-          const v = lookup({ ...this.config, theme: this.theme }, path);
-          return v === void 0 ? fallback : v;
-        },
-        corePluginEnabled: this.corePluginsEnabled,
-        prefix: this.config.prefix ?? "",
-        pluginName: "plugin"
-      });
-      p.handler(api);
-    }
-    this.pluginBase = collector.base;
-    this.pluginRawCss = collector.rawCss;
-    this.engine = new Engine({
-      theme: this.theme,
-      darkMode: this.variantCfg.dark === false ? false : this.config.darkMode ?? "class",
-      pluginEnabled: this.corePluginsEnabled,
-      variantEnabled: (key) => this.isVariantEnabled(key),
-      important: this.config.important ?? false,
-      extraStatic: collector.statics,
-      extraFunctional: collector.functional,
-      extraVariants: collector.variants,
-      combineMedia: this.config.combineMedia !== false
-    });
-  }
-  // ───────────────────────────────────────────── API ─────────────────────────────────────────────
-  /**
-   * Generate the stylesheet.
-   *
-   * - `full` mode (default): base styles, CSS variables, keyframes, every
-   *   utility + its responsive variants, and the component set.
-   * - `jit` mode: only the utilities found in `options.content`
-   *   (state variants and variant combinations included).
-   */
-  generate(options = {}) {
-    const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
-    if (mode === "jit")
-      return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
-    const css = this.generateFull(options);
-    return options.minify ? minifyCss(css) : css;
-  }
-  /** Generate JIT CSS from explicit content */
-  generateFromContent(content, options = {}) {
-    return this.generateJIT(content, options);
-  }
-  /** All utility rules in catalog order (value-bearing classes, no variants) */
-  getUtilities() {
-    return [...this.buildCatalog()];
-  }
-  /** Look up a single utility by (base) class name */
-  getUtility(className) {
-    this.buildCatalog();
-    const hit = this.catalogByClass.get(className);
-    if (hit) return hit;
-    const rules = this.engine.compile(className);
-    if (rules.length === 0) return void 0;
-    return {
-      class: className,
-      group: rules[0].plugin,
-      category: categoryForPlugin(rules[0].plugin),
-      decls: Object.assign({}, ...rules.map((r) => r.decls)),
-      description: `${className} (computed)`
-    };
-  }
-  /** Every variant name the engine knows (static + functional prefixes) */
-  getVariantNames() {
-    return this.engine.getVariants().map((v) => v.name);
-  }
-  /** Variant definitions (docs / IntelliSense) */
-  getVariantDefinitions() {
-    return this.engine.getVariants();
-  }
-  /** Resolved breakpoints, ascending */
-  getBreakpoints() {
-    return this.variantCfg.responsive !== false ? [...this.breakpoints] : [];
-  }
-  /** Compile a single candidate to CSS (empty string when unknown) */
-  compileClass(candidate) {
-    return this.serializeRules(this.engine.compile(candidate));
-  }
-  /** Statistics about a generated stylesheet */
-  /**
-   * Statistics for a stylesheet (default: the full build). Computed on the
-   * parsed CSS, not with regexes: a "rule" is a style rule with a selector,
-   * "responsive" means it sits inside a `@media`/`@container` at-rule,
-   * "variant" means at least one selector in the list carries a variant
-   * prefix (an escaped `\:` in the class part), and keyframe steps
-   * (`from`, `to`, `50%`) are excluded from all three.
-   */
-  getStats(css) {
-    const generated = css ?? this.generate();
-    const minified = minifyCss(generated);
-    let totalRules = 0;
-    let responsiveRules = 0;
-    let variantRules = 0;
-    for (const { rule, ancestors } of walkRules(parseCss(generated).nodes)) {
-      if (ancestors.some((a) => a.name === "keyframes")) continue;
-      totalRules++;
-      if (ancestors.some((a) => a.name === "media" || a.name === "container")) responsiveRules++;
-      if (splitSelectorList(rule.selector).some((sel) => /\\:/.test(sel))) variantRules++;
-    }
-    return {
-      utilities: this.buildCatalog().length,
-      responsiveRules,
-      variantRules,
-      totalRules,
-      sizeBytes: byteLength(generated),
-      minifiedSizeBytes: byteLength(minified)
-    };
-  }
-  minify(css) {
-    return minifyCss(css);
-  }
-  /** Expand `@apply`, `theme()`, `screen()` and `@screen` in author CSS */
-  processCss(css, options = {}) {
-    return processAuthorCss(css, this.engine, options);
-  }
-  /** Resolve a theme path (`colors.blue.500`, `spacing[2.5]`) */
-  themeValue(path) {
-    return this.engine.lookupTheme(path);
-  }
-  // ───────────────────────────── layer accessors ─────────────────────────────
-  /** Base styles (reset, `--tw-*` defaults, plugin base) */
-  getBase() {
-    return this.baseStyles();
-  }
-  /** `:root` CSS variables */
-  getVariables() {
-    return this.variables();
-  }
-  /** `@keyframes` for the referenced animations (all when `names` is omitted) */
-  getKeyframes(names) {
-    return this.keyframes(names);
-  }
-  /**
-   * Full utility set.
-   * @param includeVariants when true (default) the classic state variants
-   *   (`STATE_VARIANTS`) are included — the standard full build omits them.
-   */
-  getUtilitiesFull(includeVariants = true, options = {}) {
-    const catalog = this.buildCatalog();
-    const prefix = this.config.prefix ?? "";
-    const base = [];
-    for (const r of catalog) {
-      const cls = r.class.slice(prefix.length);
-      for (const c of this.engine.compile(cls))
-        base.push(prefix ? this.reprefix(c, cls, r.class) : c);
-    }
-    let css = this.serializeRules(base);
-    for (const bp of this.fullBuildScreens(options.screens)) {
-      const wrapped = [];
-      const vm = this.engine.resolveVariant(bp.name);
-      if (!vm) continue;
-      const at = vm.branches[0]?.atrules?.[0];
-      if (!at) continue;
-      for (const rule of base) {
-        const from = `.${escapeClass(rule.candidate)}`;
-        const to = `.${escapeClass(`${bp.name}:${rule.candidate}`)}`;
-        wrapped.push({
-          ...rule,
-          selector: rule.selector.split(from).join(to),
-          atrules: [at, ...rule.atrules],
-          sort: {
-            ...rule.sort,
-            variant: 1,
-            variants: [vm.sort],
-            hooks: vm.fn ? [{ ...vm.fn, bit: vm.sort }] : void 0
-          }
-        });
-      }
-      css += this.serializeRules(wrapped);
-    }
-    if (includeVariants) {
-      const candidates = [];
-      for (const v of STATE_VARIANTS) {
-        if (!this.isVariantEnabled(v.configKey)) continue;
-        for (const r of catalog) candidates.push(`${v.prefix}:${r.class}`);
-      }
-      css += this.compileCandidates(candidates).css;
-    }
-    return css;
-  }
-  /**
-   * Screens that get responsive variants in the *full* build. Default
-   * (`'core'`): the classic `sm`–`2xl` set, so the extended 10-step scale
-   * does not multiply the CDN bundle (every screen is always available in
-   * JIT mode). `'all'` or an explicit list opt in.
-   */
-  fullBuildScreens(screens = "core") {
-    const all = this.getBreakpoints();
-    if (screens === "all") return all;
-    const wanted = new Set(screens === "core" ? CORE_SCREENS : screens);
-    const picked = all.filter((b) => wanted.has(b.name));
-    return screens === "core" && picked.length === 0 ? all : picked;
-  }
-  reprefix(rule, from, to) {
-    return {
-      ...rule,
-      selector: rule.selector.split(`.${escapeClass(from)}`).join(`.${escapeClass(to)}`)
-    };
-  }
-  /** Design-paradigm component CSS */
-  getComponents() {
-    return this.components();
-  }
-  // ─────────────────────────────────────────── internals ───────────────────────────────────────────
-  hasContent() {
-    if (this.config.content !== void 0) {
-      const c = this.config.content;
-      return c !== "" && !(Array.isArray(c) && c.length === 0);
-    }
-    return false;
-  }
-  getContentFromConfig() {
-    const content = this.config.content ?? this.config.purge;
-    if (typeof content === "string") return [content];
-    return Array.isArray(content) ? content : [];
-  }
-  isVariantEnabled(key) {
-    const cfg = this.variantCfg;
-    if (cfg[key] === false) return false;
-    for (const [legacy, name] of Object.entries(LEGACY_VARIANT_KEYS)) {
-      if (name === key && cfg[legacy] === false) return false;
-    }
-    const camel = key.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
-    if (camel !== key && cfg[camel] === false) return false;
-    return true;
-  }
-  buildCatalog() {
-    if (this.catalog) return this.catalog;
-    const prefix = this.config.prefix ?? "";
-    const entries = this.engine.buildCatalog();
-    this.catalog = entries.map((e) => ({
-      class: prefix + e.class,
-      group: e.plugin,
-      category: categoryForPlugin(e.plugin),
-      decls: e.decls,
-      description: e.description
-    }));
-    this.catalogByClass = new Map(this.catalog.map((r) => [r.class, r]));
-    return this.catalog;
-  }
-  /** Compile candidates → ordered CSS text plus bookkeeping */
-  compileCandidates(candidates) {
-    const prefix = this.config.prefix ?? "";
-    const block = new Set(this.config.blocklist ?? []);
-    const rules = [];
-    const emitted = /* @__PURE__ */ new Set();
-    const animations = /* @__PURE__ */ new Set();
-    const defaults = /* @__PURE__ */ new Set();
-    const seenRules = /* @__PURE__ */ new Set();
-    const ordered = [...new Set(candidates)].sort((x, y) => x < y ? -1 : x > y ? 1 : 0);
-    for (const raw of ordered) {
-      if (emitted.has(raw) || block.has(raw)) continue;
-      let candidate = raw;
-      if (prefix) {
-        const idx = raw.lastIndexOf(":");
-        const base = raw.slice(idx + 1);
-        const neg = base.startsWith("-") ? "-" : "";
-        const bang = base.startsWith("!") ? "!" : "";
-        const core = base.slice(neg.length + bang.length);
-        if (!core.startsWith(prefix)) continue;
-        candidate = raw.slice(0, idx + 1) + neg + bang + core.slice(prefix.length);
-      }
-      const compiled = this.engine.compile(candidate);
-      if (compiled.length === 0) continue;
-      emitted.add(raw);
-      for (const r of compiled) {
-        const rule = prefix ? {
-          ...r,
-          selector: r.selector.split(`.${escapeClass(candidate)}`).join(`.${escapeClass(raw)}`)
-        } : r;
-        const identity = `${rule.selector}\0${rule.atrules.map((a) => `${a.kind} ${a.params}`).join("|")}\0${JSON.stringify(rule.decls)}`;
-        if (seenRules.has(identity)) continue;
-        seenRules.add(identity);
-        rules.push(rule);
-        if (r.defaults) defaults.add(r.defaults);
-        for (const a of r.animations ?? []) animations.add(a);
-      }
-    }
-    return { css: this.serializeRules(rules), emitted, animations, defaults };
-  }
-  /** Sort rules (variant weight → plugin → utility → value) and serialise with grouped at-rules. */
-  serializeRules(rules) {
-    const sorted = [...rules].sort(compareRules);
-    let out = "";
-    let openKey = "";
-    let openDepth = 0;
-    const closeAll = () => {
-      while (openDepth > 0) {
-        openDepth--;
-        out += `${"  ".repeat(openDepth)}}
-`;
-      }
-      openKey = "";
-    };
-    for (const rule of sorted) {
-      const key = rule.atrules.map(atRuleText).join("\0");
-      if (key !== openKey) {
-        closeAll();
-        for (const at of rule.atrules) {
-          out += `${"  ".repeat(openDepth)}${atRuleText(at)} {
-`;
-          openDepth++;
-        }
-        openKey = key;
-      }
-      out += `${"  ".repeat(openDepth)}${rule.selector} { ${stringifyDecls(rule.decls)}; }
-`;
-    }
-    closeAll();
-    return out;
-  }
-  // ─────────────────────────────── layers ───────────────────────────────
-  baseStyles() {
-    if (!this.corePluginsEnabled("base")) return "";
-    let css = "";
-    if (this.config.preflight !== false && this.corePluginsEnabled("preflight"))
-      css += preflight(this.theme);
-    css += this.twDefaults();
-    if (this.pluginBase.length) css += serializeCss(this.pluginBase);
-    return css;
-  }
-  /** `*, ::before, ::after { --tw-… }` defaults required by composed utilities */
-  twDefaults(groups) {
-    const wanted = groups ?? new Set(Object.keys(DEFAULTS_GROUPS));
-    const decls = {};
-    for (const g of Object.keys(DEFAULTS_GROUPS)) {
-      if (!wanted.has(g)) continue;
-      Object.assign(decls, DEFAULTS_GROUPS[g]);
-    }
-    if (Object.keys(decls).length === 0) return "";
-    const body = Object.entries(decls).map(([k, v]) => `  ${k}: ${v};`).join("\n");
-    return `
-*, ::before, ::after {
-${body}
-}
-
-::backdrop {
-${body}
-}
-`;
-  }
-  variables() {
-    if (!this.corePluginsEnabled("variables")) return "";
-    let css = "\n/* Nakshora v3 \u2014 CSS Variables */\n:root {\n";
-    for (const [name, scale] of Object.entries(this.theme.colors ?? {})) {
-      if (typeof scale === "string") css += `  --color-${name}: ${scale};
-`;
-      else if (scale && typeof scale === "object") {
-        for (const [shade, value] of Object.entries(scale)) {
-          if (typeof value === "string")
-            css += `  --color-${name}${shade === "DEFAULT" ? "" : `-${shade}`}: ${value};
-`;
-        }
-      }
-    }
-    for (const [key, value] of Object.entries(this.theme.spacing ?? {}))
-      css += `  --spacing-${cssIdent(key)}: ${value};
-`;
-    for (const [size, value] of Object.entries(this.theme.fontSize ?? {}))
-      css += `  --text-${size}: ${Array.isArray(value) ? value[0] : String(value)};
-`;
-    for (const [name, value] of Object.entries(this.theme.fontFamily ?? {}))
-      css += `  --font-${name}: ${Array.isArray(value) ? value.join(", ") : String(value)};
-`;
-    for (const [name, value] of Object.entries(this.theme.screens ?? {}))
-      css += `  --breakpoint-${name}: ${value};
-`;
-    css += "}\n";
-    return css;
-  }
-  keyframes(names) {
-    if (!this.corePluginsEnabled("animations") && !this.corePluginsEnabled("animation")) return "";
-    const keyframes = this.theme.keyframes ?? {};
-    const animations = this.theme.animation ?? {};
-    const needed = names ?? new Set(Object.values(animations).map((v) => String(v).split(/\s+/)[0]));
-    let css = "";
-    for (const [name, body] of Object.entries(keyframes)) {
-      if (!needed.has(name)) continue;
-      css += `@keyframes ${name} {
-`;
-      for (const [step, decls] of Object.entries(body)) {
-        css += `  ${step} { ${Object.entries(decls).map(([k, v]) => `${kebabCase(k)}: ${v};`).join(" ")} }
-`;
-      }
-      css += "}\n";
-    }
-    return css ? `
-/* Nakshora v3 \u2014 Keyframes */
-${css}` : "";
-  }
-  components() {
-    if (!this.corePluginsEnabled("components")) return "";
-    let css = "\n/* Nakshora v3 \u2014 Components */\n";
-    for (const block of Object.values(componentCss)) css += block;
-    if (this.pluginRawCss.length) css += `${this.pluginRawCss.join("\n")}
-`;
-    return css;
-  }
-  wrapLayer(name, css) {
-    if (!css.trim()) return "";
-    if (!this.config.layers) return css;
-    return `@layer ${name} {
-${css}}
-`;
-  }
-  // ─────────────────────────────── full mode ───────────────────────────────
-  generateFull(options) {
-    let css = `/*! Nakshora v${VERSION} \u2014 utility-first CSS framework (full build) */
-`;
-    if (this.config.layers) css += "@layer base, components, utilities;\n";
-    css += this.wrapLayer("base", this.baseStyles() + this.variables() + this.keyframes());
-    css += this.wrapLayer("components", this.components());
-    css += "\n/* \u2500\u2500\u2500 Utilities \u2500\u2500\u2500 */\n";
-    css += this.wrapLayer("utilities", this.getUtilitiesFull(false, { screens: options.screens }));
-    return css;
-  }
-  // ─────────────────────────────── JIT mode ───────────────────────────────
-  /**
-   * Compile a JIT build from content.
-   * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
-   */
-  generateJIT(content, options = {}, internal) {
-    const css = this.generateJITPretty(content, options, internal);
-    return options.minify ? minifyCss(css) : css;
-  }
-  /**
-   * JIT build from an already-extracted candidate set (see `ContentCache`):
-   * skips the extractor entirely, otherwise identical to `generateJIT`.
-   */
-  generateJITFromCandidates(candidates, options = {}, internal) {
-    const css = this.generateJITPretty(void 0, options, internal, new Set(candidates));
-    return options.minify ? minifyCss(css) : css;
-  }
-  generateJITPretty(content, _options, internal, candidates) {
-    const utilitiesOnly = internal?.utilitiesOnly ?? false;
-    const chunks = typeof content === "string" ? [content] : content ?? [];
-    const found = candidates ?? extractClasses(chunks, this.config.extractorPattern);
-    for (const safe of this.config.safelist ?? []) found.add(safe);
-    const { css: utilities, emitted, animations, defaults } = this.compileCandidates(found);
-    let css = "";
-    if (!utilitiesOnly) {
-      css += `/*! Nakshora v${VERSION} \u2014 JIT build \xB7 ${emitted.size} classes */
-`;
-      if (this.config.layers) css += "@layer base, components, utilities;\n";
-      let base = "";
-      if (this.corePluginsEnabled("base")) {
-        if (this.config.preflight !== false && this.corePluginsEnabled("preflight"))
-          base += preflight(this.theme);
-        base += this.twDefaults(defaults);
-        if (this.pluginBase.length) base += serializeCss(this.pluginBase);
-      }
-      css += this.wrapLayer("base", base + this.variables() + this.keyframes(animations));
-      css += this.wrapLayer("components", this.componentsFor(found));
-    }
-    css += "\n/* \u2500\u2500\u2500 Utilities (JIT) \u2500\u2500\u2500 */\n";
-    css += this.wrapLayer("utilities", utilities);
-    return css;
-  }
-  /** Components layer — only the built-in blocks whose classes appear in `candidates`. */
-  componentsFor(candidates) {
-    if (!this.corePluginsEnabled("components")) return "";
-    const used = /* @__PURE__ */ new Set();
-    for (const c of candidates) {
-      const base = c.slice(c.lastIndexOf(":") + 1);
-      used.add(base);
-    }
-    let css = "";
-    for (const block of Object.values(componentCss)) {
-      const classes = [...block.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((m) => m[1]);
-      if (classes.some((c) => used.has(c))) css += block;
-    }
-    if (this.pluginRawCss.length) css += `${this.pluginRawCss.join("\n")}
-`;
-    return css ? `
-/* Nakshora v3 \u2014 Components */
-${css}` : "";
-  }
-};
 function mergePreset(base, preset) {
   if ("colors" in preset && !("theme" in preset)) {
     const p = preset;
@@ -7957,56 +3121,6 @@ function contentHash(text) {
   }
   return `${text.length}:${(h >>> 0).toString(36)}`;
 }
-var ContentCache = class {
-  constructor(pattern2) {
-    this.pattern = pattern2;
-  }
-  pattern;
-  entries = /* @__PURE__ */ new Map();
-  hits = 0;
-  misses = 0;
-  /**
-   * Candidates for one source. `key` identifies the source (file path or
-   * `raw:<n>`), `stamp` its version (`${mtimeMs}:${size}` for files, a hash
-   * for strings). `read` is only called on a miss.
-   */
-  candidatesFor(key, stamp, read) {
-    const hit = this.entries.get(key);
-    if (hit && hit.stamp === stamp) {
-      this.hits++;
-      return hit.candidates;
-    }
-    this.misses++;
-    const candidates = extractCandidates([read()], { pattern: this.pattern });
-    this.entries.set(key, { stamp, candidates });
-    return candidates;
-  }
-  /** Raw content chunk (no path): stamped by hash. */
-  candidatesForText(text, key) {
-    const stamp = contentHash(text);
-    return this.candidatesFor(key ?? `raw:${stamp}`, stamp, () => text);
-  }
-  /** Drop sources that no longer exist (call after a glob pass with the live key set). */
-  retain(keys) {
-    const keep = new Set(keys);
-    for (const k of this.entries.keys())
-      if (!keep.has(k) && !k.startsWith("raw:")) this.entries.delete(k);
-  }
-  /** Union of several candidate sets, in a deterministic (sorted) order. */
-  static union(sets) {
-    const all = /* @__PURE__ */ new Set();
-    for (const s of sets) for (const c of s) all.add(c);
-    return new Set([...all].sort());
-  }
-  stats() {
-    return { hits: this.hits, misses: this.misses, entries: this.entries.size };
-  }
-  clear() {
-    this.entries.clear();
-    this.hits = 0;
-    this.misses = 0;
-  }
-};
 function scanSources(cache2, fs, files, raw = []) {
   const sets = [];
   const live = [];
@@ -8020,19 +3134,5411 @@ function scanSources(cache2, fs, files, raw = []) {
   cache2.retain(live);
   return ContentCache.union(sets);
 }
-var metadata = {
-  name: "nakshora",
-  version,
-  description: "The modern, ultra-fast, utility-first CSS framework with a JIT compiler",
-  author: "Rizwan Rahim Chowdhury",
-  maintainer: "RRC Development",
-  license: "MIT",
-  repository: "https://github.com/nakshora/nakshora",
-  homepage: "https://nakshora.dev",
-  documentation: "https://github.com/nakshora/nakshora/blob/main/docs"
-};
+var defaultColors, defaultVariants, componentCss, componentNames, HEX, SHORT_HEX, VALUE, SEP, ALPHA_SEP, CUSTOM_PROPERTY, RGB, HSL, NAMED_COLORS, MATH_FUNCTIONS, AUTO_VAR_INJECTION_EXCEPTIONS, CSS_FUNCTIONS, LENGTH_UNITS, LENGTH_RE, typeCheckers, TYPE_HINTS, SPECIALS, ALLOWED_CLASS_CHARACTERS, cache, UNITLESS, tailwindDefaults, DEFAULT_SCREENS, SCREEN_GUIDE, DEFAULT_CONTAINER_MIN_SCREEN, DEFAULT_CONTAINER_MAX_SCREEN, FRACTIONS, FRACTIONS_SMALL, FRACTIONS_SIXTHS, NAKSHORA_EXTRAS, STATIC_UTILITIES, TRANSFORM_VALUE, FILTER_VALUE, BACKDROP_VALUE, CHILD_SELECTOR, SHADOW_KEYWORDS, SHADOW_LENGTH, CORE_PLUGIN_ORDER, DEFAULTS_GROUPS, CATALOG_CACHE, CATALOG_CACHE_MAX, PSEUDO_ELEMENTS, VISITED_STRIP, PSEUDO_CLASSES, LEGACY_VARIANT_KEYS, MEDIA_SORT, Engine, MERGE_RE, PSEUDO_ELEMENT_PROPS, DEFAULT_PSEUDO_PROPS, NAKSHORA_STATIC, GROUP_CATEGORIES, PLUGIN_CATEGORY, PLUGIN_COMPONENTS_GROUP, ApplyError, siblingSeq, version, STATE_VARIANTS, VERSION, CORE_SCREENS, CSSGenerator, ContentCache, metadata;
+var init_dist = __esm({
+  "../core/dist/index.js"() {
+    "use strict";
+    defaultColors = {
+      inherit: "inherit",
+      current: "currentColor",
+      transparent: "transparent",
+      black: "#000",
+      white: "#fff",
+      slate: {
+        50: "#f8fafc",
+        100: "#f1f5f9",
+        200: "#e2e8f0",
+        300: "#cbd5e1",
+        400: "#94a3b8",
+        500: "#64748b",
+        600: "#475569",
+        700: "#334155",
+        800: "#1e293b",
+        900: "#0f172a",
+        950: "#020617"
+      },
+      gray: {
+        50: "#f9fafb",
+        100: "#f3f4f6",
+        200: "#e5e7eb",
+        300: "#d1d5db",
+        400: "#9ca3af",
+        500: "#6b7280",
+        600: "#4b5563",
+        700: "#374151",
+        800: "#1f2937",
+        900: "#111827",
+        950: "#030712"
+      },
+      zinc: {
+        50: "#fafafa",
+        100: "#f4f4f5",
+        200: "#e4e4e7",
+        300: "#d4d4d8",
+        400: "#a1a1aa",
+        500: "#71717a",
+        600: "#52525b",
+        700: "#3f3f46",
+        800: "#27272a",
+        900: "#18181b",
+        950: "#09090b"
+      },
+      neutral: {
+        50: "#fafafa",
+        100: "#f5f5f5",
+        200: "#e5e5e5",
+        300: "#d4d4d4",
+        400: "#a3a3a3",
+        500: "#737373",
+        600: "#525252",
+        700: "#404040",
+        800: "#262626",
+        900: "#171717",
+        950: "#0a0a0a"
+      },
+      stone: {
+        50: "#fafaf9",
+        100: "#f5f5f4",
+        200: "#e7e5e4",
+        300: "#d6d3d1",
+        400: "#a8a29e",
+        500: "#78716c",
+        600: "#57534e",
+        700: "#44403c",
+        800: "#292524",
+        900: "#1c1917",
+        950: "#0c0a09"
+      },
+      red: {
+        50: "#fef2f2",
+        100: "#fee2e2",
+        200: "#fecaca",
+        300: "#fca5a5",
+        400: "#f87171",
+        500: "#ef4444",
+        600: "#dc2626",
+        700: "#b91c1c",
+        800: "#991b1b",
+        900: "#7f1d1d",
+        950: "#450a0a"
+      },
+      orange: {
+        50: "#fff7ed",
+        100: "#ffedd5",
+        200: "#fed7aa",
+        300: "#fdba74",
+        400: "#fb923c",
+        500: "#f97316",
+        600: "#ea580c",
+        700: "#c2410c",
+        800: "#9a3412",
+        900: "#7c2d12",
+        950: "#431407"
+      },
+      amber: {
+        50: "#fffbeb",
+        100: "#fef3c7",
+        200: "#fde68a",
+        300: "#fcd34d",
+        400: "#fbbf24",
+        500: "#f59e0b",
+        600: "#d97706",
+        700: "#b45309",
+        800: "#92400e",
+        900: "#78350f",
+        950: "#451a03"
+      },
+      yellow: {
+        50: "#fefce8",
+        100: "#fef9c3",
+        200: "#fef08a",
+        300: "#fde047",
+        400: "#facc15",
+        500: "#eab308",
+        600: "#ca8a04",
+        700: "#a16207",
+        800: "#854d0e",
+        900: "#713f12",
+        950: "#422006"
+      },
+      lime: {
+        50: "#f7fee7",
+        100: "#ecfccb",
+        200: "#d9f99d",
+        300: "#bef264",
+        400: "#a3e635",
+        500: "#84cc16",
+        600: "#65a30d",
+        700: "#4d7c0f",
+        800: "#3f6212",
+        900: "#365314",
+        950: "#1a2e05"
+      },
+      emerald: {
+        50: "#ecfdf5",
+        100: "#d1fae5",
+        200: "#a7f3d0",
+        300: "#6ee7b7",
+        400: "#34d399",
+        500: "#10b981",
+        600: "#059669",
+        700: "#047857",
+        800: "#065f46",
+        900: "#064e3b",
+        950: "#022c22"
+      },
+      green: {
+        50: "#f0fdf4",
+        100: "#dcfce7",
+        200: "#bbf7d0",
+        300: "#86efac",
+        400: "#4ade80",
+        500: "#22c55e",
+        600: "#16a34a",
+        700: "#15803d",
+        800: "#166534",
+        900: "#14532d",
+        950: "#052e16"
+      },
+      teal: {
+        50: "#f0fdfa",
+        100: "#ccfbf1",
+        200: "#99f6e4",
+        300: "#5eead4",
+        400: "#2dd4bf",
+        500: "#14b8a6",
+        600: "#0d9488",
+        700: "#0f766e",
+        800: "#115e59",
+        900: "#134e4a",
+        950: "#042f2e"
+      },
+      cyan: {
+        50: "#ecfeff",
+        100: "#cffafe",
+        200: "#a5f3fc",
+        300: "#67e8f9",
+        400: "#22d3ee",
+        500: "#06b6d4",
+        600: "#0891b2",
+        700: "#0e7490",
+        800: "#155e75",
+        900: "#164e63",
+        950: "#083344"
+      },
+      sky: {
+        50: "#f0f9ff",
+        100: "#e0f2fe",
+        200: "#bae6fd",
+        300: "#7dd3fc",
+        400: "#38bdf8",
+        500: "#0ea5e9",
+        600: "#0284c7",
+        700: "#0369a1",
+        800: "#075985",
+        900: "#0c4a6e",
+        950: "#082f49"
+      },
+      blue: {
+        50: "#eff6ff",
+        100: "#dbeafe",
+        200: "#bfdbfe",
+        300: "#93c5fd",
+        400: "#60a5fa",
+        500: "#3b82f6",
+        600: "#2563eb",
+        700: "#1d4ed8",
+        800: "#1e40af",
+        900: "#1e3a8a",
+        950: "#172554"
+      },
+      indigo: {
+        50: "#eef2ff",
+        100: "#e0e7ff",
+        200: "#c7d2fe",
+        300: "#a5b4fc",
+        400: "#818cf8",
+        500: "#6366f1",
+        600: "#4f46e5",
+        700: "#4338ca",
+        800: "#3730a3",
+        900: "#312e81",
+        950: "#1e1b4b"
+      },
+      violet: {
+        50: "#f5f3ff",
+        100: "#ede9fe",
+        200: "#ddd6fe",
+        300: "#c4b5fd",
+        400: "#a78bfa",
+        500: "#8b5cf6",
+        600: "#7c3aed",
+        700: "#6d28d9",
+        800: "#5b21b6",
+        900: "#4c1d95",
+        950: "#2e1065"
+      },
+      purple: {
+        50: "#faf5ff",
+        100: "#f3e8ff",
+        200: "#e9d5ff",
+        300: "#d8b4fe",
+        400: "#c084fc",
+        500: "#a855f7",
+        600: "#9333ea",
+        700: "#7e22ce",
+        800: "#6b21a8",
+        900: "#581c87",
+        950: "#3b0764"
+      },
+      fuchsia: {
+        50: "#fdf4ff",
+        100: "#fae8ff",
+        200: "#f5d0fe",
+        300: "#f0abfc",
+        400: "#e879f9",
+        500: "#d946ef",
+        600: "#c026d3",
+        700: "#a21caf",
+        800: "#86198f",
+        900: "#701a75",
+        950: "#4a044e"
+      },
+      pink: {
+        50: "#fdf2f8",
+        100: "#fce7f3",
+        200: "#fbcfe8",
+        300: "#f9a8d4",
+        400: "#f472b6",
+        500: "#ec4899",
+        600: "#db2777",
+        700: "#be185d",
+        800: "#9d174d",
+        900: "#831843",
+        950: "#500724"
+      },
+      rose: {
+        50: "#fff1f2",
+        100: "#ffe4e6",
+        200: "#fecdd3",
+        300: "#fda4af",
+        400: "#fb7185",
+        500: "#f43f5e",
+        600: "#e11d48",
+        700: "#be123c",
+        800: "#9f1239",
+        900: "#881337",
+        950: "#4c0519"
+      }
+    };
+    defaultVariants = {
+      hover: true,
+      focus: true,
+      focusVisible: true,
+      focusWithin: true,
+      active: true,
+      visited: true,
+      disabled: true,
+      firstChild: true,
+      lastChild: true,
+      group: true,
+      groupHover: true,
+      groupFocus: true,
+      peer: true,
+      peerHover: true,
+      peerFocus: true,
+      dark: true,
+      responsive: true,
+      maxResponsive: true,
+      containerQueries: true,
+      arbitraryVariants: true
+    };
+    componentCss = {
+      glass: `
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  border-radius: 0.75rem;
+  color: #f8fafc;
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(31, 41, 55, 0.12);
+  border-radius: 0.75rem;
+  color: #1f2937;
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  border-radius: 0.75rem;
+  color: #f8fafc;
+}
+`,
+      neon: `
+.neon-card {
+  background: #0a1929;
+  border: 1px solid rgba(0, 217, 255, 0.4);
+  border-radius: 0.75rem;
+  box-shadow: 0 0 12px rgba(0, 217, 255, 0.35), inset 0 0 18px rgba(0, 217, 255, 0.08);
+  color: #e0f7ff;
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+.neon-card:hover {
+  box-shadow: 0 0 24px rgba(0, 217, 255, 0.6), inset 0 0 24px rgba(0, 217, 255, 0.12);
+  border-color: rgba(0, 217, 255, 0.8);
+}
+
+.neon-btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #00d9ff 0%, #ff006e 100%);
+  color: #050d1a;
+  font-weight: 700;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(0, 217, 255, 0.45);
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.neon-btn:hover {
+  box-shadow: 0 0 32px rgba(255, 0, 110, 0.6);
+  transform: translateY(-1px);
+}
+
+.neon-glow {
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.6), 0 0 30px rgba(0, 217, 255, 0.3);
+}
+
+.neon-text {
+  color: #00d9ff;
+  text-shadow: 0 0 8px rgba(0, 217, 255, 0.8), 0 0 24px rgba(0, 217, 255, 0.4);
+}
+`,
+      brutalist: `
+.brutalist-card {
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 0;
+  box-shadow: 8px 8px 0 #000;
+  color: #000;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.brutalist-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0 #f43f5e;
+}
+
+.brutalist-btn {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  background: #facc15;
+  border: 3px solid #000;
+  border-radius: 0;
+  box-shadow: 5px 5px 0 #000;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: transform 100ms ease, box-shadow 100ms ease;
+}
+.brutalist-btn:hover {
+  background: #f43f5e;
+  color: #fff;
+}
+.brutalist-btn:active {
+  transform: translate(5px, 5px);
+  box-shadow: 0 0 0 #000;
+}
+`,
+      minimalist: `
+.minimalist-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  color: #1f2937;
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+.minimalist-card:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.minimalist-btn {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: #111827;
+  color: #f9fafb;
+  border: 1px solid #111827;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+.minimalist-btn:hover {
+  background: #f9fafb;
+  color: #111827;
+}
+`,
+      skeletons: `
+.skeleton-rect {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  border-radius: 0.375rem;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-circle {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  border-radius: 9999px;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-text {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  border-radius: 0.25rem;
+  height: 1em;
+  animation: shimmer 1.5s linear infinite;
+}
+`,
+      helpers: `
+.hover-lift {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.2);
+}
+
+.gradient-text {
+  background-image: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.gradient-neon {
+  background: linear-gradient(135deg, #0a1929 0%, #16213e 45%, #0f3460 100%);
+}
+.gradient-pastel {
+  background: linear-gradient(135deg, #fdf2f8 0%, #eff6ff 50%, #ecfdf5 100%);
+}
+.gradient-nature {
+  background: linear-gradient(135deg, #14532d 0%, #166534 50%, #365314 100%);
+}
+.gradient-brutalist {
+  background: linear-gradient(135deg, #facc15 0%, #f43f5e 100%);
+}
+`
+    };
+    componentNames = Object.keys(componentCss);
+    HEX = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i;
+    SHORT_HEX = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i;
+    VALUE = `(?:\\d+|\\d*\\.\\d+)%?`;
+    SEP = `(?:\\s*,\\s*|\\s+)`;
+    ALPHA_SEP = `\\s*[,/]\\s*`;
+    CUSTOM_PROPERTY = `var\\(--(?:[^ )]*?)(?:,(?:[^ )]*?|var\\(--[^ )]*?\\)))?\\)`;
+    RGB = new RegExp(
+      `^(rgba?)\\(\\s*(${VALUE}|${CUSTOM_PROPERTY})(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${ALPHA_SEP}(${VALUE}|${CUSTOM_PROPERTY}))?\\s*\\)$`
+    );
+    HSL = new RegExp(
+      `^(hsla?)\\(\\s*((?:${VALUE})(?:deg|rad|grad|turn)?|${CUSTOM_PROPERTY})(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${ALPHA_SEP}(${VALUE}|${CUSTOM_PROPERTY}))?\\s*\\)$`
+    );
+    NAMED_COLORS = {
+      black: [0, 0, 0],
+      white: [255, 255, 255],
+      red: [255, 0, 0],
+      green: [0, 128, 0],
+      blue: [0, 0, 255],
+      yellow: [255, 255, 0],
+      cyan: [0, 255, 255],
+      magenta: [255, 0, 255],
+      gray: [128, 128, 128],
+      grey: [128, 128, 128],
+      silver: [192, 192, 192],
+      maroon: [128, 0, 0],
+      olive: [128, 128, 0],
+      lime: [0, 255, 0],
+      aqua: [0, 255, 255],
+      teal: [0, 128, 128],
+      navy: [0, 0, 128],
+      fuchsia: [255, 0, 255],
+      purple: [128, 0, 128],
+      orange: [255, 165, 0],
+      hotpink: [255, 105, 180],
+      rebeccapurple: [102, 51, 153],
+      tomato: [255, 99, 71],
+      gold: [255, 215, 0],
+      coral: [255, 127, 80],
+      salmon: [250, 128, 114],
+      crimson: [220, 20, 60],
+      indigo: [75, 0, 130],
+      violet: [238, 130, 238],
+      pink: [255, 192, 203],
+      brown: [165, 42, 42],
+      tan: [210, 180, 140],
+      khaki: [240, 230, 140],
+      turquoise: [64, 224, 208],
+      skyblue: [135, 206, 235],
+      steelblue: [70, 130, 180],
+      slategray: [112, 128, 144],
+      darkgray: [169, 169, 169],
+      lightgray: [211, 211, 211],
+      whitesmoke: [245, 245, 245],
+      ivory: [255, 255, 240],
+      beige: [245, 245, 220],
+      wheat: [245, 222, 179],
+      chocolate: [210, 105, 30],
+      firebrick: [178, 34, 34],
+      darkred: [139, 0, 0],
+      darkgreen: [0, 100, 0],
+      darkblue: [0, 0, 139],
+      royalblue: [65, 105, 225],
+      dodgerblue: [30, 144, 255],
+      deepskyblue: [0, 191, 255],
+      limegreen: [50, 205, 50],
+      forestgreen: [34, 139, 34],
+      seagreen: [46, 139, 87],
+      springgreen: [0, 255, 127],
+      orangered: [255, 69, 0],
+      darkorange: [255, 140, 0],
+      plum: [221, 160, 221],
+      orchid: [218, 112, 214],
+      lavender: [230, 230, 250],
+      mintcream: [245, 255, 250],
+      azure: [240, 255, 255],
+      aliceblue: [240, 248, 255],
+      honeydew: [240, 255, 240],
+      linen: [250, 240, 230],
+      snow: [255, 250, 250],
+      seashell: [255, 245, 238],
+      transparent: [0, 0, 0]
+    };
+    MATH_FUNCTIONS = [
+      "calc",
+      "min",
+      "max",
+      "clamp",
+      "mod",
+      "rem",
+      "sin",
+      "cos",
+      "tan",
+      "asin",
+      "acos",
+      "atan",
+      "atan2",
+      "pow",
+      "sqrt",
+      "hypot",
+      "log",
+      "exp",
+      "round"
+    ];
+    AUTO_VAR_INJECTION_EXCEPTIONS = /* @__PURE__ */ new Set([
+      "scroll-timeline-name",
+      "timeline-scope",
+      "view-timeline-name",
+      "font-palette",
+      "anchor-name",
+      "anchor-scope",
+      "position-anchor",
+      "position-try-options",
+      "scroll-timeline",
+      "animation-timeline",
+      "view-timeline",
+      "position-try"
+    ]);
+    CSS_FUNCTIONS = ["min", "max", "clamp", "calc"];
+    LENGTH_UNITS = [
+      "cm",
+      "mm",
+      "Q",
+      "in",
+      "pc",
+      "pt",
+      "px",
+      "em",
+      "ex",
+      "ch",
+      "rem",
+      "lh",
+      "rlh",
+      "vw",
+      "vh",
+      "vmin",
+      "vmax",
+      "vb",
+      "vi",
+      "svw",
+      "svh",
+      "lvw",
+      "lvh",
+      "dvw",
+      "dvh",
+      "cqw",
+      "cqh",
+      "cqi",
+      "cqb",
+      "cqmin",
+      "cqmax"
+    ];
+    LENGTH_RE = new RegExp(
+      `^[+-]?[0-9]*\\.?[0-9]+(?:[eE][+-]?[0-9]+)?(?:${LENGTH_UNITS.join("|")})$`
+    );
+    typeCheckers = {
+      any: () => true,
+      url: (v) => v.startsWith("url("),
+      number: (v) => !isNaN(Number(v)) || isCSSFunction(v),
+      integer: (v) => /^-?\d+$/.test(v),
+      percentage: (v) => v.endsWith("%") && !isNaN(Number(v.slice(0, -1))) || isCSSFunction(v),
+      length: (v) => v === "0" || LENGTH_RE.test(v) || isCSSFunction(v),
+      "line-width": (v) => ["thin", "medium", "thick"].includes(v),
+      shadow: (v) => {
+        const SHADOW_KEYWORDS2 = /* @__PURE__ */ new Set(["inset", "inherit", "initial", "revert", "unset"]);
+        return splitAtTopLevelOnly(normalizeValue(v), ",").every((shadow) => {
+          const parts = shadow.trim().split(/ +(?![^(]*\))/g);
+          let lengths = 0;
+          let seenKeyword = false;
+          for (const part of parts) {
+            if (!seenKeyword && SHADOW_KEYWORDS2.has(part)) seenKeyword = true;
+            else if (/^-?(\d+|\.\d+)(.*?)$/.test(part)) lengths++;
+          }
+          return lengths >= 2;
+        });
+      },
+      color: (v) => {
+        let colors = 0;
+        const ok = splitAtTopLevelOnly(v, "_").every((part) => {
+          part = normalizeValue(part);
+          if (part.startsWith("var(")) return true;
+          if (parseColor(part, { loose: true }) !== null) return colors++, true;
+          return false;
+        });
+        return ok && colors > 0;
+      },
+      image: (v) => {
+        let images = 0;
+        const ok = splitAtTopLevelOnly(v, ",").every((part) => {
+          part = normalizeValue(part);
+          if (part.startsWith("var(")) return true;
+          if (part.startsWith("url(") || typeCheckers.gradient(part) || ["element(", "image(", "cross-fade(", "image-set("].some((fn) => part.startsWith(fn))) {
+            images++;
+            return true;
+          }
+          return false;
+        });
+        return ok && images > 0;
+      },
+      gradient: (v) => {
+        v = normalizeValue(v);
+        return [
+          "conic-gradient",
+          "linear-gradient",
+          "radial-gradient",
+          "repeating-conic-gradient",
+          "repeating-linear-gradient",
+          "repeating-radial-gradient"
+        ].some((t) => v.startsWith(`${t}(`));
+      },
+      position: (v) => {
+        let positions = 0;
+        const ok = splitAtTopLevelOnly(v, "_").every((part) => {
+          part = normalizeValue(part);
+          if (part.startsWith("var(")) return true;
+          if (["center", "top", "right", "bottom", "left"].includes(part) || typeCheckers.length(part) || typeCheckers.percentage(part)) {
+            positions++;
+            return true;
+          }
+          return false;
+        });
+        return ok && positions > 0;
+      },
+      "family-name": (v) => {
+        let fonts = 0;
+        const ok = splitAtTopLevelOnly(v, ",").every((part) => {
+          part = normalizeValue(part);
+          if (part.startsWith("var(")) return true;
+          if (part.includes(" ") && !/(['"])([^"']+)\1/g.test(part)) return false;
+          if (/^\d/g.test(part)) return false;
+          fonts++;
+          return true;
+        });
+        return ok && fonts > 0;
+      },
+      "generic-name": (v) => [
+        "serif",
+        "sans-serif",
+        "monospace",
+        "cursive",
+        "fantasy",
+        "system-ui",
+        "ui-serif",
+        "ui-sans-serif",
+        "ui-monospace",
+        "ui-rounded",
+        "math",
+        "emoji",
+        "fangsong"
+      ].includes(v),
+      "absolute-size": (v) => [
+        "xx-small",
+        "x-small",
+        "small",
+        "medium",
+        "large",
+        "x-large",
+        "xx-large",
+        "xxx-large"
+      ].includes(v),
+      "relative-size": (v) => ["larger", "smaller"].includes(v),
+      size: (v) => typeCheckers["bg-size"](v),
+      "bg-size": (v) => {
+        const parts = splitAtTopLevelOnly(normalizeValue(v), ",");
+        return parts.every(
+          (p) => splitAtTopLevelOnly(p.trim(), " ").every(
+            (s) => ["auto", "cover", "contain"].includes(s) || typeCheckers.length(s) || typeCheckers.percentage(s)
+          )
+        );
+      },
+      angle: (v) => /^[+-]?[0-9]*\.?[0-9]+(deg|rad|grad|turn)$/.test(v) || v === "0" || isCSSFunction(v),
+      time: (v) => /^[+-]?[0-9]*\.?[0-9]+(ms|s)$/.test(v) || isCSSFunction(v),
+      lookup: () => false
+    };
+    TYPE_HINTS = /* @__PURE__ */ new Set([
+      "color",
+      "url",
+      "image",
+      "length",
+      "percentage",
+      "position",
+      "family-name",
+      "generic-name",
+      "number",
+      "line-width",
+      "absolute-size",
+      "relative-size",
+      "shadow",
+      "size",
+      "angle",
+      "time",
+      "integer",
+      "any"
+    ]);
+    SPECIALS = /([[\]'"`])([^[\]'"`])?/g;
+    ALLOWED_CLASS_CHARACTERS = /[^"'`\s<>\]]+/;
+    cache = /* @__PURE__ */ new Map();
+    UNITLESS = /* @__PURE__ */ new Set([
+      "box-flex",
+      "box-flex-group",
+      "column-count",
+      "flex",
+      "flex-grow",
+      "flex-positive",
+      "flex-shrink",
+      "flex-negative",
+      "font-weight",
+      "line-clamp",
+      "line-height",
+      "opacity",
+      "order",
+      "orphans",
+      "tab-size",
+      "widows",
+      "z-index",
+      "zoom",
+      "fill-opacity",
+      "stroke-dashoffset",
+      "stroke-opacity",
+      "stroke-width"
+    ]);
+    tailwindDefaults = {
+      animation: {
+        none: "none",
+        spin: "spin 1s linear infinite",
+        ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        bounce: "bounce 1s infinite"
+      },
+      aspectRatio: {
+        auto: "auto",
+        square: "1 / 1",
+        video: "16 / 9"
+      },
+      backgroundImage: {
+        none: "none",
+        "gradient-to-t": "linear-gradient(to top, var(--tw-gradient-stops))",
+        "gradient-to-tr": "linear-gradient(to top right, var(--tw-gradient-stops))",
+        "gradient-to-r": "linear-gradient(to right, var(--tw-gradient-stops))",
+        "gradient-to-br": "linear-gradient(to bottom right, var(--tw-gradient-stops))",
+        "gradient-to-b": "linear-gradient(to bottom, var(--tw-gradient-stops))",
+        "gradient-to-bl": "linear-gradient(to bottom left, var(--tw-gradient-stops))",
+        "gradient-to-l": "linear-gradient(to left, var(--tw-gradient-stops))",
+        "gradient-to-tl": "linear-gradient(to top left, var(--tw-gradient-stops))"
+      },
+      backgroundPosition: {
+        bottom: "bottom",
+        center: "center",
+        left: "left",
+        "left-bottom": "left bottom",
+        "left-top": "left top",
+        right: "right",
+        "right-bottom": "right bottom",
+        "right-top": "right top",
+        top: "top"
+      },
+      backgroundSize: {
+        auto: "auto",
+        cover: "cover",
+        contain: "contain"
+      },
+      blur: {
+        "0": "0",
+        none: "",
+        sm: "4px",
+        DEFAULT: "8px",
+        md: "12px",
+        lg: "16px",
+        xl: "24px",
+        "2xl": "40px",
+        "3xl": "64px"
+      },
+      borderRadius: {
+        none: "0px",
+        sm: "0.125rem",
+        DEFAULT: "0.25rem",
+        md: "0.375rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
+        full: "9999px"
+      },
+      borderWidth: {
+        "0": "0px",
+        "2": "2px",
+        "4": "4px",
+        "8": "8px",
+        DEFAULT: "1px"
+      },
+      boxShadow: {
+        sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+        inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
+        none: "none"
+      },
+      brightness: {
+        "0": "0",
+        "50": ".5",
+        "75": ".75",
+        "90": ".9",
+        "95": ".95",
+        "100": "1",
+        "105": "1.05",
+        "110": "1.1",
+        "125": "1.25",
+        "150": "1.5",
+        "200": "2"
+      },
+      contrast: {
+        "0": "0",
+        "50": ".5",
+        "75": ".75",
+        "100": "1",
+        "125": "1.25",
+        "150": "1.5",
+        "200": "2"
+      },
+      cursor: {
+        auto: "auto",
+        default: "default",
+        pointer: "pointer",
+        wait: "wait",
+        text: "text",
+        move: "move",
+        help: "help",
+        "not-allowed": "not-allowed",
+        none: "none",
+        "context-menu": "context-menu",
+        progress: "progress",
+        cell: "cell",
+        crosshair: "crosshair",
+        "vertical-text": "vertical-text",
+        alias: "alias",
+        copy: "copy",
+        "no-drop": "no-drop",
+        grab: "grab",
+        grabbing: "grabbing",
+        "all-scroll": "all-scroll",
+        "col-resize": "col-resize",
+        "row-resize": "row-resize",
+        "n-resize": "n-resize",
+        "e-resize": "e-resize",
+        "s-resize": "s-resize",
+        "w-resize": "w-resize",
+        "ne-resize": "ne-resize",
+        "nw-resize": "nw-resize",
+        "se-resize": "se-resize",
+        "sw-resize": "sw-resize",
+        "ew-resize": "ew-resize",
+        "ns-resize": "ns-resize",
+        "nesw-resize": "nesw-resize",
+        "nwse-resize": "nwse-resize",
+        "zoom-in": "zoom-in",
+        "zoom-out": "zoom-out"
+      },
+      dropShadow: {
+        sm: "0 1px 1px rgb(0 0 0 / 0.05)",
+        DEFAULT: ["0 1px 2px rgb(0 0 0 / 0.1)", "0 1px 1px rgb(0 0 0 / 0.06)"],
+        md: ["0 4px 3px rgb(0 0 0 / 0.07)", "0 2px 2px rgb(0 0 0 / 0.06)"],
+        lg: ["0 10px 8px rgb(0 0 0 / 0.04)", "0 4px 3px rgb(0 0 0 / 0.1)"],
+        xl: ["0 20px 13px rgb(0 0 0 / 0.03)", "0 8px 5px rgb(0 0 0 / 0.08)"],
+        "2xl": "0 25px 25px rgb(0 0 0 / 0.15)",
+        none: "0 0 #0000"
+      },
+      flex: {
+        "1": "1 1 0%",
+        auto: "1 1 auto",
+        initial: "0 1 auto",
+        none: "none"
+      },
+      flexGrow: {
+        "0": "0",
+        DEFAULT: "1"
+      },
+      flexShrink: {
+        "0": "0",
+        DEFAULT: "1"
+      },
+      fontFamily: {
+        sans: [
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+          '"Noto Color Emoji"'
+        ],
+        serif: ["ui-serif", "Georgia", "Cambria", '"Times New Roman"', "Times", "serif"],
+        mono: [
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Monaco",
+          "Consolas",
+          '"Liberation Mono"',
+          '"Courier New"',
+          "monospace"
+        ]
+      },
+      fontSize: {
+        xs: [
+          "0.75rem",
+          {
+            lineHeight: "1rem"
+          }
+        ],
+        sm: [
+          "0.875rem",
+          {
+            lineHeight: "1.25rem"
+          }
+        ],
+        base: [
+          "1rem",
+          {
+            lineHeight: "1.5rem"
+          }
+        ],
+        lg: [
+          "1.125rem",
+          {
+            lineHeight: "1.75rem"
+          }
+        ],
+        xl: [
+          "1.25rem",
+          {
+            lineHeight: "1.75rem"
+          }
+        ],
+        "2xl": [
+          "1.5rem",
+          {
+            lineHeight: "2rem"
+          }
+        ],
+        "3xl": [
+          "1.875rem",
+          {
+            lineHeight: "2.25rem"
+          }
+        ],
+        "4xl": [
+          "2.25rem",
+          {
+            lineHeight: "2.5rem"
+          }
+        ],
+        "5xl": [
+          "3rem",
+          {
+            lineHeight: "1"
+          }
+        ],
+        "6xl": [
+          "3.75rem",
+          {
+            lineHeight: "1"
+          }
+        ],
+        "7xl": [
+          "4.5rem",
+          {
+            lineHeight: "1"
+          }
+        ],
+        "8xl": [
+          "6rem",
+          {
+            lineHeight: "1"
+          }
+        ],
+        "9xl": [
+          "8rem",
+          {
+            lineHeight: "1"
+          }
+        ]
+      },
+      fontWeight: {
+        thin: "100",
+        extralight: "200",
+        light: "300",
+        normal: "400",
+        medium: "500",
+        semibold: "600",
+        bold: "700",
+        extrabold: "800",
+        black: "900"
+      },
+      gradientColorStopPositions: {
+        "0%": "0%",
+        "5%": "5%",
+        "10%": "10%",
+        "15%": "15%",
+        "20%": "20%",
+        "25%": "25%",
+        "30%": "30%",
+        "35%": "35%",
+        "40%": "40%",
+        "45%": "45%",
+        "50%": "50%",
+        "55%": "55%",
+        "60%": "60%",
+        "65%": "65%",
+        "70%": "70%",
+        "75%": "75%",
+        "80%": "80%",
+        "85%": "85%",
+        "90%": "90%",
+        "95%": "95%",
+        "100%": "100%"
+      },
+      grayscale: {
+        "0": "0",
+        DEFAULT: "100%"
+      },
+      gridAutoColumns: {
+        auto: "auto",
+        min: "min-content",
+        max: "max-content",
+        fr: "minmax(0, 1fr)"
+      },
+      gridAutoRows: {
+        auto: "auto",
+        min: "min-content",
+        max: "max-content",
+        fr: "minmax(0, 1fr)"
+      },
+      gridColumn: {
+        auto: "auto",
+        "span-1": "span 1 / span 1",
+        "span-2": "span 2 / span 2",
+        "span-3": "span 3 / span 3",
+        "span-4": "span 4 / span 4",
+        "span-5": "span 5 / span 5",
+        "span-6": "span 6 / span 6",
+        "span-7": "span 7 / span 7",
+        "span-8": "span 8 / span 8",
+        "span-9": "span 9 / span 9",
+        "span-10": "span 10 / span 10",
+        "span-11": "span 11 / span 11",
+        "span-12": "span 12 / span 12",
+        "span-full": "1 / -1"
+      },
+      gridColumnEnd: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "10",
+        "11": "11",
+        "12": "12",
+        "13": "13",
+        auto: "auto"
+      },
+      gridColumnStart: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "10",
+        "11": "11",
+        "12": "12",
+        "13": "13",
+        auto: "auto"
+      },
+      gridRow: {
+        auto: "auto",
+        "span-1": "span 1 / span 1",
+        "span-2": "span 2 / span 2",
+        "span-3": "span 3 / span 3",
+        "span-4": "span 4 / span 4",
+        "span-5": "span 5 / span 5",
+        "span-6": "span 6 / span 6",
+        "span-7": "span 7 / span 7",
+        "span-8": "span 8 / span 8",
+        "span-9": "span 9 / span 9",
+        "span-10": "span 10 / span 10",
+        "span-11": "span 11 / span 11",
+        "span-12": "span 12 / span 12",
+        "span-full": "1 / -1"
+      },
+      gridRowEnd: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "10",
+        "11": "11",
+        "12": "12",
+        "13": "13",
+        auto: "auto"
+      },
+      gridRowStart: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "10",
+        "11": "11",
+        "12": "12",
+        "13": "13",
+        auto: "auto"
+      },
+      gridTemplateColumns: {
+        "1": "repeat(1, minmax(0, 1fr))",
+        "2": "repeat(2, minmax(0, 1fr))",
+        "3": "repeat(3, minmax(0, 1fr))",
+        "4": "repeat(4, minmax(0, 1fr))",
+        "5": "repeat(5, minmax(0, 1fr))",
+        "6": "repeat(6, minmax(0, 1fr))",
+        "7": "repeat(7, minmax(0, 1fr))",
+        "8": "repeat(8, minmax(0, 1fr))",
+        "9": "repeat(9, minmax(0, 1fr))",
+        "10": "repeat(10, minmax(0, 1fr))",
+        "11": "repeat(11, minmax(0, 1fr))",
+        "12": "repeat(12, minmax(0, 1fr))",
+        none: "none",
+        subgrid: "subgrid"
+      },
+      gridTemplateRows: {
+        "1": "repeat(1, minmax(0, 1fr))",
+        "2": "repeat(2, minmax(0, 1fr))",
+        "3": "repeat(3, minmax(0, 1fr))",
+        "4": "repeat(4, minmax(0, 1fr))",
+        "5": "repeat(5, minmax(0, 1fr))",
+        "6": "repeat(6, minmax(0, 1fr))",
+        "7": "repeat(7, minmax(0, 1fr))",
+        "8": "repeat(8, minmax(0, 1fr))",
+        "9": "repeat(9, minmax(0, 1fr))",
+        "10": "repeat(10, minmax(0, 1fr))",
+        "11": "repeat(11, minmax(0, 1fr))",
+        "12": "repeat(12, minmax(0, 1fr))",
+        none: "none",
+        subgrid: "subgrid"
+      },
+      hueRotate: {
+        "0": "0deg",
+        "15": "15deg",
+        "30": "30deg",
+        "60": "60deg",
+        "90": "90deg",
+        "180": "180deg"
+      },
+      invert: {
+        "0": "0",
+        DEFAULT: "100%"
+      },
+      keyframes: {
+        spin: {
+          to: {
+            transform: "rotate(360deg)"
+          }
+        },
+        ping: {
+          "75%, 100%": {
+            transform: "scale(2)",
+            opacity: "0"
+          }
+        },
+        pulse: {
+          "50%": {
+            opacity: ".5"
+          }
+        },
+        bounce: {
+          "0%, 100%": {
+            transform: "translateY(-25%)",
+            animationTimingFunction: "cubic-bezier(0.8,0,1,1)"
+          },
+          "50%": {
+            transform: "none",
+            animationTimingFunction: "cubic-bezier(0,0,0.2,1)"
+          }
+        }
+      },
+      letterSpacing: {
+        tighter: "-0.05em",
+        tight: "-0.025em",
+        normal: "0em",
+        wide: "0.025em",
+        wider: "0.05em",
+        widest: "0.1em"
+      },
+      lineHeight: {
+        "3": ".75rem",
+        "4": "1rem",
+        "5": "1.25rem",
+        "6": "1.5rem",
+        "7": "1.75rem",
+        "8": "2rem",
+        "9": "2.25rem",
+        "10": "2.5rem",
+        none: "1",
+        tight: "1.25",
+        snug: "1.375",
+        normal: "1.5",
+        relaxed: "1.625",
+        loose: "2"
+      },
+      listStyleType: {
+        none: "none",
+        disc: "disc",
+        decimal: "decimal"
+      },
+      objectPosition: {
+        bottom: "bottom",
+        center: "center",
+        left: "left",
+        "left-bottom": "left bottom",
+        "left-top": "left top",
+        right: "right",
+        "right-bottom": "right bottom",
+        "right-top": "right top",
+        top: "top"
+      },
+      opacity: {
+        "0": "0",
+        "5": "0.05",
+        "10": "0.1",
+        "15": "0.15",
+        "20": "0.2",
+        "25": "0.25",
+        "30": "0.3",
+        "35": "0.35",
+        "40": "0.4",
+        "45": "0.45",
+        "50": "0.5",
+        "55": "0.55",
+        "60": "0.6",
+        "65": "0.65",
+        "70": "0.7",
+        "75": "0.75",
+        "80": "0.8",
+        "85": "0.85",
+        "90": "0.9",
+        "95": "0.95",
+        "100": "1"
+      },
+      order: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "10",
+        "11": "11",
+        "12": "12",
+        first: "-9999",
+        last: "9999",
+        none: "0"
+      },
+      outlineOffset: {
+        "0": "0px",
+        "1": "1px",
+        "2": "2px",
+        "4": "4px",
+        "8": "8px"
+      },
+      outlineWidth: {
+        "0": "0px",
+        "1": "1px",
+        "2": "2px",
+        "4": "4px",
+        "8": "8px"
+      },
+      ringWidth: {
+        "0": "0px",
+        "1": "1px",
+        "2": "2px",
+        "4": "4px",
+        "8": "8px",
+        DEFAULT: "3px"
+      },
+      rotate: {
+        "0": "0deg",
+        "1": "1deg",
+        "2": "2deg",
+        "3": "3deg",
+        "6": "6deg",
+        "12": "12deg",
+        "45": "45deg",
+        "90": "90deg",
+        "180": "180deg"
+      },
+      saturate: {
+        "0": "0",
+        "50": ".5",
+        "100": "1",
+        "150": "1.5",
+        "200": "2"
+      },
+      scale: {
+        "0": "0",
+        "50": ".5",
+        "75": ".75",
+        "90": ".9",
+        "95": ".95",
+        "100": "1",
+        "105": "1.05",
+        "110": "1.1",
+        "125": "1.25",
+        "150": "1.5"
+      },
+      sepia: {
+        "0": "0",
+        DEFAULT: "100%"
+      },
+      skew: {
+        "0": "0deg",
+        "1": "1deg",
+        "2": "2deg",
+        "3": "3deg",
+        "6": "6deg",
+        "12": "12deg"
+      },
+      spacing: {
+        "0": "0px",
+        "1": "0.25rem",
+        "2": "0.5rem",
+        "3": "0.75rem",
+        "4": "1rem",
+        "5": "1.25rem",
+        "6": "1.5rem",
+        "7": "1.75rem",
+        "8": "2rem",
+        "9": "2.25rem",
+        "10": "2.5rem",
+        "11": "2.75rem",
+        "12": "3rem",
+        "14": "3.5rem",
+        "16": "4rem",
+        "20": "5rem",
+        "24": "6rem",
+        "28": "7rem",
+        "32": "8rem",
+        "36": "9rem",
+        "40": "10rem",
+        "44": "11rem",
+        "48": "12rem",
+        "52": "13rem",
+        "56": "14rem",
+        "60": "15rem",
+        "64": "16rem",
+        "72": "18rem",
+        "80": "20rem",
+        "96": "24rem",
+        px: "1px",
+        "0.5": "0.125rem",
+        "1.5": "0.375rem",
+        "2.5": "0.625rem",
+        "3.5": "0.875rem"
+      },
+      textDecorationThickness: {
+        "0": "0px",
+        "1": "1px",
+        "2": "2px",
+        "4": "4px",
+        "8": "8px",
+        auto: "auto",
+        "from-font": "from-font"
+      },
+      transformOrigin: {
+        center: "center",
+        top: "top",
+        "top-right": "top right",
+        right: "right",
+        "bottom-right": "bottom right",
+        bottom: "bottom",
+        "bottom-left": "bottom left",
+        left: "left",
+        "top-left": "top left"
+      },
+      transitionDuration: {
+        "0": "0s",
+        "75": "75ms",
+        "100": "100ms",
+        "150": "150ms",
+        "200": "200ms",
+        "300": "300ms",
+        "500": "500ms",
+        "700": "700ms",
+        "1000": "1000ms",
+        DEFAULT: "150ms"
+      },
+      transitionProperty: {
+        none: "none",
+        all: "all",
+        DEFAULT: "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+        colors: "color, background-color, border-color, text-decoration-color, fill, stroke",
+        opacity: "opacity",
+        shadow: "box-shadow",
+        transform: "transform"
+      },
+      transitionTimingFunction: {
+        DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
+        linear: "linear",
+        in: "cubic-bezier(0.4, 0, 1, 1)",
+        out: "cubic-bezier(0, 0, 0.2, 1)",
+        "in-out": "cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      willChange: {
+        auto: "auto",
+        scroll: "scroll-position",
+        contents: "contents",
+        transform: "transform"
+      },
+      zIndex: {
+        "0": "0",
+        "10": "10",
+        "20": "20",
+        "30": "30",
+        "40": "40",
+        "50": "50",
+        auto: "auto"
+      }
+    };
+    DEFAULT_SCREENS = {
+      xxs: "200px",
+      xs: "400px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+      "3xl": "1920px",
+      "4xl": "2560px",
+      "5xl": "5000px"
+    };
+    SCREEN_GUIDE = {
+      xxs: "tiny / folded screens, wearables",
+      xs: "small phones",
+      sm: "large phones",
+      md: "tablets",
+      lg: "laptops",
+      xl: "desktops",
+      "2xl": "large desktops",
+      "3xl": "Full HD (1080p) monitors, TVs",
+      "4xl": "QHD / 2K monitors",
+      "5xl": "4K+, video walls, ultra-wide"
+    };
+    DEFAULT_CONTAINER_MIN_SCREEN = "sm";
+    DEFAULT_CONTAINER_MAX_SCREEN = "2xl";
+    FRACTIONS = {
+      "1/2": "50%",
+      "1/3": "33.333333%",
+      "2/3": "66.666667%",
+      "1/4": "25%",
+      "2/4": "50%",
+      "3/4": "75%",
+      "1/5": "20%",
+      "2/5": "40%",
+      "3/5": "60%",
+      "4/5": "80%",
+      "1/6": "16.666667%",
+      "2/6": "33.333333%",
+      "3/6": "50%",
+      "4/6": "66.666667%",
+      "5/6": "83.333333%",
+      "1/12": "8.333333%",
+      "2/12": "16.666667%",
+      "3/12": "25%",
+      "4/12": "33.333333%",
+      "5/12": "41.666667%",
+      "6/12": "50%",
+      "7/12": "58.333333%",
+      "8/12": "66.666667%",
+      "9/12": "75%",
+      "10/12": "83.333333%",
+      "11/12": "91.666667%"
+    };
+    FRACTIONS_SMALL = Object.fromEntries(
+      Object.entries(FRACTIONS).filter(
+        ([k]) => !k.endsWith("/5") && !k.endsWith("/6") && !k.endsWith("/12")
+      )
+    );
+    FRACTIONS_SIXTHS = Object.fromEntries(
+      Object.entries(FRACTIONS).filter(([k]) => !k.endsWith("/12"))
+    );
+    NAKSHORA_EXTRAS = {
+      boxShadow: { glow: "0 0 20px 0 rgba(59, 130, 246, 0.5)" },
+      borderRadius: { xs: "0.125rem" },
+      zIndex: { hide: "-1" },
+      transitionTimingFunction: { back: "cubic-bezier(0.68, -0.55, 0.265, 1.55)" },
+      animation: {
+        fade: "fade 300ms ease-out",
+        slide: "slide 300ms ease-out",
+        shimmer: "shimmer 1.5s linear infinite"
+      },
+      keyframes: {
+        fade: { from: { opacity: "0" }, to: { opacity: "1" } },
+        slide: {
+          from: { transform: "translateY(1rem)", opacity: "0" },
+          to: { transform: "translateY(0)", opacity: "1" }
+        },
+        shimmer: {
+          from: { "background-position": "200% 0" },
+          to: { "background-position": "-200% 0" }
+        }
+      },
+      lineHeight: { base: "1.5" },
+      scale: { 175: "1.75", 200: "2" },
+      rotate: { 135: "135deg", 225: "225deg", 270: "270deg", 315: "315deg", 360: "360deg" },
+      textDecorationThickness: { thin: "1px" }
+    };
+    STATIC_UTILITIES = [
+      {
+        p: "accessibility",
+        c: "sr-only",
+        d: [
+          ["position", "absolute"],
+          ["width", "1px"],
+          ["height", "1px"],
+          ["padding", "0"],
+          ["margin", "-1px"],
+          ["overflow", "hidden"],
+          ["clip", "rect(0, 0, 0, 0)"],
+          ["white-space", "nowrap"],
+          ["border-width", "0"]
+        ]
+      },
+      {
+        p: "accessibility",
+        c: "not-sr-only",
+        d: [
+          ["position", "static"],
+          ["width", "auto"],
+          ["height", "auto"],
+          ["padding", "0"],
+          ["margin", "0"],
+          ["overflow", "visible"],
+          ["clip", "auto"],
+          ["white-space", "normal"]
+        ]
+      },
+      { p: "pointerEvents", c: "pointer-events-none", d: [["pointer-events", "none"]] },
+      { p: "pointerEvents", c: "pointer-events-auto", d: [["pointer-events", "auto"]] },
+      { p: "visibility", c: "visible", d: [["visibility", "visible"]] },
+      { p: "visibility", c: "invisible", d: [["visibility", "hidden"]] },
+      { p: "visibility", c: "collapse", d: [["visibility", "collapse"]] },
+      { p: "position", c: "static", d: [["position", "static"]] },
+      { p: "position", c: "fixed", d: [["position", "fixed"]] },
+      { p: "position", c: "absolute", d: [["position", "absolute"]] },
+      { p: "position", c: "relative", d: [["position", "relative"]] },
+      { p: "position", c: "sticky", d: [["position", "sticky"]] },
+      { p: "isolation", c: "isolate", d: [["isolation", "isolate"]] },
+      { p: "isolation", c: "isolation-auto", d: [["isolation", "auto"]] },
+      { p: "float", c: "float-start", d: [["float", "inline-start"]] },
+      { p: "float", c: "float-end", d: [["float", "inline-end"]] },
+      { p: "float", c: "float-right", d: [["float", "right"]] },
+      { p: "float", c: "float-left", d: [["float", "left"]] },
+      { p: "float", c: "float-none", d: [["float", "none"]] },
+      { p: "clear", c: "clear-start", d: [["clear", "inline-start"]] },
+      { p: "clear", c: "clear-end", d: [["clear", "inline-end"]] },
+      { p: "clear", c: "clear-left", d: [["clear", "left"]] },
+      { p: "clear", c: "clear-right", d: [["clear", "right"]] },
+      { p: "clear", c: "clear-both", d: [["clear", "both"]] },
+      { p: "clear", c: "clear-none", d: [["clear", "none"]] },
+      { p: "boxSizing", c: "box-border", d: [["box-sizing", "border-box"]] },
+      { p: "boxSizing", c: "box-content", d: [["box-sizing", "content-box"]] },
+      {
+        p: "lineClamp",
+        c: "line-clamp-none",
+        d: [
+          ["overflow", "visible"],
+          ["display", "block"],
+          ["-webkit-box-orient", "horizontal"],
+          ["-webkit-line-clamp", "none"]
+        ]
+      },
+      { p: "display", c: "block", d: [["display", "block"]] },
+      { p: "display", c: "inline-block", d: [["display", "inline-block"]] },
+      { p: "display", c: "inline", d: [["display", "inline"]] },
+      { p: "display", c: "flex", d: [["display", "flex"]] },
+      { p: "display", c: "inline-flex", d: [["display", "inline-flex"]] },
+      { p: "display", c: "table", d: [["display", "table"]] },
+      { p: "display", c: "inline-table", d: [["display", "inline-table"]] },
+      { p: "display", c: "table-caption", d: [["display", "table-caption"]] },
+      { p: "display", c: "table-cell", d: [["display", "table-cell"]] },
+      { p: "display", c: "table-column", d: [["display", "table-column"]] },
+      { p: "display", c: "table-column-group", d: [["display", "table-column-group"]] },
+      { p: "display", c: "table-footer-group", d: [["display", "table-footer-group"]] },
+      { p: "display", c: "table-header-group", d: [["display", "table-header-group"]] },
+      { p: "display", c: "table-row-group", d: [["display", "table-row-group"]] },
+      { p: "display", c: "table-row", d: [["display", "table-row"]] },
+      { p: "display", c: "flow-root", d: [["display", "flow-root"]] },
+      { p: "display", c: "grid", d: [["display", "grid"]] },
+      { p: "display", c: "inline-grid", d: [["display", "inline-grid"]] },
+      { p: "display", c: "contents", d: [["display", "contents"]] },
+      { p: "display", c: "list-item", d: [["display", "list-item"]] },
+      { p: "display", c: "hidden", d: [["display", "none"]] },
+      { p: "tableLayout", c: "table-auto", d: [["table-layout", "auto"]] },
+      { p: "tableLayout", c: "table-fixed", d: [["table-layout", "fixed"]] },
+      { p: "captionSide", c: "caption-top", d: [["caption-side", "top"]] },
+      { p: "captionSide", c: "caption-bottom", d: [["caption-side", "bottom"]] },
+      { p: "borderCollapse", c: "border-collapse", d: [["border-collapse", "collapse"]] },
+      { p: "borderCollapse", c: "border-separate", d: [["border-collapse", "separate"]] },
+      {
+        p: "transform",
+        c: "transform",
+        d: [
+          [
+            "transform",
+            "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+          ]
+        ],
+        df: "transform"
+      },
+      {
+        p: "transform",
+        c: "transform-cpu",
+        d: [
+          [
+            "transform",
+            "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+          ]
+        ]
+      },
+      {
+        p: "transform",
+        c: "transform-gpu",
+        d: [
+          [
+            "transform",
+            "translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+          ]
+        ]
+      },
+      { p: "transform", c: "transform-none", d: [["transform", "none"]] },
+      { p: "touchAction", c: "touch-auto", d: [["touch-action", "auto"]] },
+      { p: "touchAction", c: "touch-none", d: [["touch-action", "none"]] },
+      {
+        p: "touchAction",
+        c: "touch-pan-x",
+        d: [
+          ["--tw-pan-x", "pan-x"],
+          ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+        ],
+        df: "touch-action"
+      },
+      {
+        p: "touchAction",
+        c: "touch-pan-left",
+        d: [
+          ["--tw-pan-x", "pan-left"],
+          ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+        ],
+        df: "touch-action"
+      },
+      {
+        p: "touchAction",
+        c: "touch-pan-right",
+        d: [
+          ["--tw-pan-x", "pan-right"],
+          ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+        ],
+        df: "touch-action"
+      },
+      {
+        p: "touchAction",
+        c: "touch-pan-y",
+        d: [
+          ["--tw-pan-y", "pan-y"],
+          ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+        ],
+        df: "touch-action"
+      },
+      {
+        p: "touchAction",
+        c: "touch-pan-up",
+        d: [
+          ["--tw-pan-y", "pan-up"],
+          ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+        ],
+        df: "touch-action"
+      },
+      {
+        p: "touchAction",
+        c: "touch-pan-down",
+        d: [
+          ["--tw-pan-y", "pan-down"],
+          ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+        ],
+        df: "touch-action"
+      },
+      {
+        p: "touchAction",
+        c: "touch-pinch-zoom",
+        d: [
+          ["--tw-pinch-zoom", "pinch-zoom"],
+          ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+        ],
+        df: "touch-action"
+      },
+      { p: "touchAction", c: "touch-manipulation", d: [["touch-action", "manipulation"]] },
+      { p: "userSelect", c: "select-none", d: [["user-select", "none"]] },
+      { p: "userSelect", c: "select-text", d: [["user-select", "text"]] },
+      { p: "userSelect", c: "select-all", d: [["user-select", "all"]] },
+      { p: "userSelect", c: "select-auto", d: [["user-select", "auto"]] },
+      { p: "resize", c: "resize-none", d: [["resize", "none"]] },
+      { p: "resize", c: "resize-y", d: [["resize", "vertical"]] },
+      { p: "resize", c: "resize-x", d: [["resize", "horizontal"]] },
+      { p: "resize", c: "resize", d: [["resize", "both"]] },
+      { p: "scrollSnapType", c: "snap-none", d: [["scroll-snap-type", "none"]] },
+      {
+        p: "scrollSnapType",
+        c: "snap-x",
+        d: [["scroll-snap-type", "x var(--tw-scroll-snap-strictness)"]],
+        df: "scroll-snap-type"
+      },
+      {
+        p: "scrollSnapType",
+        c: "snap-y",
+        d: [["scroll-snap-type", "y var(--tw-scroll-snap-strictness)"]],
+        df: "scroll-snap-type"
+      },
+      {
+        p: "scrollSnapType",
+        c: "snap-both",
+        d: [["scroll-snap-type", "both var(--tw-scroll-snap-strictness)"]],
+        df: "scroll-snap-type"
+      },
+      { p: "scrollSnapType", c: "snap-mandatory", d: [["--tw-scroll-snap-strictness", "mandatory"]] },
+      { p: "scrollSnapType", c: "snap-proximity", d: [["--tw-scroll-snap-strictness", "proximity"]] },
+      { p: "scrollSnapAlign", c: "snap-start", d: [["scroll-snap-align", "start"]] },
+      { p: "scrollSnapAlign", c: "snap-end", d: [["scroll-snap-align", "end"]] },
+      { p: "scrollSnapAlign", c: "snap-center", d: [["scroll-snap-align", "center"]] },
+      { p: "scrollSnapAlign", c: "snap-align-none", d: [["scroll-snap-align", "none"]] },
+      { p: "scrollSnapStop", c: "snap-normal", d: [["scroll-snap-stop", "normal"]] },
+      { p: "scrollSnapStop", c: "snap-always", d: [["scroll-snap-stop", "always"]] },
+      { p: "listStylePosition", c: "list-inside", d: [["list-style-position", "inside"]] },
+      { p: "listStylePosition", c: "list-outside", d: [["list-style-position", "outside"]] },
+      { p: "appearance", c: "appearance-none", d: [["appearance", "none"]] },
+      { p: "appearance", c: "appearance-auto", d: [["appearance", "auto"]] },
+      { p: "breakBefore", c: "break-before-auto", d: [["break-before", "auto"]] },
+      { p: "breakBefore", c: "break-before-avoid", d: [["break-before", "avoid"]] },
+      { p: "breakBefore", c: "break-before-all", d: [["break-before", "all"]] },
+      { p: "breakBefore", c: "break-before-avoid-page", d: [["break-before", "avoid-page"]] },
+      { p: "breakBefore", c: "break-before-page", d: [["break-before", "page"]] },
+      { p: "breakBefore", c: "break-before-left", d: [["break-before", "left"]] },
+      { p: "breakBefore", c: "break-before-right", d: [["break-before", "right"]] },
+      { p: "breakBefore", c: "break-before-column", d: [["break-before", "column"]] },
+      { p: "breakInside", c: "break-inside-auto", d: [["break-inside", "auto"]] },
+      { p: "breakInside", c: "break-inside-avoid", d: [["break-inside", "avoid"]] },
+      { p: "breakInside", c: "break-inside-avoid-page", d: [["break-inside", "avoid-page"]] },
+      { p: "breakInside", c: "break-inside-avoid-column", d: [["break-inside", "avoid-column"]] },
+      { p: "breakAfter", c: "break-after-auto", d: [["break-after", "auto"]] },
+      { p: "breakAfter", c: "break-after-avoid", d: [["break-after", "avoid"]] },
+      { p: "breakAfter", c: "break-after-all", d: [["break-after", "all"]] },
+      { p: "breakAfter", c: "break-after-avoid-page", d: [["break-after", "avoid-page"]] },
+      { p: "breakAfter", c: "break-after-page", d: [["break-after", "page"]] },
+      { p: "breakAfter", c: "break-after-left", d: [["break-after", "left"]] },
+      { p: "breakAfter", c: "break-after-right", d: [["break-after", "right"]] },
+      { p: "breakAfter", c: "break-after-column", d: [["break-after", "column"]] },
+      { p: "gridAutoFlow", c: "grid-flow-row", d: [["grid-auto-flow", "row"]] },
+      { p: "gridAutoFlow", c: "grid-flow-col", d: [["grid-auto-flow", "column"]] },
+      { p: "gridAutoFlow", c: "grid-flow-dense", d: [["grid-auto-flow", "dense"]] },
+      { p: "gridAutoFlow", c: "grid-flow-row-dense", d: [["grid-auto-flow", "row dense"]] },
+      { p: "gridAutoFlow", c: "grid-flow-col-dense", d: [["grid-auto-flow", "column dense"]] },
+      { p: "flexDirection", c: "flex-row", d: [["flex-direction", "row"]] },
+      { p: "flexDirection", c: "flex-row-reverse", d: [["flex-direction", "row-reverse"]] },
+      { p: "flexDirection", c: "flex-col", d: [["flex-direction", "column"]] },
+      { p: "flexDirection", c: "flex-col-reverse", d: [["flex-direction", "column-reverse"]] },
+      { p: "flexWrap", c: "flex-wrap", d: [["flex-wrap", "wrap"]] },
+      { p: "flexWrap", c: "flex-wrap-reverse", d: [["flex-wrap", "wrap-reverse"]] },
+      { p: "flexWrap", c: "flex-nowrap", d: [["flex-wrap", "nowrap"]] },
+      { p: "placeContent", c: "place-content-center", d: [["place-content", "center"]] },
+      { p: "placeContent", c: "place-content-start", d: [["place-content", "start"]] },
+      { p: "placeContent", c: "place-content-end", d: [["place-content", "end"]] },
+      { p: "placeContent", c: "place-content-between", d: [["place-content", "space-between"]] },
+      { p: "placeContent", c: "place-content-around", d: [["place-content", "space-around"]] },
+      { p: "placeContent", c: "place-content-evenly", d: [["place-content", "space-evenly"]] },
+      { p: "placeContent", c: "place-content-baseline", d: [["place-content", "baseline"]] },
+      { p: "placeContent", c: "place-content-stretch", d: [["place-content", "stretch"]] },
+      { p: "placeItems", c: "place-items-start", d: [["place-items", "start"]] },
+      { p: "placeItems", c: "place-items-end", d: [["place-items", "end"]] },
+      { p: "placeItems", c: "place-items-center", d: [["place-items", "center"]] },
+      { p: "placeItems", c: "place-items-baseline", d: [["place-items", "baseline"]] },
+      { p: "placeItems", c: "place-items-stretch", d: [["place-items", "stretch"]] },
+      { p: "alignContent", c: "content-normal", d: [["align-content", "normal"]] },
+      { p: "alignContent", c: "content-center", d: [["align-content", "center"]] },
+      { p: "alignContent", c: "content-start", d: [["align-content", "flex-start"]] },
+      { p: "alignContent", c: "content-end", d: [["align-content", "flex-end"]] },
+      { p: "alignContent", c: "content-between", d: [["align-content", "space-between"]] },
+      { p: "alignContent", c: "content-around", d: [["align-content", "space-around"]] },
+      { p: "alignContent", c: "content-evenly", d: [["align-content", "space-evenly"]] },
+      { p: "alignContent", c: "content-baseline", d: [["align-content", "baseline"]] },
+      { p: "alignContent", c: "content-stretch", d: [["align-content", "stretch"]] },
+      { p: "alignItems", c: "items-start", d: [["align-items", "flex-start"]] },
+      { p: "alignItems", c: "items-end", d: [["align-items", "flex-end"]] },
+      { p: "alignItems", c: "items-center", d: [["align-items", "center"]] },
+      { p: "alignItems", c: "items-baseline", d: [["align-items", "baseline"]] },
+      { p: "alignItems", c: "items-stretch", d: [["align-items", "stretch"]] },
+      { p: "justifyContent", c: "justify-normal", d: [["justify-content", "normal"]] },
+      { p: "justifyContent", c: "justify-start", d: [["justify-content", "flex-start"]] },
+      { p: "justifyContent", c: "justify-end", d: [["justify-content", "flex-end"]] },
+      { p: "justifyContent", c: "justify-center", d: [["justify-content", "center"]] },
+      { p: "justifyContent", c: "justify-between", d: [["justify-content", "space-between"]] },
+      { p: "justifyContent", c: "justify-around", d: [["justify-content", "space-around"]] },
+      { p: "justifyContent", c: "justify-evenly", d: [["justify-content", "space-evenly"]] },
+      { p: "justifyContent", c: "justify-stretch", d: [["justify-content", "stretch"]] },
+      { p: "justifyItems", c: "justify-items-start", d: [["justify-items", "start"]] },
+      { p: "justifyItems", c: "justify-items-end", d: [["justify-items", "end"]] },
+      { p: "justifyItems", c: "justify-items-center", d: [["justify-items", "center"]] },
+      { p: "justifyItems", c: "justify-items-stretch", d: [["justify-items", "stretch"]] },
+      {
+        p: "space",
+        c: "space-y-reverse",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["--tw-space-y-reverse", "1"]]
+      },
+      {
+        p: "space",
+        c: "space-x-reverse",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["--tw-space-x-reverse", "1"]]
+      },
+      {
+        p: "divideWidth",
+        c: "divide-y-reverse",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["--tw-divide-y-reverse", "1"]],
+        df: "border-width"
+      },
+      {
+        p: "divideWidth",
+        c: "divide-x-reverse",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["--tw-divide-x-reverse", "1"]],
+        df: "border-width"
+      },
+      {
+        p: "divideStyle",
+        c: "divide-solid",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["border-style", "solid"]]
+      },
+      {
+        p: "divideStyle",
+        c: "divide-dashed",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["border-style", "dashed"]]
+      },
+      {
+        p: "divideStyle",
+        c: "divide-dotted",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["border-style", "dotted"]]
+      },
+      {
+        p: "divideStyle",
+        c: "divide-double",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["border-style", "double"]]
+      },
+      {
+        p: "divideStyle",
+        c: "divide-none",
+        s: " > :not([hidden]) ~ :not([hidden])",
+        d: [["border-style", "none"]]
+      },
+      { p: "placeSelf", c: "place-self-auto", d: [["place-self", "auto"]] },
+      { p: "placeSelf", c: "place-self-start", d: [["place-self", "start"]] },
+      { p: "placeSelf", c: "place-self-end", d: [["place-self", "end"]] },
+      { p: "placeSelf", c: "place-self-center", d: [["place-self", "center"]] },
+      { p: "placeSelf", c: "place-self-stretch", d: [["place-self", "stretch"]] },
+      { p: "alignSelf", c: "self-auto", d: [["align-self", "auto"]] },
+      { p: "alignSelf", c: "self-start", d: [["align-self", "flex-start"]] },
+      { p: "alignSelf", c: "self-end", d: [["align-self", "flex-end"]] },
+      { p: "alignSelf", c: "self-center", d: [["align-self", "center"]] },
+      { p: "alignSelf", c: "self-stretch", d: [["align-self", "stretch"]] },
+      { p: "alignSelf", c: "self-baseline", d: [["align-self", "baseline"]] },
+      { p: "justifySelf", c: "justify-self-auto", d: [["justify-self", "auto"]] },
+      { p: "justifySelf", c: "justify-self-start", d: [["justify-self", "start"]] },
+      { p: "justifySelf", c: "justify-self-end", d: [["justify-self", "end"]] },
+      { p: "justifySelf", c: "justify-self-center", d: [["justify-self", "center"]] },
+      { p: "justifySelf", c: "justify-self-stretch", d: [["justify-self", "stretch"]] },
+      { p: "overflow", c: "overflow-auto", d: [["overflow", "auto"]] },
+      { p: "overflow", c: "overflow-hidden", d: [["overflow", "hidden"]] },
+      { p: "overflow", c: "overflow-clip", d: [["overflow", "clip"]] },
+      { p: "overflow", c: "overflow-visible", d: [["overflow", "visible"]] },
+      { p: "overflow", c: "overflow-scroll", d: [["overflow", "scroll"]] },
+      { p: "overflow", c: "overflow-x-auto", d: [["overflow-x", "auto"]] },
+      { p: "overflow", c: "overflow-y-auto", d: [["overflow-y", "auto"]] },
+      { p: "overflow", c: "overflow-x-hidden", d: [["overflow-x", "hidden"]] },
+      { p: "overflow", c: "overflow-y-hidden", d: [["overflow-y", "hidden"]] },
+      { p: "overflow", c: "overflow-x-clip", d: [["overflow-x", "clip"]] },
+      { p: "overflow", c: "overflow-y-clip", d: [["overflow-y", "clip"]] },
+      { p: "overflow", c: "overflow-x-visible", d: [["overflow-x", "visible"]] },
+      { p: "overflow", c: "overflow-y-visible", d: [["overflow-y", "visible"]] },
+      { p: "overflow", c: "overflow-x-scroll", d: [["overflow-x", "scroll"]] },
+      { p: "overflow", c: "overflow-y-scroll", d: [["overflow-y", "scroll"]] },
+      { p: "overscrollBehavior", c: "overscroll-auto", d: [["overscroll-behavior", "auto"]] },
+      { p: "overscrollBehavior", c: "overscroll-contain", d: [["overscroll-behavior", "contain"]] },
+      { p: "overscrollBehavior", c: "overscroll-none", d: [["overscroll-behavior", "none"]] },
+      { p: "overscrollBehavior", c: "overscroll-y-auto", d: [["overscroll-behavior-y", "auto"]] },
+      { p: "overscrollBehavior", c: "overscroll-y-contain", d: [["overscroll-behavior-y", "contain"]] },
+      { p: "overscrollBehavior", c: "overscroll-y-none", d: [["overscroll-behavior-y", "none"]] },
+      { p: "overscrollBehavior", c: "overscroll-x-auto", d: [["overscroll-behavior-x", "auto"]] },
+      { p: "overscrollBehavior", c: "overscroll-x-contain", d: [["overscroll-behavior-x", "contain"]] },
+      { p: "overscrollBehavior", c: "overscroll-x-none", d: [["overscroll-behavior-x", "none"]] },
+      { p: "scrollBehavior", c: "scroll-auto", d: [["scroll-behavior", "auto"]] },
+      { p: "scrollBehavior", c: "scroll-smooth", d: [["scroll-behavior", "smooth"]] },
+      {
+        p: "textOverflow",
+        c: "truncate",
+        d: [
+          ["overflow", "hidden"],
+          ["text-overflow", "ellipsis"],
+          ["white-space", "nowrap"]
+        ]
+      },
+      { p: "textOverflow", c: "overflow-ellipsis", d: [["text-overflow", "ellipsis"]] },
+      { p: "textOverflow", c: "text-ellipsis", d: [["text-overflow", "ellipsis"]] },
+      { p: "textOverflow", c: "text-clip", d: [["text-overflow", "clip"]] },
+      { p: "hyphens", c: "hyphens-none", d: [["hyphens", "none"]] },
+      { p: "hyphens", c: "hyphens-manual", d: [["hyphens", "manual"]] },
+      { p: "hyphens", c: "hyphens-auto", d: [["hyphens", "auto"]] },
+      { p: "whitespace", c: "whitespace-normal", d: [["white-space", "normal"]] },
+      { p: "whitespace", c: "whitespace-nowrap", d: [["white-space", "nowrap"]] },
+      { p: "whitespace", c: "whitespace-pre", d: [["white-space", "pre"]] },
+      { p: "whitespace", c: "whitespace-pre-line", d: [["white-space", "pre-line"]] },
+      { p: "whitespace", c: "whitespace-pre-wrap", d: [["white-space", "pre-wrap"]] },
+      { p: "whitespace", c: "whitespace-break-spaces", d: [["white-space", "break-spaces"]] },
+      { p: "textWrap", c: "text-wrap", d: [["text-wrap", "wrap"]] },
+      { p: "textWrap", c: "text-nowrap", d: [["text-wrap", "nowrap"]] },
+      { p: "textWrap", c: "text-balance", d: [["text-wrap", "balance"]] },
+      { p: "textWrap", c: "text-pretty", d: [["text-wrap", "pretty"]] },
+      {
+        p: "wordBreak",
+        c: "break-normal",
+        d: [
+          ["overflow-wrap", "normal"],
+          ["word-break", "normal"]
+        ]
+      },
+      { p: "wordBreak", c: "break-words", d: [["overflow-wrap", "break-word"]] },
+      { p: "wordBreak", c: "break-all", d: [["word-break", "break-all"]] },
+      { p: "wordBreak", c: "break-keep", d: [["word-break", "keep-all"]] },
+      { p: "borderStyle", c: "border-solid", d: [["border-style", "solid"]] },
+      { p: "borderStyle", c: "border-dashed", d: [["border-style", "dashed"]] },
+      { p: "borderStyle", c: "border-dotted", d: [["border-style", "dotted"]] },
+      { p: "borderStyle", c: "border-double", d: [["border-style", "double"]] },
+      { p: "borderStyle", c: "border-hidden", d: [["border-style", "hidden"]] },
+      { p: "borderStyle", c: "border-none", d: [["border-style", "none"]] },
+      { p: "boxDecorationBreak", c: "decoration-slice", d: [["box-decoration-break", "slice"]] },
+      { p: "boxDecorationBreak", c: "decoration-clone", d: [["box-decoration-break", "clone"]] },
+      { p: "boxDecorationBreak", c: "box-decoration-slice", d: [["box-decoration-break", "slice"]] },
+      { p: "boxDecorationBreak", c: "box-decoration-clone", d: [["box-decoration-break", "clone"]] },
+      { p: "backgroundAttachment", c: "bg-fixed", d: [["background-attachment", "fixed"]] },
+      { p: "backgroundAttachment", c: "bg-local", d: [["background-attachment", "local"]] },
+      { p: "backgroundAttachment", c: "bg-scroll", d: [["background-attachment", "scroll"]] },
+      { p: "backgroundClip", c: "bg-clip-border", d: [["background-clip", "border-box"]] },
+      { p: "backgroundClip", c: "bg-clip-padding", d: [["background-clip", "padding-box"]] },
+      { p: "backgroundClip", c: "bg-clip-content", d: [["background-clip", "content-box"]] },
+      { p: "backgroundClip", c: "bg-clip-text", d: [["background-clip", "text"]] },
+      { p: "backgroundRepeat", c: "bg-repeat", d: [["background-repeat", "repeat"]] },
+      { p: "backgroundRepeat", c: "bg-no-repeat", d: [["background-repeat", "no-repeat"]] },
+      { p: "backgroundRepeat", c: "bg-repeat-x", d: [["background-repeat", "repeat-x"]] },
+      { p: "backgroundRepeat", c: "bg-repeat-y", d: [["background-repeat", "repeat-y"]] },
+      { p: "backgroundRepeat", c: "bg-repeat-round", d: [["background-repeat", "round"]] },
+      { p: "backgroundRepeat", c: "bg-repeat-space", d: [["background-repeat", "space"]] },
+      { p: "backgroundOrigin", c: "bg-origin-border", d: [["background-origin", "border-box"]] },
+      { p: "backgroundOrigin", c: "bg-origin-padding", d: [["background-origin", "padding-box"]] },
+      { p: "backgroundOrigin", c: "bg-origin-content", d: [["background-origin", "content-box"]] },
+      { p: "objectFit", c: "object-contain", d: [["object-fit", "contain"]] },
+      { p: "objectFit", c: "object-cover", d: [["object-fit", "cover"]] },
+      { p: "objectFit", c: "object-fill", d: [["object-fit", "fill"]] },
+      { p: "objectFit", c: "object-none", d: [["object-fit", "none"]] },
+      { p: "objectFit", c: "object-scale-down", d: [["object-fit", "scale-down"]] },
+      { p: "textAlign", c: "text-left", d: [["text-align", "left"]] },
+      { p: "textAlign", c: "text-center", d: [["text-align", "center"]] },
+      { p: "textAlign", c: "text-right", d: [["text-align", "right"]] },
+      { p: "textAlign", c: "text-justify", d: [["text-align", "justify"]] },
+      { p: "textAlign", c: "text-start", d: [["text-align", "start"]] },
+      { p: "textAlign", c: "text-end", d: [["text-align", "end"]] },
+      { p: "verticalAlign", c: "align-baseline", d: [["vertical-align", "baseline"]] },
+      { p: "verticalAlign", c: "align-top", d: [["vertical-align", "top"]] },
+      { p: "verticalAlign", c: "align-middle", d: [["vertical-align", "middle"]] },
+      { p: "verticalAlign", c: "align-bottom", d: [["vertical-align", "bottom"]] },
+      { p: "verticalAlign", c: "align-text-top", d: [["vertical-align", "text-top"]] },
+      { p: "verticalAlign", c: "align-text-bottom", d: [["vertical-align", "text-bottom"]] },
+      { p: "verticalAlign", c: "align-sub", d: [["vertical-align", "sub"]] },
+      { p: "verticalAlign", c: "align-super", d: [["vertical-align", "super"]] },
+      { p: "textTransform", c: "uppercase", d: [["text-transform", "uppercase"]] },
+      { p: "textTransform", c: "lowercase", d: [["text-transform", "lowercase"]] },
+      { p: "textTransform", c: "capitalize", d: [["text-transform", "capitalize"]] },
+      { p: "textTransform", c: "normal-case", d: [["text-transform", "none"]] },
+      { p: "fontStyle", c: "italic", d: [["font-style", "italic"]] },
+      { p: "fontStyle", c: "not-italic", d: [["font-style", "normal"]] },
+      { p: "fontVariantNumeric", c: "normal-nums", d: [["font-variant-numeric", "normal"]] },
+      {
+        p: "fontVariantNumeric",
+        c: "ordinal",
+        d: [
+          ["--tw-ordinal", "ordinal"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      {
+        p: "fontVariantNumeric",
+        c: "slashed-zero",
+        d: [
+          ["--tw-slashed-zero", "slashed-zero"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      {
+        p: "fontVariantNumeric",
+        c: "lining-nums",
+        d: [
+          ["--tw-numeric-figure", "lining-nums"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      {
+        p: "fontVariantNumeric",
+        c: "oldstyle-nums",
+        d: [
+          ["--tw-numeric-figure", "oldstyle-nums"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      {
+        p: "fontVariantNumeric",
+        c: "proportional-nums",
+        d: [
+          ["--tw-numeric-spacing", "proportional-nums"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      {
+        p: "fontVariantNumeric",
+        c: "tabular-nums",
+        d: [
+          ["--tw-numeric-spacing", "tabular-nums"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      {
+        p: "fontVariantNumeric",
+        c: "diagonal-fractions",
+        d: [
+          ["--tw-numeric-fraction", "diagonal-fractions"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      {
+        p: "fontVariantNumeric",
+        c: "stacked-fractions",
+        d: [
+          ["--tw-numeric-fraction", "stacked-fractions"],
+          [
+            "font-variant-numeric",
+            "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+          ]
+        ],
+        df: "font-variant-numeric"
+      },
+      { p: "textDecoration", c: "underline", d: [["text-decoration-line", "underline"]] },
+      { p: "textDecoration", c: "overline", d: [["text-decoration-line", "overline"]] },
+      { p: "textDecoration", c: "line-through", d: [["text-decoration-line", "line-through"]] },
+      { p: "textDecoration", c: "no-underline", d: [["text-decoration-line", "none"]] },
+      { p: "textDecorationStyle", c: "decoration-solid", d: [["text-decoration-style", "solid"]] },
+      { p: "textDecorationStyle", c: "decoration-double", d: [["text-decoration-style", "double"]] },
+      { p: "textDecorationStyle", c: "decoration-dotted", d: [["text-decoration-style", "dotted"]] },
+      { p: "textDecorationStyle", c: "decoration-dashed", d: [["text-decoration-style", "dashed"]] },
+      { p: "textDecorationStyle", c: "decoration-wavy", d: [["text-decoration-style", "wavy"]] },
+      {
+        p: "fontSmoothing",
+        c: "antialiased",
+        d: [
+          ["-webkit-font-smoothing", "antialiased"],
+          ["-moz-osx-font-smoothing", "grayscale"]
+        ]
+      },
+      {
+        p: "fontSmoothing",
+        c: "subpixel-antialiased",
+        d: [
+          ["-webkit-font-smoothing", "auto"],
+          ["-moz-osx-font-smoothing", "auto"]
+        ]
+      },
+      { p: "backgroundBlendMode", c: "bg-blend-normal", d: [["background-blend-mode", "normal"]] },
+      { p: "backgroundBlendMode", c: "bg-blend-multiply", d: [["background-blend-mode", "multiply"]] },
+      { p: "backgroundBlendMode", c: "bg-blend-screen", d: [["background-blend-mode", "screen"]] },
+      { p: "backgroundBlendMode", c: "bg-blend-overlay", d: [["background-blend-mode", "overlay"]] },
+      { p: "backgroundBlendMode", c: "bg-blend-darken", d: [["background-blend-mode", "darken"]] },
+      { p: "backgroundBlendMode", c: "bg-blend-lighten", d: [["background-blend-mode", "lighten"]] },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-color-dodge",
+        d: [["background-blend-mode", "color-dodge"]]
+      },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-color-burn",
+        d: [["background-blend-mode", "color-burn"]]
+      },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-hard-light",
+        d: [["background-blend-mode", "hard-light"]]
+      },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-soft-light",
+        d: [["background-blend-mode", "soft-light"]]
+      },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-difference",
+        d: [["background-blend-mode", "difference"]]
+      },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-exclusion",
+        d: [["background-blend-mode", "exclusion"]]
+      },
+      { p: "backgroundBlendMode", c: "bg-blend-hue", d: [["background-blend-mode", "hue"]] },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-saturation",
+        d: [["background-blend-mode", "saturation"]]
+      },
+      { p: "backgroundBlendMode", c: "bg-blend-color", d: [["background-blend-mode", "color"]] },
+      {
+        p: "backgroundBlendMode",
+        c: "bg-blend-luminosity",
+        d: [["background-blend-mode", "luminosity"]]
+      },
+      { p: "mixBlendMode", c: "mix-blend-normal", d: [["mix-blend-mode", "normal"]] },
+      { p: "mixBlendMode", c: "mix-blend-multiply", d: [["mix-blend-mode", "multiply"]] },
+      { p: "mixBlendMode", c: "mix-blend-screen", d: [["mix-blend-mode", "screen"]] },
+      { p: "mixBlendMode", c: "mix-blend-overlay", d: [["mix-blend-mode", "overlay"]] },
+      { p: "mixBlendMode", c: "mix-blend-darken", d: [["mix-blend-mode", "darken"]] },
+      { p: "mixBlendMode", c: "mix-blend-lighten", d: [["mix-blend-mode", "lighten"]] },
+      { p: "mixBlendMode", c: "mix-blend-color-dodge", d: [["mix-blend-mode", "color-dodge"]] },
+      { p: "mixBlendMode", c: "mix-blend-color-burn", d: [["mix-blend-mode", "color-burn"]] },
+      { p: "mixBlendMode", c: "mix-blend-hard-light", d: [["mix-blend-mode", "hard-light"]] },
+      { p: "mixBlendMode", c: "mix-blend-soft-light", d: [["mix-blend-mode", "soft-light"]] },
+      { p: "mixBlendMode", c: "mix-blend-difference", d: [["mix-blend-mode", "difference"]] },
+      { p: "mixBlendMode", c: "mix-blend-exclusion", d: [["mix-blend-mode", "exclusion"]] },
+      { p: "mixBlendMode", c: "mix-blend-hue", d: [["mix-blend-mode", "hue"]] },
+      { p: "mixBlendMode", c: "mix-blend-saturation", d: [["mix-blend-mode", "saturation"]] },
+      { p: "mixBlendMode", c: "mix-blend-color", d: [["mix-blend-mode", "color"]] },
+      { p: "mixBlendMode", c: "mix-blend-luminosity", d: [["mix-blend-mode", "luminosity"]] },
+      { p: "mixBlendMode", c: "mix-blend-plus-darker", d: [["mix-blend-mode", "plus-darker"]] },
+      { p: "mixBlendMode", c: "mix-blend-plus-lighter", d: [["mix-blend-mode", "plus-lighter"]] },
+      {
+        p: "outlineStyle",
+        c: "outline-none",
+        d: [
+          ["outline", "2px solid transparent"],
+          ["outline-offset", "2px"]
+        ]
+      },
+      { p: "outlineStyle", c: "outline", d: [["outline-style", "solid"]] },
+      { p: "outlineStyle", c: "outline-dashed", d: [["outline-style", "dashed"]] },
+      { p: "outlineStyle", c: "outline-dotted", d: [["outline-style", "dotted"]] },
+      { p: "outlineStyle", c: "outline-double", d: [["outline-style", "double"]] },
+      { p: "ringWidth", c: "ring-inset", d: [["--tw-ring-inset", "inset"]], df: "ring-width" },
+      {
+        p: "filter",
+        c: "filter",
+        d: [
+          [
+            "filter",
+            "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
+          ]
+        ],
+        df: "filter"
+      },
+      { p: "filter", c: "filter-none", d: [["filter", "none"]] },
+      {
+        p: "backdropFilter",
+        c: "backdrop-filter",
+        d: [
+          [
+            "-webkit-backdrop-filter",
+            "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+          ],
+          [
+            "backdrop-filter",
+            "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+          ]
+        ],
+        df: "backdrop-filter"
+      },
+      {
+        p: "backdropFilter",
+        c: "backdrop-filter-none",
+        d: [
+          ["-webkit-backdrop-filter", "none"],
+          ["backdrop-filter", "none"]
+        ]
+      },
+      { p: "contain", c: "contain-none", d: [["contain", "none"]] },
+      { p: "contain", c: "contain-content", d: [["contain", "content"]] },
+      { p: "contain", c: "contain-strict", d: [["contain", "strict"]] },
+      {
+        p: "contain",
+        c: "contain-size",
+        d: [
+          ["--tw-contain-size", "size"],
+          [
+            "contain",
+            "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+          ]
+        ],
+        df: "contain"
+      },
+      {
+        p: "contain",
+        c: "contain-inline-size",
+        d: [
+          ["--tw-contain-size", "inline-size"],
+          [
+            "contain",
+            "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+          ]
+        ],
+        df: "contain"
+      },
+      {
+        p: "contain",
+        c: "contain-layout",
+        d: [
+          ["--tw-contain-layout", "layout"],
+          [
+            "contain",
+            "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+          ]
+        ],
+        df: "contain"
+      },
+      {
+        p: "contain",
+        c: "contain-paint",
+        d: [
+          ["--tw-contain-paint", "paint"],
+          [
+            "contain",
+            "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+          ]
+        ],
+        df: "contain"
+      },
+      {
+        p: "contain",
+        c: "contain-style",
+        d: [
+          ["--tw-contain-style", "style"],
+          [
+            "contain",
+            "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+          ]
+        ],
+        df: "contain"
+      },
+      { p: "forcedColorAdjust", c: "forced-color-adjust-auto", d: [["forced-color-adjust", "auto"]] },
+      { p: "forcedColorAdjust", c: "forced-color-adjust-none", d: [["forced-color-adjust", "none"]] }
+    ];
+    TRANSFORM_VALUE = "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))";
+    FILTER_VALUE = "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)";
+    BACKDROP_VALUE = "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)";
+    CHILD_SELECTOR = " > :not([hidden]) ~ :not([hidden])";
+    SHADOW_KEYWORDS = /* @__PURE__ */ new Set(["inset", "inherit", "initial", "revert", "unset"]);
+    SHADOW_LENGTH = /^-?(\d+|\.\d+)(.*?)$/;
+    CORE_PLUGIN_ORDER = [
+      "preflight",
+      "container",
+      "accessibility",
+      "pointerEvents",
+      "visibility",
+      "position",
+      "inset",
+      "isolation",
+      "zIndex",
+      "order",
+      "gridColumn",
+      "gridColumnStart",
+      "gridColumnEnd",
+      "gridRow",
+      "gridRowStart",
+      "gridRowEnd",
+      "float",
+      "clear",
+      "margin",
+      "boxSizing",
+      "lineClamp",
+      "display",
+      "aspectRatio",
+      "size",
+      "height",
+      "maxHeight",
+      "minHeight",
+      "width",
+      "minWidth",
+      "maxWidth",
+      "flex",
+      "flexShrink",
+      "flexGrow",
+      "flexBasis",
+      "tableLayout",
+      "captionSide",
+      "borderCollapse",
+      "borderSpacing",
+      "transformOrigin",
+      "translate",
+      "rotate",
+      "skew",
+      "scale",
+      "transform",
+      "animation",
+      "cursor",
+      "touchAction",
+      "userSelect",
+      "resize",
+      "scrollSnapType",
+      "scrollSnapAlign",
+      "scrollSnapStop",
+      "scrollMargin",
+      "scrollPadding",
+      "listStylePosition",
+      "listStyleType",
+      "listStyleImage",
+      "appearance",
+      "columns",
+      "breakBefore",
+      "breakInside",
+      "breakAfter",
+      "gridAutoColumns",
+      "gridAutoFlow",
+      "gridAutoRows",
+      "gridTemplateColumns",
+      "gridTemplateRows",
+      "flexDirection",
+      "flexWrap",
+      "placeContent",
+      "placeItems",
+      "alignContent",
+      "alignItems",
+      "justifyContent",
+      "justifyItems",
+      "gap",
+      "space",
+      "divideWidth",
+      "divideStyle",
+      "divideColor",
+      "divideOpacity",
+      "placeSelf",
+      "alignSelf",
+      "justifySelf",
+      "overflow",
+      "overscrollBehavior",
+      "scrollBehavior",
+      "textOverflow",
+      "hyphens",
+      "whitespace",
+      "textWrap",
+      "wordBreak",
+      "borderRadius",
+      "borderWidth",
+      "borderStyle",
+      "borderColor",
+      "borderOpacity",
+      "backgroundColor",
+      "backgroundOpacity",
+      "backgroundImage",
+      "gradientColorStops",
+      "boxDecorationBreak",
+      "backgroundSize",
+      "backgroundAttachment",
+      "backgroundClip",
+      "backgroundPosition",
+      "backgroundRepeat",
+      "backgroundOrigin",
+      "fill",
+      "stroke",
+      "strokeWidth",
+      "objectFit",
+      "objectPosition",
+      "padding",
+      "textAlign",
+      "textIndent",
+      "verticalAlign",
+      "fontFamily",
+      "fontSize",
+      "fontWeight",
+      "textTransform",
+      "fontStyle",
+      "fontVariantNumeric",
+      "lineHeight",
+      "letterSpacing",
+      "textColor",
+      "textOpacity",
+      "textDecoration",
+      "textDecorationColor",
+      "textDecorationStyle",
+      "textDecorationThickness",
+      "textUnderlineOffset",
+      "fontSmoothing",
+      "placeholderColor",
+      "placeholderOpacity",
+      "caretColor",
+      "accentColor",
+      "opacity",
+      "backgroundBlendMode",
+      "mixBlendMode",
+      "boxShadow",
+      "boxShadowColor",
+      "outlineStyle",
+      "outlineWidth",
+      "outlineOffset",
+      "outlineColor",
+      "ringWidth",
+      "ringColor",
+      "ringOpacity",
+      "ringOffsetWidth",
+      "ringOffsetColor",
+      "blur",
+      "brightness",
+      "contrast",
+      "dropShadow",
+      "grayscale",
+      "hueRotate",
+      "invert",
+      "saturate",
+      "sepia",
+      "filter",
+      "backdropBlur",
+      "backdropBrightness",
+      "backdropContrast",
+      "backdropGrayscale",
+      "backdropHueRotate",
+      "backdropInvert",
+      "backdropOpacity",
+      "backdropSaturate",
+      "backdropSepia",
+      "backdropFilter",
+      "transitionProperty",
+      "transitionDelay",
+      "transitionDuration",
+      "transitionTimingFunction",
+      "willChange",
+      "contain",
+      "content",
+      "forcedColorAdjust",
+      // Nakshora built-ins that Tailwind ships as plugins
+      "containerQueries"
+    ];
+    DEFAULTS_GROUPS = {
+      "border-spacing": { "--tw-border-spacing-x": "0", "--tw-border-spacing-y": "0" },
+      transform: {
+        "--tw-translate-x": "0",
+        "--tw-translate-y": "0",
+        "--tw-rotate": "0",
+        "--tw-skew-x": "0",
+        "--tw-skew-y": "0",
+        "--tw-scale-x": "1",
+        "--tw-scale-y": "1"
+      },
+      "touch-action": { "--tw-pan-x": " ", "--tw-pan-y": " ", "--tw-pinch-zoom": " " },
+      "scroll-snap-type": { "--tw-scroll-snap-strictness": "proximity" },
+      "gradient-color-stops": {
+        "--tw-gradient-from-position": " ",
+        "--tw-gradient-via-position": " ",
+        "--tw-gradient-to-position": " "
+      },
+      "font-variant-numeric": {
+        "--tw-ordinal": " ",
+        "--tw-slashed-zero": " ",
+        "--tw-numeric-figure": " ",
+        "--tw-numeric-spacing": " ",
+        "--tw-numeric-fraction": " "
+      },
+      "box-shadow": {
+        "--tw-ring-offset-shadow": "0 0 #0000",
+        "--tw-ring-shadow": "0 0 #0000",
+        "--tw-shadow": "0 0 #0000",
+        "--tw-shadow-colored": "0 0 #0000"
+      },
+      "ring-width": {
+        "--tw-ring-inset": " ",
+        "--tw-ring-offset-width": "0px",
+        "--tw-ring-offset-color": "#fff",
+        "--tw-ring-color": "rgb(59 130 246 / 0.5)",
+        "--tw-ring-offset-shadow": "0 0 #0000",
+        "--tw-ring-shadow": "0 0 #0000",
+        "--tw-shadow": "0 0 #0000",
+        "--tw-shadow-colored": "0 0 #0000"
+      },
+      filter: {
+        "--tw-blur": " ",
+        "--tw-brightness": " ",
+        "--tw-contrast": " ",
+        "--tw-grayscale": " ",
+        "--tw-hue-rotate": " ",
+        "--tw-invert": " ",
+        "--tw-saturate": " ",
+        "--tw-sepia": " ",
+        "--tw-drop-shadow": " "
+      },
+      "backdrop-filter": {
+        "--tw-backdrop-blur": " ",
+        "--tw-backdrop-brightness": " ",
+        "--tw-backdrop-contrast": " ",
+        "--tw-backdrop-grayscale": " ",
+        "--tw-backdrop-hue-rotate": " ",
+        "--tw-backdrop-invert": " ",
+        "--tw-backdrop-opacity": " ",
+        "--tw-backdrop-saturate": " ",
+        "--tw-backdrop-sepia": " "
+      },
+      contain: {
+        "--tw-contain-size": " ",
+        "--tw-contain-layout": " ",
+        "--tw-contain-paint": " ",
+        "--tw-contain-style": " "
+      },
+      "border-width": {}
+    };
+    CATALOG_CACHE = /* @__PURE__ */ new Map();
+    CATALOG_CACHE_MAX = 4;
+    PSEUDO_ELEMENTS = [
+      ["first-letter", "&::first-letter"],
+      ["first-line", "&::first-line"],
+      ["marker", ["& *::marker", "&::marker"], void 0, ["--tw-text-opacity"]],
+      ["selection", ["& *::selection", "&::selection"]],
+      ["file", "&::file-selector-button"],
+      ["placeholder", "&::placeholder"],
+      ["backdrop", "&::backdrop"],
+      ["before", "&::before", { content: "var(--tw-content)" }],
+      ["after", "&::after", { content: "var(--tw-content)" }]
+    ];
+    VISITED_STRIP = ["--tw-text-opacity", "--tw-border-opacity", "--tw-bg-opacity"];
+    PSEUDO_CLASSES = [
+      ["first", "&:first-child"],
+      ["last", "&:last-child"],
+      ["only", "&:only-child"],
+      ["odd", "&:nth-child(odd)"],
+      ["even", "&:nth-child(even)"],
+      ["first-of-type", "&:first-of-type"],
+      ["last-of-type", "&:last-of-type"],
+      ["only-of-type", "&:only-of-type"],
+      ["visited", "&:visited"],
+      ["target", "&:target"],
+      ["open", "&[open]"],
+      ["default", "&:default"],
+      ["checked", "&:checked"],
+      ["indeterminate", "&:indeterminate"],
+      ["placeholder-shown", "&:placeholder-shown"],
+      ["autofill", "&:autofill"],
+      ["optional", "&:optional"],
+      ["required", "&:required"],
+      ["valid", "&:valid"],
+      ["invalid", "&:invalid"],
+      ["in-range", "&:in-range"],
+      ["out-of-range", "&:out-of-range"],
+      ["read-only", "&:read-only"],
+      ["empty", "&:empty"],
+      ["focus-within", "&:focus-within"],
+      ["hover", "&:hover"],
+      ["focus", "&:focus"],
+      ["focus-visible", "&:focus-visible"],
+      ["active", "&:active"],
+      ["enabled", "&:enabled"],
+      ["disabled", "&:disabled"],
+      // Nakshora / v4 additions
+      ["inert", "&:is([inert], [inert] *)"],
+      ["nth-last-child", "&:nth-last-child"]
+    ];
+    LEGACY_VARIANT_KEYS = {
+      focusVisible: "focus-visible",
+      focusWithin: "focus-within",
+      firstChild: "first",
+      lastChild: "last",
+      groupHover: "group-hover",
+      groupFocus: "group-focus",
+      peerHover: "peer-hover",
+      peerFocus: "peer-focus"
+    };
+    MEDIA_SORT = {
+      supports: 100,
+      motion: 200,
+      contrast: 300,
+      screen: 1e3,
+      container: 5e3,
+      orientation: 6e3,
+      dark: 6200,
+      forcedColors: 6300,
+      print: 6400,
+      starting: 6500,
+      arbitrary: 7e3
+    };
+    Engine = class {
+      theme;
+      options;
+      /** static class → defs (later wins for duplicates) */
+      /**
+       * class → every static rule registered for it. Core classes map to one rule;
+       * plugin components (e.g. typography's `.prose`) register dozens of rules
+       * for the same class (different selector suffixes / at-rules), all of which
+       * must be emitted.
+       */
+      staticMap = /* @__PURE__ */ new Map();
+      /** prefix → functional utilities */
+      functionalMap = /* @__PURE__ */ new Map();
+      functional;
+      statics;
+      variants = /* @__PURE__ */ new Map();
+      functionalVariants = [];
+      pluginIndex = /* @__PURE__ */ new Map();
+      screens;
+      cache = /* @__PURE__ */ new Map();
+      seq = 0;
+      constructor(options) {
+        this.options = options;
+        this.theme = options.theme;
+        CORE_PLUGIN_ORDER.forEach((p, i) => this.pluginIndex.set(p, i));
+        this.screens = Object.entries(this.theme.screens).sort(
+          (a, b) => screenToPx(a[1]) - screenToPx(b[1])
+        );
+        this.statics = [...STATIC_UTILITIES, ...NAKSHORA_STATIC, ...options.extraStatic ?? []].map(
+          (s, index) => ({ ...s, index })
+        );
+        for (const s of this.statics) {
+          if (!this.pluginIndex.has(s.p)) this.pluginIndex.set(s.p, this.pluginIndex.size + 1e3);
+          const list = this.staticMap.get(s.c);
+          if (list) list.push(s);
+          else this.staticMap.set(s.c, [s]);
+        }
+        this.functional = [
+          ...buildFunctionalUtilities(this.theme, { pluginEnabled: options.pluginEnabled }),
+          ...options.extraFunctional ?? []
+        ].map((f, index) => ({ ...f, index }));
+        for (const f of this.functional) {
+          if (!this.pluginIndex.has(f.plugin))
+            this.pluginIndex.set(f.plugin, this.pluginIndex.size + 1e3);
+          const list = this.functionalMap.get(f.prefix) ?? [];
+          list.push(f);
+          this.functionalMap.set(f.prefix, list);
+        }
+        this.buildVariants(options.extraVariants ?? []);
+      }
+      /** next free cascade weight (Tailwind variant bit) */
+      nextBit = 1;
+      /**
+       * Register a variant and reserve its cascade weights: one per static branch
+       * (`marker` → 2, `dark` with two formats → 2), or `slots + 1` for a
+       * functional variant (one per themed value, the last one for arbitrary
+       * values) — exactly what Tailwind's `Offsets.recordVariant` does.
+       */
+      registerVariant(input) {
+        const bit = this.nextBit;
+        const width = input.match ? (input.slots ?? 0) + 1 : input.branches?.length ?? 1;
+        this.nextBit += width;
+        const v = { ...input, sort: bit };
+        if (v.branches) v.branches = v.branches.map((b, i) => ({ ...b, bit: bit + i }));
+        this.variants.set(v.name, v);
+        if (v.match) this.functionalVariants.push(v);
+        this.functionalVariants.sort((a, b) => b.name.length - a.name.length);
+      }
+      // ───────────────────────── variant table ─────────────────────────
+      /**
+       * Variants in Tailwind 3.4's registration order — the order *is* the
+       * cascade: child → pseudo-elements → pseudo-classes → group-* → peer-* →
+       * has/aria/data → plugin variants (built-in `@container` first) → supports →
+       * motion/contrast → [dark when `class`] → screens (max-*, then min) →
+       * orientation → direction → [dark otherwise] → forced-colors → print.
+       * Nakshora extras (`inert`, `not-*`, `starting`) sit next to their
+       * closest relatives.
+       */
+      buildVariants(extra) {
+        const push = (v) => this.registerVariant(v);
+        push({
+          name: "*",
+          key: "child",
+          branches: [{ format: "& > *" }],
+          description: "direct children"
+        });
+        for (const [name, fmt, decls, stripAlpha] of PSEUDO_ELEMENTS) {
+          const formats = Array.isArray(fmt) ? fmt : [fmt];
+          push({
+            name,
+            key: name,
+            branches: formats.map((format) => ({ format, decls, stripAlpha })),
+            description: `::${name} pseudo-element`
+          });
+        }
+        const pseudoBranches = /* @__PURE__ */ new Map();
+        for (const [name, fmt] of PSEUDO_CLASSES) {
+          if (name === "nth-last-child") continue;
+          pseudoBranches.set(name, fmt);
+          push({
+            name,
+            key: name,
+            branches: [{ format: fmt, stripAlpha: name === "visited" ? VISITED_STRIP : void 0 }],
+            description: `${fmt.slice(1)} state`
+          });
+        }
+        push({
+          name: "not",
+          key: "not",
+          functional: true,
+          match: (value) => {
+            if (value.startsWith("[") && value.endsWith("]"))
+              return [{ format: `&:not(${normalizeValue(value.slice(1, -1))})` }];
+            const fmt = pseudoBranches.get(value);
+            if (!fmt) return null;
+            return [{ format: `&:not(${fmt.slice(1)})` }];
+          },
+          description: "negated state (`not-hover:`, `not-[\u2026]:`)"
+        });
+        for (const kind of ["group", "peer"]) {
+          const combinator = kind === "group" ? " &" : " ~ &";
+          for (const [name, fmt] of PSEUDO_CLASSES) {
+            if (name === "nth-last-child") continue;
+            const sel = fmt.slice(1);
+            push({
+              name: `${kind}-${name}`,
+              key: `${kind}-${name}`,
+              match: (_v, modifier) => [
+                { format: `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})${sel}${combinator}` }
+              ],
+              description: `${kind === "group" ? "parent .group" : "preceding .peer sibling"} ${sel}`
+            });
+          }
+          push({
+            name: kind,
+            key: kind,
+            functional: true,
+            match: (value, modifier) => {
+              if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+              const base = `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})`;
+              const sel = normalizeValue(value.slice(1, -1));
+              if (sel.includes("&")) return [{ format: sel.replace(/&/g, base) + combinator }];
+              return [{ format: `${base}${sel}${combinator}` }];
+            },
+            description: `${kind} arbitrary state (\`${kind}-[\u2026]:\`)`
+          });
+        }
+        const hasFamily = (kind) => {
+          const name = kind ? `${kind}-has` : "has";
+          push({
+            name,
+            key: name,
+            functional: true,
+            match: (value, modifier) => {
+              if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+              const has = `:has(${normalizeValue(value.slice(1, -1))})`;
+              if (!kind) return [{ format: `&${has}` }];
+              const base = `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})`;
+              return [{ format: `${base}${has}${kind === "group" ? " &" : " ~ &"}` }];
+            },
+            description: kind ? `${kind} :has() relational state` : ":has() relational state"
+          });
+        };
+        hasFamily("");
+        hasFamily("group");
+        hasFamily("peer");
+        for (const attr of ["aria", "data"]) {
+          const themed = Object.keys(this.theme[attr] ?? {});
+          for (const kind of ["", "group", "peer"]) {
+            const name = kind ? `${kind}-${attr}` : attr;
+            push({
+              name,
+              key: name,
+              functional: true,
+              slots: themed.length,
+              match: (value, modifier) => {
+                const selector = this.attrSelector(attr, value);
+                if (!selector) return null;
+                const slot = themed.indexOf(value);
+                const format = kind ? `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})${selector}${kind === "group" ? " &" : " ~ &"}` : `&${selector}`;
+                return { branches: [{ format }], slot: slot === -1 ? themed.length : slot };
+              },
+              description: `${kind ? `${kind} ` : ""}${attr} attribute state`
+            });
+          }
+        }
+        const containers = this.theme.containers;
+        const containerKeys = Object.keys(containers);
+        const containerHook = (value, modifier) => ({
+          id: "@container",
+          value,
+          modifier,
+          compare: compareContainers
+        });
+        const containerSize = (value) => {
+          if (value.startsWith("[") && value.endsWith("]")) return normalizeValue(value.slice(1, -1));
+          return containers[value] ?? null;
+        };
+        push({
+          name: "@max",
+          key: "containerQueries",
+          functional: true,
+          slots: containerKeys.length,
+          match: (value, modifier) => {
+            const size = containerSize(value);
+            if (size === null) return null;
+            const px = screenToPx(size);
+            const slot = containerKeys.indexOf(value);
+            return {
+              branches: [
+                {
+                  atrules: [
+                    {
+                      kind: "container",
+                      params: `${modifier ? `${modifier} ` : ""}(width < ${size})`,
+                      sort: MEDIA_SORT.container - (Number.isNaN(px) ? 0 : px / 10),
+                      max: px
+                    }
+                  ]
+                }
+              ],
+              slot: slot === -1 ? containerKeys.length : slot,
+              fn: {
+                ...containerHook(size, modifier),
+                id: "@container-max",
+                compare: (a, b) => -compareContainers(a, b)
+              }
+            };
+          },
+          description: "@container max-size query"
+        });
+        push({
+          name: "@",
+          key: "containerQueries",
+          functional: true,
+          slots: containerKeys.length,
+          match: (raw, modifier) => {
+            const value = raw.startsWith("min-") ? raw.slice(4) : raw;
+            const size = containerSize(value);
+            if (size === null) return null;
+            const px = screenToPx(size);
+            const slot = containerKeys.indexOf(value);
+            return {
+              branches: [
+                {
+                  atrules: [
+                    {
+                      kind: "container",
+                      params: `${modifier ? `${modifier} ` : ""}(min-width: ${size})`,
+                      sort: MEDIA_SORT.container + (Number.isNaN(px) ? 0 : px / 10),
+                      min: px
+                    }
+                  ]
+                }
+              ],
+              slot: slot === -1 ? containerKeys.length : slot,
+              fn: containerHook(size, modifier)
+            };
+          },
+          description: "@container size query"
+        });
+        for (const v of extra) push(v);
+        const media = (name, params, sort, description) => push({
+          name,
+          key: name,
+          branches: [{ atrules: [{ kind: "media", params, sort }] }],
+          description
+        });
+        const supportsThemed = Object.keys(this.theme.supports ?? {});
+        push({
+          name: "supports",
+          key: "supports",
+          functional: true,
+          slots: supportsThemed.length,
+          match: (value) => {
+            let check;
+            if (value.startsWith("[") && value.endsWith("]")) {
+              check = normalizeValue(value.slice(1, -1));
+            } else {
+              const themed = this.theme.supports[value];
+              if (themed === void 0) return null;
+              check = themed;
+            }
+            const isRaw = /^\w*\s*\(/.test(check);
+            if (isRaw)
+              check = check.replace(/\b(and|or|not)\b/g, " $1 ").replace(/\s+/g, " ").trim();
+            else check = check.includes(":") ? `(${check})` : `(${check}: var(--tw))`;
+            const slot = supportsThemed.indexOf(value);
+            return {
+              branches: [{ atrules: [{ kind: "supports", params: check, sort: MEDIA_SORT.supports }] }],
+              slot: slot === -1 ? supportsThemed.length : slot
+            };
+          },
+          description: "@supports feature query"
+        });
+        media(
+          "motion-safe",
+          "(prefers-reduced-motion: no-preference)",
+          MEDIA_SORT.motion,
+          "user allows motion"
+        );
+        media(
+          "motion-reduce",
+          "(prefers-reduced-motion: reduce)",
+          MEDIA_SORT.motion + 1,
+          "user prefers reduced motion"
+        );
+        media(
+          "contrast-more",
+          "(prefers-contrast: more)",
+          MEDIA_SORT.contrast,
+          "user prefers more contrast"
+        );
+        media(
+          "contrast-less",
+          "(prefers-contrast: less)",
+          MEDIA_SORT.contrast + 1,
+          "user prefers less contrast"
+        );
+        const dark = this.options.darkMode;
+        const legacyDark = dark === "class" || Array.isArray(dark) && dark[0] === "class";
+        const pushDark = () => {
+          if (dark === false) return;
+          const [mode, selector] = Array.isArray(dark) ? dark : [dark, void 0];
+          let branches;
+          if (mode === "media") {
+            branches = [
+              {
+                atrules: [
+                  { kind: "media", params: "(prefers-color-scheme: dark)", sort: MEDIA_SORT.dark }
+                ]
+              }
+            ];
+          } else if (mode === "variant") {
+            const formats = Array.isArray(selector) ? selector : [selector ?? "&:is(.dark *)"];
+            branches = formats.map((format) => this.formatToBranch(format, MEDIA_SORT.dark));
+          } else if (mode === "selector") {
+            const sel = selector ?? ".dark";
+            branches = [{ format: `&:where(${sel}, ${sel} *)` }];
+          } else {
+            const sel = selector ?? ".dark";
+            branches = [{ format: `&:is(${sel} *)` }];
+          }
+          push({ name: "dark", key: "dark", branches, description: "dark mode" });
+        };
+        if (legacyDark) pushDark();
+        const minHook = (px) => ({
+          id: "min-screens",
+          value: px,
+          modifier: null,
+          compare: (a, b) => a.value - b.value
+        });
+        const maxHook = (px) => ({
+          id: "max-screens",
+          value: px,
+          modifier: null,
+          compare: (a, b) => b.value - a.value
+        });
+        for (const [name, value] of this.screens) {
+          push({
+            name: `max-${name}`,
+            key: "maxResponsive",
+            branches: [{ atrules: [maxWidthCond(maxWidthValue(value))] }],
+            fn: maxHook(screenToPx(value)),
+            description: `max-width ${maxWidthValue(value)}`
+          });
+        }
+        push({
+          name: "max",
+          key: "maxResponsive",
+          functional: true,
+          match: (value) => {
+            if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+            const v = normalizeValue(value.slice(1, -1));
+            if (!typeCheckers.length(v)) return null;
+            return { branches: [{ atrules: [maxWidthCond(v)] }], fn: maxHook(screenToPx(v)) };
+          },
+          description: "arbitrary max-width"
+        });
+        for (const [name, value] of this.screens) {
+          push({
+            name,
+            key: "responsive",
+            branches: [{ atrules: [minWidthCond(value)] }],
+            fn: minHook(screenToPx(value)),
+            description: `min-width ${value}`
+          });
+        }
+        push({
+          name: "min",
+          key: "responsive",
+          functional: true,
+          match: (value) => {
+            if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+            const v = normalizeValue(value.slice(1, -1));
+            if (!typeCheckers.length(v)) return null;
+            return { branches: [{ atrules: [minWidthCond(v)] }], fn: minHook(screenToPx(v)) };
+          },
+          description: "arbitrary min-width"
+        });
+        media("portrait", "(orientation: portrait)", MEDIA_SORT.orientation, "portrait orientation");
+        media(
+          "landscape",
+          "(orientation: landscape)",
+          MEDIA_SORT.orientation + 1,
+          "landscape orientation"
+        );
+        push({
+          name: "ltr",
+          key: "ltr",
+          branches: [{ format: '&:where([dir="ltr"], [dir="ltr"] *)' }],
+          description: "left-to-right documents"
+        });
+        push({
+          name: "rtl",
+          key: "rtl",
+          branches: [{ format: '&:where([dir="rtl"], [dir="rtl"] *)' }],
+          description: "right-to-left documents"
+        });
+        if (!legacyDark) pushDark();
+        media(
+          "forced-colors",
+          "(forced-colors: active)",
+          MEDIA_SORT.forcedColors,
+          "forced colours mode"
+        );
+        media("print", "print", MEDIA_SORT.print, "print media");
+        push({
+          name: "starting",
+          key: "starting",
+          branches: [{ atrules: [{ kind: "starting", params: "", sort: MEDIA_SORT.starting }] }],
+          description: "@starting-style (entry transitions)"
+        });
+      }
+      /** `@media (…) { &:not(.light *) }` / `&:is(.dark *)` / `@media (…)` → branch */
+      formatToBranch(format, sort) {
+        const f = format.trim();
+        const m = /^@([\w-]+)\s*([^{]*?)\s*(?:\{\s*(.*?)\s*\})?$/.exec(f);
+        if (!m) return { format: f };
+        const kind = m[1] === "media" ? "media" : m[1] === "supports" ? "supports" : m[1] === "container" ? "container" : "raw";
+        const inner = m[3];
+        return {
+          atrules: [{ kind, params: kind === "raw" ? `${m[1]} ${m[2]}` : m[2], sort }],
+          format: inner && inner !== "&" ? inner : void 0
+        };
+      }
+      attrSelector(kind, value) {
+        if (value.startsWith("[") && value.endsWith("]")) {
+          return `[${kind}-${normalizeAttributeSelectors(normalizeValue(value.slice(1, -1)))}]`;
+        }
+        const themed = this.theme[kind]?.[value];
+        if (themed === void 0) return null;
+        return `[${kind}-${themed}]`;
+      }
+      /** Public: variant definitions (docs / IntelliSense). */
+      getVariants() {
+        return [...this.variants.values()];
+      }
+      getScreens() {
+        return this.screens;
+      }
+      // ───────────────────────── catalog ─────────────────────────
+      /** Every value-bearing utility class the theme defines (no variants, no arbitrary values). */
+      /**
+       * Full catalog (one entry per value-bearing class). Memoised per *resolved
+       * theme + enabled core plugins* across Engine instances: the Vite/PostCSS
+       * plugins create a fresh generator per build, and the catalog (11k entries,
+       * ~35 ms) only depends on those inputs. Engines with plugin-added utilities
+       * are not shared (their extras are per instance). Entries are shared by
+       * reference — callers must treat them as read-only.
+       */
+      buildCatalog() {
+        if (this.catalogMemo) return this.catalogMemo;
+        const hasExtras = (this.options.extraStatic?.length ?? 0) > 0 || (this.options.extraFunctional?.length ?? 0) > 0;
+        const key = hasExtras ? null : this.catalogKey();
+        if (key !== null) {
+          const hit = CATALOG_CACHE.get(key);
+          if (hit) {
+            CATALOG_CACHE.delete(key);
+            CATALOG_CACHE.set(key, hit);
+            this.catalogMemo = hit;
+            return hit;
+          }
+        }
+        const built = this.buildCatalogUncached();
+        if (key !== null) {
+          CATALOG_CACHE.set(key, built);
+          if (CATALOG_CACHE.size > CATALOG_CACHE_MAX)
+            CATALOG_CACHE.delete(CATALOG_CACHE.keys().next().value);
+        }
+        this.catalogMemo = built;
+        return built;
+      }
+      catalogMemo = null;
+      /** Cache key: theme JSON + which core plugins are enabled. */
+      catalogKey() {
+        const plugins = /* @__PURE__ */ new Set();
+        for (const s of this.statics) plugins.add(s.p);
+        for (const f of this.functional) plugins.add(f.plugin);
+        plugins.add("container");
+        const enabled = [...plugins].sort().filter((p) => this.options.pluginEnabled(p));
+        return `${enabled.join(",")}\0${JSON.stringify(this.theme)}`;
+      }
+      buildCatalogUncached() {
+        const out = [];
+        const seenStatic = /* @__PURE__ */ new Set();
+        for (const s of this.statics) {
+          if (!this.options.pluginEnabled(s.p)) continue;
+          if (seenStatic.has(s.c)) continue;
+          seenStatic.add(s.c);
+          out.push({
+            class: s.c,
+            plugin: s.p,
+            decls: Object.fromEntries(s.d),
+            selector: s.s,
+            defaults: s.df,
+            description: s.d.map(([k, v]) => `${k}: ${v}`).join("; "),
+            sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 }
+          });
+        }
+        for (const f of this.functional) {
+          if (!this.options.pluginEnabled(f.plugin)) continue;
+          let vi = 0;
+          for (const [key, raw] of Object.entries(f.values)) {
+            vi++;
+            const cls = key === "DEFAULT" ? f.prefix : `${f.prefix}-${key}`;
+            const decls = f.build(raw, { modifier: null, key });
+            if (!decls) continue;
+            out.push({
+              class: cls,
+              plugin: f.plugin,
+              decls,
+              selector: f.selector,
+              defaults: f.defaults,
+              description: f.describe.replace("{value}", String(Array.isArray(raw) ? raw[0] : raw)),
+              sort: { plugin: this.pluginIndex.get(f.plugin) ?? 9999, utility: f.index, value: vi }
+            });
+            if (f.negative) {
+              const neg = this.negate(raw);
+              if (neg !== null) {
+                const nd = f.build(neg, { modifier: null, key });
+                if (nd)
+                  out.push({
+                    class: `-${cls}`,
+                    plugin: f.plugin,
+                    decls: nd,
+                    selector: f.selector,
+                    defaults: f.defaults,
+                    description: f.describe.replace("{value}", neg),
+                    sort: {
+                      plugin: this.pluginIndex.get(f.plugin) ?? 9999,
+                      utility: f.index,
+                      value: vi + 0.5
+                    }
+                  });
+              }
+            }
+          }
+        }
+        if (this.options.pluginEnabled("container")) {
+          out.push({
+            class: "container",
+            plugin: "container",
+            decls: { width: "100%" },
+            description: "responsive fixed-width container",
+            sort: { plugin: this.pluginIndex.get("container") ?? 1, utility: 0, value: 0 }
+          });
+        }
+        const seen = /* @__PURE__ */ new Map();
+        const result = [];
+        for (const e of out) {
+          const idx = seen.get(e.class);
+          if (idx !== void 0) result[idx] = e;
+          else {
+            seen.set(e.class, result.length);
+            result.push(e);
+          }
+        }
+        return result;
+      }
+      negate(raw) {
+        return negateValue(Array.isArray(raw) ? raw[0] : raw);
+      }
+      // ───────────────────────── compile ─────────────────────────
+      /** Compile one candidate into rules (empty when unknown). Cached. */
+      compile(candidate) {
+        const cached = this.cache.get(candidate);
+        if (cached) return cached;
+        const rules = this.compileUncached(candidate);
+        this.cache.set(candidate, rules);
+        return rules;
+      }
+      compileUncached(candidate) {
+        if (!candidate || candidate.length > 256) return [];
+        const parts = splitAtTopLevelOnly(candidate, ":");
+        let base = parts[parts.length - 1];
+        const variantNames = parts.slice(0, -1);
+        if (!base) return [];
+        let important = false;
+        if (base.startsWith("!")) {
+          important = true;
+          base = base.slice(1);
+        } else if (base.endsWith("!") && this.options.trailingImportant !== false) {
+          important = true;
+          base = base.slice(0, -1);
+        }
+        let negative = false;
+        if (base.startsWith("-")) {
+          negative = true;
+          base = base.slice(1);
+        }
+        if (!base || base.startsWith("-") || base.startsWith("!")) return [];
+        const resolved = this.resolveUtility(base, negative);
+        if (resolved.length === 0) return [];
+        const variantMatches = [];
+        for (let i = variantNames.length - 1; i >= 0; i--) {
+          const m = this.resolveVariant(variantNames[i]);
+          if (!m) return [];
+          variantMatches.push(m);
+        }
+        const rules = [];
+        const escaped = `.${escapeClassName(candidate)}`;
+        for (const u of resolved) {
+          const suffix = u.selector ?? "";
+          const isTemplate = suffix.includes("&");
+          let branches = [{ selector: escaped, atrules: [...u.atrules ?? []], decls: { ...u.decls } }];
+          const weights = [];
+          const hooks = [];
+          let parallel = 0;
+          for (const vm of variantMatches) {
+            if (vm.arbitrary) weights.push(vm.arbitrary);
+            else if (vm.functional || vm.branches.length === 1) weights.push(vm.sort);
+            if (vm.fn) hooks.push({ ...vm.fn, bit: vm.sort });
+            const next = [];
+            for (const b of branches) {
+              vm.branches.forEach((vb, bi) => {
+                if (!vm.arbitrary && !vm.functional && vm.branches.length > 1)
+                  b.weights = [...b.weights ?? [], vb.bit ?? vm.sort + bi];
+                if (vm.functional && vm.branches.length > 1) parallel = Math.max(parallel, bi);
+                const selector = vb.format ? applyFormat(b.selector, vb.format) : b.selector;
+                let decls = vb.decls && !Object.keys(vb.decls).some((k) => k in b.decls) ? { ...vb.decls, ...b.decls } : b.decls;
+                if (vb.stripAlpha) decls = removeAlphaVariables(decls, vb.stripAlpha);
+                next.push({
+                  selector,
+                  atrules: [...b.atrules, ...vb.atrules ?? []],
+                  decls,
+                  weights: b.weights,
+                  parallel: Math.max(b.parallel ?? 0, vm.functional ? bi : 0)
+                });
+              });
+            }
+            branches = next;
+          }
+          for (const b of branches) {
+            const withSuffix = suffix ? isTemplate ? suffix.replace(/&/g, b.selector) : splitAtTopLevelOnly(b.selector, ",").map((part) => part.trim() + suffix).join(", ") : b.selector;
+            let selector = finalizeSelector(withSuffix);
+            if (u.siblings?.length && variantMatches.length === 0) {
+              const ownParts = splitAtTopLevelOnly(selector, ",").map((p) => p.trim());
+              let i = 0;
+              selector = u.siblings.map((part) => part === "&" ? ownParts[i++] ?? "" : part).filter(Boolean).join(", ");
+            }
+            selector = this.wrapImportant(selector);
+            const bang = important || this.options.important === true;
+            const decls = bang ? Object.fromEntries(
+              Object.entries(b.decls).map(([k, v]) => [
+                k,
+                v.endsWith("!important") ? v : `${v} !important`
+              ])
+            ) : b.decls;
+            rules.push({
+              selector,
+              decls,
+              atrules: this.mergeAtRules(b.atrules),
+              sort: {
+                variant: variantMatches.length ? 1 : 0,
+                layer: u.component || u.plugin === "container" ? 0 : 1,
+                // a bit mask: the same variant applied twice (`hover:hover:x`) sets one bit
+                variants: [.../* @__PURE__ */ new Set([...weights, ...b.weights ?? []])].sort(compareWeights),
+                // outermost variant first — the order Tailwind walks `options`
+                hooks: hooks.length ? [...hooks].reverse() : void 0,
+                parallel: Math.max(parallel, b.parallel ?? 0),
+                plugin: u.sort.plugin,
+                utility: u.sort.utility,
+                value: u.sort.value,
+                property: u.sort.property,
+                seq: this.seq++
+              },
+              candidate,
+              plugin: u.plugin,
+              defaults: u.defaults,
+              animations: u.animations,
+              component: u.component
+            });
+          }
+        }
+        return dedupeRules(rules);
+      }
+      wrapImportant(selector) {
+        const imp = this.options.important;
+        if (typeof imp === "string" && imp.trim()) {
+          const scopes = imp.trim().split(",").map((s) => s.trim()).filter(Boolean);
+          return splitAtTopLevelOnly(selector, ",").map((s) => s.trim()).flatMap((sel) => scopes.map((scope) => sel.includes(scope) ? sel : `${scope} ${sel}`)).join(", ");
+        }
+        return selector;
+      }
+      /**
+       * Order at-rules outermost-first (the leftmost variant is the outermost
+       * wrapper, as in Tailwind) and — Nakshora policy — collapse every
+       * non-arbitrary `@media` condition into a single combined query
+       * (`print:md:` → `@media print and (min-width: 768px)`). Nested min-widths
+       * keep the largest, max-widths the smallest; the combined query sits where
+       * the outermost media query was. Arbitrary (`[@media(...)]:`) queries are
+       * never rewritten.
+       */
+      mergeAtRules(accumulated) {
+        if (accumulated.length <= 1) return accumulated;
+        const outerFirst = [...accumulated].reverse();
+        if (this.options.combineMedia === false) return outerFirst;
+        const mergeable = outerFirst.filter((a) => a.kind === "media" && !a.raw);
+        if (mergeable.length <= 1) return outerFirst;
+        const types = [];
+        const features = [];
+        let minCond;
+        let maxCond;
+        for (const m of mergeable) {
+          for (const part of m.params.split(/\s+and\s+/)) {
+            const p = part.trim();
+            if (/^(not\s+|only\s+)?(all|print|screen|speech)$/.test(p)) {
+              if (!types.includes(p)) types.push(p);
+            } else if (m.min !== void 0 && !Number.isNaN(m.min) && /^\(min-width: [^)]+\)$/.test(p)) {
+              if (!minCond || m.min > minCond.min) minCond = m;
+            } else if (m.max !== void 0 && !Number.isNaN(m.max) && /^\(max-width: [^)]+\)$/.test(p)) {
+              if (!maxCond || m.max < maxCond.max) maxCond = m;
+            } else if (!features.includes(p)) features.push(p);
+          }
+        }
+        const parts = [
+          ...types,
+          ...minCond ? [minCond.params] : [],
+          ...maxCond ? [maxCond.params] : [],
+          ...features
+        ];
+        const combined = {
+          kind: "media",
+          params: parts.join(" and "),
+          sort: Math.max(...mergeable.map((m) => m.sort)),
+          min: minCond?.min,
+          max: maxCond?.max
+        };
+        const out = [];
+        let placed = false;
+        for (const a of outerFirst) {
+          if (a.kind === "media" && !a.raw) {
+            if (!placed) {
+              out.push(combined);
+              placed = true;
+            }
+            continue;
+          }
+          out.push(a);
+        }
+        return out;
+      }
+      // ───────────────────────── variants ─────────────────────────
+      variantCache = /* @__PURE__ */ new Map();
+      resolveVariant(name) {
+        const cached = this.variantCache.get(name);
+        if (cached !== void 0) return cached;
+        const result = this.resolveVariantUncached(name);
+        this.variantCache.set(name, result);
+        return result;
+      }
+      variantAllowed(def) {
+        if (!this.options.variantEnabled(def.key)) return false;
+        if (def.key === "maxResponsive" && !this.options.variantEnabled("responsive")) return false;
+        if (def.name !== def.key && !this.options.variantEnabled(def.name)) return false;
+        if ((def.name.startsWith("group-") || def.name === "group") && !this.options.variantEnabled("group"))
+          return false;
+        if ((def.name.startsWith("peer-") || def.name === "peer") && !this.options.variantEnabled("peer"))
+          return false;
+        return true;
+      }
+      resolveVariantUncached(name) {
+        if (!name) return null;
+        if (name.startsWith("[") && name.endsWith("]")) {
+          if (!this.options.variantEnabled("arbitraryVariants")) return null;
+          const inner = normalizeValue(name.slice(1, -1));
+          if (inner.startsWith("@")) {
+            const m = /^@([a-zA-Z-]+)\s*(.*)$/.exec(inner);
+            if (!m) return null;
+            const kindName = m[1];
+            const params = m[2].trim();
+            const kind = kindName === "media" ? "media" : kindName === "supports" ? "supports" : kindName === "container" ? "container" : "raw";
+            const cond = {
+              kind,
+              params: kind === "raw" ? `${kindName} ${params}` : params,
+              sort: MEDIA_SORT.arbitrary,
+              raw: true
+            };
+            const mm = /^\((min|max)-width:\s*([^)]+)\)$/.exec(params);
+            if (mm && kind === "media") {
+              const px = screenToPx(mm[2]);
+              if (mm[1] === "min") cond.min = px;
+              else cond.max = px;
+            }
+            return {
+              branches: [{ atrules: [cond] }],
+              sort: 0,
+              arbitrary: name,
+              key: "arbitraryVariants"
+            };
+          }
+          if (!inner.includes("&")) return null;
+          return {
+            branches: [{ format: inner }],
+            sort: 0,
+            arbitrary: name,
+            key: "arbitraryVariants"
+          };
+        }
+        const def = this.variants.get(name);
+        if (def && def.branches && !def.functional) {
+          if (!this.variantAllowed(def)) return null;
+          return { branches: def.branches, sort: def.sort, key: def.key, fn: def.fn };
+        }
+        for (const fv of this.functionalVariants) {
+          let rest = null;
+          if (fv.name === "@max") {
+            if (name.startsWith("@max-")) rest = name.slice(5);
+          } else if (fv.name === "@") {
+            if (name.startsWith("@") && !name.startsWith("@max-")) rest = name.slice(1);
+          } else if (name === fv.name && !fv.functional) rest = "";
+          else if (name.startsWith(`${fv.name}-`)) rest = name.slice(fv.name.length + 1);
+          else if (name.startsWith(`${fv.name}/`)) rest = name.slice(fv.name.length);
+          if (rest === null) continue;
+          if (!this.variantAllowed(fv)) continue;
+          const slashSplit = splitModifier(rest);
+          const value = slashSplit.value;
+          let modifier = slashSplit.modifier;
+          if (modifier !== null && modifier.startsWith("[") && modifier.endsWith("]"))
+            modifier = normalizeValue(modifier.slice(1, -1));
+          const result = fv.match(value, modifier, { theme: this.theme });
+          if (!result) continue;
+          const r = Array.isArray(result) ? { branches: result } : result;
+          if (r.branches.length === 0) continue;
+          return {
+            branches: r.branches,
+            sort: fv.sort + Math.min(r.slot ?? fv.slots ?? 0, fv.slots ?? 0),
+            key: fv.key,
+            functional: true,
+            fn: r.fn
+          };
+        }
+        return null;
+      }
+      // ───────────────────────── utilities ─────────────────────────
+      resolveUtility(base, negative) {
+        const out = [];
+        if (base.startsWith("[") && base.endsWith("]") && !negative) {
+          if (this.options.arbitraryProperties === false) return [];
+          const inner = base.slice(1, -1);
+          const idx = inner.indexOf(":");
+          if (idx <= 0) return [];
+          const prop = inner.slice(0, idx).trim();
+          const value = normalizeValue(this.resolveThemeFn(inner.slice(idx + 1)), { property: prop });
+          if (!/^(--[\w-]+|[a-zA-Z][\w-]*)$/.test(prop) || !value || !isValidArbitraryValue(value))
+            return [];
+          return [
+            {
+              decls: { [prop]: value },
+              plugin: "arbitraryProperties",
+              sort: { plugin: 99999, utility: 0, value: 0, property: prop }
+            }
+          ];
+        }
+        if (!negative) {
+          for (const s of this.staticMap.get(base) ?? []) {
+            if (!this.options.pluginEnabled(s.p)) continue;
+            const decls = Object.fromEntries(s.d);
+            const animations = s.pc ? animationNames(decls.animation ?? decls["animation-name"]) : void 0;
+            out.push({
+              decls,
+              selector: s.s,
+              siblings: s.sl,
+              component: s.pc,
+              plugin: s.p,
+              defaults: s.df,
+              atrules: s.at?.map(parseAtRule),
+              animations: animations?.length ? animations : void 0,
+              sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 }
+            });
+          }
+          if (base === "container" && this.options.pluginEnabled("container"))
+            out.push(...this.containerRules());
+        }
+        const tryPrefix = (prefix, modifier) => {
+          const list = this.functionalMap.get(prefix);
+          if (!list) return;
+          const matches = [];
+          for (const u of list) {
+            if (!this.options.pluginEnabled(u.plugin)) continue;
+            const r = this.resolveFunctional(u, modifier, negative);
+            if (r) matches.push({ u, r: r.rules, types: r.types, arbitrary: r.arbitrary });
+          }
+          if (matches.length === 0) return;
+          const arbitrary = matches.filter((m) => m.arbitrary);
+          if (arbitrary.length > 1) {
+            const withoutAny = arbitrary.filter((m) => !m.types.includes("any"));
+            const pick = (ms) => {
+              if (ms.length === 1) return ms[0];
+              return ms.find((m) => m.u.preferOnConflict);
+            };
+            const chosen = pick(withoutAny) ?? pick(arbitrary);
+            if (!chosen) return;
+            out.push(...chosen.r);
+            for (const m of matches) if (!m.arbitrary) out.push(...m.r);
+            return;
+          }
+          for (const m of matches) out.push(...m.r);
+        };
+        tryPrefix(base, "DEFAULT");
+        for (const [prefix, modifier] of candidatePermutations(base)) tryPrefix(prefix, modifier);
+        return out;
+      }
+      resolveFunctional(u, modifier, negative) {
+        const sortBase = { plugin: this.pluginIndex.get(u.plugin) ?? 9999, utility: u.index };
+        let lastArgs = null;
+        const build = (value2, ctx) => {
+          lastArgs = [value2, ctx.modifier];
+          return u.build(value2, ctx);
+        };
+        const make = (decls2, value2, types2, arbitrary, animations2) => {
+          if (!decls2) return null;
+          const common = {
+            plugin: u.plugin,
+            defaults: u.defaults,
+            sort: { ...sortBase, value: value2 },
+            animations: animations2
+          };
+          if (u.buildAll && lastArgs) {
+            const shapes = u.buildAll(lastArgs[0], lastArgs[1]);
+            if (!shapes || shapes.length === 0) return null;
+            return {
+              rules: shapes.map((sh) => ({
+                ...common,
+                decls: sh.decls,
+                selector: sh.selector,
+                atrules: sh.atrules?.map(parseAtRule)
+              })),
+              types: types2,
+              arbitrary
+            };
+          }
+          const selector = u.selectorFor && lastArgs ? u.selectorFor(lastArgs[0], lastArgs[1]) ?? u.selector : u.selector;
+          return { rules: [{ ...common, decls: decls2, selector }], types: types2, arbitrary };
+        };
+        const keys = Object.keys(u.values);
+        let valueKey = modifier;
+        let mod = null;
+        if (u.modifier) {
+          const split = splitModifier(modifier);
+          if (split.modifier !== null) {
+            valueKey = split.value;
+            mod = split.modifier;
+          }
+        }
+        if (valueKey === "" && mod !== null) valueKey = "DEFAULT";
+        const direct = (key) => Object.prototype.hasOwnProperty.call(u.values, key) ? u.values[key] : void 0;
+        let themeValue = direct(modifier);
+        let usedKey = modifier;
+        if (themeValue === void 0 && mod !== null) {
+          themeValue = direct(valueKey);
+          usedKey = valueKey;
+        } else if (themeValue !== void 0) {
+          mod = null;
+        }
+        if (themeValue !== void 0) {
+          const idx = keys.indexOf(usedKey) + 1;
+          if (negative) {
+            if (!u.negative) return null;
+            const neg = this.negate(themeValue);
+            if (neg === null) return null;
+            return make(build(neg, { modifier: null, key: usedKey }), idx + 0.5, [], false);
+          }
+          const modValue2 = mod === null ? null : this.resolveModifier(u, mod);
+          if (mod !== null && modValue2 === null) return null;
+          if (u.modifier === "color" && modValue2 !== null) {
+            const color = String(
+              typeof themeValue === "function" ? themeValue({}) : themeValue
+            );
+            const withAlpha = withAlphaValue(color, modValue2, "");
+            if (withAlpha === "") return null;
+            return make(
+              build(withAlpha, { modifier: modValue2, key: usedKey }),
+              idx,
+              [],
+              false,
+              void 0
+            );
+          }
+          const decls2 = build(themeValue, { modifier: modValue2, key: usedKey });
+          const animations2 = u.plugin === "animation" && decls2 ? animationNames(decls2.animation) : void 0;
+          return make(decls2, idx, [], false, animations2);
+        }
+        const arb = mod !== null ? valueKey : modifier;
+        if (!(arb.startsWith("[") && arb.endsWith("]"))) return null;
+        const raw = arb.slice(1, -1);
+        if (!raw) return null;
+        const { hint } = splitTypeHint(raw);
+        const types = u.types.length ? u.types : ["any"];
+        if (hint && !types.includes(hint)) return null;
+        const coerced = coerceValue(
+          this.resolveThemeFn(raw),
+          types.filter((t) => t !== "lookup"),
+          {}
+        );
+        if (!coerced) return null;
+        const value = coerced.value;
+        if (!isValidArbitraryValue(value)) return null;
+        if (negative) {
+          if (!u.negative) return null;
+          const neg = negateValue(value);
+          if (neg === null) return null;
+          return make(build(neg, { modifier: null, key: arb }), 1e6, types, true);
+        }
+        const modValue = mod === null ? null : this.resolveModifier(u, mod);
+        if (mod !== null && modValue === null) return null;
+        if (u.modifier === "color" && modValue !== null) {
+          const withAlpha = withAlphaValue(value, modValue, "");
+          if (withAlpha === "") return null;
+          return make(build(withAlpha, { modifier: modValue, key: arb }), 1e6, types, true);
+        }
+        const decls = build(value, { modifier: modValue, key: arb });
+        const animations = u.plugin === "animation" && decls ? animationNames(decls.animation) : void 0;
+        return make(decls, 1e6, types, true, animations);
+      }
+      /** `/50` → `0.5` (opacity scale), `/[.3]` → `.3`; fontSize modifier → lineHeight */
+      resolveModifier(u, mod) {
+        if (mod.startsWith("[") && mod.endsWith("]")) return normalizeValue(mod.slice(1, -1)) || null;
+        if (u.modifier === "lineHeight") {
+          const lh = this.theme.lineHeight[mod];
+          return lh === void 0 ? null : String(lh);
+        }
+        if (u.modifier === "any") return mod;
+        if (u.modifier && typeof u.modifier === "object") {
+          const v = u.modifier[mod];
+          return v === void 0 ? null : String(v);
+        }
+        const op = this.theme.opacity[mod];
+        return op === void 0 ? null : String(op);
+      }
+      /** Replace `theme(path)` / `theme(path/alpha)` inside an arbitrary value. */
+      resolveThemeFn(value) {
+        if (!value.includes("theme(")) return value;
+        return value.replace(/theme\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g, (whole, inner) => {
+          const path = inner.trim().replace(/^['"]|['"]$/g, "");
+          const resolved = this.options.themeFn ? this.options.themeFn(path) : this.lookupTheme(path);
+          return resolved === void 0 ? whole : resolved;
+        });
+      }
+      /** Resolve `colors.red.500`, `spacing[2.5]`, `colors.red.500/50%` against the theme. */
+      lookupTheme(path) {
+        let alpha;
+        const slash = path.lastIndexOf("/");
+        if (slash !== -1 && !path.slice(slash).includes("]")) {
+          alpha = path.slice(slash + 1).trim();
+          path = path.slice(0, slash).trim();
+        }
+        const keys = splitPath(path);
+        let cur = this.theme;
+        for (const key of keys) {
+          if (cur === null || typeof cur !== "object") return void 0;
+          cur = cur[key];
+        }
+        if (cur === void 0) return void 0;
+        if (typeof cur === "function") cur = cur({});
+        if (Array.isArray(cur)) cur = keys[0] === "fontSize" ? cur[0] : cur.join(", ");
+        if (cur && typeof cur === "object") {
+          const d = cur.DEFAULT;
+          if (d === void 0) return void 0;
+          cur = d;
+        }
+        const str = String(cur);
+        return alpha !== void 0 ? withAlphaValue(str, alpha) : str;
+      }
+      /** `.container` rules (width + per-screen max-width up to `theme.container.maxScreen`). */
+      containerRules() {
+        const container = this.theme.container ?? {};
+        const plugin2 = this.pluginIndex.get("container") ?? 1;
+        const screens = container.screens ? Object.entries(container.screens).sort((a, b) => screenToPx(a[1]) - screenToPx(b[1])) : this.screens;
+        const minScreen = container.minScreen === void 0 ? DEFAULT_CONTAINER_MIN_SCREEN : container.minScreen;
+        const maxScreen = container.maxScreen === void 0 ? DEFAULT_CONTAINER_MAX_SCREEN : container.maxScreen;
+        const lower = minScreen === false || container.screens || this.theme.screens[minScreen] === void 0 ? 0 : screenToPx(this.theme.screens[minScreen]);
+        const limit = maxScreen === false || container.screens || this.theme.screens[maxScreen] === void 0 ? Infinity : screenToPx(this.theme.screens[maxScreen]);
+        const paddingFor = (screen) => {
+          const p = container.padding;
+          if (p === void 0) return {};
+          if (typeof p === "string")
+            return screen === "DEFAULT" ? { "padding-right": p, "padding-left": p } : {};
+          const v = p[screen];
+          return v === void 0 ? {} : { "padding-right": v, "padding-left": v };
+        };
+        const rules = [
+          {
+            decls: {
+              width: "100%",
+              ...container.center ? { "margin-right": "auto", "margin-left": "auto" } : {},
+              ...paddingFor("DEFAULT")
+            },
+            plugin: "container",
+            sort: { plugin: plugin2, utility: 0, value: 0 }
+          }
+        ];
+        if (!this.options.variantEnabled("responsive")) return rules;
+        let i = 1;
+        for (const [name, value] of screens) {
+          const px = screenToPx(value);
+          if (Number.isNaN(px) || px <= 0) continue;
+          if (px < lower || px > limit) continue;
+          rules.push({
+            decls: { "max-width": value, ...paddingFor(name) },
+            plugin: "container",
+            atrules: [minWidthCond(value)],
+            sort: { plugin: plugin2, utility: 0, value: i++ }
+          });
+        }
+        return rules;
+      }
+    };
+    MERGE_RE = /:merge\(((?:[^()]|\([^()]*\))*)\)/g;
+    PSEUDO_ELEMENT_PROPS = {
+      "::after": ["terminal", "jumpable"],
+      "::backdrop": ["terminal", "jumpable"],
+      "::before": ["terminal", "jumpable"],
+      "::cue": ["terminal"],
+      "::cue-region": ["terminal"],
+      "::first-letter": ["terminal", "jumpable"],
+      "::first-line": ["terminal", "jumpable"],
+      "::grammar-error": ["terminal"],
+      "::marker": ["terminal", "jumpable"],
+      "::part": ["terminal", "actionable"],
+      "::placeholder": ["terminal", "jumpable"],
+      "::selection": ["terminal", "jumpable"],
+      "::slotted": ["terminal"],
+      "::spelling-error": ["terminal"],
+      "::target-text": ["terminal"],
+      "::file-selector-button": ["terminal", "actionable"],
+      "::deep": ["actionable"],
+      "::v-deep": ["actionable"],
+      "::ng-deep": ["actionable"],
+      ":after": ["terminal", "jumpable"],
+      ":before": ["terminal", "jumpable"],
+      ":first-letter": ["terminal", "jumpable"],
+      ":first-line": ["terminal", "jumpable"]
+    };
+    DEFAULT_PSEUDO_PROPS = ["terminal", "actionable"];
+    NAKSHORA_STATIC = [
+      { p: "animation", c: "animation-paused", d: [["animation-play-state", "paused"]] },
+      { p: "animation", c: "animation-running", d: [["animation-play-state", "running"]] },
+      { p: "whitespace", c: "break-spaces", d: [["white-space", "break-spaces"]] },
+      { p: "fontStretch", c: "font-stretch-normal", d: [["font-stretch", "normal"]] },
+      { p: "fontStretch", c: "font-stretch-ultra-condensed", d: [["font-stretch", "ultra-condensed"]] },
+      { p: "fontStretch", c: "font-stretch-extra-condensed", d: [["font-stretch", "extra-condensed"]] },
+      { p: "fontStretch", c: "font-stretch-condensed", d: [["font-stretch", "condensed"]] },
+      { p: "fontStretch", c: "font-stretch-semi-condensed", d: [["font-stretch", "semi-condensed"]] },
+      { p: "fontStretch", c: "font-stretch-semi-expanded", d: [["font-stretch", "semi-expanded"]] },
+      { p: "fontStretch", c: "font-stretch-expanded", d: [["font-stretch", "expanded"]] },
+      { p: "fontStretch", c: "font-stretch-extra-expanded", d: [["font-stretch", "extra-expanded"]] },
+      { p: "fontStretch", c: "font-stretch-ultra-expanded", d: [["font-stretch", "ultra-expanded"]] },
+      { p: "fieldSizing", c: "field-sizing-content", d: [["field-sizing", "content"]] },
+      { p: "fieldSizing", c: "field-sizing-fixed", d: [["field-sizing", "fixed"]] },
+      { p: "colorScheme", c: "scheme-normal", d: [["color-scheme", "normal"]] },
+      { p: "colorScheme", c: "scheme-dark", d: [["color-scheme", "dark"]] },
+      { p: "colorScheme", c: "scheme-light", d: [["color-scheme", "light"]] },
+      { p: "colorScheme", c: "scheme-light-dark", d: [["color-scheme", "light dark"]] },
+      { p: "colorScheme", c: "scheme-only-dark", d: [["color-scheme", "only dark"]] },
+      { p: "colorScheme", c: "scheme-only-light", d: [["color-scheme", "only light"]] }
+    ];
+    GROUP_CATEGORIES = {
+      layout: "Layout",
+      display: "Display",
+      position: "Position",
+      inset: "Inset (Offset)",
+      zIndex: "Stacking (Z-Index)",
+      overflow: "Overflow",
+      visibility: "Visibility",
+      sizing: "Sizing",
+      margin: "Margin",
+      padding: "Padding",
+      gap: "Gap",
+      flex: "Flexbox",
+      grid: "Grid",
+      typography: "Typography",
+      textDecoration: "Text Decoration",
+      textColor: "Text Colors",
+      backgroundColor: "Background Colors",
+      borderColor: "Border Colors",
+      gradients: "Gradient Stops",
+      borders: "Borders",
+      borderRadius: "Border Radius",
+      backgrounds: "Backgrounds",
+      shadows: "Shadows",
+      opacity: "Opacity",
+      filters: "Filters",
+      transforms: "Transforms",
+      transitions: "Transitions",
+      animations: "Animations",
+      cursors: "Cursors",
+      interactivity: "Interactivity",
+      svg: "SVG",
+      tables: "Tables",
+      accessibility: "Accessibility",
+      effects: "Effects",
+      whitespace: "Whitespace & Misc",
+      components: "Components",
+      plugin: "Plugins"
+    };
+    PLUGIN_CATEGORY = {
+      container: "layout",
+      accessibility: "accessibility",
+      pointerEvents: "interactivity",
+      visibility: "visibility",
+      position: "position",
+      inset: "inset",
+      isolation: "layout",
+      zIndex: "zIndex",
+      order: "flex",
+      gridColumn: "grid",
+      gridColumnStart: "grid",
+      gridColumnEnd: "grid",
+      gridRow: "grid",
+      gridRowStart: "grid",
+      gridRowEnd: "grid",
+      float: "layout",
+      clear: "layout",
+      margin: "margin",
+      boxSizing: "layout",
+      lineClamp: "typography",
+      display: "display",
+      aspectRatio: "sizing",
+      size: "sizing",
+      height: "sizing",
+      maxHeight: "sizing",
+      minHeight: "sizing",
+      width: "sizing",
+      minWidth: "sizing",
+      maxWidth: "sizing",
+      flex: "flex",
+      flexShrink: "flex",
+      flexGrow: "flex",
+      flexBasis: "flex",
+      tableLayout: "tables",
+      captionSide: "tables",
+      borderCollapse: "tables",
+      borderSpacing: "tables",
+      transformOrigin: "transforms",
+      translate: "transforms",
+      rotate: "transforms",
+      skew: "transforms",
+      scale: "transforms",
+      transform: "transforms",
+      animation: "animations",
+      cursor: "cursors",
+      touchAction: "interactivity",
+      userSelect: "interactivity",
+      resize: "interactivity",
+      scrollSnapType: "interactivity",
+      scrollSnapAlign: "interactivity",
+      scrollSnapStop: "interactivity",
+      scrollMargin: "interactivity",
+      scrollPadding: "interactivity",
+      listStylePosition: "typography",
+      listStyleType: "typography",
+      listStyleImage: "typography",
+      appearance: "interactivity",
+      columns: "layout",
+      breakBefore: "layout",
+      breakInside: "layout",
+      breakAfter: "layout",
+      gridAutoColumns: "grid",
+      gridAutoFlow: "grid",
+      gridAutoRows: "grid",
+      gridTemplateColumns: "grid",
+      gridTemplateRows: "grid",
+      flexDirection: "flex",
+      flexWrap: "flex",
+      placeContent: "flex",
+      placeItems: "flex",
+      alignContent: "flex",
+      alignItems: "flex",
+      justifyContent: "flex",
+      justifyItems: "flex",
+      gap: "gap",
+      space: "margin",
+      divideWidth: "borders",
+      divideStyle: "borders",
+      divideColor: "borderColor",
+      divideOpacity: "borderColor",
+      placeSelf: "flex",
+      alignSelf: "flex",
+      justifySelf: "flex",
+      overflow: "overflow",
+      overscrollBehavior: "overflow",
+      scrollBehavior: "interactivity",
+      textOverflow: "typography",
+      hyphens: "typography",
+      whitespace: "whitespace",
+      textWrap: "typography",
+      wordBreak: "typography",
+      borderRadius: "borderRadius",
+      borderWidth: "borders",
+      borderStyle: "borders",
+      borderColor: "borderColor",
+      borderOpacity: "borderColor",
+      backgroundColor: "backgroundColor",
+      backgroundOpacity: "backgroundColor",
+      backgroundImage: "backgrounds",
+      gradientColorStops: "gradients",
+      boxDecorationBreak: "backgrounds",
+      backgroundSize: "backgrounds",
+      backgroundAttachment: "backgrounds",
+      backgroundClip: "backgrounds",
+      backgroundPosition: "backgrounds",
+      backgroundRepeat: "backgrounds",
+      backgroundOrigin: "backgrounds",
+      fill: "svg",
+      stroke: "svg",
+      strokeWidth: "svg",
+      objectFit: "sizing",
+      objectPosition: "sizing",
+      padding: "padding",
+      textAlign: "typography",
+      textIndent: "typography",
+      verticalAlign: "typography",
+      fontFamily: "typography",
+      fontSize: "typography",
+      fontWeight: "typography",
+      textTransform: "typography",
+      fontStyle: "typography",
+      fontVariantNumeric: "typography",
+      lineHeight: "typography",
+      letterSpacing: "typography",
+      textColor: "textColor",
+      textOpacity: "textColor",
+      textDecoration: "textDecoration",
+      textDecorationColor: "textDecoration",
+      textDecorationStyle: "textDecoration",
+      textDecorationThickness: "textDecoration",
+      textUnderlineOffset: "textDecoration",
+      fontSmoothing: "typography",
+      placeholderColor: "textColor",
+      placeholderOpacity: "textColor",
+      caretColor: "interactivity",
+      accentColor: "interactivity",
+      opacity: "opacity",
+      backgroundBlendMode: "effects",
+      mixBlendMode: "effects",
+      boxShadow: "shadows",
+      boxShadowColor: "shadows",
+      outlineStyle: "borders",
+      outlineWidth: "borders",
+      outlineOffset: "borders",
+      outlineColor: "borderColor",
+      ringWidth: "borders",
+      ringColor: "borderColor",
+      ringOpacity: "borderColor",
+      ringOffsetWidth: "borders",
+      ringOffsetColor: "borderColor",
+      blur: "filters",
+      brightness: "filters",
+      contrast: "filters",
+      dropShadow: "filters",
+      grayscale: "filters",
+      hueRotate: "filters",
+      invert: "filters",
+      saturate: "filters",
+      sepia: "filters",
+      filter: "filters",
+      backdropBlur: "filters",
+      backdropBrightness: "filters",
+      backdropContrast: "filters",
+      backdropGrayscale: "filters",
+      backdropHueRotate: "filters",
+      backdropInvert: "filters",
+      backdropOpacity: "filters",
+      backdropSaturate: "filters",
+      backdropSepia: "filters",
+      backdropFilter: "filters",
+      transitionProperty: "transitions",
+      transitionDelay: "transitions",
+      transitionDuration: "transitions",
+      transitionTimingFunction: "transitions",
+      willChange: "interactivity",
+      contain: "layout",
+      content: "typography",
+      containerQueries: "layout",
+      forcedColorAdjust: "accessibility",
+      fontStretch: "typography",
+      fieldSizing: "interactivity",
+      colorScheme: "interactivity",
+      arbitraryProperties: "plugin",
+      components: "components",
+      "plugin-components": "components"
+    };
+    PLUGIN_COMPONENTS_GROUP = "plugin-components";
+    plugin.withOptions = function withOptions(pluginFunction, configFunction = () => ({})) {
+      const optionsFunction = (options) => ({
+        handler: pluginFunction(options),
+        config: configFunction(options)
+      });
+      optionsFunction.__isOptionsFunction = true;
+      return optionsFunction;
+    };
+    ApplyError = class extends Error {
+      constructor(message, candidate) {
+        super(message);
+        this.candidate = candidate;
+        this.name = "ApplyError";
+      }
+      candidate;
+    };
+    siblingSeq = 0;
+    version = "3.0.0";
+    STATE_VARIANTS = [
+      {
+        prefix: "hover",
+        suffix: ":hover",
+        ancestor: "",
+        configKey: "hover",
+        description: "applies on hover"
+      },
+      {
+        prefix: "focus",
+        suffix: ":focus",
+        ancestor: "",
+        configKey: "focus",
+        description: "applies on focus"
+      },
+      {
+        prefix: "focus-visible",
+        suffix: ":focus-visible",
+        ancestor: "",
+        configKey: "focusVisible",
+        description: "keyboard focus"
+      },
+      {
+        prefix: "focus-within",
+        suffix: ":focus-within",
+        ancestor: "",
+        configKey: "focusWithin",
+        description: "a descendant has focus"
+      },
+      {
+        prefix: "active",
+        suffix: ":active",
+        ancestor: "",
+        configKey: "active",
+        description: "while pressed"
+      },
+      {
+        prefix: "visited",
+        suffix: ":visited",
+        ancestor: "",
+        configKey: "visited",
+        description: "visited links"
+      },
+      {
+        prefix: "disabled",
+        suffix: ":disabled",
+        ancestor: "",
+        configKey: "disabled",
+        description: "disabled controls"
+      },
+      {
+        prefix: "first",
+        suffix: ":first-child",
+        ancestor: "",
+        configKey: "firstChild",
+        description: "first child"
+      },
+      {
+        prefix: "last",
+        suffix: ":last-child",
+        ancestor: "",
+        configKey: "lastChild",
+        description: "last child"
+      },
+      {
+        prefix: "group-hover",
+        suffix: "",
+        ancestor: ".group:hover",
+        configKey: "groupHover",
+        description: "parent .group hovered"
+      },
+      {
+        prefix: "group-focus",
+        suffix: "",
+        ancestor: ".group:focus",
+        configKey: "groupFocus",
+        description: "parent .group focused"
+      },
+      {
+        prefix: "peer-hover",
+        suffix: "",
+        ancestor: ".peer:hover ~",
+        configKey: "peerHover",
+        description: "preceding .peer hovered"
+      },
+      {
+        prefix: "peer-focus",
+        suffix: "",
+        ancestor: ".peer:focus ~",
+        configKey: "peerFocus",
+        description: "preceding .peer focused"
+      },
+      {
+        prefix: "dark",
+        suffix: "",
+        ancestor: ":is(.dark *)",
+        configKey: "dark",
+        description: "dark mode"
+      }
+    ];
+    VERSION = version;
+    CORE_SCREENS = ["sm", "md", "lg", "xl", "2xl"];
+    CSSGenerator = class {
+      config;
+      /** the fully resolved theme (Tailwind-shaped scales) */
+      theme;
+      engine;
+      variantCfg;
+      breakpoints;
+      catalog = null;
+      catalogByClass = null;
+      pluginBase;
+      pluginRawCss;
+      corePluginsEnabled;
+      constructor(config = {}) {
+        let draft = {};
+        for (const preset of config.presets ?? []) draft = mergePreset(draft, preset);
+        draft = mergePreset(draft, config);
+        const plugins = (draft.plugins ?? []).map((p) => normalizePlugin(p));
+        const pluginThemes = [];
+        for (const p of plugins) {
+          if (p.legacyConfig) p.legacyConfig(draft);
+          if (p.config) {
+            const { theme, ...rest } = p.config;
+            if (theme) pluginThemes.push(theme);
+            for (const [k, v] of Object.entries(rest))
+              if (draft[k] === void 0)
+                draft[k] = v;
+          }
+        }
+        const corePlugins = draft.corePlugins ?? {};
+        this.corePluginsEnabled = Array.isArray(corePlugins) ? (name) => corePlugins.includes(name) || ["base", "variables", "components", "animations"].includes(name) : (name) => corePlugins[name] !== false;
+        this.config = {
+          ...draft,
+          theme: draft.theme ?? {},
+          variants: { ...defaultVariants, ...draft.variants },
+          darkMode: draft.darkMode ?? "class",
+          content: draft.content,
+          purge: draft.purge ?? [],
+          safelist: draft.safelist ?? [],
+          blocklist: draft.blocklist ?? [],
+          plugins: draft.plugins ?? [],
+          important: draft.important ?? false,
+          corePlugins,
+          prefix: draft.prefix ?? "",
+          extractorPattern: draft.extractorPattern,
+          layers: draft.layers ?? false,
+          preflight: draft.preflight ?? true
+        };
+        this.variantCfg = this.config.variants;
+        this.theme = resolveTheme(this.config.theme, { pluginTheme: pluginThemes });
+        this.breakpoints = Object.entries(this.theme.screens).map(([name, value]) => ({ name, value, px: screenPx(value) })).filter((b) => !Number.isNaN(b.px) && b.px > 0).sort((a, b) => a.px - b.px);
+        const collector = {
+          statics: [],
+          functional: [],
+          variants: [],
+          base: [],
+          rawCss: []
+        };
+        const themeFn = (path, fallback) => {
+          if (path === void 0) return this.theme;
+          const v = lookup(this.theme, path);
+          return v === void 0 ? fallback : v;
+        };
+        for (const p of plugins) {
+          if (!p.handler) continue;
+          const api = createPluginAPI(collector, {
+            theme: this.theme,
+            themeFn,
+            configFn: (path, fallback) => {
+              if (path === void 0) return { ...this.config, theme: this.theme };
+              if (path === "prefix") return this.config.prefix;
+              if (path === "separator") return ":";
+              if (path === "darkMode") return this.config.darkMode;
+              const v = lookup({ ...this.config, theme: this.theme }, path);
+              return v === void 0 ? fallback : v;
+            },
+            corePluginEnabled: this.corePluginsEnabled,
+            prefix: this.config.prefix ?? "",
+            pluginName: "plugin"
+          });
+          p.handler(api);
+        }
+        this.pluginBase = collector.base;
+        this.pluginRawCss = collector.rawCss;
+        this.engine = new Engine({
+          theme: this.theme,
+          darkMode: this.variantCfg.dark === false ? false : this.config.darkMode ?? "class",
+          pluginEnabled: this.corePluginsEnabled,
+          variantEnabled: (key) => this.isVariantEnabled(key),
+          important: this.config.important ?? false,
+          extraStatic: collector.statics,
+          extraFunctional: collector.functional,
+          extraVariants: collector.variants,
+          combineMedia: this.config.combineMedia !== false
+        });
+      }
+      // ───────────────────────────────────────────── API ─────────────────────────────────────────────
+      /**
+       * Generate the stylesheet.
+       *
+       * - `full` mode (default): base styles, CSS variables, keyframes, every
+       *   utility + its responsive variants, and the component set.
+       * - `jit` mode: only the utilities found in `options.content`
+       *   (state variants and variant combinations included).
+       */
+      generate(options = {}) {
+        const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
+        if (mode === "jit")
+          return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
+        const css = this.generateFull(options);
+        return options.minify ? minifyCss(css) : css;
+      }
+      /** Generate JIT CSS from explicit content */
+      generateFromContent(content, options = {}) {
+        return this.generateJIT(content, options);
+      }
+      /** All utility rules in catalog order (value-bearing classes, no variants) */
+      getUtilities() {
+        return [...this.buildCatalog()];
+      }
+      /** Look up a single utility by (base) class name */
+      getUtility(className) {
+        this.buildCatalog();
+        const hit = this.catalogByClass.get(className);
+        if (hit) return hit;
+        const rules = this.engine.compile(className);
+        if (rules.length === 0) return void 0;
+        return {
+          class: className,
+          group: rules[0].plugin,
+          category: categoryForPlugin(rules[0].plugin),
+          decls: Object.assign({}, ...rules.map((r) => r.decls)),
+          description: `${className} (computed)`
+        };
+      }
+      /** Every variant name the engine knows (static + functional prefixes) */
+      getVariantNames() {
+        return this.engine.getVariants().map((v) => v.name);
+      }
+      /** Variant definitions (docs / IntelliSense) */
+      getVariantDefinitions() {
+        return this.engine.getVariants();
+      }
+      /** Resolved breakpoints, ascending */
+      getBreakpoints() {
+        return this.variantCfg.responsive !== false ? [...this.breakpoints] : [];
+      }
+      /** Compile a single candidate to CSS (empty string when unknown) */
+      compileClass(candidate) {
+        return this.serializeRules(this.engine.compile(candidate));
+      }
+      /** Statistics about a generated stylesheet */
+      /**
+       * Statistics for a stylesheet (default: the full build). Computed on the
+       * parsed CSS, not with regexes: a "rule" is a style rule with a selector,
+       * "responsive" means it sits inside a `@media`/`@container` at-rule,
+       * "variant" means at least one selector in the list carries a variant
+       * prefix (an escaped `\:` in the class part), and keyframe steps
+       * (`from`, `to`, `50%`) are excluded from all three.
+       */
+      getStats(css) {
+        const generated = css ?? this.generate();
+        const minified = minifyCss(generated);
+        let totalRules = 0;
+        let responsiveRules = 0;
+        let variantRules = 0;
+        for (const { rule, ancestors } of walkRules(parseCss(generated).nodes)) {
+          if (ancestors.some((a) => a.name === "keyframes")) continue;
+          totalRules++;
+          if (ancestors.some((a) => a.name === "media" || a.name === "container")) responsiveRules++;
+          if (splitSelectorList(rule.selector).some((sel) => /\\:/.test(sel))) variantRules++;
+        }
+        return {
+          utilities: this.buildCatalog().length,
+          responsiveRules,
+          variantRules,
+          totalRules,
+          sizeBytes: byteLength(generated),
+          minifiedSizeBytes: byteLength(minified)
+        };
+      }
+      minify(css) {
+        return minifyCss(css);
+      }
+      /** Expand `@apply`, `theme()`, `screen()` and `@screen` in author CSS */
+      processCss(css, options = {}) {
+        return processAuthorCss(css, this.engine, options);
+      }
+      /** Resolve a theme path (`colors.blue.500`, `spacing[2.5]`) */
+      themeValue(path) {
+        return this.engine.lookupTheme(path);
+      }
+      // ───────────────────────────── layer accessors ─────────────────────────────
+      /** Base styles (reset, `--tw-*` defaults, plugin base) */
+      getBase() {
+        return this.baseStyles();
+      }
+      /** `:root` CSS variables */
+      getVariables() {
+        return this.variables();
+      }
+      /** `@keyframes` for the referenced animations (all when `names` is omitted) */
+      getKeyframes(names) {
+        return this.keyframes(names);
+      }
+      /**
+       * Full utility set.
+       * @param includeVariants when true (default) the classic state variants
+       *   (`STATE_VARIANTS`) are included — the standard full build omits them.
+       */
+      getUtilitiesFull(includeVariants = true, options = {}) {
+        const catalog = this.buildCatalog();
+        const prefix = this.config.prefix ?? "";
+        const base = [];
+        for (const r of catalog) {
+          const cls = r.class.slice(prefix.length);
+          for (const c of this.engine.compile(cls))
+            base.push(prefix ? this.reprefix(c, cls, r.class) : c);
+        }
+        let css = this.serializeRules(base);
+        for (const bp of this.fullBuildScreens(options.screens)) {
+          const wrapped = [];
+          const vm = this.engine.resolveVariant(bp.name);
+          if (!vm) continue;
+          const at = vm.branches[0]?.atrules?.[0];
+          if (!at) continue;
+          for (const rule of base) {
+            const from = `.${escapeClass(rule.candidate)}`;
+            const to = `.${escapeClass(`${bp.name}:${rule.candidate}`)}`;
+            wrapped.push({
+              ...rule,
+              selector: rule.selector.split(from).join(to),
+              atrules: [at, ...rule.atrules],
+              sort: {
+                ...rule.sort,
+                variant: 1,
+                variants: [vm.sort],
+                hooks: vm.fn ? [{ ...vm.fn, bit: vm.sort }] : void 0
+              }
+            });
+          }
+          css += this.serializeRules(wrapped);
+        }
+        if (includeVariants) {
+          const candidates = [];
+          for (const v of STATE_VARIANTS) {
+            if (!this.isVariantEnabled(v.configKey)) continue;
+            for (const r of catalog) candidates.push(`${v.prefix}:${r.class}`);
+          }
+          css += this.compileCandidates(candidates).css;
+        }
+        return css;
+      }
+      /**
+       * Screens that get responsive variants in the *full* build. Default
+       * (`'core'`): the classic `sm`–`2xl` set, so the extended 10-step scale
+       * does not multiply the CDN bundle (every screen is always available in
+       * JIT mode). `'all'` or an explicit list opt in.
+       */
+      fullBuildScreens(screens = "core") {
+        const all = this.getBreakpoints();
+        if (screens === "all") return all;
+        const wanted = new Set(screens === "core" ? CORE_SCREENS : screens);
+        const picked = all.filter((b) => wanted.has(b.name));
+        return screens === "core" && picked.length === 0 ? all : picked;
+      }
+      reprefix(rule, from, to) {
+        return {
+          ...rule,
+          selector: rule.selector.split(`.${escapeClass(from)}`).join(`.${escapeClass(to)}`)
+        };
+      }
+      /** Design-paradigm component CSS */
+      getComponents() {
+        return this.components();
+      }
+      // ─────────────────────────────────────────── internals ───────────────────────────────────────────
+      hasContent() {
+        if (this.config.content !== void 0) {
+          const c = this.config.content;
+          return c !== "" && !(Array.isArray(c) && c.length === 0);
+        }
+        return false;
+      }
+      getContentFromConfig() {
+        const content = this.config.content ?? this.config.purge;
+        if (typeof content === "string") return [content];
+        return Array.isArray(content) ? content : [];
+      }
+      isVariantEnabled(key) {
+        const cfg = this.variantCfg;
+        if (cfg[key] === false) return false;
+        for (const [legacy, name] of Object.entries(LEGACY_VARIANT_KEYS)) {
+          if (name === key && cfg[legacy] === false) return false;
+        }
+        const camel = key.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
+        if (camel !== key && cfg[camel] === false) return false;
+        return true;
+      }
+      buildCatalog() {
+        if (this.catalog) return this.catalog;
+        const prefix = this.config.prefix ?? "";
+        const entries = this.engine.buildCatalog();
+        this.catalog = entries.map((e) => ({
+          class: prefix + e.class,
+          group: e.plugin,
+          category: categoryForPlugin(e.plugin),
+          decls: e.decls,
+          description: e.description
+        }));
+        this.catalogByClass = new Map(this.catalog.map((r) => [r.class, r]));
+        return this.catalog;
+      }
+      /** Compile candidates → ordered CSS text plus bookkeeping */
+      compileCandidates(candidates) {
+        const prefix = this.config.prefix ?? "";
+        const block = new Set(this.config.blocklist ?? []);
+        const rules = [];
+        const emitted = /* @__PURE__ */ new Set();
+        const animations = /* @__PURE__ */ new Set();
+        const defaults = /* @__PURE__ */ new Set();
+        const seenRules = /* @__PURE__ */ new Set();
+        const ordered = [...new Set(candidates)].sort((x, y) => x < y ? -1 : x > y ? 1 : 0);
+        for (const raw of ordered) {
+          if (emitted.has(raw) || block.has(raw)) continue;
+          let candidate = raw;
+          if (prefix) {
+            const idx = raw.lastIndexOf(":");
+            const base = raw.slice(idx + 1);
+            const neg = base.startsWith("-") ? "-" : "";
+            const bang = base.startsWith("!") ? "!" : "";
+            const core = base.slice(neg.length + bang.length);
+            if (!core.startsWith(prefix)) continue;
+            candidate = raw.slice(0, idx + 1) + neg + bang + core.slice(prefix.length);
+          }
+          const compiled = this.engine.compile(candidate);
+          if (compiled.length === 0) continue;
+          emitted.add(raw);
+          for (const r of compiled) {
+            const rule = prefix ? {
+              ...r,
+              selector: r.selector.split(`.${escapeClass(candidate)}`).join(`.${escapeClass(raw)}`)
+            } : r;
+            const identity = `${rule.selector}\0${rule.atrules.map((a) => `${a.kind} ${a.params}`).join("|")}\0${JSON.stringify(rule.decls)}`;
+            if (seenRules.has(identity)) continue;
+            seenRules.add(identity);
+            rules.push(rule);
+            if (r.defaults) defaults.add(r.defaults);
+            for (const a of r.animations ?? []) animations.add(a);
+          }
+        }
+        return { css: this.serializeRules(rules), emitted, animations, defaults };
+      }
+      /** Sort rules (variant weight → plugin → utility → value) and serialise with grouped at-rules. */
+      serializeRules(rules) {
+        const sorted = [...rules].sort(compareRules);
+        let out = "";
+        let openKey = "";
+        let openDepth = 0;
+        const closeAll = () => {
+          while (openDepth > 0) {
+            openDepth--;
+            out += `${"  ".repeat(openDepth)}}
+`;
+          }
+          openKey = "";
+        };
+        for (const rule of sorted) {
+          const key = rule.atrules.map(atRuleText).join("\0");
+          if (key !== openKey) {
+            closeAll();
+            for (const at of rule.atrules) {
+              out += `${"  ".repeat(openDepth)}${atRuleText(at)} {
+`;
+              openDepth++;
+            }
+            openKey = key;
+          }
+          out += `${"  ".repeat(openDepth)}${rule.selector} { ${stringifyDecls(rule.decls)}; }
+`;
+        }
+        closeAll();
+        return out;
+      }
+      // ─────────────────────────────── layers ───────────────────────────────
+      baseStyles() {
+        if (!this.corePluginsEnabled("base")) return "";
+        let css = "";
+        if (this.config.preflight !== false && this.corePluginsEnabled("preflight"))
+          css += preflight(this.theme);
+        css += this.twDefaults();
+        if (this.pluginBase.length) css += serializeCss(this.pluginBase);
+        return css;
+      }
+      /** `*, ::before, ::after { --tw-… }` defaults required by composed utilities */
+      twDefaults(groups) {
+        const wanted = groups ?? new Set(Object.keys(DEFAULTS_GROUPS));
+        const decls = {};
+        for (const g of Object.keys(DEFAULTS_GROUPS)) {
+          if (!wanted.has(g)) continue;
+          Object.assign(decls, DEFAULTS_GROUPS[g]);
+        }
+        if (Object.keys(decls).length === 0) return "";
+        const body = Object.entries(decls).map(([k, v]) => `  ${k}: ${v};`).join("\n");
+        return `
+*, ::before, ::after {
+${body}
+}
+
+::backdrop {
+${body}
+}
+`;
+      }
+      variables() {
+        if (!this.corePluginsEnabled("variables")) return "";
+        let css = "\n/* Nakshora v3 \u2014 CSS Variables */\n:root {\n";
+        for (const [name, scale] of Object.entries(this.theme.colors ?? {})) {
+          if (typeof scale === "string") css += `  --color-${name}: ${scale};
+`;
+          else if (scale && typeof scale === "object") {
+            for (const [shade, value] of Object.entries(scale)) {
+              if (typeof value === "string")
+                css += `  --color-${name}${shade === "DEFAULT" ? "" : `-${shade}`}: ${value};
+`;
+            }
+          }
+        }
+        for (const [key, value] of Object.entries(this.theme.spacing ?? {}))
+          css += `  --spacing-${cssIdent(key)}: ${value};
+`;
+        for (const [size, value] of Object.entries(this.theme.fontSize ?? {}))
+          css += `  --text-${size}: ${Array.isArray(value) ? value[0] : String(value)};
+`;
+        for (const [name, value] of Object.entries(this.theme.fontFamily ?? {}))
+          css += `  --font-${name}: ${Array.isArray(value) ? value.join(", ") : String(value)};
+`;
+        for (const [name, value] of Object.entries(this.theme.screens ?? {}))
+          css += `  --breakpoint-${name}: ${value};
+`;
+        css += "}\n";
+        return css;
+      }
+      keyframes(names) {
+        if (!this.corePluginsEnabled("animations") && !this.corePluginsEnabled("animation")) return "";
+        const keyframes = this.theme.keyframes ?? {};
+        const animations = this.theme.animation ?? {};
+        const needed = names ?? new Set(Object.values(animations).map((v) => String(v).split(/\s+/)[0]));
+        let css = "";
+        for (const [name, body] of Object.entries(keyframes)) {
+          if (!needed.has(name)) continue;
+          css += `@keyframes ${name} {
+`;
+          for (const [step, decls] of Object.entries(body)) {
+            css += `  ${step} { ${Object.entries(decls).map(([k, v]) => `${kebabCase(k)}: ${v};`).join(" ")} }
+`;
+          }
+          css += "}\n";
+        }
+        return css ? `
+/* Nakshora v3 \u2014 Keyframes */
+${css}` : "";
+      }
+      components() {
+        if (!this.corePluginsEnabled("components")) return "";
+        let css = "\n/* Nakshora v3 \u2014 Components */\n";
+        for (const block of Object.values(componentCss)) css += block;
+        if (this.pluginRawCss.length) css += `${this.pluginRawCss.join("\n")}
+`;
+        return css;
+      }
+      wrapLayer(name, css) {
+        if (!css.trim()) return "";
+        if (!this.config.layers) return css;
+        return `@layer ${name} {
+${css}}
+`;
+      }
+      // ─────────────────────────────── full mode ───────────────────────────────
+      generateFull(options) {
+        let css = `/*! Nakshora v${VERSION} \u2014 utility-first CSS framework (full build) */
+`;
+        if (this.config.layers) css += "@layer base, components, utilities;\n";
+        css += this.wrapLayer("base", this.baseStyles() + this.variables() + this.keyframes());
+        css += this.wrapLayer("components", this.components());
+        css += "\n/* \u2500\u2500\u2500 Utilities \u2500\u2500\u2500 */\n";
+        css += this.wrapLayer("utilities", this.getUtilitiesFull(false, { screens: options.screens }));
+        return css;
+      }
+      // ─────────────────────────────── JIT mode ───────────────────────────────
+      /**
+       * Compile a JIT build from content.
+       * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
+       */
+      generateJIT(content, options = {}, internal) {
+        const css = this.generateJITPretty(content, options, internal);
+        return options.minify ? minifyCss(css) : css;
+      }
+      /**
+       * JIT build from an already-extracted candidate set (see `ContentCache`):
+       * skips the extractor entirely, otherwise identical to `generateJIT`.
+       */
+      generateJITFromCandidates(candidates, options = {}, internal) {
+        const css = this.generateJITPretty(void 0, options, internal, new Set(candidates));
+        return options.minify ? minifyCss(css) : css;
+      }
+      generateJITPretty(content, _options, internal, candidates) {
+        const utilitiesOnly = internal?.utilitiesOnly ?? false;
+        const chunks = typeof content === "string" ? [content] : content ?? [];
+        const found = candidates ?? extractClasses(chunks, this.config.extractorPattern);
+        for (const safe of this.config.safelist ?? []) found.add(safe);
+        const { css: utilities, emitted, animations, defaults } = this.compileCandidates(found);
+        let css = "";
+        if (!utilitiesOnly) {
+          css += `/*! Nakshora v${VERSION} \u2014 JIT build \xB7 ${emitted.size} classes */
+`;
+          if (this.config.layers) css += "@layer base, components, utilities;\n";
+          let base = "";
+          if (this.corePluginsEnabled("base")) {
+            if (this.config.preflight !== false && this.corePluginsEnabled("preflight"))
+              base += preflight(this.theme);
+            base += this.twDefaults(defaults);
+            if (this.pluginBase.length) base += serializeCss(this.pluginBase);
+          }
+          css += this.wrapLayer("base", base + this.variables() + this.keyframes(animations));
+          css += this.wrapLayer("components", this.componentsFor(found));
+        }
+        css += "\n/* \u2500\u2500\u2500 Utilities (JIT) \u2500\u2500\u2500 */\n";
+        css += this.wrapLayer("utilities", utilities);
+        return css;
+      }
+      /** Components layer — only the built-in blocks whose classes appear in `candidates`. */
+      componentsFor(candidates) {
+        if (!this.corePluginsEnabled("components")) return "";
+        const used = /* @__PURE__ */ new Set();
+        for (const c of candidates) {
+          const base = c.slice(c.lastIndexOf(":") + 1);
+          used.add(base);
+        }
+        let css = "";
+        for (const block of Object.values(componentCss)) {
+          const classes = [...block.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((m) => m[1]);
+          if (classes.some((c) => used.has(c))) css += block;
+        }
+        if (this.pluginRawCss.length) css += `${this.pluginRawCss.join("\n")}
+`;
+        return css ? `
+/* Nakshora v3 \u2014 Components */
+${css}` : "";
+      }
+    };
+    ContentCache = class {
+      constructor(pattern2) {
+        this.pattern = pattern2;
+      }
+      pattern;
+      entries = /* @__PURE__ */ new Map();
+      hits = 0;
+      misses = 0;
+      /**
+       * Candidates for one source. `key` identifies the source (file path or
+       * `raw:<n>`), `stamp` its version (`${mtimeMs}:${size}` for files, a hash
+       * for strings). `read` is only called on a miss.
+       */
+      candidatesFor(key, stamp, read) {
+        const hit = this.entries.get(key);
+        if (hit && hit.stamp === stamp) {
+          this.hits++;
+          return hit.candidates;
+        }
+        this.misses++;
+        const candidates = extractCandidates([read()], { pattern: this.pattern });
+        this.entries.set(key, { stamp, candidates });
+        return candidates;
+      }
+      /** Raw content chunk (no path): stamped by hash. */
+      candidatesForText(text, key) {
+        const stamp = contentHash(text);
+        return this.candidatesFor(key ?? `raw:${stamp}`, stamp, () => text);
+      }
+      /** Drop sources that no longer exist (call after a glob pass with the live key set). */
+      retain(keys) {
+        const keep = new Set(keys);
+        for (const k of this.entries.keys())
+          if (!keep.has(k) && !k.startsWith("raw:")) this.entries.delete(k);
+      }
+      /** Union of several candidate sets, in a deterministic (sorted) order. */
+      static union(sets) {
+        const all = /* @__PURE__ */ new Set();
+        for (const s of sets) for (const c of s) all.add(c);
+        return new Set([...all].sort());
+      }
+      stats() {
+        return { hits: this.hits, misses: this.misses, entries: this.entries.size };
+      }
+      clear() {
+        this.entries.clear();
+        this.hits = 0;
+        this.misses = 0;
+      }
+    };
+    metadata = {
+      name: "nakshora",
+      version,
+      description: "The modern, ultra-fast, utility-first CSS framework with a JIT compiler",
+      author: "Rizwan Rahim Chowdhury",
+      maintainer: "RRC Development",
+      license: "MIT",
+      repository: "https://github.com/nakshora/nakshora",
+      homepage: "https://nakshora.dev",
+      documentation: "https://github.com/nakshora/nakshora/blob/main/docs"
+    };
+  }
+});
+
+// src/config-loader.ts
+import { existsSync as existsSync3, readFileSync as readFileSync3 } from "fs";
+import { dirname as dirname2, isAbsolute as isAbsolute2, join as join2, resolve as resolve3 } from "path";
+function findConfigFile(startDir = process.cwd()) {
+  let dir = resolve3(startDir);
+  for (let i = 0; i < 5; i++) {
+    for (const file of CONFIG_FILES) {
+      const candidate = join2(dir, file);
+      if (existsSync3(candidate)) return candidate;
+    }
+    const parent = dirname2(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return null;
+}
+async function loadConfigFile(file) {
+  const ext = file.slice(file.lastIndexOf("."));
+  if (ext === ".json") {
+    return JSON.parse(readFileSync3(file, "utf-8"));
+  }
+  try {
+    const mod = await import(file);
+    const cfg = mod.default ?? mod;
+    return cfg;
+  } catch (err) {
+    if (ext === ".ts" && err.message.includes("Unknown file extension")) {
+      throw new Error(
+        `TypeScript configs require Node >= 22.18 (native type stripping).
+You are on Node ${process.version}. Use a .js, .mjs or .json config instead,
+or upgrade Node (https://nodejs.org).`
+      );
+    }
+    throw err;
+  }
+}
+async function resolveConfig(explicitPath, startDir) {
+  const file = explicitPath ? isAbsolute2(explicitPath) ? explicitPath : resolve3(startDir ?? process.cwd(), explicitPath) : findConfigFile(startDir);
+  if (!file) return { config: {}, file: null };
+  if (!existsSync3(file)) {
+    throw new Error(`Config file not found: ${file}`);
+  }
+  const config = await loadConfigFile(file);
+  return { config, file };
+}
+var CONFIG_FILES;
+var init_config_loader = __esm({
+  "src/config-loader.ts"() {
+    "use strict";
+    CONFIG_FILES = [
+      "nakshora.config.ts",
+      "nakshora.config.js",
+      "nakshora.config.mjs",
+      "nakshora.config.cjs",
+      "nakshora.config.json"
+    ];
+  }
+});
+
+// src/language-service.ts
+function matchParen(text, open) {
+  let depth = 0;
+  let quote = null;
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i];
+    if (quote) {
+      if (ch === "\\") i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") quote = ch;
+    else if (ch === "(") depth++;
+    else if (ch === ")" && --depth === 0) return i;
+  }
+  return -1;
+}
+function componentRule(css, candidate) {
+  const base = candidate.slice(candidate.lastIndexOf(":") + 1).replace(/^!/, "");
+  const re = new RegExp(`\\.${escapeRe(base)}(?![\\w-])`);
+  const out = [];
+  for (const { rule, ancestors } of walkRules(parseCss(css).nodes))
+    if (re.test(rule.selector) && ancestors.every((a) => a.name !== "keyframes")) out.push(rule);
+  return serializeCss(out).trimEnd();
+}
+function extractColor(value) {
+  const cleaned = value.replace(/\/\s*var\([^)]*\)/g, "").trim();
+  const m = cleaned.match(/#[0-9a-f]{3,8}\b|(?:rgba?|hsla?)\([^)]*\)|\btransparent\b/i);
+  if (!m) return null;
+  const parsed = parseColor(m[0]);
+  if (!parsed) return null;
+  const alpha = parsed.alpha === void 0 ? 1 : parseFloat(parsed.alpha);
+  if (Number.isNaN(alpha)) return null;
+  const n = parsed.color.map(parseFloat);
+  if (n.some(Number.isNaN)) return null;
+  if (parsed.mode === "hsl") {
+    const [r, g, b] = hslToRgb(n[0], n[1] / 100, n[2] / 100);
+    return { red: r, green: g, blue: b, alpha };
+  }
+  return { red: n[0] / 255, green: n[1] / 255, blue: n[2] / 255, alpha };
+}
+function hslToRgb(h, s, l) {
+  const k = (n) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+  return [f(0), f(8), f(4)];
+}
+var DEFAULT_ATTRIBUTES, DEFAULT_FUNCTIONS, TOKEN_CHARS, MARKER_CLASSES, escapeRe, LanguageService;
+var init_language_service = __esm({
+  "src/language-service.ts"() {
+    "use strict";
+    init_dist();
+    DEFAULT_ATTRIBUTES = ["class", "className", "class:list"];
+    DEFAULT_FUNCTIONS = ["clsx", "cn", "cva", "classNames", "twMerge", "tw", "cx"];
+    TOKEN_CHARS = /[^\s"'`<>{}]/;
+    MARKER_CLASSES = /^(?:group|peer)(?:\/[\w-]+)?$/;
+    escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    LanguageService = class {
+      generator;
+      catalog = [];
+      catalogIndex = /* @__PURE__ */ new Map();
+      components = [];
+      variants = [];
+      attributes;
+      functions;
+      limit;
+      attributeRe;
+      callRe;
+      constructor(options = {}) {
+        this.attributes = [...DEFAULT_ATTRIBUTES, ...options.classAttributes ?? []];
+        this.functions = [...DEFAULT_FUNCTIONS, ...options.classFunctions ?? []];
+        this.limit = options.completionLimit ?? 300;
+        this.attributeRe = new RegExp(
+          `(?:^|[\\s(,{])(?:${this.attributes.map(escapeRe).join("|")})\\s*=\\s*(["'\`])`,
+          "g"
+        );
+        this.callRe = new RegExp(`\\b(?:${this.functions.map(escapeRe).join("|")})\\s*(\\(|\`)`, "g");
+        this.generator = new CSSGenerator(options.config ?? {});
+        this.index();
+      }
+      /** Swap the configuration (config file changed). */
+      reload(config = {}) {
+        this.generator = new CSSGenerator(config);
+        this.index();
+      }
+      index() {
+        this.catalog = this.generator.getUtilities();
+        this.catalogIndex = new Map(this.catalog.map((u) => [u.class, u]));
+        const componentCss2 = this.generator.getComponents();
+        this.components = [...new Set([...componentCss2.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1]))].filter((c) => !this.catalogIndex.has(c)).sort();
+        this.variants = this.generator.getVariantDefinitions().map((v) => ({
+          name: v.name,
+          functional: v.functional === true,
+          description: v.description
+        }));
+      }
+      // ───────────────────────────── regions / tokens ─────────────────────────────
+      /** Class-list regions of a document. `languageId` selects the scanners. */
+      regions(text, languageId = "html") {
+        const out = [];
+        const isCss = /^(?:css|scss|less|postcss)$/.test(languageId);
+        if (!isCss) {
+          this.attributeRe.lastIndex = 0;
+          for (const m of text.matchAll(this.attributeRe)) {
+            const quote = m[1];
+            const start = m.index + m[0].length;
+            let end = text.indexOf(quote, start);
+            if (end === -1) {
+              const nl = text.indexOf("\n", start);
+              end = nl === -1 ? text.length : nl;
+            }
+            out.push({ start, end, kind: "attribute" });
+          }
+          for (const m of text.matchAll(this.callRe)) {
+            const open = m.index + m[0].length - 1;
+            if (m[1] === "`") {
+              const end = text.indexOf("`", open + 1);
+              if (end !== -1) out.push({ start: open + 1, end, kind: "call" });
+              continue;
+            }
+            const close = matchParen(text, open);
+            if (close === -1) continue;
+            const body = text.slice(open + 1, close);
+            for (const s of body.matchAll(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g))
+              out.push({ start: open + 1 + s.index + 1, end: open + 1 + s.index + 1 + s[2].length, kind: "call" });
+          }
+        }
+        for (const m of text.matchAll(/@apply\s+([^;{}]*)/g)) {
+          const start = m.index + m[0].length - m[1].length;
+          out.push({ start, end: start + m[1].trimEnd().length, kind: "apply" });
+        }
+        return out.sort((a, b) => a.start - b.start);
+      }
+      /** Every class token of every region. */
+      tokens(text, languageId = "html") {
+        const out = [];
+        for (const region of this.regions(text, languageId)) {
+          const slice = text.slice(region.start, region.end);
+          for (const m of slice.matchAll(/\S+/g)) {
+            const raw = m[0];
+            if (raw.includes("${")) continue;
+            out.push({ text: raw, start: region.start + m.index, end: region.start + m.index + raw.length, region });
+          }
+        }
+        return out;
+      }
+      /** The token under `offset` (or the empty token at the caret inside a region). */
+      tokenAt(text, offset, languageId = "html") {
+        const region = this.regions(text, languageId).find((r) => offset >= r.start && offset <= r.end);
+        if (!region) return null;
+        let start = offset;
+        while (start > region.start && TOKEN_CHARS.test(text[start - 1])) start--;
+        let end = offset;
+        while (end < region.end && TOKEN_CHARS.test(text[end])) end++;
+        return { text: text.slice(start, end), start, end, region };
+      }
+      // ───────────────────────────── features ─────────────────────────────
+      complete(text, offset, languageId = "html") {
+        const token = this.tokenAt(text, offset, languageId);
+        if (!token) return { items: [], incomplete: false };
+        const typed = text.slice(token.start, offset);
+        const lastColon = typed.lastIndexOf(":");
+        const segStart = token.start + lastColon + 1;
+        const segment = typed.slice(lastColon + 1);
+        const important = segment.startsWith("!");
+        const needle = important ? segment.slice(1) : segment;
+        const items = [];
+        const range = { start: segStart + (important ? 1 : 0), end: token.end };
+        if (token.region.kind !== "apply") {
+          for (const v of this.variants) {
+            if (!v.name.startsWith(needle) || v.name.startsWith("@") && !needle.startsWith("@")) continue;
+            items.push({
+              label: v.functional ? `${v.name}-` : `${v.name}:`,
+              kind: "variant",
+              detail: v.description,
+              ...range
+            });
+          }
+        }
+        const whole = text.slice(range.start, token.end);
+        const matches = this.catalog.filter((u) => u.class.startsWith(needle));
+        if (whole.length > needle.length)
+          matches.sort((a, b) => Number(b.class.startsWith(whole)) - Number(a.class.startsWith(whole)));
+        const incomplete = matches.length > this.limit;
+        for (const u of matches.slice(0, this.limit))
+          items.push({ label: u.class, kind: "class", detail: u.description, ...range });
+        if (token.region.kind !== "apply") {
+          for (const c of this.components)
+            if (c.startsWith(needle)) items.push({ label: c, kind: "component", ...range });
+        }
+        return { items, incomplete };
+      }
+      /** CSS of the candidate under `offset` (null when unknown). */
+      hover(text, offset, languageId = "html") {
+        const token = this.tokenAt(text, offset, languageId);
+        if (!token || !token.text) return null;
+        const css = this.compile(token.text);
+        if (!css) return null;
+        return { css, start: token.start, end: token.end };
+      }
+      compile(candidate) {
+        const css = this.generator.compileClass(candidate);
+        if (css.trim()) return css.trimEnd();
+        if (this.isComponent(candidate)) return componentRule(this.generator.getComponents(), candidate);
+        return "";
+      }
+      diagnostics(text, languageId = "html") {
+        const out = [];
+        const byRegion = /* @__PURE__ */ new Map();
+        for (const t of this.tokens(text, languageId)) {
+          const list = byRegion.get(t.region) ?? [];
+          list.push(t);
+          byRegion.set(t.region, list);
+        }
+        for (const [region, tokens] of byRegion) {
+          const conflictKeys = /* @__PURE__ */ new Map();
+          for (const t of tokens) {
+            const rules = this.generator.engine.compile(t.text);
+            const known = rules.length > 0 || MARKER_CLASSES.test(t.text) || this.isComponent(t.text);
+            if (!known) {
+              if (region.kind === "apply")
+                out.push({
+                  code: "invalidApply",
+                  severity: "error",
+                  message: `\`${t.text}\` is not a Nakshora utility or component \u2014 @apply would fail`,
+                  start: t.start,
+                  end: t.end
+                });
+              else if (t.text.includes(":") && !t.text.startsWith("["))
+                out.push({
+                  code: "unknownClass",
+                  severity: "warning",
+                  message: `\`${t.text}\` is not a Nakshora class (unknown variant or utility)`,
+                  start: t.start,
+                  end: t.end
+                });
+              continue;
+            }
+            if (rules.length === 0) continue;
+            const rule = rules[0];
+            const props = Object.keys(rule.decls).filter((p) => !p.startsWith("--"));
+            if (props.length === 0) continue;
+            const key = JSON.stringify([
+              rule.atrules.map((a) => `${a.kind}:${a.params}`),
+              rule.selector.replace(/\.(?:\\.|[\w-])+/, ".X"),
+              props.sort()
+            ]);
+            const list = conflictKeys.get(key) ?? [];
+            list.push(t);
+            conflictKeys.set(key, list);
+          }
+          for (const list of conflictKeys.values()) {
+            const distinct = [...new Set(list.map((t) => t.text))];
+            if (distinct.length < 2) continue;
+            for (const t of list)
+              out.push({
+                code: "cssConflict",
+                severity: "warning",
+                message: `\`${t.text}\` applies the same CSS properties as ${distinct.filter((d) => d !== t.text).map((d) => `\`${d}\``).join(", ")}`,
+                start: t.start,
+                end: t.end
+              });
+          }
+        }
+        return out.sort((a, b) => a.start - b.start);
+      }
+      colors(text, languageId = "html") {
+        const out = [];
+        for (const t of this.tokens(text, languageId)) {
+          const rules = this.generator.engine.compile(t.text);
+          if (rules.length === 0) continue;
+          for (const value of Object.values(rules[0].decls)) {
+            const color = extractColor(String(value));
+            if (!color) continue;
+            out.push({ start: t.start, end: t.end, ...color });
+            break;
+          }
+        }
+        return out;
+      }
+      isComponent(candidate) {
+        const base = candidate.slice(candidate.lastIndexOf(":") + 1).replace(/^!/, "");
+        return this.components.includes(base);
+      }
+    };
+  }
+});
+
+// src/language-server.ts
+var language_server_exports = {};
+__export(language_server_exports, {
+  startLanguageServer: () => startLanguageServer
+});
+import { fileURLToPath } from "url";
+import { dirname as dirname5 } from "path";
+import {
+  createConnection,
+  ProposedFeatures,
+  TextDocuments,
+  TextDocumentSyncKind,
+  CompletionItemKind,
+  DiagnosticSeverity,
+  MarkupKind
+} from "vscode-languageserver/node";
+import { TextDocument } from "vscode-languageserver-textdocument";
+function startLanguageServer(options = {}) {
+  const connection = options.connection ?? createConnection(ProposedFeatures.all, process.stdin, process.stdout);
+  const documents = new TextDocuments(TextDocument);
+  let service = new LanguageService();
+  let rootDir = process.cwd();
+  let configFile = null;
+  async function loadConfig() {
+    try {
+      const resolved = await resolveConfig(options.config, rootDir);
+      configFile = resolved.file;
+      service.reload(resolved.config);
+      connection.console.log(`nakshora: config ${configFile ?? "(defaults)"}`);
+    } catch (err) {
+      connection.console.error(`nakshora: config error \u2014 ${err.message}`);
+      service = new LanguageService();
+    }
+    for (const doc of documents.all()) validate(doc);
+  }
+  function validate(doc) {
+    const diagnostics = service.diagnostics(doc.getText(), doc.languageId).map((d) => ({
+      range: { start: doc.positionAt(d.start), end: doc.positionAt(d.end) },
+      severity: SEVERITY[d.severity],
+      code: d.code,
+      source: "nakshora",
+      message: d.message
+    }));
+    void connection.sendDiagnostics({ uri: doc.uri, diagnostics });
+  }
+  connection.onInitialize((params) => {
+    const root = params.workspaceFolders?.[0]?.uri ?? params.rootUri;
+    if (root) rootDir = fileURLToPath(root);
+    const init = params.initializationOptions;
+    if (init?.config && !options.config) options.config = init.config;
+    return {
+      capabilities: {
+        textDocumentSync: TextDocumentSyncKind.Incremental,
+        completionProvider: { triggerCharacters: [":", "-", '"', "'", " ", "["] },
+        hoverProvider: true,
+        colorProvider: true
+      },
+      serverInfo: { name: "nakshora-language-server" }
+    };
+  });
+  connection.onInitialized(() => void loadConfig());
+  connection.onDidChangeWatchedFiles((e) => {
+    if (e.changes.some((c) => /nakshora\.config\.\w+$/.test(c.uri))) void loadConfig();
+  });
+  documents.onDidChangeContent((e) => {
+    if (configFile && fileURLToPath(e.document.uri) === configFile) return;
+    validate(e.document);
+  });
+  documents.onDidSave((e) => {
+    const path = fileURLToPath(e.document.uri);
+    if (path === configFile || !configFile && dirname5(path) === rootDir && /nakshora\.config\./.test(path))
+      void loadConfig();
+  });
+  documents.onDidClose((e) => void connection.sendDiagnostics({ uri: e.document.uri, diagnostics: [] }));
+  connection.onCompletion((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return null;
+    const { items, incomplete } = service.complete(doc.getText(), doc.offsetAt(params.position), doc.languageId);
+    return {
+      isIncomplete: incomplete,
+      items: items.map((item, i) => ({
+        label: item.label,
+        kind: KIND[item.kind],
+        detail: item.detail,
+        sortText: String(i).padStart(5, "0"),
+        textEdit: {
+          range: { start: doc.positionAt(item.start), end: doc.positionAt(item.end) },
+          newText: item.label
+        },
+        command: item.kind === "variant" ? { title: "suggest", command: "editor.action.triggerSuggest" } : void 0
+      }))
+    };
+  });
+  connection.onCompletionResolve((item) => {
+    if (item.kind === KIND.class || item.kind === KIND.component) {
+      const css = service.compile(item.label);
+      if (css) item.documentation = { kind: MarkupKind.Markdown, value: "```css\n" + css + "\n```" };
+    }
+    return item;
+  });
+  connection.onHover((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return null;
+    const h = service.hover(doc.getText(), doc.offsetAt(params.position), doc.languageId);
+    if (!h) return null;
+    return {
+      contents: { kind: MarkupKind.Markdown, value: "```css\n" + h.css + "\n```" },
+      range: { start: doc.positionAt(h.start), end: doc.positionAt(h.end) }
+    };
+  });
+  connection.onDocumentColor((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return [];
+    return service.colors(doc.getText(), doc.languageId).map((c) => ({
+      range: { start: doc.positionAt(c.start), end: doc.positionAt(c.end) },
+      color: { red: c.red, green: c.green, blue: c.blue, alpha: c.alpha }
+    }));
+  });
+  connection.onColorPresentation(() => []);
+  documents.listen(connection);
+  connection.listen();
+  return connection;
+}
+var KIND, SEVERITY;
+var init_language_server = __esm({
+  "src/language-server.ts"() {
+    "use strict";
+    init_language_service();
+    init_config_loader();
+    KIND = {
+      class: CompletionItemKind.Constant,
+      variant: CompletionItemKind.Module,
+      component: CompletionItemKind.Class
+    };
+    SEVERITY = {
+      error: DiagnosticSeverity.Error,
+      warning: DiagnosticSeverity.Warning,
+      information: DiagnosticSeverity.Information
+    };
+  }
+});
+
+// src/cli.ts
+init_dist();
+import { Command } from "commander";
+import { existsSync as existsSync6, mkdirSync as mkdirSync2, readFileSync as readFileSync6, realpathSync, writeFileSync as writeFileSync3 } from "fs";
+import { dirname as dirname6, isAbsolute as isAbsolute4, join as join6, resolve as resolve6 } from "path";
+import { fileURLToPath as fileURLToPath2 } from "url";
+import chalk from "chalk";
 
 // src/build.ts
+init_dist();
 import { existsSync as existsSync2, mkdirSync, readFileSync as readFileSync2, statSync as statSync2, writeFileSync } from "fs";
 import { basename, dirname, isAbsolute, join, resolve as resolve2 } from "path";
 
@@ -8214,58 +8720,8 @@ async function collectWatchPaths(config, input, cwd = process.cwd()) {
   return [...paths];
 }
 
-// src/config-loader.ts
-import { existsSync as existsSync3, readFileSync as readFileSync3 } from "fs";
-import { dirname as dirname2, isAbsolute as isAbsolute2, join as join2, resolve as resolve3 } from "path";
-var CONFIG_FILES = [
-  "nakshora.config.ts",
-  "nakshora.config.js",
-  "nakshora.config.mjs",
-  "nakshora.config.cjs",
-  "nakshora.config.json"
-];
-function findConfigFile(startDir = process.cwd()) {
-  let dir = resolve3(startDir);
-  for (let i = 0; i < 5; i++) {
-    for (const file of CONFIG_FILES) {
-      const candidate = join2(dir, file);
-      if (existsSync3(candidate)) return candidate;
-    }
-    const parent = dirname2(dir);
-    if (parent === dir) break;
-    dir = parent;
-  }
-  return null;
-}
-async function loadConfigFile(file) {
-  const ext = file.slice(file.lastIndexOf("."));
-  if (ext === ".json") {
-    return JSON.parse(readFileSync3(file, "utf-8"));
-  }
-  try {
-    const mod = await import(file);
-    const cfg = mod.default ?? mod;
-    return cfg;
-  } catch (err) {
-    if (ext === ".ts" && err.message.includes("Unknown file extension")) {
-      throw new Error(
-        `TypeScript configs require Node >= 22.18 (native type stripping).
-You are on Node ${process.version}. Use a .js, .mjs or .json config instead,
-or upgrade Node (https://nodejs.org).`
-      );
-    }
-    throw err;
-  }
-}
-async function resolveConfig(explicitPath, startDir) {
-  const file = explicitPath ? isAbsolute2(explicitPath) ? explicitPath : resolve3(startDir ?? process.cwd(), explicitPath) : findConfigFile(startDir);
-  if (!file) return { config: {}, file: null };
-  if (!existsSync3(file)) {
-    throw new Error(`Config file not found: ${file}`);
-  }
-  const config = await loadConfigFile(file);
-  return { config, file };
-}
+// src/cli.ts
+init_config_loader();
 
 // src/watch.ts
 import { readdirSync, statSync as statSync3, watch } from "fs";
@@ -8356,6 +8812,8 @@ function createWatcher(paths, onChange) {
 }
 
 // src/doctor.ts
+init_dist();
+init_config_loader();
 import { existsSync as existsSync4, readFileSync as readFileSync4, statSync as statSync4 } from "fs";
 import { dirname as dirname4, isAbsolute as isAbsolute3, join as join4, resolve as resolve5 } from "path";
 import { globby as globby2 } from "globby";
@@ -8935,7 +9393,7 @@ program.command("export:ai").description("export the utility corpus for AI/LLM t
     fileName = opts.out;
   }
   const abs = isAbsolute4(fileName) ? fileName : resolve6(process.cwd(), fileName);
-  mkdirSync2(dirname5(abs), { recursive: true });
+  mkdirSync2(dirname6(abs), { recursive: true });
   writeFileSync3(abs, out);
   console.log(
     chalk.green(
@@ -8985,6 +9443,10 @@ program.command("migrate [globs...]").description(
   if (!res.files.length && !res.config) console.log(chalk.dim("nothing to migrate"));
   else if (!opts.write) console.log(chalk.dim("\ndry run \u2014 re-run with --write to apply"));
 });
+program.command("lsp").description("start the Nakshora language server (LSP over stdio) for editor integrations").option("-c, --config <path>", "config file (default: discovered from the workspace root)").action(async (opts) => {
+  const { startLanguageServer: startLanguageServer2 } = await Promise.resolve().then(() => (init_language_server(), language_server_exports));
+  startLanguageServer2({ config: opts.config });
+});
 program.action(() => {
   program.outputHelp();
 });
@@ -8994,7 +9456,7 @@ function isEntryPoint() {
   const argv1 = process.argv[1];
   if (!argv1) return false;
   try {
-    return realpathSync(argv1) === realpathSync(fileURLToPath(import.meta.url));
+    return realpathSync(argv1) === realpathSync(fileURLToPath2(import.meta.url));
   } catch {
     return false;
   }

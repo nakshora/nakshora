@@ -20,11 +20,13 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
+  LanguageService: () => LanguageService,
   TAILWIND_RENAMES: () => TAILWIND_RENAMES,
   V1_RENAMES: () => V1_RENAMES,
   collectWatchPaths: () => collectWatchPaths,
   createWatcher: () => createWatcher,
   diagnose: () => diagnose,
+  extractColor: () => extractColor,
   findConfigFile: () => findConfigFile,
   formatFindings: () => formatFindings,
   generatedSourceMap: () => generatedSourceMap,
@@ -36,6 +38,7 @@ __export(src_exports, {
   resolveSources: () => resolveSources,
   runBuild: () => runBuild,
   runMigrate: () => runMigrate,
+  startLanguageServer: () => startLanguageServer,
   summarize: () => summarize,
   version: () => version
 });
@@ -8648,13 +8651,418 @@ function createWatcher(paths, onChange) {
     }
   };
 }
+
+// src/language-service.ts
+var DEFAULT_ATTRIBUTES = ["class", "className", "class:list"];
+var DEFAULT_FUNCTIONS = ["clsx", "cn", "cva", "classNames", "twMerge", "tw", "cx"];
+var TOKEN_CHARS = /[^\s"'`<>{}]/;
+var MARKER_CLASSES = /^(?:group|peer)(?:\/[\w-]+)?$/;
+var escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var LanguageService = class {
+  generator;
+  catalog = [];
+  catalogIndex = /* @__PURE__ */ new Map();
+  components = [];
+  variants = [];
+  attributes;
+  functions;
+  limit;
+  attributeRe;
+  callRe;
+  constructor(options = {}) {
+    this.attributes = [...DEFAULT_ATTRIBUTES, ...options.classAttributes ?? []];
+    this.functions = [...DEFAULT_FUNCTIONS, ...options.classFunctions ?? []];
+    this.limit = options.completionLimit ?? 300;
+    this.attributeRe = new RegExp(
+      `(?:^|[\\s(,{])(?:${this.attributes.map(escapeRe).join("|")})\\s*=\\s*(["'\`])`,
+      "g"
+    );
+    this.callRe = new RegExp(`\\b(?:${this.functions.map(escapeRe).join("|")})\\s*(\\(|\`)`, "g");
+    this.generator = new CSSGenerator(options.config ?? {});
+    this.index();
+  }
+  /** Swap the configuration (config file changed). */
+  reload(config = {}) {
+    this.generator = new CSSGenerator(config);
+    this.index();
+  }
+  index() {
+    this.catalog = this.generator.getUtilities();
+    this.catalogIndex = new Map(this.catalog.map((u) => [u.class, u]));
+    const componentCss2 = this.generator.getComponents();
+    this.components = [...new Set([...componentCss2.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1]))].filter((c) => !this.catalogIndex.has(c)).sort();
+    this.variants = this.generator.getVariantDefinitions().map((v) => ({
+      name: v.name,
+      functional: v.functional === true,
+      description: v.description
+    }));
+  }
+  // ───────────────────────────── regions / tokens ─────────────────────────────
+  /** Class-list regions of a document. `languageId` selects the scanners. */
+  regions(text, languageId = "html") {
+    const out = [];
+    const isCss = /^(?:css|scss|less|postcss)$/.test(languageId);
+    if (!isCss) {
+      this.attributeRe.lastIndex = 0;
+      for (const m of text.matchAll(this.attributeRe)) {
+        const quote = m[1];
+        const start = m.index + m[0].length;
+        let end = text.indexOf(quote, start);
+        if (end === -1) {
+          const nl = text.indexOf("\n", start);
+          end = nl === -1 ? text.length : nl;
+        }
+        out.push({ start, end, kind: "attribute" });
+      }
+      for (const m of text.matchAll(this.callRe)) {
+        const open = m.index + m[0].length - 1;
+        if (m[1] === "`") {
+          const end = text.indexOf("`", open + 1);
+          if (end !== -1) out.push({ start: open + 1, end, kind: "call" });
+          continue;
+        }
+        const close = matchParen(text, open);
+        if (close === -1) continue;
+        const body = text.slice(open + 1, close);
+        for (const s of body.matchAll(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g))
+          out.push({ start: open + 1 + s.index + 1, end: open + 1 + s.index + 1 + s[2].length, kind: "call" });
+      }
+    }
+    for (const m of text.matchAll(/@apply\s+([^;{}]*)/g)) {
+      const start = m.index + m[0].length - m[1].length;
+      out.push({ start, end: start + m[1].trimEnd().length, kind: "apply" });
+    }
+    return out.sort((a, b) => a.start - b.start);
+  }
+  /** Every class token of every region. */
+  tokens(text, languageId = "html") {
+    const out = [];
+    for (const region of this.regions(text, languageId)) {
+      const slice = text.slice(region.start, region.end);
+      for (const m of slice.matchAll(/\S+/g)) {
+        const raw = m[0];
+        if (raw.includes("${")) continue;
+        out.push({ text: raw, start: region.start + m.index, end: region.start + m.index + raw.length, region });
+      }
+    }
+    return out;
+  }
+  /** The token under `offset` (or the empty token at the caret inside a region). */
+  tokenAt(text, offset, languageId = "html") {
+    const region = this.regions(text, languageId).find((r) => offset >= r.start && offset <= r.end);
+    if (!region) return null;
+    let start = offset;
+    while (start > region.start && TOKEN_CHARS.test(text[start - 1])) start--;
+    let end = offset;
+    while (end < region.end && TOKEN_CHARS.test(text[end])) end++;
+    return { text: text.slice(start, end), start, end, region };
+  }
+  // ───────────────────────────── features ─────────────────────────────
+  complete(text, offset, languageId = "html") {
+    const token = this.tokenAt(text, offset, languageId);
+    if (!token) return { items: [], incomplete: false };
+    const typed = text.slice(token.start, offset);
+    const lastColon = typed.lastIndexOf(":");
+    const segStart = token.start + lastColon + 1;
+    const segment = typed.slice(lastColon + 1);
+    const important = segment.startsWith("!");
+    const needle = important ? segment.slice(1) : segment;
+    const items = [];
+    const range = { start: segStart + (important ? 1 : 0), end: token.end };
+    if (token.region.kind !== "apply") {
+      for (const v of this.variants) {
+        if (!v.name.startsWith(needle) || v.name.startsWith("@") && !needle.startsWith("@")) continue;
+        items.push({
+          label: v.functional ? `${v.name}-` : `${v.name}:`,
+          kind: "variant",
+          detail: v.description,
+          ...range
+        });
+      }
+    }
+    const whole = text.slice(range.start, token.end);
+    const matches = this.catalog.filter((u) => u.class.startsWith(needle));
+    if (whole.length > needle.length)
+      matches.sort((a, b) => Number(b.class.startsWith(whole)) - Number(a.class.startsWith(whole)));
+    const incomplete = matches.length > this.limit;
+    for (const u of matches.slice(0, this.limit))
+      items.push({ label: u.class, kind: "class", detail: u.description, ...range });
+    if (token.region.kind !== "apply") {
+      for (const c of this.components)
+        if (c.startsWith(needle)) items.push({ label: c, kind: "component", ...range });
+    }
+    return { items, incomplete };
+  }
+  /** CSS of the candidate under `offset` (null when unknown). */
+  hover(text, offset, languageId = "html") {
+    const token = this.tokenAt(text, offset, languageId);
+    if (!token || !token.text) return null;
+    const css = this.compile(token.text);
+    if (!css) return null;
+    return { css, start: token.start, end: token.end };
+  }
+  compile(candidate) {
+    const css = this.generator.compileClass(candidate);
+    if (css.trim()) return css.trimEnd();
+    if (this.isComponent(candidate)) return componentRule(this.generator.getComponents(), candidate);
+    return "";
+  }
+  diagnostics(text, languageId = "html") {
+    const out = [];
+    const byRegion = /* @__PURE__ */ new Map();
+    for (const t of this.tokens(text, languageId)) {
+      const list = byRegion.get(t.region) ?? [];
+      list.push(t);
+      byRegion.set(t.region, list);
+    }
+    for (const [region, tokens] of byRegion) {
+      const conflictKeys = /* @__PURE__ */ new Map();
+      for (const t of tokens) {
+        const rules = this.generator.engine.compile(t.text);
+        const known = rules.length > 0 || MARKER_CLASSES.test(t.text) || this.isComponent(t.text);
+        if (!known) {
+          if (region.kind === "apply")
+            out.push({
+              code: "invalidApply",
+              severity: "error",
+              message: `\`${t.text}\` is not a Nakshora utility or component \u2014 @apply would fail`,
+              start: t.start,
+              end: t.end
+            });
+          else if (t.text.includes(":") && !t.text.startsWith("["))
+            out.push({
+              code: "unknownClass",
+              severity: "warning",
+              message: `\`${t.text}\` is not a Nakshora class (unknown variant or utility)`,
+              start: t.start,
+              end: t.end
+            });
+          continue;
+        }
+        if (rules.length === 0) continue;
+        const rule = rules[0];
+        const props = Object.keys(rule.decls).filter((p) => !p.startsWith("--"));
+        if (props.length === 0) continue;
+        const key = JSON.stringify([
+          rule.atrules.map((a) => `${a.kind}:${a.params}`),
+          rule.selector.replace(/\.(?:\\.|[\w-])+/, ".X"),
+          props.sort()
+        ]);
+        const list = conflictKeys.get(key) ?? [];
+        list.push(t);
+        conflictKeys.set(key, list);
+      }
+      for (const list of conflictKeys.values()) {
+        const distinct = [...new Set(list.map((t) => t.text))];
+        if (distinct.length < 2) continue;
+        for (const t of list)
+          out.push({
+            code: "cssConflict",
+            severity: "warning",
+            message: `\`${t.text}\` applies the same CSS properties as ${distinct.filter((d) => d !== t.text).map((d) => `\`${d}\``).join(", ")}`,
+            start: t.start,
+            end: t.end
+          });
+      }
+    }
+    return out.sort((a, b) => a.start - b.start);
+  }
+  colors(text, languageId = "html") {
+    const out = [];
+    for (const t of this.tokens(text, languageId)) {
+      const rules = this.generator.engine.compile(t.text);
+      if (rules.length === 0) continue;
+      for (const value of Object.values(rules[0].decls)) {
+        const color = extractColor(String(value));
+        if (!color) continue;
+        out.push({ start: t.start, end: t.end, ...color });
+        break;
+      }
+    }
+    return out;
+  }
+  isComponent(candidate) {
+    const base = candidate.slice(candidate.lastIndexOf(":") + 1).replace(/^!/, "");
+    return this.components.includes(base);
+  }
+};
+function matchParen(text, open) {
+  let depth = 0;
+  let quote = null;
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i];
+    if (quote) {
+      if (ch === "\\") i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") quote = ch;
+    else if (ch === "(") depth++;
+    else if (ch === ")" && --depth === 0) return i;
+  }
+  return -1;
+}
+function componentRule(css, candidate) {
+  const base = candidate.slice(candidate.lastIndexOf(":") + 1).replace(/^!/, "");
+  const re = new RegExp(`\\.${escapeRe(base)}(?![\\w-])`);
+  const out = [];
+  for (const { rule, ancestors } of walkRules(parseCss(css).nodes))
+    if (re.test(rule.selector) && ancestors.every((a) => a.name !== "keyframes")) out.push(rule);
+  return serializeCss(out).trimEnd();
+}
+function extractColor(value) {
+  const cleaned = value.replace(/\/\s*var\([^)]*\)/g, "").trim();
+  const m = cleaned.match(/#[0-9a-f]{3,8}\b|(?:rgba?|hsla?)\([^)]*\)|\btransparent\b/i);
+  if (!m) return null;
+  const parsed = parseColor(m[0]);
+  if (!parsed) return null;
+  const alpha = parsed.alpha === void 0 ? 1 : parseFloat(parsed.alpha);
+  if (Number.isNaN(alpha)) return null;
+  const n = parsed.color.map(parseFloat);
+  if (n.some(Number.isNaN)) return null;
+  if (parsed.mode === "hsl") {
+    const [r, g, b] = hslToRgb(n[0], n[1] / 100, n[2] / 100);
+    return { red: r, green: g, blue: b, alpha };
+  }
+  return { red: n[0] / 255, green: n[1] / 255, blue: n[2] / 255, alpha };
+}
+function hslToRgb(h, s, l) {
+  const k = (n) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+  return [f(0), f(8), f(4)];
+}
+
+// src/language-server.ts
+var import_node_url = require("url");
+var import_node_path7 = require("path");
+var import_node = require("vscode-languageserver/node");
+var import_vscode_languageserver_textdocument = require("vscode-languageserver-textdocument");
+var KIND = {
+  class: import_node.CompletionItemKind.Constant,
+  variant: import_node.CompletionItemKind.Module,
+  component: import_node.CompletionItemKind.Class
+};
+var SEVERITY = {
+  error: import_node.DiagnosticSeverity.Error,
+  warning: import_node.DiagnosticSeverity.Warning,
+  information: import_node.DiagnosticSeverity.Information
+};
+function startLanguageServer(options = {}) {
+  const connection = options.connection ?? (0, import_node.createConnection)(import_node.ProposedFeatures.all, process.stdin, process.stdout);
+  const documents = new import_node.TextDocuments(import_vscode_languageserver_textdocument.TextDocument);
+  let service = new LanguageService();
+  let rootDir = process.cwd();
+  let configFile = null;
+  async function loadConfig() {
+    try {
+      const resolved = await resolveConfig(options.config, rootDir);
+      configFile = resolved.file;
+      service.reload(resolved.config);
+      connection.console.log(`nakshora: config ${configFile ?? "(defaults)"}`);
+    } catch (err) {
+      connection.console.error(`nakshora: config error \u2014 ${err.message}`);
+      service = new LanguageService();
+    }
+    for (const doc of documents.all()) validate(doc);
+  }
+  function validate(doc) {
+    const diagnostics = service.diagnostics(doc.getText(), doc.languageId).map((d) => ({
+      range: { start: doc.positionAt(d.start), end: doc.positionAt(d.end) },
+      severity: SEVERITY[d.severity],
+      code: d.code,
+      source: "nakshora",
+      message: d.message
+    }));
+    void connection.sendDiagnostics({ uri: doc.uri, diagnostics });
+  }
+  connection.onInitialize((params) => {
+    const root = params.workspaceFolders?.[0]?.uri ?? params.rootUri;
+    if (root) rootDir = (0, import_node_url.fileURLToPath)(root);
+    const init = params.initializationOptions;
+    if (init?.config && !options.config) options.config = init.config;
+    return {
+      capabilities: {
+        textDocumentSync: import_node.TextDocumentSyncKind.Incremental,
+        completionProvider: { triggerCharacters: [":", "-", '"', "'", " ", "["] },
+        hoverProvider: true,
+        colorProvider: true
+      },
+      serverInfo: { name: "nakshora-language-server" }
+    };
+  });
+  connection.onInitialized(() => void loadConfig());
+  connection.onDidChangeWatchedFiles((e) => {
+    if (e.changes.some((c) => /nakshora\.config\.\w+$/.test(c.uri))) void loadConfig();
+  });
+  documents.onDidChangeContent((e) => {
+    if (configFile && (0, import_node_url.fileURLToPath)(e.document.uri) === configFile) return;
+    validate(e.document);
+  });
+  documents.onDidSave((e) => {
+    const path = (0, import_node_url.fileURLToPath)(e.document.uri);
+    if (path === configFile || !configFile && (0, import_node_path7.dirname)(path) === rootDir && /nakshora\.config\./.test(path))
+      void loadConfig();
+  });
+  documents.onDidClose((e) => void connection.sendDiagnostics({ uri: e.document.uri, diagnostics: [] }));
+  connection.onCompletion((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return null;
+    const { items, incomplete } = service.complete(doc.getText(), doc.offsetAt(params.position), doc.languageId);
+    return {
+      isIncomplete: incomplete,
+      items: items.map((item, i) => ({
+        label: item.label,
+        kind: KIND[item.kind],
+        detail: item.detail,
+        sortText: String(i).padStart(5, "0"),
+        textEdit: {
+          range: { start: doc.positionAt(item.start), end: doc.positionAt(item.end) },
+          newText: item.label
+        },
+        command: item.kind === "variant" ? { title: "suggest", command: "editor.action.triggerSuggest" } : void 0
+      }))
+    };
+  });
+  connection.onCompletionResolve((item) => {
+    if (item.kind === KIND.class || item.kind === KIND.component) {
+      const css = service.compile(item.label);
+      if (css) item.documentation = { kind: import_node.MarkupKind.Markdown, value: "```css\n" + css + "\n```" };
+    }
+    return item;
+  });
+  connection.onHover((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return null;
+    const h = service.hover(doc.getText(), doc.offsetAt(params.position), doc.languageId);
+    if (!h) return null;
+    return {
+      contents: { kind: import_node.MarkupKind.Markdown, value: "```css\n" + h.css + "\n```" },
+      range: { start: doc.positionAt(h.start), end: doc.positionAt(h.end) }
+    };
+  });
+  connection.onDocumentColor((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return [];
+    return service.colors(doc.getText(), doc.languageId).map((c) => ({
+      range: { start: doc.positionAt(c.start), end: doc.positionAt(c.end) },
+      color: { red: c.red, green: c.green, blue: c.blue, alpha: c.alpha }
+    }));
+  });
+  connection.onColorPresentation(() => []);
+  documents.listen(connection);
+  connection.listen();
+  return connection;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  LanguageService,
   TAILWIND_RENAMES,
   V1_RENAMES,
   collectWatchPaths,
   createWatcher,
   diagnose,
+  extractColor,
   findConfigFile,
   formatFindings,
   generatedSourceMap,
@@ -8666,6 +9074,7 @@ function createWatcher(paths, onChange) {
   resolveSources,
   runBuild,
   runMigrate,
+  startLanguageServer,
   summarize,
   version
 });

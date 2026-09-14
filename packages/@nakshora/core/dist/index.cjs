@@ -1651,6 +1651,20 @@ function declText(d, minify = false) {
 function minifyCssSafe(css) {
   return serializeCss(parseCss(css), { minify: true });
 }
+function classesInCss(root) {
+  const set = /* @__PURE__ */ new Set();
+  const walk = (list) => {
+    for (const node of list) {
+      if (node.type === "rule") {
+        for (const m of node.selector.matchAll(/\.((?:\\.|[\w-])+)/g))
+          set.add(m[1].replace(/\\(.)/g, "$1"));
+        walk(node.nodes);
+      } else if (node.type === "atrule" && node.nodes) walk(node.nodes);
+    }
+  };
+  walk(Array.isArray(root) ? root : root.nodes);
+  return set;
+}
 function* walkRules(nodes, ancestors = []) {
   for (const node of nodes) {
     if (node.type === "rule") {
@@ -8854,6 +8868,7 @@ exports.byteLength = byteLength;
 exports.candidatePermutations = candidatePermutations;
 exports.categoryForPlugin = categoryForPlugin;
 exports.classToSelector = classToSelector;
+exports.classesInCss = classesInCss;
 exports.clearCatalogCache = clearCatalogCache;
 exports.coerceValue = coerceValue;
 exports.componentCss = componentCss;
@@ -8896,6 +8911,7 @@ exports.splitClass = splitClass;
 exports.splitPath = splitPath;
 exports.stringifyDecls = stringifyDecls;
 exports.version = version;
+exports.walkRules = walkRules;
 exports.withAlphaValue = withAlphaValue;
 exports.withAlphaVariable = withAlphaVariable;
 //# sourceMappingURL=index.cjs.map

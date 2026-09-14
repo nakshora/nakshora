@@ -12,7 +12,7 @@ import {
 } from './engine';
 import { resolveTheme, DEFAULT_SCREENS, SCREEN_GUIDE, splitPath, screenToPx } from './theme';
 import { plugin } from './plugin-api';
-import { parseCss, serializeCss, minifyCssSafe } from './css-ast';
+import { parseCss, serializeCss, minifyCssSafe, walkRules, classesInCss } from './css-ast';
 import { processAuthorCss, ApplyError } from './apply';
 import { escapeClassName, normalizeValue, coerceValue } from './values';
 import { parseColor, formatColor, withAlphaValue, withAlphaVariable } from './color';
@@ -66,7 +66,7 @@ export { resolveTheme, DEFAULT_SCREENS, SCREEN_GUIDE, splitPath, screenToPx };
 export type { ResolvedTheme } from './theme';
 export { plugin };
 export type { PluginAPI, TailwindPluginObject } from './plugin-api';
-export { parseCss, serializeCss, minifyCssSafe };
+export { parseCss, serializeCss, minifyCssSafe, walkRules, classesInCss };
 export { ContentCache, contentHash, scanSources } from './content-cache';
 export type { ContentCacheStats, ScanFs } from './content-cache';
 export type { CssNode, CssRoot, CssRule, CssDecl, CssAtRule } from './css-ast';

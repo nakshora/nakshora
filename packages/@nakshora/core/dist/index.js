@@ -1647,6 +1647,20 @@ function declText(d, minify = false) {
 function minifyCssSafe(css) {
   return serializeCss(parseCss(css), { minify: true });
 }
+function classesInCss(root) {
+  const set = /* @__PURE__ */ new Set();
+  const walk = (list) => {
+    for (const node of list) {
+      if (node.type === "rule") {
+        for (const m of node.selector.matchAll(/\.((?:\\.|[\w-])+)/g))
+          set.add(m[1].replace(/\\(.)/g, "$1"));
+        walk(node.nodes);
+      } else if (node.type === "atrule" && node.nodes) walk(node.nodes);
+    }
+  };
+  walk(Array.isArray(root) ? root : root.nodes);
+  return set;
+}
 function* walkRules(nodes, ancestors = []) {
   for (const node of nodes) {
     if (node.type === "rule") {
@@ -8833,6 +8847,6 @@ var nakshora = {
 };
 var src_default = nakshora;
 
-export { ApplyError, CSSGenerator, ContentCache, DEFAULT_SCREENS, Engine, GROUP_CATEGORIES, SCREEN_GUIDE, STATE_VARIANTS, applyFormat, applyPreset, brutalistTheme, buildAICorpus, buildUtilityList, byteLength, candidatePermutations, categoryForPlugin, classToSelector, clearCatalogCache, coerceValue, componentCss, componentNames, contentHash, corpusToSFT, createGenerator, deepMerge, src_default as default, defaultColors, defaultTheme, defaultVariants, escapeClass, escapeClassName, extractClasses, finalizeSelector, formatBytes, formatColor, maxWidthValue, mergeConfig, metadata, minifyCss, minifyCssSafe, minimalistTheme, natureTheme, neonTheme, normalizeValue, parseColor, parseCss, pastelTheme, plugin, preflight, processAuthorCss, resolveTheme, resolveThemeValue, scanSources, screenToPx, serializeCss, splitClass, splitPath, stringifyDecls, version, withAlphaValue, withAlphaVariable };
+export { ApplyError, CSSGenerator, ContentCache, DEFAULT_SCREENS, Engine, GROUP_CATEGORIES, SCREEN_GUIDE, STATE_VARIANTS, applyFormat, applyPreset, brutalistTheme, buildAICorpus, buildUtilityList, byteLength, candidatePermutations, categoryForPlugin, classToSelector, classesInCss, clearCatalogCache, coerceValue, componentCss, componentNames, contentHash, corpusToSFT, createGenerator, deepMerge, src_default as default, defaultColors, defaultTheme, defaultVariants, escapeClass, escapeClassName, extractClasses, finalizeSelector, formatBytes, formatColor, maxWidthValue, mergeConfig, metadata, minifyCss, minifyCssSafe, minimalistTheme, natureTheme, neonTheme, normalizeValue, parseColor, parseCss, pastelTheme, plugin, preflight, processAuthorCss, resolveTheme, resolveThemeValue, scanSources, screenToPx, serializeCss, splitClass, splitPath, stringifyDecls, version, walkRules, withAlphaValue, withAlphaVariable };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map
