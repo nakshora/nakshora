@@ -3,12 +3,12 @@
 //   postcss.config.js
 //   module.exports = { plugins: [require('@nakshora/postcss')({ config: { content: [...] } })] }
 
-import type { AtRule, Container, Plugin } from 'postcss';
+import type { AtRule, Container, Plugin, Result, Root } from 'postcss';
 import postcss from 'postcss';
 import { globby } from 'globby';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { CSSGenerator, type NakshoraConfig } from '@nakshora/core';
+import { CSSGenerator, ApplyError, type NakshoraConfig } from '@nakshora/core';
 
 export interface NakshoraPostCSSOptions {
   /** Nakshora configuration (theme, content, safelist, important…) */
@@ -20,6 +20,11 @@ export interface NakshoraPostCSSOptions {
   content?: string | string[];
   /** Minify the generated CSS */
   minify?: boolean;
+  /**
+   * Expand `@apply`, `theme()` / `screen()` and `@screen` in author CSS
+   * (default: true). Errors are reported as PostCSS errors with the file name.
+   */
+  apply?: boolean;
   /**
    * Directory content globs resolve against. Defaults to the directory of the
    * CSS file being processed (falling back to `process.cwd()`); the Vite
@@ -115,6 +120,50 @@ export function spliceCss(atRule: AtRule, css: string): void {
   (parent as unknown as { markDirty(): void }).markDirty();
 }
 
+/** Does the stylesheet use any author-CSS feature (`@apply`, `theme()`, `screen()`, `@screen`)? */
+export function needsAuthorPass(root: Root): boolean {
+  let found = false;
+  root.walk((node) => {
+    if (found) return false;
+    if (node.type === 'atrule' && (node.name === 'apply' || node.name === 'screen')) found = true;
+    else if (node.type === 'decl' && /\b(?:theme|screen)\(/.test(node.value)) found = true;
+    else if (node.type === 'atrule' && /\b(?:theme|screen)\(/.test(node.params)) found = true;
+    return found ? false : undefined;
+  });
+  return found;
+}
+
+/**
+ * Expand `@apply` / `theme()` / `@screen` on the whole root. Nakshora's own
+ * CSS AST is used for the transform (identical to `nakshora build`); the
+ * result is parsed back so later PostCSS plugins see real nodes. Errors are
+ * rethrown as PostCSS `CssSyntaxError`s pointing at the stylesheet.
+ */
+export function runAuthorPass(root: Root, generator: CSSGenerator, result: Result): void {
+  let css: string;
+  try {
+    css = generator.processCss(root.toString());
+  } catch (err) {
+    if (err instanceof ApplyError) {
+      const node =
+        (err.candidate &&
+          (() => {
+            let hit: AtRule | undefined;
+            root.walkAtRules('apply', (at) => {
+              if (!hit && at.params.split(/\s+/).includes(err.candidate as string)) hit = at;
+            });
+            return hit;
+          })()) ||
+        root;
+      throw node.error(err.message, { plugin: 'nakshora', word: err.candidate });
+    }
+    throw err;
+  }
+  const parsed = postcss.parse(css, { from: result.opts.from });
+  root.removeAll();
+  root.append(parsed.nodes);
+}
+
 /**
  * Nakshora PostCSS plugin.
  *
@@ -125,6 +174,7 @@ export function spliceCss(atRule: AtRule, css: string): void {
  *   @nakshora keyframes;   → @keyframes only
  *   @nakshora utilities;   → ALL utilities (no base)
  *   @nakshora components;  → design-paradigm components only
+ *   @apply …; theme(…); screen(…); @screen md { … }  → expanded in place
  *
  * If `content` is configured (option or config), `@nakshora source;` and
  * `@nakshora utilities;` switch to JIT mode: only used classes are emitted.
@@ -132,15 +182,20 @@ export function spliceCss(atRule: AtRule, css: string): void {
 export default function nakshora(options: NakshoraPostCSSOptions = {}): Plugin {
   return {
     postcssPlugin: 'nakshora',
-    async Once(root) {
+    async Once(root, { result }) {
       const config: Partial<NakshoraConfig> = { ...(options.config ?? {}) };
       if (options.content !== undefined) config.content = options.content;
 
-      const generator = new CSSGenerator(config);
       const baseDir =
         options.base ??
         (root.source?.input?.file ? resolve(root.source.input.file, '..') : process.cwd());
       const hasAtRule = root.nodes?.some((n) => n.type === 'atrule' && n.name === 'nakshora');
+      const authorPass = options.apply !== false && needsAuthorPass(root);
+      if (!hasAtRule && !authorPass) return;
+      const generator = new CSSGenerator(config);
+      // `@apply` first so applied utilities never get spliced generated CSS
+      // re-scanned, and so `@nakshora` output itself is left untouched.
+      if (authorPass) runAuthorPass(root, generator, result);
       if (!hasAtRule) return;
 
       const useJIT = config.content !== undefined || config.purge !== undefined;

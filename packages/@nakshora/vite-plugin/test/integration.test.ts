@@ -37,7 +37,10 @@ function scaffold(): string {
       '<script type="module" src="/src/main.js"></script></body></html>',
   );
   writeFileSync(join(root, 'src/main.js'), "import 'virtual:nakshora';\nimport './app.css';\n");
-  writeFileSync(join(root, 'src/app.css'), '@nakshora utilities;\n.x { color: red }\n');
+  writeFileSync(
+    join(root, 'src/app.css'),
+    '@nakshora utilities;\n.x { color: red }\n.btn { @apply px-4 hover:underline; color: theme(colors.blue.500); }\n',
+  );
   return root;
 }
 
@@ -65,6 +68,12 @@ function check(css: string): void {
   expect(css).toContain('.md\\:hover\\:bg-red-500\\/50:hover');
   expect(css).toContain('.neon-btn'); // design component used in index.html
   expect(css).toContain('.x'); // author CSS survives around `@nakshora utilities;`
+  expect(css).toContain('.btn'); // `@apply` + theme() expanded by the PostCSS plugin
+  expect(css).toContain('padding-left: 1rem');
+  expect(css).toContain('.btn:hover');
+  expect(css).toContain('#3b82f6');
+  expect(css).not.toContain('@apply');
+  expect(css).not.toContain('theme(');
   expect(css).not.toContain('@nakshora');
   // JIT: not the full build
   expect(css.length).toBeLessThan(200_000);

@@ -73,6 +73,41 @@ describe('@nakshora/postcss', () => {
     expect(css).toContain('box-sizing:border-box');
   });
 
+  it('expands @apply / theme() / @screen in author CSS (with and without @nakshora)', async () => {
+    const css = await run(
+      '.btn { @apply px-4 hover:bg-red-500 md:flex !important; color: theme(colors.blue.500); }\n' +
+        '@screen lg { .wide { width: theme(spacing.4); } }\n@media screen(md) { .m { top: 0 } }\n',
+    );
+    expect(css).toContain(
+      '.btn { padding-left: 1rem !important; padding-right: 1rem !important; }',
+    );
+    expect(css).toContain('.btn:hover { --tw-bg-opacity: 1 !important;');
+    expect(css).toContain('@media (min-width: 768px) {\n  .btn { display: flex !important; }\n}');
+    expect(css).toContain('.btn { color: #3b82f6; }');
+    expect(css).toContain('@media (min-width: 1024px) {\n  .wide { width: 1rem; }\n}');
+    expect(css).toContain('@media (min-width: 768px) {\n  .m { top: 0; }\n}');
+    expect(css).not.toContain('@apply');
+    // combined with a JIT `@nakshora utilities;` — applied utilities are not re-scanned
+    const both = await run('@nakshora utilities;\n.card { @apply rounded-lg shadow; }', {
+      content: '<div class="p-1">x</div>',
+    });
+    expect(both).toContain('.p-1 { padding: 0.25rem; }');
+    expect(both).toContain('.card { border-radius: 0.5rem;');
+    expect(both).not.toContain('.rounded-lg {');
+    expect(both).not.toContain('@nakshora');
+  });
+
+  it('reports unknown @apply classes as PostCSS errors that name the class', async () => {
+    await expect(run('.a { @apply p-4 not-a-class; }')).rejects.toMatchObject({
+      name: 'CssSyntaxError',
+      plugin: 'nakshora',
+      reason: expect.stringContaining('not-a-class'),
+    });
+    // opt-out
+    const raw = await run('.a { @apply p-4; }', { apply: false });
+    expect(raw).toBe('.a { @apply p-4; }');
+  });
+
   it('leaves CSS without at-rules untouched', async () => {
     const css = await run('body { color: red; }');
     expect(css).toBe('body { color: red; }');

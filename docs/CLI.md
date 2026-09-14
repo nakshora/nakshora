@@ -34,14 +34,18 @@ nakshora build --watch                  # rebuild on change
 nakshora build -c path/to/config.js     # explicit config
 ```
 
-| Flag                  | Description                                                               |
-| --------------------- | ------------------------------------------------------------------------- |
-| `input`               | Optional CSS file containing `@nakshora source;` / `@nakshora utilities;` |
-| `-o, --output <file>` | Write to file (default: stdout)                                           |
-| `-m, --minify`        | Minify output                                                             |
-| `--mode <full\|jit>`  | Force the build mode (default: JIT when content is configured)            |
-| `-c, --config <path>` | Explicit config file                                                      |
-| `--watch`             | Rebuild on change                                                         |
+| Flag                  | Description                                                                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| `input`               | Optional CSS file containing `@nakshora source;` / `@nakshora utilities;`, `@apply`, `theme()`, `@screen` |
+| `-o, --output <file>` | Write to file (default: stdout)                                                                           |
+| `-m, --minify`        | Minify output                                                                                             |
+| `--mode <full\|jit>`  | Force the build mode (default: JIT when content is configured)                                            |
+| `-c, --config <path>` | Explicit config file                                                                                      |
+| `--watch`             | Rebuild on change                                                                                         |
+
+When `input` is given, `@apply` / `theme()` / `screen()` / `@screen` in it are
+expanded (see [POSTCSS.md](POSTCSS.md#apply-theme-screen-and-screen)); an
+unknown class fails the build with `input.css: The \`x\` class does not exist…`.
 
 **Build mode selection:**
 

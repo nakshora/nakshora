@@ -3,6 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import {
+  ApplyError,
   CSSGenerator,
   formatBytes,
   minifyCss,
@@ -32,6 +33,7 @@ export interface BuildResult {
 
 const SOURCE_RE = /@nakshora\s+source\s*;?/g;
 const UTILITIES_RE = /@nakshora\s+utilities\s*;?/g;
+const AUTHOR_RE = /@apply\b|@screen\b|\b(?:theme|screen)\(/;
 
 /**
  * Run a full Nakshora build.
@@ -58,8 +60,18 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   if (input.input) {
     const absInput = isAbsolute(input.input) ? input.input : resolve(cwd, input.input);
     if (existsSync(absInput)) {
-      const source = readFileSync(absInput, 'utf-8');
-      if (SOURCE_RE.test(source) || UTILITIES_RE.test(source)) {
+      let source = readFileSync(absInput, 'utf-8');
+      // `@apply` / `theme()` / `screen()` / `@screen` in the author stylesheet
+      const authorPass = AUTHOR_RE.test(source);
+      if (authorPass) {
+        try {
+          source = generator.processCss(source);
+        } catch (err) {
+          if (err instanceof ApplyError) throw new Error(`${input.input}: ${err.message}`);
+          throw err;
+        }
+      }
+      if (authorPass || SOURCE_RE.test(source) || UTILITIES_RE.test(source)) {
         const hasJitContent = content.length > 0;
         // `@nakshora source;` → the complete pipeline for the active mode:
         // JIT build (base + variables + keyframes + used utilities + components)

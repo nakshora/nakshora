@@ -106,6 +106,30 @@ describe('runBuild', () => {
     expect(css).not.toContain('@nakshora');
   });
 
+  it('expands @apply / theme() in the input stylesheet and fails loudly on unknown classes', async () => {
+    const input = join(tmp, 'apply.css');
+    const out = join(tmp, 'dist', 'apply.css');
+    writeFileSync(
+      input,
+      '@nakshora utilities;\n.btn { @apply px-4 hover:bg-red-500; color: theme(colors.blue.500); }\n',
+    );
+    await runBuild({ config: { content: ['./src/**/*.html'] }, input, output: out, cwd: tmp });
+    const css = readFileSync(out, 'utf-8');
+    expect(css).toContain('.btn { padding-left: 1rem; padding-right: 1rem; }');
+    expect(css).toContain('.btn:hover { --tw-bg-opacity: 1;');
+    expect(css).toContain('.btn { color: #3b82f6; }');
+    expect(css).not.toContain('@apply');
+    expect(css).not.toContain('@nakshora');
+    // author-only stylesheet (no `@nakshora` at-rule) is processed too
+    writeFileSync(input, '.a { @apply p-2; }\n');
+    await runBuild({ config: { content: ['./src/**/*.html'] }, input, output: out, cwd: tmp });
+    expect(readFileSync(out, 'utf-8')).toBe('.a { padding: 0.5rem; }\n');
+    writeFileSync(input, '.a { @apply nope-42; }\n');
+    await expect(
+      runBuild({ config: { content: ['./src/**/*.html'] }, input, output: out, cwd: tmp }),
+    ).rejects.toThrow(/apply\.css: .*nope-42/);
+  });
+
   it('prints a summary line', async () => {
     const result = await runBuild({
       config: { content: ['./src/**/*.html'] },

@@ -74,6 +74,10 @@ Instead of the virtual module, keep a classic entry file:
 import './nakshora.css';
 ```
 
+Every `.css` file in the project goes through the bundled PostCSS plugin, so
+`@nakshora …` at-rules, `@apply`, `theme()` and `@screen` work in any
+stylesheet (see [POSTCSS.md](POSTCSS.md#apply-theme-screen-and-screen)).
+
 ## Framework wrappers
 
 - **Vue 3 + Vite** — same as vanilla; `content: ['*.html', 'src/**/*.{vue,js,ts}']`

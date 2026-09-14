@@ -31,6 +31,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   default: () => nakshora,
+  needsAuthorPass: () => needsAuthorPass,
+  runAuthorPass: () => runAuthorPass,
   spliceCss: () => spliceCss
 });
 module.exports = __toCommonJS(src_exports);
@@ -7856,15 +7858,50 @@ function spliceCss(atRule, css) {
   parent.nodes = nodes.slice(0, idx).concat(fresh, nodes.slice(idx + 1));
   parent.markDirty();
 }
+function needsAuthorPass(root) {
+  let found = false;
+  root.walk((node) => {
+    if (found) return false;
+    if (node.type === "atrule" && (node.name === "apply" || node.name === "screen")) found = true;
+    else if (node.type === "decl" && /\b(?:theme|screen)\(/.test(node.value)) found = true;
+    else if (node.type === "atrule" && /\b(?:theme|screen)\(/.test(node.params)) found = true;
+    return found ? false : void 0;
+  });
+  return found;
+}
+function runAuthorPass(root, generator, result) {
+  let css;
+  try {
+    css = generator.processCss(root.toString());
+  } catch (err) {
+    if (err instanceof ApplyError) {
+      const node = err.candidate && (() => {
+        let hit;
+        root.walkAtRules("apply", (at) => {
+          if (!hit && at.params.split(/\s+/).includes(err.candidate)) hit = at;
+        });
+        return hit;
+      })() || root;
+      throw node.error(err.message, { plugin: "nakshora", word: err.candidate });
+    }
+    throw err;
+  }
+  const parsed = import_postcss.default.parse(css, { from: result.opts.from });
+  root.removeAll();
+  root.append(parsed.nodes);
+}
 function nakshora(options = {}) {
   return {
     postcssPlugin: "nakshora",
-    async Once(root) {
+    async Once(root, { result }) {
       const config = { ...options.config ?? {} };
       if (options.content !== void 0) config.content = options.content;
-      const generator = new CSSGenerator(config);
       const baseDir = options.base ?? (root.source?.input?.file ? (0, import_node_path.resolve)(root.source.input.file, "..") : process.cwd());
       const hasAtRule = root.nodes?.some((n) => n.type === "atrule" && n.name === "nakshora");
+      const authorPass = options.apply !== false && needsAuthorPass(root);
+      if (!hasAtRule && !authorPass) return;
+      const generator = new CSSGenerator(config);
+      if (authorPass) runAuthorPass(root, generator, result);
       if (!hasAtRule) return;
       const useJIT = config.content !== void 0 || config.purge !== void 0;
       const content = await resolveContent(config.content ?? config.purge, baseDir);
@@ -7893,6 +7930,8 @@ function nakshora(options = {}) {
 nakshora.postcss = true;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  needsAuthorPass,
+  runAuthorPass,
   spliceCss
 });
 module.exports = Object.assign(module.exports.default, module.exports);

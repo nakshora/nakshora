@@ -7798,6 +7798,7 @@ async function resolveContent(content, cwd = process.cwd()) {
 // src/build.ts
 var SOURCE_RE = /@nakshora\s+source\s*;?/g;
 var UTILITIES_RE = /@nakshora\s+utilities\s*;?/g;
+var AUTHOR_RE = /@apply\b|@screen\b|\b(?:theme|screen)\(/;
 async function runBuild(input) {
   const cwd = input.cwd ?? process.cwd();
   const config = input.config;
@@ -7817,8 +7818,17 @@ async function runBuild(input) {
   if (input.input) {
     const absInput = isAbsolute(input.input) ? input.input : resolve2(cwd, input.input);
     if (existsSync2(absInput)) {
-      const source = readFileSync2(absInput, "utf-8");
-      if (SOURCE_RE.test(source) || UTILITIES_RE.test(source)) {
+      let source = readFileSync2(absInput, "utf-8");
+      const authorPass = AUTHOR_RE.test(source);
+      if (authorPass) {
+        try {
+          source = generator.processCss(source);
+        } catch (err) {
+          if (err instanceof ApplyError) throw new Error(`${input.input}: ${err.message}`);
+          throw err;
+        }
+      }
+      if (authorPass || SOURCE_RE.test(source) || UTILITIES_RE.test(source)) {
         const hasJitContent = content.length > 0;
         const sourceCss = hasJitContent ? css : generator.generate({ minify: false, mode: "full" });
         const utilCss = hasJitContent ? generator.generateJIT(content, { minify: false }, { utilitiesOnly: true }) : generator.getUtilitiesFull(false);
