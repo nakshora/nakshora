@@ -82,22 +82,57 @@ Changes:
 
 ## From Tailwind CSS
 
-The utility surface is intentionally familiar, so most markup ports 1:1.
-Differences:
+The utility grammar is Tailwind v3.4's: **11,343 static + 1,338 dynamic
+classes** compile byte-identically (see [COMPATIBILITY.md](./COMPATIBILITY.md)
+§1 for the measured list and §3 for the 15 v4-only features that are not
+supported). Markup ports 1:1; the config needs a few edits — and
+`nakshora migrate` does the mechanical ones for you.
 
-| Tailwind                                                     | Nakshora                                                                 |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `@tailwind base; @tailwind components; @tailwind utilities;` | `@nakshora source;` (or layered at-rules)                                |
-| `tailwind.config.js`                                         | `nakshora.config.{js,ts,json}`                                           |
-| `npx tailwindcss -i in.css -o out.css`                       | `nakshora build in.css -o out.css --minify`                              |
-| `content: []`                                                | `content: []` (same semantics)                                           |
-| `darkMode: 'class'`                                          | `dark:` variants (class strategy built in)                               |
-| arbitrary values `w-[37px]`                                  | spacing scale + custom `theme.spacing` keys (no bracket syntax)          |
-| `@layer`                                                     | fixed layer order: base → variables → keyframes → utilities → components |
-| plugins via `plugin(...)`                                    | plugin objects with `handler(api)` (addUtilities/addComponents/addBase)  |
+### 1. Run the codemod
 
-Arbitrary-value patterns: add the needed token to the theme instead:
-
-```js
-theme: { spacing: { 37: '37px' } } // → w-37, p-37, …
+```bash
+npx nakshora migrate            # dry run: shows every change
+npx nakshora migrate --write    # apply
+npx nakshora doctor             # verify the result
 ```
+
+`migrate --from tailwind` (the default):
+
+- copies `tailwind.config.{js,cjs,mjs,ts}` to `nakshora.config.*` (existing
+  file is never overwritten), replaces the `import('tailwindcss').Config`
+  type comment with `import('@nakshora/core').NakshoraConfig`, and rewrites
+  `tailwindcss/defaultTheme`, `tailwindcss/colors` and `tailwindcss/plugin`
+  imports to their `@nakshora/core` named exports;
+- prints review notes for the keys that behave differently (below);
+- rewrites the renamed utilities in your sources (`flex-grow` → `grow`,
+  `flex-shrink` → `shrink`, `overflow-ellipsis` → `text-ellipsis`,
+  `decoration-slice/clone` → `box-decoration-*`).
+
+### 2. Review the config
+
+| Tailwind                                                     | Nakshora                                                                                                              |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `@tailwind base; @tailwind components; @tailwind utilities;` | `@nakshora source;` (or `@nakshora base; @nakshora components; @nakshora utilities;`)                                 |
+| `tailwind.config.js`                                         | `nakshora.config.{js,cjs,mjs,ts,json}` — same shape                                                                   |
+| `npx tailwindcss -i in.css -o out.css`                       | `nakshora build in.css -o out.css --minify`                                                                           |
+| `content`, `safelist`, `prefix`, `important`, `corePlugins`  | identical semantics                                                                                                   |
+| `theme.screens` (5 breakpoints)                              | 10 breakpoints `xxs`…`5xl` by default; setting `theme.screens` **replaces** the scale, `theme.extend.screens` adds    |
+| `darkMode: 'media'` (Tailwind default)                       | default is `'class'` (`.dark` ancestor); set `darkMode: 'media'` or `['selector', '[data-theme=dark]']` to keep yours |
+| `@apply`, `theme()`, `screen()`                              | supported, including variants and `!important`                                                                        |
+| arbitrary values / properties / variants                     | supported (`w-[37px]`, `[mask-type:luminance]`, `[&>*]:p-2`, `supports-[…]`, `has-[…]`)                               |
+| `@layer components { … }` in author CSS                      | supported: emitted in the fixed order base → components → utilities                                                   |
+| `plugin(fn)`, `plugin.withOptions`, official plugins         | run through the plugin adapter unchanged (typography, forms, aspect-ratio, container-queries verified)                |
+| `presets`, `separator`                                       | `presets` accepted (theme merged); `separator` fixed to `:`                                                           |
+| `@tailwind variants`, `theme.extend.screens` `raw:`          | ignored / not supported (see COMPATIBILITY §3)                                                                        |
+
+### 3. Update the build integration
+
+| Tailwind                             | Nakshora                                                        |
+| ------------------------------------ | --------------------------------------------------------------- |
+| `tailwindcss` in `postcss.config.js` | `@nakshora/postcss` ([POSTCSS.md](./POSTCSS.md))                |
+| `@tailwindcss/vite`                  | `@nakshora/vite-plugin` ([VITE.md](./VITE.md))                  |
+| `tailwindcss` CLI (`-i/-o/-w/-m`)    | `nakshora build/dev` (`-o`, `--watch`, `--minify`, `--content`) |
+| Tailwind IntelliSense                | `nakshora inspect <class>`, `ai/corpus.json` for editors        |
+
+Uninstall `tailwindcss` afterwards; `nakshora doctor` warns while both are
+installed because the two PostCSS plugins would fight over `@apply`.

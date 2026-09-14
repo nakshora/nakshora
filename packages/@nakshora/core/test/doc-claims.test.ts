@@ -44,6 +44,27 @@ describe('documentation claims match the code', () => {
     expect(read('docs/RESPONSIVE.md')).toContain('## The 10 breakpoints');
   });
 
+  it('JIT.md colour-matrix explanation matches the catalog', () => {
+    const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+    const paletteNames = Object.entries(gen.theme.colors)
+      .filter(([, v]) => typeof v === 'object' && v !== null && '500' in (v as object))
+      .map(([k]) => k);
+    const re = new RegExp(`-(?:${paletteNames.join('|')})-(?:${shades.join('|')})$`);
+    const colour = gen.getUtilities().filter((u) => re.test(u.class));
+    const families = new Set(colour.map((u) => u.class.replace(re, '-*')));
+    const jit = read('docs/JIT.md');
+    expect(jit).toContain(`${palettes} palettes × ${shades.length} shades ×`);
+    expect(jit).toContain(`${families.size} colour utilities`);
+    expect(jit).toContain(`= ${fmt(colour.length)} of the ${fmt(catalog)} catalog classes`);
+    // bytes: rules with a hex colour / rgb() / opacity var share of the pretty full build
+    const pretty = gen.generate({ mode: 'full' });
+    let colourBytes = 0;
+    for (const m of pretty.matchAll(/^\s*[^{}\n]+ \{ ([^}]*)\}$/gm))
+      if (/#[0-9a-f]{6}|rgb\(|--tw-[a-z-]*opacity/.test(m[1])) colourBytes += m[0].length;
+    const pct = ((100 * colourBytes) / pretty.length).toFixed(1);
+    expect(jit).toContain(`measured ${pct} % of the pretty full build`);
+  });
+
   it('full-build sizes quoted in docs are the real bytes', () => {
     const pretty = gen.generate({ mode: 'full' });
     const min = minifyCss(pretty);

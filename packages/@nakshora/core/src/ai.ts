@@ -2,6 +2,7 @@
 // Produces a structured corpus of every utility so LLMs can be
 // fine-tuned (SFT) or augmented (RAG) with accurate Nakshora knowledge.
 
+import { version as PACKAGE_VERSION } from './version';
 import type { NakshoraConfig, UtilityRule } from './types';
 import { escapeClassName } from './values';
 import { CSSGenerator, STATE_VARIANTS } from './generator';
@@ -53,7 +54,10 @@ function exampleFor(rule: UtilityRule): string {
 /**
  * Build the full AI corpus for the given configuration.
  */
-export function buildAICorpus(config: Partial<NakshoraConfig> = {}, version = '3.0.0'): AICorpus {
+export function buildAICorpus(
+  config: Partial<NakshoraConfig> = {},
+  version: string = PACKAGE_VERSION,
+): AICorpus {
   const generator = new CSSGenerator(config);
   const rules = generator.getUtilities();
 

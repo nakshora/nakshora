@@ -959,6 +959,14 @@ declare class CSSGenerator {
     /** Compile a single candidate to CSS (empty string when unknown) */
     compileClass(candidate: string): string;
     /** Statistics about a generated stylesheet */
+    /**
+     * Statistics for a stylesheet (default: the full build). Computed on the
+     * parsed CSS, not with regexes: a "rule" is a style rule with a selector,
+     * "responsive" means it sits inside a `@media`/`@container` at-rule,
+     * "variant" means at least one selector in the list carries a variant
+     * prefix (an escaped `\:` in the class part), and keyframe steps
+     * (`from`, `to`, `50%`) are excluded from all three.
+     */
     getStats(css?: string): GenerationStats;
     minify(css: string): string;
     /** Expand `@apply`, `theme()`, `screen()` and `@screen` in author CSS */
@@ -1306,6 +1314,7 @@ interface ScanFs {
 declare function scanSources(cache: ContentCache, fs: ScanFs, files: readonly string[], raw?: readonly string[]): Set<string>;
 
 declare const version = "3.0.0";
+
 declare const metadata: {
     name: string;
     version: string;

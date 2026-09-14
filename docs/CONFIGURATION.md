@@ -13,14 +13,47 @@ export default {
   content: './**/*.{html,js,ts,jsx,tsx,vue,astro,svelte,md}', // JIT mode
   purge: [], // legacy alias of content (string[])
   safelist: [], // classes always included (may include variants)
+  blocklist: [], // classes never emitted (JIT)
   theme: {}, // theme overrides (deep-merged)
+  presets: [], // configs/presets merged before `theme`
   variants: {}, // variant toggles
   corePlugins: {}, // group toggles
+  darkMode: 'class', // 'class' | 'media' | 'selector' | ['selector', '[data-theme=dark]'] | ['variant', '&:where(.dark, .dark *)'] | false
+  prefix: '', // class prefix, e.g. 'nk-' → .nk-flex
   important: false, // true | '#scope'
-  plugins: [], // Plugin objects
+  preflight: true, // include the reset in `base`
+  layers: false, // wrap output in real `@layer base/components/utilities`
+  combineMedia: true, // `print:md:flex` → one `@media print and (min-width: 768px)`
+  plugins: [], // Plugin objects / Tailwind plugin() / functions
   extractorPattern: undefined, // custom class-extractor regex
 };
 ```
+
+### `darkMode`
+
+`'class'` (default): `dark:` rules become `.dark\:flex:is(.dark *)`.
+`'media'`: `@media (prefers-color-scheme: dark)`. `'selector'` / `['selector', sel]`
+/ `['class', sel]`: custom ancestor selector. `['variant', selectors]`: raw
+selector template(s) with `&`. `false`: no `dark:` variant. See
+[VARIANTS.md](./VARIANTS.md).
+
+### `layers` — real cascade layers (opt-in)
+
+By default output is flat (like Tailwind v3) so it wins against
+unlayered third-party CSS. With `layers: true` every build (full and JIT)
+starts with `@layer base, components, utilities;` and wraps the three
+sections in `@layer` blocks, so your own unlayered CSS always overrides
+utilities and the framework can be combined with other layered stylesheets:
+
+```css
+@layer base, components, utilities;
+@layer base { … preflight, variables, keyframes … }
+@layer components { … design-system + plugin components … }
+@layer utilities { .flex { display: flex; } @media (min-width: 768px) { … } }
+```
+
+Author CSS `@layer components { .btn { @apply … } }` is expanded in place
+either way.
 
 ### `content` — JIT sources
 

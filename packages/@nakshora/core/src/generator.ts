@@ -40,10 +40,11 @@ import {
   type AnyPlugin,
   type PluginCollector,
 } from './plugin-api';
-import { serializeCss, type CssNode } from './css-ast';
+import { parseCss, serializeCss, splitSelectorList, walkRules, type CssNode } from './css-ast';
 import { processAuthorCss } from './apply';
 import { compareRules } from './engine';
 import { splitPath } from './theme';
+import { version } from './version';
 
 /**
  * A single state-variant definition (public, documentation-oriented view).
@@ -172,7 +173,7 @@ export interface ResolvedBreakpoint {
   value: string;
 }
 
-const VERSION = '3.0.0';
+const VERSION = version;
 /** Breakpoints whose responsive variants are part of the default full build. */
 export const CORE_SCREENS = ['sm', 'md', 'lg', 'xl', '2xl'];
 
@@ -358,17 +359,31 @@ export class CSSGenerator {
   }
 
   /** Statistics about a generated stylesheet */
+  /**
+   * Statistics for a stylesheet (default: the full build). Computed on the
+   * parsed CSS, not with regexes: a "rule" is a style rule with a selector,
+   * "responsive" means it sits inside a `@media`/`@container` at-rule,
+   * "variant" means at least one selector in the list carries a variant
+   * prefix (an escaped `\:` in the class part), and keyframe steps
+   * (`from`, `to`, `50%`) are excluded from all three.
+   */
   getStats(css?: string): GenerationStats {
     const generated = css ?? this.generate();
     const minified = minifyCss(generated);
-    const ruleCount = (generated.match(/\{[^{}]*\}/g) ?? []).length;
-    const responsiveRules = countRulesInside(generated, /@media \((?:min|max)-width/);
-    const variantRules = (generated.match(/\\:/g) ?? []).length;
+    let totalRules = 0;
+    let responsiveRules = 0;
+    let variantRules = 0;
+    for (const { rule, ancestors } of walkRules(parseCss(generated).nodes)) {
+      if (ancestors.some((a) => a.name === 'keyframes')) continue;
+      totalRules++;
+      if (ancestors.some((a) => a.name === 'media' || a.name === 'container')) responsiveRules++;
+      if (splitSelectorList(rule.selector).some((sel) => /\\:/.test(sel))) variantRules++;
+    }
     return {
       utilities: this.buildCatalog().length,
       responsiveRules,
       variantRules,
-      totalRules: ruleCount,
+      totalRules,
       sizeBytes: byteLength(generated),
       minifiedSizeBytes: byteLength(minified),
     };
@@ -862,26 +877,6 @@ function atRuleText(at: CompiledRule['atrules'][number]): string {
     default:
       return `@${at.params}`;
   }
-}
-
-function countRulesInside(css: string, header: RegExp): number {
-  let count = 0;
-  const lines = css.split('\n');
-  let depth = 0;
-  let inside = 0;
-  for (const line of lines) {
-    if (header.test(line) && line.trimEnd().endsWith('{')) {
-      inside = depth + 1;
-      depth++;
-      continue;
-    }
-    const opens = (line.match(/\{/g) ?? []).length;
-    const closes = (line.match(/\}/g) ?? []).length;
-    if (inside && depth >= inside && /\{[^}]*\}/.test(line)) count++;
-    depth += opens - closes;
-    if (depth < inside) inside = 0;
-  }
-  return count;
 }
 
 /** Tailwind-compatible preflight (v3.4) with Nakshora's font stack applied. */

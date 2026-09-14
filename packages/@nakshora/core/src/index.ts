@@ -129,12 +129,13 @@ export { buildAICorpus, corpusToSFT };
 export type { AICorpus, AICategory, AIUtilityEntry } from './ai';
 
 // Version
-export const version = '3.0.0';
+import { version } from './version';
+export { version };
 
 // Package metadata
 export const metadata = {
   name: 'nakshora',
-  version: '3.0.0',
+  version,
   description: 'The modern, ultra-fast, utility-first CSS framework with a JIT compiler',
   author: 'Rizwan Rahim Chowdhury',
   maintainer: 'RRC Development',

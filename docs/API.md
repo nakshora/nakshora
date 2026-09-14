@@ -102,14 +102,19 @@ interface UtilityRule {
 
 ```ts
 interface GenerationStats {
-  utilities: number;
-  responsiveRules: number;
-  variantRules: number;
-  totalRules: number;
+  utilities: number; // catalog size (value-bearing classes without variants)
+  responsiveRules: number; // style rules inside @media / @container
+  variantRules: number; // style rules whose selector list has a variant prefix (`\:`)
+  totalRules: number; // style rules (keyframe steps excluded)
   sizeBytes: number;
   minifiedSizeBytes: number;
 }
 ```
+
+Counts are taken from the parsed stylesheet (`parseCss`), so nested at-rules,
+selector lists and comments are handled exactly. Full build (measured):
+68,601 rules, 57,115 responsive, 57,110 variant — the 5 non-variant responsive
+rules are the `sm`…`2xl` `.container` steps.
 
 ### `generator.minify(css) → string`
 

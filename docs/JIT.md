@@ -68,8 +68,11 @@ Tailwind-compatible `purge: [...]` works as an alias of `content`
 
 ## Sizes
 
-Full-build size is dominated by the color matrix (22 palettes × 11 shades ×
-6 utilities × 6 responsive slots). You can shrink it:
+Full-build size is dominated by the colour matrix: 22 palettes × 11 shades ×
+25 colour utilities (`bg-*`, `text-*`, `border-*` ×10 sides, `ring-*`,
+`from/via/to-*`, …) = 6,050 of the 11,417 catalog classes, each emitted in 6
+slots (base + `sm`…`2xl`) — measured 66.7 % of the pretty full build's bytes.
+You can shrink it:
 
 ```js
 corePlugins: { gradients: false, filters: false, whitespace: false },

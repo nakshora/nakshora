@@ -1423,6 +1423,16 @@ function declText(d, minify = false) {
 function minifyCssSafe(css) {
   return serializeCss(parseCss(css), { minify: true });
 }
+function* walkRules(nodes, ancestors = []) {
+  for (const node of nodes) {
+    if (node.type === "rule") {
+      yield { rule: node, ancestors };
+      yield* walkRules(node.nodes, ancestors);
+    } else if (node.type === "atrule" && node.nodes) {
+      yield* walkRules(node.nodes, [...ancestors, node]);
+    }
+  }
+}
 function kebabProp(prop) {
   if (prop.startsWith("--")) return prop;
   return prop.replace(/^(Webkit|Moz|Ms|O)(?=[A-Z])/, (m) => `-${m.toLowerCase()}`).replace(/([a-z\d])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();
@@ -7049,6 +7059,7 @@ function atParams(kind, params) {
   if (kind === "starting") return "";
   return params;
 }
+var version = "3.0.0";
 var STATE_VARIANTS = [
   {
     prefix: "hover",
@@ -7149,7 +7160,7 @@ var STATE_VARIANTS = [
     description: "dark mode"
   }
 ];
-var VERSION = "3.0.0";
+var VERSION = version;
 var CORE_SCREENS = ["sm", "md", "lg", "xl", "2xl"];
 var CSSGenerator = class {
   config;
@@ -7302,17 +7313,31 @@ var CSSGenerator = class {
     return this.serializeRules(this.engine.compile(candidate));
   }
   /** Statistics about a generated stylesheet */
+  /**
+   * Statistics for a stylesheet (default: the full build). Computed on the
+   * parsed CSS, not with regexes: a "rule" is a style rule with a selector,
+   * "responsive" means it sits inside a `@media`/`@container` at-rule,
+   * "variant" means at least one selector in the list carries a variant
+   * prefix (an escaped `\:` in the class part), and keyframe steps
+   * (`from`, `to`, `50%`) are excluded from all three.
+   */
   getStats(css) {
     const generated = css ?? this.generate();
     const minified = minifyCss(generated);
-    const ruleCount = (generated.match(/\{[^{}]*\}/g) ?? []).length;
-    const responsiveRules = countRulesInside(generated, /@media \((?:min|max)-width/);
-    const variantRules = (generated.match(/\\:/g) ?? []).length;
+    let totalRules = 0;
+    let responsiveRules = 0;
+    let variantRules = 0;
+    for (const { rule, ancestors } of walkRules(parseCss(generated).nodes)) {
+      if (ancestors.some((a) => a.name === "keyframes")) continue;
+      totalRules++;
+      if (ancestors.some((a) => a.name === "media" || a.name === "container")) responsiveRules++;
+      if (splitSelectorList(rule.selector).some((sel) => /\\:/.test(sel))) variantRules++;
+    }
     return {
       utilities: this.buildCatalog().length,
       responsiveRules,
       variantRules,
-      totalRules: ruleCount,
+      totalRules,
       sizeBytes: byteLength(generated),
       minifiedSizeBytes: byteLength(minified)
     };
@@ -7736,25 +7761,6 @@ function atRuleText(at) {
     default:
       return `@${at.params}`;
   }
-}
-function countRulesInside(css, header) {
-  let count = 0;
-  const lines = css.split("\n");
-  let depth = 0;
-  let inside = 0;
-  for (const line of lines) {
-    if (header.test(line) && line.trimEnd().endsWith("{")) {
-      inside = depth + 1;
-      depth++;
-      continue;
-    }
-    const opens = (line.match(/\{/g) ?? []).length;
-    const closes = (line.match(/\}/g) ?? []).length;
-    if (inside && depth >= inside && /\{[^}]*\}/.test(line)) count++;
-    depth += opens - closes;
-    if (depth < inside) inside = 0;
-  }
-  return count;
 }
 function preflight(theme) {
   const sans = fontStack(theme.fontFamily?.sans) || 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
