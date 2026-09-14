@@ -5996,14 +5996,17 @@ var Engine = class {
     if (!negative) {
       for (const s of this.staticMap.get(base) ?? []) {
         if (!this.options.pluginEnabled(s.p)) continue;
+        const decls = Object.fromEntries(s.d);
+        const animations = s.pc ? animationNames(decls.animation ?? decls["animation-name"]) : void 0;
         out.push({
-          decls: Object.fromEntries(s.d),
+          decls,
           selector: s.s,
           siblings: s.sl,
           component: s.pc,
           plugin: s.p,
           defaults: s.df,
           atrules: s.at?.map(parseAtRule),
+          animations: animations?.length ? animations : void 0,
           sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 }
         });
       }
@@ -6810,7 +6813,8 @@ var PLUGIN_CATEGORY = {
   fieldSizing: "interactivity",
   colorScheme: "interactivity",
   arbitraryProperties: "plugin",
-  components: "components"
+  components: "components",
+  "plugin-components": "components"
 };
 function categoryForPlugin(plugin2) {
   return PLUGIN_CATEGORY[plugin2] ?? (GROUP_CATEGORIES[plugin2] ? plugin2 : "plugin");
@@ -6833,6 +6837,7 @@ function buildUtilityList(theme = {}) {
 }
 
 // src/plugin-api.ts
+var PLUGIN_COMPONENTS_GROUP = "plugin-components";
 function normalizePlugin(plugin2) {
   if (typeof plugin2 === "function") {
     if (plugin2.__isOptionsFunction) {
@@ -6949,7 +6954,7 @@ function createPluginAPI(collector, ctx) {
         ])
       )
     );
-    const group = typeof options === "string" ? options : kind === "components" ? "components" : ctx.pluginName;
+    const group = typeof options === "string" ? options : kind === "components" ? PLUGIN_COMPONENTS_GROUP : ctx.pluginName;
     const { rules } = cssInJsToRules(normalised);
     collector.statics.push(...rulesToStatics(group, rules));
   };
@@ -6968,7 +6973,7 @@ function createPluginAPI(collector, ctx) {
         }));
       };
       collector.functional.push({
-        plugin: kind === "components" ? "components" : ctx.pluginName,
+        plugin: kind === "components" ? PLUGIN_COMPONENTS_GROUP : ctx.pluginName,
         prefix,
         values: options.values ?? {},
         types,
@@ -7653,6 +7658,7 @@ var CSSGenerator = class {
     const emitted = /* @__PURE__ */ new Set();
     const animations = /* @__PURE__ */ new Set();
     const defaults = /* @__PURE__ */ new Set();
+    const seenRules = /* @__PURE__ */ new Set();
     const ordered = [...new Set(candidates)].sort((x, y) => x < y ? -1 : x > y ? 1 : 0);
     for (const raw of ordered) {
       if (emitted.has(raw) || block.has(raw)) continue;
@@ -7674,6 +7680,9 @@ var CSSGenerator = class {
           ...r,
           selector: r.selector.split(`.${escapeClass(candidate)}`).join(`.${escapeClass(raw)}`)
         } : r;
+        const identity = `${rule.selector}\0${rule.atrules.map((a) => `${a.kind} ${a.params}`).join("|")}\0${JSON.stringify(rule.decls)}`;
+        if (seenRules.has(identity)) continue;
+        seenRules.add(identity);
         rules.push(rule);
         if (r.defaults) defaults.add(r.defaults);
         for (const a of r.animations ?? []) animations.add(a);

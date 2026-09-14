@@ -43,7 +43,7 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "build": "pnpm -r build && node scripts/generate-css.mjs",
+    "build": "pnpm -r build && node scripts/generate-css.mjs && node scripts/build-site.mjs",
     "build:core": "pnpm -F @nakshora/core build",
     "build:cli": "pnpm -F @nakshora/cli build",
     "build:postcss": "pnpm -F @nakshora/postcss build",

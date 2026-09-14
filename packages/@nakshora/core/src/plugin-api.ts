@@ -36,6 +36,14 @@ export interface LegacyPlugin {
   handler?: (api: PluginAPI) => void;
 }
 
+/**
+ * Group name for user `addComponents` / `matchComponents` output. Deliberately
+ * distinct from the `components` core-plugin key so that
+ * `corePlugins: { components: false }` (which disables Nakshora's *built-in*
+ * component blocks) never silences a project's own plugin components.
+ */
+export const PLUGIN_COMPONENTS_GROUP = 'plugin-components';
+
 export interface MatchOptions {
   values?: Record<string, unknown>;
   type?: DataType | Array<DataType | [DataType, { preferOnConflict?: boolean }]>;
@@ -281,7 +289,11 @@ export function createPluginAPI(
       ),
     );
     const group =
-      typeof options === 'string' ? options : kind === 'components' ? 'components' : ctx.pluginName;
+      typeof options === 'string'
+        ? options
+        : kind === 'components'
+          ? PLUGIN_COMPONENTS_GROUP
+          : ctx.pluginName;
     const { rules } = cssInJsToRules(normalised as CssInJs[]);
     collector.statics.push(...rulesToStatics(group, rules));
   };
@@ -310,7 +322,7 @@ export function createPluginAPI(
         }));
       };
       collector.functional.push({
-        plugin: kind === 'components' ? 'components' : ctx.pluginName,
+        plugin: kind === 'components' ? PLUGIN_COMPONENTS_GROUP : ctx.pluginName,
         prefix,
         values: options.values ?? {},
         types,

@@ -3,7 +3,17 @@
 ## From Nakshora v1 (static CSS)
 
 v1 was a single static file (`min.main.css`) with everything baked in.
-v3 is a compiler.
+v3 is a compiler. The v1 file is frozen at `minified-version/v1.0.0.css`; the
+`min.main.css` URL now serves the v3 full build (`dist/css/nakshora.min.css`).
+
+The whole v1 design system (palettes `neon-*`, `pastel-*`, `mono`, `forest`,
+`ocean`, `sunset`, `brutal-*`; components `btn*`, `card*`, `input*`, `badge*`,
+`progress*`, `alert*`, `tabs`/`tab`, `toggle`, `spinner-neon`, `navbar-glass`,
+`glass`, `neu-light`, glow/gradient helpers; fluid `text-*` scale) is expressed
+as a real Nakshora config in [`site/nakshora.config.mjs`](../site/nakshora.config.mjs):
+palettes → `theme.extend.colors`, tokens → `theme.extend.*`, components →
+`plugins[].addComponents`. Copy it as your `nakshora.config.js` to keep the v1
+look on the v3 compiler; the landing page (`index.html`) is built exactly that way.
 
 | v1                                        | v3                                                                        |
 | ----------------------------------------- | ------------------------------------------------------------------------- |

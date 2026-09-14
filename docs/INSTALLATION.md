@@ -47,8 +47,9 @@ Pinned version:
 />
 ```
 
-> v1 CDN file (legacy, still served):
-> `https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css`
+> `https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css` (the historical URL) serves the
+> same bytes as `dist/css/nakshora.min.css`. The frozen v1.0.0 stylesheet is
+> `…@main/minified-version/v1.0.0.css` — see `minified-version/cdn.md`.
 
 ## Monorepo (framework development)
 

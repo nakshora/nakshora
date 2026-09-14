@@ -241,6 +241,7 @@ const PLUGIN_CATEGORY: Record<string, string> = {
   colorScheme: 'interactivity',
   arbitraryProperties: 'plugin',
   components: 'components',
+  'plugin-components': 'components',
 };
 
 /** Category id for a core plugin / plugin group name. */

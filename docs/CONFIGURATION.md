@@ -106,6 +106,14 @@ textColor, textDecoration, transforms, transitions, typography, whitespace, zInd
 corePlugins: { transforms: false, whitespace: false }
 ```
 
+`components: false` removes Nakshora's built-in showcase blocks (`.glass`,
+`.neon-btn`, `.brutalist-card`, …). It never affects components you register
+yourself with `addComponents` / `matchComponents` — those belong to the
+`plugin-components` group. `preflight: false` (or the top-level
+`preflight: false`) drops the Tailwind reset; `variables: false` drops the
+`:root { --color-*, --spacing-*, … }` block; `container: false` removes
+`.container` so a plugin can define its own.
+
 ### `important`
 
 ```js

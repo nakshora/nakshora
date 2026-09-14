@@ -247,6 +247,62 @@ describe('CSSGenerator — options & config', () => {
     expect(css).toContain('h1 { margin: 1rem 0; }');
   });
 
+  it('corePlugins.components:false disables built-in blocks but never user addComponents', () => {
+    const gen = new CSSGenerator({
+      corePlugins: { components: false },
+      plugins: [
+        {
+          handler: (api) => {
+            api.addComponents({ '.btn': { padding: '1rem' }, '.glass': { color: 'red' } });
+          },
+        },
+      ],
+    });
+    const css = gen.generateFromContent('<a class="btn glass neon-btn">');
+    expect(css).toContain('.btn { padding: 1rem; }');
+    // user `.glass` wins; the built-in showcase `.glass` block is gone
+    expect(css.split(/\n\.glass \{/).length - 1).toBe(1);
+    expect(css).toContain('.glass { color: red; }');
+    expect(css).not.toContain('.neon-btn');
+  });
+
+  it('a selector-list component used by several candidates is emitted once', () => {
+    const gen = new CSSGenerator({
+      plugins: [
+        {
+          handler: (api) => {
+            api.addComponents({ '.foo-link:hover, .bar-link:hover': { color: 'red' } });
+          },
+        },
+      ],
+    });
+    const rule = '.foo-link:hover, .bar-link:hover { color: red; }';
+    const css = gen.generateFromContent('<a class="foo-link bar-link">');
+    expect(css.split(rule).length - 1).toBe(1);
+    // a single candidate keeps the whole list (Tailwind emits the rule verbatim)…
+    expect(gen.generateFromContent('<a class="bar-link">')).toContain(rule);
+    // …but under a variant only its own part survives (Tailwind eliminateIrrelevantSelectors)
+    expect(gen.generateFromContent('<a class="md:bar-link">')).toContain(
+      '.md\\:bar-link:hover { color: red; }',
+    );
+  });
+
+  it('a plugin component that animates pulls its theme keyframes into the JIT build', () => {
+    const gen = new CSSGenerator({
+      plugins: [
+        {
+          handler: (api) => {
+            api.addComponents({ '.spinner': { animation: 'spin 1s linear infinite' } });
+          },
+        },
+      ],
+    });
+    const css = gen.generateFromContent('<a class="spinner">');
+    expect(css).toContain('@keyframes spin');
+    expect(css.split('@keyframes spin').length - 1).toBe(1);
+    expect(gen.generateFromContent('<a class="flex">')).not.toContain('@keyframes spin');
+  });
+
   it('applies presets', () => {
     const gen = new CSSGenerator({ theme: { colors: neonTheme.colors } });
     const css = gen.generate({ mode: 'full' });

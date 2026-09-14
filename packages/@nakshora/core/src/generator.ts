@@ -548,6 +548,7 @@ export class CSSGenerator {
     const emitted = new Set<string>();
     const animations = new Set<string>();
     const defaults = new Set<string>();
+    const seenRules = new Set<string>();
     // Tailwind sorts the candidate set (code-unit order) before generating, so
     // the output never depends on where a class was first seen.
     const ordered = [...new Set(candidates)].sort((x, y) => (x < y ? -1 : x > y ? 1 : 0));
@@ -574,6 +575,14 @@ export class CSSGenerator {
               selector: r.selector.split(`.${escapeClass(candidate)}`).join(`.${escapeClass(raw)}`),
             }
           : r;
+        // A selector-list component (`.a:hover, .b:hover { … }`) is registered
+        // under every class it names; when several of them are candidates the
+        // same rule must still be emitted once (Tailwind dedupes by rule identity).
+        const identity = `${rule.selector}\u0000${rule.atrules
+          .map((a) => `${a.kind} ${a.params}`)
+          .join('|')}\u0000${JSON.stringify(rule.decls)}`;
+        if (seenRules.has(identity)) continue;
+        seenRules.add(identity);
         rules.push(rule);
         if (r.defaults) defaults.add(r.defaults);
         for (const a of r.animations ?? []) animations.add(a);

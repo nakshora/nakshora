@@ -59,11 +59,8 @@
   <link rel="manifest" href="/site.webmanifest">
   <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
 
-  <!-- CSS (Nakshora framework)-->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/min.main.css"/>
-
-  <!-- Performance hints -->
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <!-- CSS: JIT build of this page against site/nakshora.config.mjs (node scripts/build-site.mjs) -->
+  <link rel="stylesheet" href="site/index.min.css"/>
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -128,106 +125,6 @@
   }
   </script>
 
-  <style>
-    body {
-      background:
-        radial-gradient(circle at top left, rgba(168, 85, 247, 0.18), transparent 30%),
-        radial-gradient(circle at top right, rgba(0, 255, 255, 0.15), transparent 30%),
-        radial-gradient(circle at bottom center, rgba(255, 0, 128, 0.12), transparent 35%),
-        hsl(0, 0%, 5%);
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-    }
-
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        135deg,
-        rgba(168, 85, 247, 0.14),
-        rgba(255, 0, 128, 0.10),
-        rgba(0, 255, 255, 0.10)
-      );
-      pointer-events: none;
-    }
-
-    .section-title {
-      position: relative;
-      display: inline-block;
-      padding-bottom: 0.5rem;
-    }
-
-    .section-title::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 60%;
-      height: 3px;
-      background: linear-gradient(90deg, hsl(280, 100%, 55%), hsl(180, 100%, 55%));
-      border-radius: 9999px;
-    }
-
-    .logo-dot {
-      width: 12px;
-      height: 12px;
-      display: inline-block;
-      border-radius: 9999px;
-      background: hsl(180, 100%, 55%);
-      box-shadow: 0 0 10px hsl(180, 100%, 55%), 0 0 20px hsl(180, 100%, 55%);
-    }
-
-    .showcase-box {
-      min-height: 180px;
-    }
-
-    .footer-link:hover,
-    .nav-link:hover {
-      color: hsl(180, 100%, 55%);
-    }
-
-    .code-inline {
-      font-family: monospace;
-      background: rgba(255,255,255,0.08);
-      padding: 0.2rem 0.45rem;
-      border-radius: 0.4rem;
-    }
-
-    .skip-link {
-      position: absolute;
-      left: -9999px;
-      top: 0;
-      z-index: 99999;
-      background: #000;
-      color: #fff;
-      padding: 0.75rem 1rem;
-      border-radius: 0.5rem;
-    }
-
-    .skip-link:focus {
-      left: 1rem;
-      top: 1rem;
-    }
-
-    .hero-kpis {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .hero-kpis {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body class="text-mono-white">
 

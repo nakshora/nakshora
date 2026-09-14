@@ -1290,14 +1290,21 @@ export class Engine {
     if (!negative) {
       for (const s of this.staticMap.get(base) ?? []) {
         if (!this.options.pluginEnabled(s.p)) continue;
+        const decls = Object.fromEntries(s.d);
+        // A plugin component that animates (`.spinner { animation: spin … }`)
+        // pulls its theme keyframes into the build like `animate-*` does.
+        const animations = s.pc
+          ? animationNames(decls.animation ?? decls['animation-name'])
+          : undefined;
         out.push({
-          decls: Object.fromEntries(s.d),
+          decls,
           selector: s.s,
           siblings: s.sl,
           component: s.pc,
           plugin: s.p,
           defaults: s.df,
           atrules: s.at?.map(parseAtRule),
+          animations: animations?.length ? animations : undefined,
           sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 },
         });
       }
