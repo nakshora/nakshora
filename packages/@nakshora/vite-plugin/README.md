@@ -18,7 +18,7 @@ design components and theme presets, compiled down to only the classes you use.
 npm install -D @nakshora/vite-plugin
 ```
 
-`vite ^5 || ^6` is a peer dependency.
+`vite ^5 || ^6 || ^7 || ^8` is a peer dependency (each major is exercised by a real `vite build` in `test/integration.test.ts`; Vite 7+ needs Node ≥ 20.19).
 
 ## Quick start
 

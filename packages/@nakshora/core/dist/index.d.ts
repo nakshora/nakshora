@@ -991,9 +991,10 @@ declare class CSSGenerator {
      * Compile a JIT build from content.
      * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
      */
-    generateJIT(content: string | string[] | undefined, _options: GenerationOptions, internal?: {
+    generateJIT(content: string | string[] | undefined, options?: GenerationOptions, internal?: {
         utilitiesOnly?: boolean;
     }): string;
+    private generateJITPretty;
     /** Components layer — only the built-in blocks whose classes appear in `candidates`. */
     private componentsFor;
 }

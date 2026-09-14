@@ -7200,13 +7200,13 @@ var CSSGenerator = class {
    */
   generate(options = {}) {
     const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
-    const css = mode === "jit" ? this.generateJIT(options.content ?? this.getContentFromConfig(), options) : this.generateFull(options);
+    if (mode === "jit") return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
+    const css = this.generateFull(options);
     return options.minify ? minifyCss(css) : css;
   }
   /** Generate JIT CSS from explicit content */
   generateFromContent(content, options = {}) {
-    const css = this.generateJIT(content, options);
-    return options.minify ? minifyCss(css) : css;
+    return this.generateJIT(content, options);
   }
   /** All utility rules in catalog order (value-bearing classes, no variants) */
   getUtilities() {
@@ -7575,7 +7575,11 @@ ${css}}
    * Compile a JIT build from content.
    * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
    */
-  generateJIT(content, _options, internal) {
+  generateJIT(content, options = {}, internal) {
+    const css = this.generateJITPretty(content, options, internal);
+    return options.minify ? minifyCss(css) : css;
+  }
+  generateJITPretty(content, _options, internal) {
     const utilitiesOnly = internal?.utilitiesOnly ?? false;
     const chunks = typeof content === "string" ? [content] : content ?? [];
     const found = extractClasses(chunks, this.config.extractorPattern);
@@ -14907,13 +14911,13 @@ var CSSGenerator2 = class {
    */
   generate(options = {}) {
     const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
-    const css = mode === "jit" ? this.generateJIT(options.content ?? this.getContentFromConfig(), options) : this.generateFull(options);
+    if (mode === "jit") return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
+    const css = this.generateFull(options);
     return options.minify ? minifyCss2(css) : css;
   }
   /** Generate JIT CSS from explicit content */
   generateFromContent(content, options = {}) {
-    const css = this.generateJIT(content, options);
-    return options.minify ? minifyCss2(css) : css;
+    return this.generateJIT(content, options);
   }
   /** All utility rules in catalog order (value-bearing classes, no variants) */
   getUtilities() {
@@ -15282,7 +15286,11 @@ ${css}}
    * Compile a JIT build from content.
    * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
    */
-  generateJIT(content, _options, internal) {
+  generateJIT(content, options = {}, internal) {
+    const css = this.generateJITPretty(content, options, internal);
+    return options.minify ? minifyCss2(css) : css;
+  }
+  generateJITPretty(content, _options, internal) {
     const utilitiesOnly = internal?.utilitiesOnly ?? false;
     const chunks = typeof content === "string" ? [content] : content ?? [];
     const found = extractClasses2(chunks, this.config.extractorPattern);
@@ -15516,7 +15524,7 @@ function nakshora(options = {}) {
       const config = { ...options.config ?? {} };
       if (options.content !== void 0) config.content = options.content;
       const generator = new CSSGenerator2(config);
-      const baseDir = root.source?.input?.file ? (0, import_path.resolve)(root.source.input.file, "..") : process.cwd();
+      const baseDir = options.base ?? (root.source?.input?.file ? (0, import_path.resolve)(root.source.input.file, "..") : process.cwd());
       const hasAtRule = root.nodes?.some((n) => n.type === "atrule" && n.name === "nakshora");
       if (!hasAtRule) return;
       const useJIT = config.content !== void 0 || config.purge !== void 0;
@@ -15630,7 +15638,7 @@ function createWatcher(paths, onChange) {
 
 // src/index.ts
 var VIRTUAL_ID = "virtual:nakshora";
-var RESOLVED_VIRTUAL_ID = "\0" + VIRTUAL_ID;
+var RESOLVED_VIRTUAL_ID = "\0" + VIRTUAL_ID + ".css";
 async function resolveContent2(content, root) {
   if (!content) return [];
   const entries = Array.isArray(content) ? content : [content];
@@ -15662,15 +15670,21 @@ async function resolveContent2(content, root) {
 function nakshora2(options = {}) {
   const postcssEnabled = options.postcss ?? true;
   let watcher = null;
+  let root = process.cwd();
   return {
     name: "nakshora",
     enforce: "pre",
+    configResolved(resolved) {
+      root = resolved.root;
+    },
     config(config) {
       if (!postcssEnabled) return;
       const plugin3 = nakshora({
         config: options.config,
         content: options.content,
-        minify: options.minify
+        minify: options.minify,
+        // `config` runs before `configResolved`; resolve the root the same way Vite will
+        base: (0, import_node_path2.resolve)(config.root ?? process.cwd())
       });
       const css = config.css ?? {};
       const postcss2 = css.postcss;
@@ -15686,7 +15700,6 @@ function nakshora2(options = {}) {
     },
     async load(id) {
       if (id !== RESOLVED_VIRTUAL_ID) return null;
-      const root = process.cwd();
       const config = { ...options.config ?? {} };
       if (options.content !== void 0) config.content = options.content;
       const generator = new CSSGenerator(config);
@@ -15695,7 +15708,6 @@ function nakshora2(options = {}) {
       return css;
     },
     configureServer(server) {
-      const root = server.config.root;
       const content = options.content ?? options.config?.content ?? options.config?.purge;
       if (!content) return;
       const entries = Array.isArray(content) ? content : [content];

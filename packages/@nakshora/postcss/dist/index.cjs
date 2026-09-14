@@ -7201,13 +7201,13 @@ var CSSGenerator = class {
    */
   generate(options = {}) {
     const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
-    const css = mode === "jit" ? this.generateJIT(options.content ?? this.getContentFromConfig(), options) : this.generateFull(options);
+    if (mode === "jit") return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
+    const css = this.generateFull(options);
     return options.minify ? minifyCss(css) : css;
   }
   /** Generate JIT CSS from explicit content */
   generateFromContent(content, options = {}) {
-    const css = this.generateJIT(content, options);
-    return options.minify ? minifyCss(css) : css;
+    return this.generateJIT(content, options);
   }
   /** All utility rules in catalog order (value-bearing classes, no variants) */
   getUtilities() {
@@ -7576,7 +7576,11 @@ ${css}}
    * Compile a JIT build from content.
    * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
    */
-  generateJIT(content, _options, internal) {
+  generateJIT(content, options = {}, internal) {
+    const css = this.generateJITPretty(content, options, internal);
+    return options.minify ? minifyCss(css) : css;
+  }
+  generateJITPretty(content, _options, internal) {
     const utilitiesOnly = internal?.utilitiesOnly ?? false;
     const chunks = typeof content === "string" ? [content] : content ?? [];
     const found = extractClasses(chunks, this.config.extractorPattern);
@@ -7812,7 +7816,7 @@ function nakshora(options = {}) {
       const config = { ...options.config ?? {} };
       if (options.content !== void 0) config.content = options.content;
       const generator = new CSSGenerator(config);
-      const baseDir = root.source?.input?.file ? (0, import_node_path.resolve)(root.source.input.file, "..") : process.cwd();
+      const baseDir = options.base ?? (root.source?.input?.file ? (0, import_node_path.resolve)(root.source.input.file, "..") : process.cwd());
       const hasAtRule = root.nodes?.some((n) => n.type === "atrule" && n.name === "nakshora");
       if (!hasAtRule) return;
       const useJIT = config.content !== void 0 || config.purge !== void 0;
@@ -7844,4 +7848,5 @@ nakshora.postcss = true;
 0 && (module.exports = {
   spliceCss
 });
+module.exports = Object.assign(module.exports.default, module.exports);
 //# sourceMappingURL=index.cjs.map

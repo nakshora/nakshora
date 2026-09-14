@@ -27,7 +27,9 @@ export interface NakshoraViteOptions {
 }
 
 const VIRTUAL_ID = 'virtual:nakshora';
-const RESOLVED_VIRTUAL_ID = '\0' + VIRTUAL_ID;
+// The resolved id must end in `.css` so Vite's CSS pipeline (and Rollup in
+// `vite build`) treats the module as a stylesheet instead of parsing it as JS.
+const RESOLVED_VIRTUAL_ID = '\0' + VIRTUAL_ID + '.css';
 
 async function resolveContent(
   content: string | string[] | undefined,
@@ -74,16 +76,23 @@ async function resolveContent(
 export function nakshora(options: NakshoraViteOptions = {}): VitePlugin {
   const postcssEnabled = options.postcss ?? true;
   let watcher: WatcherHandle | null = null;
+  // Vite project root (content globs are relative to it, not to process.cwd())
+  let root = process.cwd();
 
   return {
     name: 'nakshora',
     enforce: 'pre',
+    configResolved(resolved) {
+      root = resolved.root;
+    },
     config(config) {
       if (!postcssEnabled) return;
       const plugin = nakshoraPostcss({
         config: options.config,
         content: options.content,
         minify: options.minify,
+        // `config` runs before `configResolved`; resolve the root the same way Vite will
+        base: resolve(config.root ?? process.cwd()),
       });
       const css = config.css ?? {};
       const postcss = css.postcss;
@@ -99,7 +108,6 @@ export function nakshora(options: NakshoraViteOptions = {}): VitePlugin {
     },
     async load(id) {
       if (id !== RESOLVED_VIRTUAL_ID) return null;
-      const root = process.cwd();
       const config: Partial<NakshoraConfig> = { ...(options.config ?? {}) };
       if (options.content !== undefined) config.content = options.content;
       const generator = new CSSGenerator(config);
@@ -111,7 +119,6 @@ export function nakshora(options: NakshoraViteOptions = {}): VitePlugin {
       return css;
     },
     configureServer(server) {
-      const root = server.config.root;
       const content = options.content ?? options.config?.content ?? options.config?.purge;
       if (!content) return;
       const entries = Array.isArray(content) ? content : [content];

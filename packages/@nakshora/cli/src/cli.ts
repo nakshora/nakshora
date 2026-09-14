@@ -2,8 +2,9 @@
 // (the shebang is added by tsup via the `banner` option in tsup.config.ts)
 
 import { Command } from 'commander';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { buildAICorpus, corpusToSFT, metadata, version, type NakshoraConfig } from '@nakshora/core';
 import { runBuild, summarize, collectWatchPaths } from './build';
@@ -202,8 +203,26 @@ program.action(() => {
 export { runBuild, resolveConfig, createWatcher, metadata };
 export default program;
 
+/**
+ * True when this module is the process entry point. `npx nakshora`, pnpm/yarn
+ * bins and global installs all run the binary through a symlink
+ * (`node_modules/.bin/nakshora`), so `process.argv[1]` and `import.meta.url`
+ * must be compared by real path — a plain string comparison silently did
+ * nothing (exit 0, no output) for every symlinked invocation.
+ */
+function isEntryPoint(): boolean {
+  if (process.env.NAKSHORA_CLI === '1') return true;
+  const argv1 = process.argv[1];
+  if (!argv1) return false;
+  try {
+    return realpathSync(argv1) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
 // Execute when run as a binary
-if (import.meta.url === `file://${process.argv[1]}` || process.env.NAKSHORA_CLI === '1') {
+if (isEntryPoint()) {
   program.parseAsync(process.argv).catch((err) => {
     console.error(chalk.red(`Error: ${(err as Error).message}`));
     process.exit(1);

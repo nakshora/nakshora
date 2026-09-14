@@ -11,6 +11,13 @@ interface NakshoraPostCSSOptions {
     content?: string | string[];
     /** Minify the generated CSS */
     minify?: boolean;
+    /**
+     * Directory content globs resolve against. Defaults to the directory of the
+     * CSS file being processed (falling back to `process.cwd()`); the Vite
+     * plugin passes the project root so `content: ['index.html']` means the same
+     * thing in `vite.config` and in every stylesheet.
+     */
+    base?: string;
 }
 /**
  * Replace `atRule` with the nodes parsed from `css` in O(n).

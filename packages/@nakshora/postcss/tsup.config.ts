@@ -1,16 +1,33 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig({
+const shared = {
   entry: { index: 'src/index.ts' },
-  format: ['esm', 'cjs'],
-  dts: true,
   sourcemap: true,
-  clean: true,
   target: 'es2022',
   platform: 'node',
   noExternal: [/@nakshora\/core/],
   external: ['postcss', 'globby'],
-  outExtension({ format }) {
-    return { js: format === 'cjs' ? '.cjs' : '.js' };
+} as const;
+
+export default defineConfig([
+  {
+    ...shared,
+    format: ['esm'],
+    dts: true,
+    clean: true,
+    outExtension: () => ({ js: '.js' }),
   },
-});
+  {
+    ...shared,
+    format: ['cjs'],
+    dts: true,
+    clean: false,
+    outExtension: () => ({ js: '.cjs' }),
+    // `require('@nakshora/postcss')` must be the plugin function itself
+    // (`require('@nakshora/postcss')({ … })`, and postcss-load-config's
+    // `plugins: { '@nakshora/postcss': {} }`), not `{ default }`.
+    footer: {
+      js: 'module.exports = Object.assign(module.exports.default, module.exports);',
+    },
+  },
+]);

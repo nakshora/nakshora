@@ -304,17 +304,15 @@ export class CSSGenerator {
    */
   generate(options: GenerationOptions = {}): string {
     const mode = options.mode ?? (this.hasContent() ? 'jit' : 'full');
-    const css =
-      mode === 'jit'
-        ? this.generateJIT(options.content ?? this.getContentFromConfig(), options)
-        : this.generateFull(options);
+    if (mode === 'jit')
+      return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
+    const css = this.generateFull(options);
     return options.minify ? minifyCss(css) : css;
   }
 
   /** Generate JIT CSS from explicit content */
   generateFromContent(content: string | string[], options: GenerationOptions = {}): string {
-    const css = this.generateJIT(content, options);
-    return options.minify ? minifyCss(css) : css;
+    return this.generateJIT(content, options);
   }
 
   /** All utility rules in catalog order (value-bearing classes, no variants) */
@@ -730,6 +728,15 @@ export class CSSGenerator {
    * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
    */
   generateJIT(
+    content: string | string[] | undefined,
+    options: GenerationOptions = {},
+    internal?: { utilitiesOnly?: boolean },
+  ): string {
+    const css = this.generateJITPretty(content, options, internal);
+    return options.minify ? minifyCss(css) : css;
+  }
+
+  private generateJITPretty(
     content: string | string[] | undefined,
     _options: GenerationOptions,
     internal?: { utilitiesOnly?: boolean },
