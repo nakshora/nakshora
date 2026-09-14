@@ -20,14 +20,22 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
+  TAILWIND_RENAMES: () => TAILWIND_RENAMES,
+  V1_RENAMES: () => V1_RENAMES,
   collectWatchPaths: () => collectWatchPaths,
   createWatcher: () => createWatcher,
+  diagnose: () => diagnose,
   findConfigFile: () => findConfigFile,
+  formatFindings: () => formatFindings,
+  generatedSourceMap: () => generatedSourceMap,
   loadConfigFile: () => loadConfigFile,
+  migrateSource: () => migrateSource,
+  migrateTailwindConfig: () => migrateTailwindConfig,
   resolveConfig: () => resolveConfig,
   resolveContent: () => resolveContent,
   resolveSources: () => resolveSources,
   runBuild: () => runBuild,
+  runMigrate: () => runMigrate,
   summarize: () => summarize,
   version: () => version
 });
@@ -7984,6 +7992,7 @@ var SOURCE_RE = /@nakshora\s+source\s*;?/g;
 var UTILITIES_RE = /@nakshora\s+utilities\s*;?/g;
 var AUTHOR_RE = /@apply\b|@screen\b|\b(?:theme|screen)\(/;
 async function runBuild(input) {
+  const started = performance.now();
   const cwd = input.cwd ?? process.cwd();
   const config = input.config;
   const generator = new CSSGenerator(config);
@@ -8001,16 +8010,19 @@ async function runBuild(input) {
     css = generator.generate({ ...options, mode: "full" });
     classes = countClasses(css);
   }
-  if (input.input) {
-    const absInput = (0, import_node_path2.isAbsolute)(input.input) ? input.input : (0, import_node_path2.resolve)(cwd, input.input);
-    if ((0, import_node_fs2.existsSync)(absInput)) {
-      let source = (0, import_node_fs2.readFileSync)(absInput, "utf-8");
+  const absInput = input.input && input.input !== "-" ? (0, import_node_path2.isAbsolute)(input.input) ? input.input : (0, import_node_path2.resolve)(cwd, input.input) : void 0;
+  if (input.inputCss !== void 0 || absInput && (0, import_node_fs2.existsSync)(absInput)) {
+    {
+      let source = input.inputCss ?? (0, import_node_fs2.readFileSync)(absInput, "utf-8");
       const authorPass = AUTHOR_RE.test(source);
       if (authorPass) {
         try {
           source = generator.processCss(source);
         } catch (err) {
-          if (err instanceof ApplyError) throw new Error(`${input.input}: ${err.message}`);
+          if (err instanceof ApplyError)
+            throw new Error(
+              `${input.input && input.input !== "-" ? input.input : "<stdin>"}: ${err.message}`
+            );
           throw err;
         }
       }
@@ -8027,18 +8039,57 @@ async function runBuild(input) {
       }
     }
   }
+  let mapFile;
   if (input.output) {
     const outPath = (0, import_node_path2.isAbsolute)(input.output) ? input.output : (0, import_node_path2.resolve)(cwd, input.output);
-    (0, import_node_fs2.mkdirSync)((0, import_node_path2.dirname)(outPath), { recursive: true });
-    (0, import_node_fs2.writeFileSync)(outPath, css, "utf-8");
-  } else {
+    if (input.sourceMap) {
+      mapFile = `${outPath}.map`;
+      const map = generatedSourceMap(
+        css,
+        (0, import_node_path2.basename)(outPath),
+        input.input && input.input !== "-" ? input.input : void 0
+      );
+      css += `
+/*# sourceMappingURL=${(0, import_node_path2.basename)(mapFile)} */
+`;
+      if (!input.dryRun) {
+        (0, import_node_fs2.mkdirSync)((0, import_node_path2.dirname)(outPath), { recursive: true });
+        (0, import_node_fs2.writeFileSync)(mapFile, JSON.stringify(map), "utf-8");
+      }
+    }
+    if (!input.dryRun) {
+      (0, import_node_fs2.mkdirSync)((0, import_node_path2.dirname)(outPath), { recursive: true });
+      (0, import_node_fs2.writeFileSync)(outPath, css, "utf-8");
+    }
+  } else if (!input.dryRun) {
     process.stdout.write(css);
   }
+  const unknown = mode === "jit" ? [...candidates].filter(
+    (c) => generator.engine.compile(c).length === 0 && !isComponentClass(generator, c)
+  ) : [];
   return {
     css,
     classes,
     sizeBytes: Buffer.byteLength(css, "utf-8"),
-    minifiedSizeBytes: Buffer.byteLength(minifyCss(css), "utf-8")
+    minifiedSizeBytes: Buffer.byteLength(minifyCss(css), "utf-8"),
+    candidates: candidates.size,
+    unknown,
+    durationMs: performance.now() - started,
+    mapFile
+  };
+}
+function isComponentClass(generator, cls) {
+  return generator.getComponents().includes(`.${cls.replace(/[^\w-]/g, "")}`);
+}
+function generatedSourceMap(css, file, inputFile) {
+  const lines = css.split("\n").length;
+  const mappings = Array.from({ length: lines }, () => "AAAA").join(";");
+  return {
+    version: 3,
+    file,
+    sources: [inputFile ?? "nakshora:generated"],
+    names: [],
+    mappings
   };
 }
 function countClasses(css) {
@@ -8080,6 +8131,11 @@ async function collectWatchPaths(config, input, cwd = process.cwd()) {
   }
   return [...paths];
 }
+
+// src/doctor.ts
+var import_node_fs4 = require("fs");
+var import_node_path4 = require("path");
+var import_globby2 = require("globby");
 
 // src/config-loader.ts
 var import_node_fs3 = require("fs");
@@ -8134,16 +8190,382 @@ async function resolveConfig(explicitPath, startDir) {
   return { config, file };
 }
 
+// src/doctor.ts
+var CSS_AT_RULES = /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/g;
+async function diagnose(cwd = process.cwd(), explicitConfig) {
+  const findings = [];
+  const push = (level, check, message, hint) => {
+    findings.push({ level, check, message, hint });
+  };
+  const major = Number(process.versions.node.split(".")[0]);
+  if (major >= 18) push("ok", "node", `Node ${process.version}`);
+  else push("error", "node", `Node ${process.version} is too old`, "Nakshora needs Node >= 18");
+  push("ok", "version", `@nakshora/core ${version}`);
+  const file = explicitConfig ? (0, import_node_path4.isAbsolute)(explicitConfig) ? explicitConfig : (0, import_node_path4.resolve)(cwd, explicitConfig) : findConfigFile(cwd);
+  let config = null;
+  if (!file) {
+    push(
+      "warn",
+      "config",
+      "no nakshora.config.{js,mjs,cjs,ts,json} found (walking up from the current directory)",
+      "run `nakshora init`, or pass --content to build in JIT mode without a config"
+    );
+  } else if (!(0, import_node_fs4.existsSync)(file)) {
+    push("error", "config", `config file not found: ${file}`);
+  } else {
+    try {
+      config = await loadConfigFile(file);
+      push("ok", "config", `loaded ${file}`);
+    } catch (err) {
+      push("error", "config", `failed to load ${file}: ${err.message}`);
+    }
+  }
+  if (config) {
+    const content = config.content ?? config.purge;
+    if (!content || Array.isArray(content) && content.length === 0) {
+      push(
+        "warn",
+        "content",
+        "no `content` configured \u2014 builds run in FULL mode (every utility, ~6 MB)",
+        "add content: ['./src/**/*.{html,js,ts,jsx,tsx,vue,svelte}'] for JIT output"
+      );
+    } else {
+      const entries = Array.isArray(content) ? content : [content];
+      const base = file ? (0, import_node_path4.dirname)(file) : cwd;
+      let total = 0;
+      for (const entry of entries) {
+        if (/[*{[]/.test(entry)) {
+          const files = await (0, import_globby2.globby)(entry, { cwd: base, absolute: true });
+          total += files.length;
+          if (files.length === 0)
+            push(
+              "warn",
+              "content",
+              `glob matches no files: ${entry}`,
+              `resolved relative to ${base}`
+            );
+          else if (!/node_modules/.test(entry) && files.some((f) => f.includes("/node_modules/")))
+            push(
+              "warn",
+              "content",
+              `glob reaches into node_modules: ${entry}`,
+              "this scans thousands of files on every build; narrow it"
+            );
+          else push("ok", "content", `${entry} \u2192 ${files.length} file(s)`);
+        } else if ((0, import_node_fs4.existsSync)((0, import_node_path4.resolve)(base, entry)) && (0, import_node_fs4.statSync)((0, import_node_path4.resolve)(base, entry)).isFile()) {
+          total++;
+          push("ok", "content", `${entry} (file)`);
+        } else {
+          push(
+            "warn",
+            "content",
+            `"${entry.slice(0, 40)}${entry.length > 40 ? "\u2026" : ""}" is neither a glob nor an existing file \u2014 treated as raw template text`
+          );
+        }
+      }
+      if (total > 5e3)
+        push(
+          "warn",
+          "content",
+          `${total} files matched \u2014 large content sets slow down every rebuild`,
+          "exclude build output / vendored directories"
+        );
+      if (config.purge && !config.content)
+        push(
+          "warn",
+          "config",
+          "`purge` is the legacy name",
+          "rename it to `content` (identical semantics)"
+        );
+    }
+    try {
+      const gen = new CSSGenerator(config);
+      const screens = Object.keys(gen.theme.screens);
+      push(
+        "ok",
+        "theme",
+        `${gen.getUtilities().length} utilities, ${screens.length} screens (${screens.join(" ")})`
+      );
+      const safelist = config.safelist ?? [];
+      const badSafe = safelist.filter(
+        (s) => typeof s === "string" && gen.engine.compile(s).length === 0
+      );
+      if (badSafe.length)
+        push("warn", "safelist", `safelist entries that produce no CSS: ${badSafe.join(" ")}`);
+      if (config.important === true)
+        push(
+          "warn",
+          "config",
+          "`important: true` marks every declaration !important",
+          "prefer important: '#app' (selector strategy) when you only need to win over third-party CSS"
+        );
+      const unknownVariantKeys = Object.keys(config.variants ?? {}).filter(
+        (k) => ![
+          "hover",
+          "focus",
+          "focusVisible",
+          "focusWithin",
+          "active",
+          "visited",
+          "disabled",
+          "firstChild",
+          "lastChild",
+          "group",
+          "groupHover",
+          "groupFocus",
+          "peer",
+          "peerHover",
+          "peerFocus",
+          "dark",
+          "responsive",
+          "maxResponsive",
+          "containerQueries"
+        ].includes(k)
+      );
+      if (unknownVariantKeys.length)
+        push(
+          "warn",
+          "variants",
+          `unknown variants keys are ignored: ${unknownVariantKeys.join(", ")}`
+        );
+    } catch (err) {
+      push("error", "config", `config rejected by the compiler: ${err.message}`);
+    }
+  }
+  const cssFiles = await (0, import_globby2.globby)(
+    ["**/*.css", "!node_modules/**", "!dist/**", "!build/**", "!**/*.min.css"],
+    {
+      cwd,
+      absolute: true
+    }
+  );
+  const withAtRule = cssFiles.filter((f) => CSS_AT_RULES.test((0, import_node_fs4.readFileSync)(f, "utf-8")));
+  CSS_AT_RULES.lastIndex = 0;
+  if (cssFiles.length && withAtRule.length === 0 && config)
+    push(
+      "warn",
+      "css",
+      `none of ${cssFiles.length} stylesheet(s) contain \`@nakshora source;\``,
+      'add `@nakshora source;` to your entry CSS (or import "virtual:nakshora" with the Vite plugin)'
+    );
+  else if (withAtRule.length)
+    push(
+      "ok",
+      "css",
+      `@nakshora at-rules in ${withAtRule.map((f) => f.replace(cwd + "/", "")).join(", ")}`
+    );
+  if (config) {
+    const gen = new CSSGenerator(config);
+    for (const f of cssFiles.slice(0, 200)) {
+      const css = (0, import_node_fs4.readFileSync)(f, "utf-8");
+      if (!/@apply\b|theme\(|@screen\b/.test(css)) continue;
+      try {
+        gen.processCss(css);
+        push("ok", "apply", `${f.replace(cwd + "/", "")}: @apply / theme() resolve`);
+      } catch (err) {
+        if (err instanceof ApplyError)
+          push("error", "apply", `${f.replace(cwd + "/", "")}: ${err.message}`);
+      }
+    }
+  }
+  const pkgPath = (0, import_node_path4.join)(cwd, "package.json");
+  if ((0, import_node_fs4.existsSync)(pkgPath)) {
+    const pkg = JSON.parse((0, import_node_fs4.readFileSync)(pkgPath, "utf-8"));
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+    const has = (n) => n in deps;
+    if (has("@nakshora/vite-plugin") && !has("vite"))
+      push("warn", "deps", "@nakshora/vite-plugin is installed but vite is not");
+    if (has("@nakshora/postcss") && !has("postcss"))
+      push(
+        "warn",
+        "deps",
+        "@nakshora/postcss needs the postcss peer dependency",
+        "npm i -D postcss"
+      );
+    if (has("tailwindcss") && (has("@nakshora/cli") || has("@nakshora/postcss") || has("@nakshora/vite-plugin")))
+      push(
+        "warn",
+        "deps",
+        "both tailwindcss and Nakshora are installed",
+        "run `nakshora migrate` to port tailwind.config.* and remove tailwindcss to avoid double-processing"
+      );
+    if (!Object.keys(deps).some((d) => d.startsWith("@nakshora/")))
+      push(
+        "warn",
+        "deps",
+        "no @nakshora/* package in package.json",
+        "npm i -D @nakshora/cli (or @nakshora/vite-plugin / @nakshora/postcss)"
+      );
+  }
+  return { findings, config, configFile: file ?? null };
+}
+function formatFindings(findings) {
+  const icon = { ok: "\u2714", warn: "\u25B2", error: "\u2716" };
+  return findings.map(
+    (f) => `${icon[f.level]} ${f.check.padEnd(9)} ${f.message}${f.hint ? `
+            \u21B3 ${f.hint}` : ""}`
+  ).join("\n");
+}
+
+// src/migrate.ts
+var import_node_fs5 = require("fs");
+var import_node_path5 = require("path");
+var import_globby3 = require("globby");
+var V1_RENAMES = {
+  "card-neon": "neon-card",
+  "btn-neon": "neon-btn",
+  "animate-neonGlow": "animate-neon-glow",
+  uhd: "4xl",
+  k8: "5xl"
+};
+var TAILWIND_RENAMES = {
+  "flex-grow": "grow",
+  "flex-grow-0": "grow-0",
+  "flex-shrink": "shrink",
+  "flex-shrink-0": "shrink-0",
+  "overflow-ellipsis": "text-ellipsis",
+  "decoration-slice": "box-decoration-slice",
+  "decoration-clone": "box-decoration-clone"
+};
+function migrateSource(text, from) {
+  const table = from === "v1" ? V1_RENAMES : TAILWIND_RENAMES;
+  const counts = /* @__PURE__ */ new Map();
+  const out = text.replace(
+    /(class(?:Name)?\s*=\s*)(["'`])([\s\S]*?)\2/g,
+    (_m, attr, q, body) => {
+      const rewritten = body.split(/(\s+)/).map((tok) => {
+        if (!tok.trim()) return tok;
+        const parts = tok.split(":");
+        const mapped = parts.map((p, i) => {
+          const bare = p.replace(/^!/, "").replace(/!$/, "");
+          const isVariant = i < parts.length - 1;
+          const to = table[bare];
+          if (!to) return p;
+          if (isVariant && from !== "v1") return p;
+          counts.set(bare, (counts.get(bare) ?? 0) + 1);
+          return p.replace(bare, to);
+        });
+        return mapped.join(":");
+      }).join("");
+      return `${attr}${q}${rewritten}${q}`;
+    }
+  );
+  return {
+    text: out,
+    changes: [...counts].map(([f, count]) => ({ from: f, to: table[f], count }))
+  };
+}
+function migrateTailwindConfig(source) {
+  const notes = [];
+  let text = source;
+  text = text.replace(
+    /\/\*\*\s*@type\s*\{import\(['"]tailwindcss['"]\)\.Config\}\s*\*\//,
+    "/** @type {import('@nakshora/core').NakshoraConfig} */"
+  );
+  text = text.replace(
+    /import\s+type\s+\{\s*Config\s*\}\s+from\s+['"]tailwindcss['"];?/g,
+    "import type { NakshoraConfig } from '@nakshora/core';"
+  );
+  text = text.replace(/satisfies\s+Config\b/g, "satisfies NakshoraConfig").replace(/:\s*Config\b/g, ": NakshoraConfig");
+  if (/tailwindcss\/defaultTheme/.test(text)) {
+    text = text.replace(
+      /const\s+defaultTheme\s*=\s*require\(['"]tailwindcss\/defaultTheme['"]\);?/g,
+      "const { defaultTheme } = require('@nakshora/core');"
+    ).replace(
+      /import\s+defaultTheme\s+from\s+['"]tailwindcss\/defaultTheme['"];?/g,
+      "import { defaultTheme } from '@nakshora/core';"
+    );
+    notes.push(
+      "`tailwindcss/defaultTheme` \u2192 `defaultTheme` from @nakshora/core (same keys, Tailwind values)"
+    );
+  }
+  if (/tailwindcss\/colors/.test(text)) {
+    text = text.replace(
+      /const\s+colors\s*=\s*require\(['"]tailwindcss\/colors['"]\);?/g,
+      "const { defaultColors: colors } = require('@nakshora/core');"
+    ).replace(
+      /import\s+colors\s+from\s+['"]tailwindcss\/colors['"];?/g,
+      "import { defaultColors as colors } from '@nakshora/core';"
+    );
+    notes.push("`tailwindcss/colors` \u2192 `defaultColors` from @nakshora/core");
+  }
+  if (/tailwindcss\/plugin/.test(text)) {
+    text = text.replace(
+      /const\s+plugin\s*=\s*require\(['"]tailwindcss\/plugin['"]\);?/g,
+      "const { plugin } = require('@nakshora/core');"
+    ).replace(
+      /import\s+plugin\s+from\s+['"]tailwindcss\/plugin['"];?/g,
+      "import { plugin } from '@nakshora/core';"
+    );
+    notes.push("`tailwindcss/plugin` \u2192 `plugin` from @nakshora/core (same API incl. withOptions)");
+  }
+  for (const p of ["typography", "forms", "aspect-ratio", "container-queries"])
+    if (text.includes(`@tailwindcss/${p}`))
+      notes.push(
+        `@tailwindcss/${p} works unchanged through the plugin adapter (keep the dependency)`
+      );
+  if (/\bpresets\s*:/.test(text))
+    notes.push("`presets` accepted: Tailwind preset objects and Nakshora theme presets both work");
+  if (/screens\s*:\s*\{/.test(text))
+    notes.push(
+      "`theme.screens` REPLACES the 10-step scale (Tailwind semantics); use `theme.breakpoints` to extend it instead"
+    );
+  if (/darkMode\s*:\s*['"]media['"]/.test(text))
+    notes.push("darkMode: 'media' kept \u2014 Nakshora's default is 'class' (`:is(.dark *)`)");
+  if (!/darkMode\s*:/.test(text))
+    notes.push(
+      "no darkMode key: Tailwind defaults to 'media', Nakshora to 'class' \u2014 add darkMode: 'media' to keep behaviour"
+    );
+  if (/future\s*:|experimental\s*:/.test(text))
+    notes.push("`future` / `experimental` keys are ignored");
+  if (/separator\s*:/.test(text))
+    notes.push("`separator` is not configurable (always `:`) \u2014 the key is ignored");
+  return { text, notes };
+}
+async function runMigrate(o) {
+  const out = [];
+  const files = await (0, import_globby3.globby)(o.globs, {
+    cwd: o.cwd,
+    absolute: true,
+    ignore: ["**/node_modules/**", "**/dist/**"]
+  });
+  for (const f of files) {
+    const src = (0, import_node_fs5.readFileSync)(f, "utf-8");
+    const res = migrateSource(src, o.from);
+    if (res.changes.length === 0) continue;
+    out.push({ file: f, changes: res.changes });
+    if (o.write) (0, import_node_fs5.writeFileSync)(f, res.text);
+  }
+  let config;
+  if (o.from === "tailwind") {
+    const candidates = [
+      "tailwind.config.js",
+      "tailwind.config.cjs",
+      "tailwind.config.mjs",
+      "tailwind.config.ts"
+    ];
+    const found = candidates.find((c) => (0, import_node_fs5.existsSync)((0, import_node_path5.join)(o.cwd, c)));
+    if (found) {
+      const ext = found.endsWith(".ts") ? ".ts" : found.endsWith(".cjs") ? ".cjs" : found.endsWith(".mjs") ? ".mjs" : ".js";
+      const to = (0, import_node_path5.join)(o.cwd, `nakshora.config${ext}`);
+      const res = migrateTailwindConfig((0, import_node_fs5.readFileSync)((0, import_node_path5.join)(o.cwd, found), "utf-8"));
+      if (o.write && !(0, import_node_fs5.existsSync)(to)) (0, import_node_fs5.writeFileSync)(to, res.text);
+      config = { from: found, to: `nakshora.config${ext}`, notes: res.notes };
+    }
+  }
+  return { files: out, config };
+}
+
 // src/watch.ts
-var import_node_fs4 = require("fs");
-var import_node_path4 = require("path");
+var import_node_fs6 = require("fs");
+var import_node_path6 = require("path");
 function createWatcher(paths, onChange) {
   const dirs = /* @__PURE__ */ new Set();
   for (const p of paths) {
     try {
-      const abs = (0, import_node_path4.resolve)(p);
-      if ((0, import_node_fs4.statSync)(abs).isDirectory()) dirs.add(abs);
-      else dirs.add((0, import_node_path4.dirname)(abs));
+      const abs = (0, import_node_path6.resolve)(p);
+      if ((0, import_node_fs6.statSync)(abs).isDirectory()) dirs.add(abs);
+      else dirs.add((0, import_node_path6.dirname)(abs));
     } catch {
     }
   }
@@ -8157,7 +8579,7 @@ function createWatcher(paths, onChange) {
   let usePolling = false;
   for (const dir of dirs) {
     try {
-      const w = (0, import_node_fs4.watch)(dir, { recursive: true }, () => {
+      const w = (0, import_node_fs6.watch)(dir, { recursive: true }, () => {
         if (closed.value) return;
         onChange();
       });
@@ -8172,15 +8594,15 @@ function createWatcher(paths, onChange) {
       const walk = (dir) => {
         let entries = [];
         try {
-          entries = (0, import_node_fs4.readdirSync)(dir);
+          entries = (0, import_node_fs6.readdirSync)(dir);
         } catch {
           return;
         }
         for (const name of entries) {
-          const full = (0, import_node_path4.join)(dir, name);
+          const full = (0, import_node_path6.join)(dir, name);
           let st;
           try {
-            st = (0, import_node_fs4.statSync)(full);
+            st = (0, import_node_fs6.statSync)(full);
           } catch {
             continue;
           }
@@ -8223,14 +8645,22 @@ function createWatcher(paths, onChange) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  TAILWIND_RENAMES,
+  V1_RENAMES,
   collectWatchPaths,
   createWatcher,
+  diagnose,
   findConfigFile,
+  formatFindings,
+  generatedSourceMap,
   loadConfigFile,
+  migrateSource,
+  migrateTailwindConfig,
   resolveConfig,
   resolveContent,
   resolveSources,
   runBuild,
+  runMigrate,
   summarize,
   version
 });

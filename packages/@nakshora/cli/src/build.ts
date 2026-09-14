@@ -1,7 +1,7 @@
 // Nakshora CLI — build pipeline shared by `build`/`dev`/`inspect`
 
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
 import {
   ApplyError,
   ContentCache,
@@ -30,8 +30,10 @@ const scanFs: ScanFs = {
 };
 
 export interface BuildInput {
-  /** Explicit input CSS file (may contain `@nakshora source` / `@nakshora utilities`) */
+  /** Explicit input CSS file (may contain `@nakshora source` / `@nakshora utilities`); `-` = stdin */
   input?: string;
+  /** Raw input CSS (used instead of reading `input`; the CLI fills this for stdin) */
+  inputCss?: string;
   /** Output path (stdout when omitted) */
   output?: string;
   minify?: boolean;
@@ -39,6 +41,10 @@ export interface BuildInput {
   /** Loaded config (already resolved) */
   config: Partial<NakshoraConfig>;
   cwd?: string;
+  /** Write `<output>.map` and append the `sourceMappingURL` comment */
+  sourceMap?: boolean;
+  /** Do not write anything (used by `--diff` / `--stats` dry runs) */
+  dryRun?: boolean;
 }
 
 export interface BuildResult {
@@ -46,6 +52,14 @@ export interface BuildResult {
   classes: number;
   sizeBytes: number;
   minifiedSizeBytes: number;
+  /** candidates found in content (JIT) */
+  candidates: number;
+  /** candidates that produced no CSS (unknown classes / plain words) */
+  unknown: string[];
+  /** wall time of the build in ms */
+  durationMs: number;
+  /** path of the written source map, when requested */
+  mapFile?: string;
 }
 
 const SOURCE_RE = /@nakshora\s+source\s*;?/g;
@@ -56,6 +70,7 @@ const AUTHOR_RE = /@apply\b|@screen\b|\b(?:theme|screen)\(/;
  * Run a full Nakshora build.
  */
 export async function runBuild(input: BuildInput): Promise<BuildResult> {
+  const started = performance.now();
   const cwd = input.cwd ?? process.cwd();
   const config = input.config;
   const generator = new CSSGenerator(config);
@@ -76,18 +91,26 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     classes = countClasses(css);
   }
 
-  // If an input file is given, splice the generated CSS into at-rules
-  if (input.input) {
-    const absInput = isAbsolute(input.input) ? input.input : resolve(cwd, input.input);
-    if (existsSync(absInput)) {
-      let source = readFileSync(absInput, 'utf-8');
+  // If an input file (or stdin) is given, splice the generated CSS into at-rules
+  const absInput =
+    input.input && input.input !== '-'
+      ? isAbsolute(input.input)
+        ? input.input
+        : resolve(cwd, input.input)
+      : undefined;
+  if (input.inputCss !== undefined || (absInput && existsSync(absInput))) {
+    {
+      let source = input.inputCss ?? readFileSync(absInput as string, 'utf-8');
       // `@apply` / `theme()` / `screen()` / `@screen` in the author stylesheet
       const authorPass = AUTHOR_RE.test(source);
       if (authorPass) {
         try {
           source = generator.processCss(source);
         } catch (err) {
-          if (err instanceof ApplyError) throw new Error(`${input.input}: ${err.message}`);
+          if (err instanceof ApplyError)
+            throw new Error(
+              `${input.input && input.input !== '-' ? input.input : '<stdin>'}: ${err.message}`,
+            );
           throw err;
         }
       }
@@ -112,19 +135,74 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     }
   }
 
+  let mapFile: string | undefined;
   if (input.output) {
     const outPath = isAbsolute(input.output) ? input.output : resolve(cwd, input.output);
-    mkdirSync(dirname(outPath), { recursive: true });
-    writeFileSync(outPath, css, 'utf-8');
-  } else {
+    if (input.sourceMap) {
+      mapFile = `${outPath}.map`;
+      const map = generatedSourceMap(
+        css,
+        basename(outPath),
+        input.input && input.input !== '-' ? input.input : undefined,
+      );
+      css += `\n/*# sourceMappingURL=${basename(mapFile)} */\n`;
+      if (!input.dryRun) {
+        mkdirSync(dirname(outPath), { recursive: true });
+        writeFileSync(mapFile, JSON.stringify(map), 'utf-8');
+      }
+    }
+    if (!input.dryRun) {
+      mkdirSync(dirname(outPath), { recursive: true });
+      writeFileSync(outPath, css, 'utf-8');
+    }
+  } else if (!input.dryRun) {
     process.stdout.write(css);
   }
+
+  const unknown =
+    mode === 'jit'
+      ? [...candidates].filter(
+          (c) => generator.engine.compile(c).length === 0 && !isComponentClass(generator, c),
+        )
+      : [];
 
   return {
     css,
     classes,
     sizeBytes: Buffer.byteLength(css, 'utf-8'),
     minifiedSizeBytes: Buffer.byteLength(minifyCss(css), 'utf-8'),
+    candidates: candidates.size,
+    unknown,
+    durationMs: performance.now() - started,
+    mapFile,
+  };
+}
+
+function isComponentClass(generator: CSSGenerator, cls: string): boolean {
+  return generator.getComponents().includes(`.${cls.replace(/[^\w-]/g, '')}`);
+}
+
+/**
+ * Source map for generated CSS. Every generated line maps to line 1 of a
+ * virtual `nakshora:generated` source (or to the input stylesheet when one
+ * was spliced); this satisfies tooling that insists on a map and marks the
+ * output as generated, without pretending utilities have an author location.
+ */
+export function generatedSourceMap(
+  css: string,
+  file: string,
+  inputFile?: string,
+): { version: 3; file: string; sources: string[]; names: string[]; mappings: string } {
+  const lines = css.split('\n').length;
+  // "AAAA" = generated col 0 → source 0, line 0, col 0; each following line
+  // repeats the same (relative) segment.
+  const mappings = Array.from({ length: lines }, () => 'AAAA').join(';');
+  return {
+    version: 3,
+    file,
+    sources: [inputFile ?? 'nakshora:generated'],
+    names: [],
+    mappings,
   };
 }
 

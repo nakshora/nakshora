@@ -10,3 +10,4 @@ ai/corpus.jsonl
 llms-full.md
 *.tgz
 CHANGELOG.md
+docs/utilities

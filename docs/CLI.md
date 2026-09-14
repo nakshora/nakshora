@@ -41,7 +41,18 @@ nakshora build -c path/to/config.js     # explicit config
 | `-m, --minify`        | Minify output                                                                                             |
 | `--mode <full\|jit>`  | Force the build mode (default: JIT when content is configured)                                            |
 | `-c, --config <path>` | Explicit config file                                                                                      |
-| `--watch`             | Rebuild on change                                                                                         |
+| `--watch`             | Rebuild on change (incremental: only changed files are re-scanned)                                        |
+| `--content <globs…>`  | JIT content globs / files — overrides `config.content`                                                    |
+| `--safelist <cls…>`   | Classes always emitted (space or comma separated), added to the config                                    |
+| `--source-map`        | Write `<output>.map` (v3; marks the CSS as generated) + `sourceMappingURL`                                |
+| `--stats`             | Print build time, class/candidate counts, sizes and unknown candidates                                    |
+| `--diff`              | Dry run: list selectors that would be added/removed vs the existing output                                |
+
+`input` may be `-` to read the stylesheet from **stdin**:
+
+```bash
+echo '@nakshora utilities; .btn { @apply px-4 rounded; }' | nakshora build - --content 'src/**/*.html'
+```
 
 When `input` is given, `@apply` / `theme()` / `screen()` / `@screen` in it are
 expanded (see [POSTCSS.md](POSTCSS.md#apply-theme-screen-and-screen)); an
@@ -58,6 +69,37 @@ unknown class fails the build with `input.css: The \`x\` class does not exist…
 
 Alias for `build --watch` — development mode with the same flags (minus
 `--watch`).
+
+### `nakshora doctor`
+
+Diagnoses the project without building: Node version, config discovery and
+load errors, every `content` glob (files matched, globs into `node_modules`,
+raw strings), `safelist` entries that produce nothing, unknown `variants`
+keys, stylesheets missing `@nakshora source;`, `@apply`/`theme()` that would
+fail, and dependency mismatches (`@nakshora/postcss` without `postcss`,
+Tailwind installed alongside). Exit code 1 on errors. `--json` for tooling.
+
+```
+✔ node      Node v22.22.3
+✔ config    loaded /app/nakshora.config.js
+▲ content   glob matches no files: ./pages/**/*.vue
+            ↳ resolved relative to /app
+✖ apply     src/app.css: The `btn-primry` class does not exist…
+```
+
+### `nakshora migrate [globs…]`
+
+Codemods (dry run by default, `--write` applies):
+
+- `--from tailwind` (default): rewrites `tailwind.config.{js,cjs,mjs,ts}` into
+  `nakshora.config.*` (type comment, `tailwindcss/defaultTheme|colors|plugin`
+  imports → `@nakshora/core`) and prints review notes (`theme.screens` replaces
+  the 10-step scale, `darkMode` default differs, ignored keys, official
+  plugins that keep working). Source files get the handful of renamed
+  utilities (`flex-grow` → `grow`, `overflow-ellipsis` → `text-ellipsis`, …).
+- `--from v1`: Nakshora v1 class names inside `class`/`className` attributes
+  (`card-neon` → `neon-card`, `btn-neon` → `neon-btn`, `uhd:` → `4xl:`,
+  `k8:` → `5xl:`), variant prefixes preserved.
 
 ### `nakshora inspect`
 

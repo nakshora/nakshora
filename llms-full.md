@@ -36,8 +36,8 @@
 
 |                                 |                                                                                                                                                                                                                          |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ⚡ **JIT compiler**             | Only the classes you use are compiled — KB-sized CSS from an 11,417-utility catalog                                                                                                                                        |
-| 🎨 **Utility-first**            | 11,417 utilities across 35 categories: layout, spacing, sizing, flexbox, grid, typography, colors, borders, effects, transforms, transitions, animations                                                                  |
+| ⚡ **JIT compiler**             | Only the classes you use are compiled — KB-sized CSS from an 11,417-utility catalog                                                                                                                                      |
+| 🎨 **Utility-first**            | 11,417 utilities across 35 categories: layout, spacing, sizing, flexbox, grid, typography, colors, borders, effects, transforms, transitions, animations                                                                 |
 | 🌈 **22 palettes × 11 shades**  | `slate gray zinc neutral stone red orange amber yellow lime emerald green teal cyan sky blue indigo violet purple fuchsia pink rose` — auto-generates `text-*` `bg-*` `border-*` `from-*` `via-*` `to-*` + CSS variables |
 | 📱 **Mobile-first responsive**  | 10 screens `xxs:` 200 → `5xl:` 5000px (`sm`–`2xl` identical to Tailwind), `max-*:`, `@container` / `@min-*` / `@max-*`, stacked media collapse into one query — see [Responsive](docs/RESPONSIVE.md)                     |
 | 🧩 **State variants**           | `hover:` `focus:` `active:` `disabled:` `first:` `last:` `dark:` `group-hover:` `group-focus:` `peer-hover:` `peer-focus:` `focus-visible:` `focus-within:` `visited:` — combinable: `md:hover:bg-blue-600`              |
@@ -166,7 +166,7 @@ Compiled (JIT) — only what you used:
 
 | Start here                                      | Reference                                                                                      |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| [Getting Started](docs/GETTING_STARTED.md)      | [Utilities (11,417, by category)](docs/UTILITIES.md)                                            |
+| [Getting Started](docs/GETTING_STARTED.md)      | [Utilities (11,417, by category)](docs/UTILITIES.md)                                           |
 | [⭐ Full Setup Guide](docs/SETUP.md)            | [Variants](docs/VARIANTS.md) · [Responsive](docs/RESPONSIVE.md)                                |
 | [Installation](docs/INSTALLATION.md)            | [Configuration](docs/CONFIGURATION.md) · [JIT Compiler](docs/JIT.md)                           |
 | [Migration (v1/v2/Tailwind)](docs/MIGRATION.md) | [Themes & Presets](docs/THEMES.md) · [Design Components](docs/utilities/13-components.md)      |
@@ -206,12 +206,12 @@ full build (11,417 utilities, sm–2xl)            371
 full build + minify                              302
 ```
 
-| Build                                       | Size                                    |
-| ------------------------------------------- | --------------------------------------- |
-| full (base + all utilities, sm–2xl)         | 6,380 KB → **5,842 KB min** (578 KB gz, 130 KB br) |
-| the 200-line benchmark page (JIT)           | 18.4 KB → **16.1 KB min**               |
-| this project's landing page (JIT, 179 classes) | **17.8 KB min · 3.9 KB gzip**        |
-| runtime JS                                  | **0 bytes** (pure CSS output)           |
+| Build                                          | Size                                               |
+| ---------------------------------------------- | -------------------------------------------------- |
+| full (base + all utilities, sm–2xl)            | 6,380 KB → **5,842 KB min** (578 KB gz, 130 KB br) |
+| the 200-line benchmark page (JIT)              | 18.4 KB → **16.1 KB min**                          |
+| this project's landing page (JIT, 179 classes) | **17.8 KB min · 3.9 KB gzip**                      |
+| runtime JS                                     | **0 bytes** (pure CSS output)                      |
 
 → [Performance details](docs/PERFORMANCE.md)
 
@@ -13761,11 +13761,11 @@ Nakshora 3 compiles your CSS on demand. Two build modes:
 Measured with `pnpm benchmark` (22 palettes, 11,417 utilities; see
 [PERFORMANCE.md](PERFORMANCE.md) for the full table):
 
-| Build                   | Raw         | Minified    | Time                    |
-| ----------------------- | ----------- | ----------- | ----------------------- |
-| full (sm–2xl)           | 6,533,388 B | 5,982,603 B | 371 ms                  |
-| JIT (200 lines of HTML) | 18,412 B    | 16,083 B    | 18 ms warm / 28 ms cold |
-| JIT incremental rebuild (500 files, 1 changed) | —  | —     | 1.3 ms                  |
+| Build                                          | Raw         | Minified    | Time                    |
+| ---------------------------------------------- | ----------- | ----------- | ----------------------- |
+| full (sm–2xl)                                  | 6,533,388 B | 5,982,603 B | 371 ms                  |
+| JIT (200 lines of HTML)                        | 18,412 B    | 16,083 B    | 18 ms warm / 28 ms cold |
+| JIT incremental rebuild (500 files, 1 changed) | —           | —           | 1.3 ms                  |
 
 ## How JIT works
 
@@ -14060,7 +14060,18 @@ nakshora build -c path/to/config.js     # explicit config
 | `-m, --minify`        | Minify output                                                                                             |
 | `--mode <full\|jit>`  | Force the build mode (default: JIT when content is configured)                                            |
 | `-c, --config <path>` | Explicit config file                                                                                      |
-| `--watch`             | Rebuild on change                                                                                         |
+| `--watch`             | Rebuild on change (incremental: only changed files are re-scanned)                                        |
+| `--content <globs…>`  | JIT content globs / files — overrides `config.content`                                                    |
+| `--safelist <cls…>`   | Classes always emitted (space or comma separated), added to the config                                    |
+| `--source-map`        | Write `<output>.map` (v3; marks the CSS as generated) + `sourceMappingURL`                                |
+| `--stats`             | Print build time, class/candidate counts, sizes and unknown candidates                                    |
+| `--diff`              | Dry run: list selectors that would be added/removed vs the existing output                                |
+
+`input` may be `-` to read the stylesheet from **stdin**:
+
+```bash
+echo '@nakshora utilities; .btn { @apply px-4 rounded; }' | nakshora build - --content 'src/**/*.html'
+```
 
 When `input` is given, `@apply` / `theme()` / `screen()` / `@screen` in it are
 expanded (see [POSTCSS.md](POSTCSS.md#apply-theme-screen-and-screen)); an
@@ -14077,6 +14088,37 @@ unknown class fails the build with `input.css: The \`x\` class does not exist…
 
 Alias for `build --watch` — development mode with the same flags (minus
 `--watch`).
+
+### `nakshora doctor`
+
+Diagnoses the project without building: Node version, config discovery and
+load errors, every `content` glob (files matched, globs into `node_modules`,
+raw strings), `safelist` entries that produce nothing, unknown `variants`
+keys, stylesheets missing `@nakshora source;`, `@apply`/`theme()` that would
+fail, and dependency mismatches (`@nakshora/postcss` without `postcss`,
+Tailwind installed alongside). Exit code 1 on errors. `--json` for tooling.
+
+```
+✔ node      Node v22.22.3
+✔ config    loaded /app/nakshora.config.js
+▲ content   glob matches no files: ./pages/**/*.vue
+            ↳ resolved relative to /app
+✖ apply     src/app.css: The `btn-primry` class does not exist…
+```
+
+### `nakshora migrate [globs…]`
+
+Codemods (dry run by default, `--write` applies):
+
+- `--from tailwind` (default): rewrites `tailwind.config.{js,cjs,mjs,ts}` into
+  `nakshora.config.*` (type comment, `tailwindcss/defaultTheme|colors|plugin`
+  imports → `@nakshora/core`) and prints review notes (`theme.screens` replaces
+  the 10-step scale, `darkMode` default differs, ignored keys, official
+  plugins that keep working). Source files get the handful of renamed
+  utilities (`flex-grow` → `grow`, `overflow-ellipsis` → `text-ellipsis`, …).
+- `--from v1`: Nakshora v1 class names inside `class`/`className` attributes
+  (`card-neon` → `neon-card`, `btn-neon` → `neon-btn`, `uhd:` → `4xl:`,
+  `k8:` → `5xl:`), variant prefixes preserved.
 
 ### `nakshora inspect`
 
@@ -15138,18 +15180,18 @@ sandbox — a laptop-class x86 runner is typically 1.5–2× faster). The same
 numbers live in `perf/baseline.json`, and `pnpm benchmark:check` fails when
 any of them regresses by more than 10 % (plus 2 ms absolute for timings).
 
-| Operation                                          | Measured   |
-| -------------------------------------------------- | ---------- |
-| `new CSSGenerator()` (cold, no memo)               | 7.7 ms     |
-| catalog build (11,417 utilities, cold)             | 30.6 ms    |
-| catalog with cross-instance memo hit               | 10.8 ms    |
-| JIT, 200 lines of HTML, cold generator             | 28.1 ms    |
-| JIT, 200 lines of HTML, warm generator             | 18.2 ms    |
-| minify that JIT output                             | 0.85 ms    |
-| 500 files (20k candidates), cold scan + JIT        | 190 ms     |
-| 500 files, **one file changed**, incremental       | **1.3 ms** |
-| full build (all utilities, sm–2xl responsive)      | 371 ms     |
-| full build minify                                  | 302 ms     |
+| Operation                                     | Measured   |
+| --------------------------------------------- | ---------- |
+| `new CSSGenerator()` (cold, no memo)          | 7.7 ms     |
+| catalog build (11,417 utilities, cold)        | 30.6 ms    |
+| catalog with cross-instance memo hit          | 10.8 ms    |
+| JIT, 200 lines of HTML, cold generator        | 28.1 ms    |
+| JIT, 200 lines of HTML, warm generator        | 18.2 ms    |
+| minify that JIT output                        | 0.85 ms    |
+| 500 files (20k candidates), cold scan + JIT   | 190 ms     |
+| 500 files, **one file changed**, incremental  | **1.3 ms** |
+| full build (all utilities, sm–2xl responsive) | 371 ms     |
+| full build minify                             | 302 ms     |
 
 The JIT numbers are dominated by candidate **extraction** (Tailwind's
 extractor regexes, ported verbatim): 200 lines ≈ 16 ms of the 18 ms. That is
@@ -15159,8 +15201,9 @@ only re-extracts files that changed. Output is byte-identical whichever path
 produced it — pinned by `core/test/content-cache.test.ts`.
 
 The catalog is memoised across `Engine` instances keyed by the resolved theme
-+ enabled core plugins (`core/test/catalog-memo.test.ts` checks isolation:
-different themes, disabled plugins and plugin-added utilities never share).
+
+- enabled core plugins (`core/test/catalog-memo.test.ts` checks isolation:
+  different themes, disabled plugins and plugin-added utilities never share).
 
 The Performance workflow (`.github/workflows/performance.yml`) measures the
 reference commit (merge-base for PRs, `HEAD~1` for pushes) **on the same
@@ -15171,12 +15214,12 @@ stored as artifacts for 90 days.
 
 Exact bytes from the same benchmark run:
 
-| Artifact                                                      | Raw         | Minified    | gzip      | brotli    |
-| ------------------------------------------------------------- | ----------- | ----------- | --------- | --------- |
-| full CSS (base + all utilities, sm–2xl responsive + components) | 6,533,388 B | 5,982,603 B | 592,255 B | 132,967 B |
-| full CSS with all 10 screens (`screens: 'all'`)               | 12,104,047 B | 11,077,622 B | 1,085,165 B | 184,609 B |
-| JIT, the 200-line benchmark page                              | 18,412 B    | 16,083 B    | —         | —         |
-| JIT, the project landing page (`index.html`, 179 classes)     | —           | 17,790 B    | 3,936 B   | —         |
+| Artifact                                                        | Raw          | Minified     | gzip        | brotli    |
+| --------------------------------------------------------------- | ------------ | ------------ | ----------- | --------- |
+| full CSS (base + all utilities, sm–2xl responsive + components) | 6,533,388 B  | 5,982,603 B  | 592,255 B   | 132,967 B |
+| full CSS with all 10 screens (`screens: 'all'`)                 | 12,104,047 B | 11,077,622 B | 1,085,165 B | 184,609 B |
+| JIT, the 200-line benchmark page                                | 18,412 B     | 16,083 B     | —           | —         |
+| JIT, the project landing page (`index.html`, 179 classes)       | —            | 17,790 B     | 3,936 B     | —         |
 
 The full build exists for the CDN / no-build-step use case. Every real
 project should use JIT: output scales with the classes you use, not with the

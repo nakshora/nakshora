@@ -12,265 +12,265 @@ Border width, style and radius (including per-corner radius).
 
 **100 utilities**
 
-| Class               | CSS                                                                                                                                                                                                                                                                                                                    | Description                                         |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `divide-y-reverse`  | `--tw-divide-y-reverse: 1`                                                                                                                                                                                                                                                                                             | --tw-divide-y-reverse: 1                            |
-| `divide-x-reverse`  | `--tw-divide-x-reverse: 1`                                                                                                                                                                                                                                                                                             | --tw-divide-x-reverse: 1                            |
-| `divide-solid`      | `border-style: solid`                                                                                                                                                                                                                                                                                                  | border-style: solid                                 |
-| `divide-dashed`     | `border-style: dashed`                                                                                                                                                                                                                                                                                                 | border-style: dashed                                |
-| `divide-dotted`     | `border-style: dotted`                                                                                                                                                                                                                                                                                                 | border-style: dotted                                |
-| `divide-double`     | `border-style: double`                                                                                                                                                                                                                                                                                                 | border-style: double                                |
-| `divide-none`       | `border-style: none`                                                                                                                                                                                                                                                                                                   | border-style: none                                  |
-| `border-solid`      | `border-style: solid`                                                                                                                                                                                                                                                                                                  | border-style: solid                                 |
-| `border-dashed`     | `border-style: dashed`                                                                                                                                                                                                                                                                                                 | border-style: dashed                                |
-| `border-dotted`     | `border-style: dotted`                                                                                                                                                                                                                                                                                                 | border-style: dotted                                |
-| `border-double`     | `border-style: double`                                                                                                                                                                                                                                                                                                 | border-style: double                                |
-| `border-hidden`     | `border-style: hidden`                                                                                                                                                                                                                                                                                                 | border-style: hidden                                |
-| `border-none`       | `border-style: none`                                                                                                                                                                                                                                                                                                   | border-style: none                                  |
-| `outline-none`      | `outline: 2px solid transparent; outline-offset: 2px`                                                                                                                                                                                                                                                                  | outline: 2px solid transparent; outline-offset: 2px |
-| `outline`           | `outline-style: solid`                                                                                                                                                                                                                                                                                                 | outline-style: solid                                |
-| `outline-dashed`    | `outline-style: dashed`                                                                                                                                                                                                                                                                                                | outline-style: dashed                               |
-| `outline-dotted`    | `outline-style: dotted`                                                                                                                                                                                                                                                                                                | outline-style: dotted                               |
-| `outline-double`    | `outline-style: double`                                                                                                                                                                                                                                                                                                | outline-style: double                               |
-| `ring-inset`        | `--tw-ring-inset: inset`                                                                                                                                                                                                                                                                                               | --tw-ring-inset: inset                              |
-| `divide-x-0`        | `--tw-divide-x-reverse: 0; border-right-width: calc(0px * var(--tw-divide-x-reverse)); border-left-width: calc(0px * calc(1 - var(--tw-divide-x-reverse)))`                                                                                                                                                            | vertical divider width between children: 0px        |
-| `divide-x-2`        | `--tw-divide-x-reverse: 0; border-right-width: calc(2px * var(--tw-divide-x-reverse)); border-left-width: calc(2px * calc(1 - var(--tw-divide-x-reverse)))`                                                                                                                                                            | vertical divider width between children: 2px        |
-| `divide-x-4`        | `--tw-divide-x-reverse: 0; border-right-width: calc(4px * var(--tw-divide-x-reverse)); border-left-width: calc(4px * calc(1 - var(--tw-divide-x-reverse)))`                                                                                                                                                            | vertical divider width between children: 4px        |
-| `divide-x-8`        | `--tw-divide-x-reverse: 0; border-right-width: calc(8px * var(--tw-divide-x-reverse)); border-left-width: calc(8px * calc(1 - var(--tw-divide-x-reverse)))`                                                                                                                                                            | vertical divider width between children: 8px        |
-| `divide-x`          | `--tw-divide-x-reverse: 0; border-right-width: calc(1px * var(--tw-divide-x-reverse)); border-left-width: calc(1px * calc(1 - var(--tw-divide-x-reverse)))`                                                                                                                                                            | vertical divider width between children: 1px        |
-| `divide-y-0`        | `--tw-divide-y-reverse: 0; border-top-width: calc(0px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(0px * var(--tw-divide-y-reverse))`                                                                                                                                                            | horizontal divider width between children: 0px      |
-| `divide-y-2`        | `--tw-divide-y-reverse: 0; border-top-width: calc(2px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(2px * var(--tw-divide-y-reverse))`                                                                                                                                                            | horizontal divider width between children: 2px      |
-| `divide-y-4`        | `--tw-divide-y-reverse: 0; border-top-width: calc(4px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(4px * var(--tw-divide-y-reverse))`                                                                                                                                                            | horizontal divider width between children: 4px      |
-| `divide-y-8`        | `--tw-divide-y-reverse: 0; border-top-width: calc(8px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(8px * var(--tw-divide-y-reverse))`                                                                                                                                                            | horizontal divider width between children: 8px      |
-| `divide-y`          | `--tw-divide-y-reverse: 0; border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(1px * var(--tw-divide-y-reverse))`                                                                                                                                                            | horizontal divider width between children: 1px      |
-| `border-0`          | `border-width: 0px`                                                                                                                                                                                                                                                                                                    | border-width: 0px                                   |
-| `border-2`          | `border-width: 2px`                                                                                                                                                                                                                                                                                                    | border-width: 2px                                   |
-| `border-4`          | `border-width: 4px`                                                                                                                                                                                                                                                                                                    | border-width: 4px                                   |
-| `border-8`          | `border-width: 8px`                                                                                                                                                                                                                                                                                                    | border-width: 8px                                   |
-| `border`            | `border-width: 1px`                                                                                                                                                                                                                                                                                                    | border-width: 1px                                   |
-| `border-x-0`        | `border-left-width: 0px; border-right-width: 0px`                                                                                                                                                                                                                                                                      | border-left-width / border-right-width: 0px         |
-| `border-x-2`        | `border-left-width: 2px; border-right-width: 2px`                                                                                                                                                                                                                                                                      | border-left-width / border-right-width: 2px         |
-| `border-x-4`        | `border-left-width: 4px; border-right-width: 4px`                                                                                                                                                                                                                                                                      | border-left-width / border-right-width: 4px         |
-| `border-x-8`        | `border-left-width: 8px; border-right-width: 8px`                                                                                                                                                                                                                                                                      | border-left-width / border-right-width: 8px         |
-| `border-x`          | `border-left-width: 1px; border-right-width: 1px`                                                                                                                                                                                                                                                                      | border-left-width / border-right-width: 1px         |
-| `border-y-0`        | `border-top-width: 0px; border-bottom-width: 0px`                                                                                                                                                                                                                                                                      | border-top-width / border-bottom-width: 0px         |
-| `border-y-2`        | `border-top-width: 2px; border-bottom-width: 2px`                                                                                                                                                                                                                                                                      | border-top-width / border-bottom-width: 2px         |
-| `border-y-4`        | `border-top-width: 4px; border-bottom-width: 4px`                                                                                                                                                                                                                                                                      | border-top-width / border-bottom-width: 4px         |
-| `border-y-8`        | `border-top-width: 8px; border-bottom-width: 8px`                                                                                                                                                                                                                                                                      | border-top-width / border-bottom-width: 8px         |
-| `border-y`          | `border-top-width: 1px; border-bottom-width: 1px`                                                                                                                                                                                                                                                                      | border-top-width / border-bottom-width: 1px         |
-| `border-s-0`        | `border-inline-start-width: 0px`                                                                                                                                                                                                                                                                                       | border-inline-start-width: 0px                      |
-| `border-s-2`        | `border-inline-start-width: 2px`                                                                                                                                                                                                                                                                                       | border-inline-start-width: 2px                      |
-| `border-s-4`        | `border-inline-start-width: 4px`                                                                                                                                                                                                                                                                                       | border-inline-start-width: 4px                      |
-| `border-s-8`        | `border-inline-start-width: 8px`                                                                                                                                                                                                                                                                                       | border-inline-start-width: 8px                      |
-| `border-s`          | `border-inline-start-width: 1px`                                                                                                                                                                                                                                                                                       | border-inline-start-width: 1px                      |
-| `border-e-0`        | `border-inline-end-width: 0px`                                                                                                                                                                                                                                                                                         | border-inline-end-width: 0px                        |
-| `border-e-2`        | `border-inline-end-width: 2px`                                                                                                                                                                                                                                                                                         | border-inline-end-width: 2px                        |
-| `border-e-4`        | `border-inline-end-width: 4px`                                                                                                                                                                                                                                                                                         | border-inline-end-width: 4px                        |
-| `border-e-8`        | `border-inline-end-width: 8px`                                                                                                                                                                                                                                                                                         | border-inline-end-width: 8px                        |
-| `border-e`          | `border-inline-end-width: 1px`                                                                                                                                                                                                                                                                                         | border-inline-end-width: 1px                        |
-| `border-t-0`        | `border-top-width: 0px`                                                                                                                                                                                                                                                                                                | border-top-width: 0px                               |
-| `border-t-2`        | `border-top-width: 2px`                                                                                                                                                                                                                                                                                                | border-top-width: 2px                               |
-| `border-t-4`        | `border-top-width: 4px`                                                                                                                                                                                                                                                                                                | border-top-width: 4px                               |
-| `border-t-8`        | `border-top-width: 8px`                                                                                                                                                                                                                                                                                                | border-top-width: 8px                               |
-| `border-t`          | `border-top-width: 1px`                                                                                                                                                                                                                                                                                                | border-top-width: 1px                               |
-| `border-r-0`        | `border-right-width: 0px`                                                                                                                                                                                                                                                                                              | border-right-width: 0px                             |
-| `border-r-2`        | `border-right-width: 2px`                                                                                                                                                                                                                                                                                              | border-right-width: 2px                             |
-| `border-r-4`        | `border-right-width: 4px`                                                                                                                                                                                                                                                                                              | border-right-width: 4px                             |
-| `border-r-8`        | `border-right-width: 8px`                                                                                                                                                                                                                                                                                              | border-right-width: 8px                             |
-| `border-r`          | `border-right-width: 1px`                                                                                                                                                                                                                                                                                              | border-right-width: 1px                             |
-| `border-b-0`        | `border-bottom-width: 0px`                                                                                                                                                                                                                                                                                             | border-bottom-width: 0px                            |
-| `border-b-2`        | `border-bottom-width: 2px`                                                                                                                                                                                                                                                                                             | border-bottom-width: 2px                            |
-| `border-b-4`        | `border-bottom-width: 4px`                                                                                                                                                                                                                                                                                             | border-bottom-width: 4px                            |
-| `border-b-8`        | `border-bottom-width: 8px`                                                                                                                                                                                                                                                                                             | border-bottom-width: 8px                            |
-| `border-b`          | `border-bottom-width: 1px`                                                                                                                                                                                                                                                                                             | border-bottom-width: 1px                            |
-| `border-l-0`        | `border-left-width: 0px`                                                                                                                                                                                                                                                                                               | border-left-width: 0px                              |
-| `border-l-2`        | `border-left-width: 2px`                                                                                                                                                                                                                                                                                               | border-left-width: 2px                              |
-| `border-l-4`        | `border-left-width: 4px`                                                                                                                                                                                                                                                                                               | border-left-width: 4px                              |
-| `border-l-8`        | `border-left-width: 8px`                                                                                                                                                                                                                                                                                               | border-left-width: 8px                              |
-| `border-l`          | `border-left-width: 1px`                                                                                                                                                                                                                                                                                               | border-left-width: 1px                              |
-| `outline-0`         | `outline-width: 0px`                                                                                                                                                                                                                                                                                                   | outline-width: 0px                                  |
-| `outline-1`         | `outline-width: 1px`                                                                                                                                                                                                                                                                                                   | outline-width: 1px                                  |
-| `outline-2`         | `outline-width: 2px`                                                                                                                                                                                                                                                                                                   | outline-width: 2px                                  |
-| `outline-4`         | `outline-width: 4px`                                                                                                                                                                                                                                                                                                   | outline-width: 4px                                  |
-| `outline-8`         | `outline-width: 8px`                                                                                                                                                                                                                                                                                                   | outline-width: 8px                                  |
-| `outline-offset-0`  | `outline-offset: 0px`                                                                                                                                                                                                                                                                                                  | outline-offset: 0px                                 |
-| `-outline-offset-0` | `outline-offset: -0px`                                                                                                                                                                                                                                                                                                 | outline-offset: -0px                                |
-| `outline-offset-1`  | `outline-offset: 1px`                                                                                                                                                                                                                                                                                                  | outline-offset: 1px                                 |
-| `-outline-offset-1` | `outline-offset: -1px`                                                                                                                                                                                                                                                                                                 | outline-offset: -1px                                |
-| `outline-offset-2`  | `outline-offset: 2px`                                                                                                                                                                                                                                                                                                  | outline-offset: 2px                                 |
-| `-outline-offset-2` | `outline-offset: -2px`                                                                                                                                                                                                                                                                                                 | outline-offset: -2px                                |
-| `outline-offset-4`  | `outline-offset: 4px`                                                                                                                                                                                                                                                                                                  | outline-offset: 4px                                 |
-| `-outline-offset-4` | `outline-offset: -4px`                                                                                                                                                                                                                                                                                                 | outline-offset: -4px                                |
-| `outline-offset-8`  | `outline-offset: 8px`                                                                                                                                                                                                                                                                                                  | outline-offset: 8px                                 |
-| `-outline-offset-8` | `outline-offset: -8px`                                                                                                                                                                                                                                                                                                 | outline-offset: -8px                                |
-| `ring-0`            | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 0px                                     |
-| `ring-1`            | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 1px                                     |
-| `ring-2`            | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 2px                                     |
-| `ring-4`            | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 4px                                     |
-| `ring-8`            | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(8px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 8px                                     |
-| `ring`              | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 3px                                     |
-| `ring-offset-0`     | `--tw-ring-offset-width: 0px`                                                                                                                                                                                                                                                                                          | --tw-ring-offset-width: 0px                         |
-| `ring-offset-1`     | `--tw-ring-offset-width: 1px`                                                                                                                                                                                                                                                                                          | --tw-ring-offset-width: 1px                         |
-| `ring-offset-2`     | `--tw-ring-offset-width: 2px`                                                                                                                                                                                                                                                                                          | --tw-ring-offset-width: 2px                         |
-| `ring-offset-4`     | `--tw-ring-offset-width: 4px`                                                                                                                                                                                                                                                                                          | --tw-ring-offset-width: 4px                         |
-| `ring-offset-8`     | `--tw-ring-offset-width: 8px`                                                                                                                                                                                                                                                                                          | --tw-ring-offset-width: 8px                         |
+| Class | CSS | Description |
+| --- | --- | --- |
+| `divide-y-reverse` | `--tw-divide-y-reverse: 1` | --tw-divide-y-reverse: 1 |
+| `divide-x-reverse` | `--tw-divide-x-reverse: 1` | --tw-divide-x-reverse: 1 |
+| `divide-solid` | `border-style: solid` | border-style: solid |
+| `divide-dashed` | `border-style: dashed` | border-style: dashed |
+| `divide-dotted` | `border-style: dotted` | border-style: dotted |
+| `divide-double` | `border-style: double` | border-style: double |
+| `divide-none` | `border-style: none` | border-style: none |
+| `border-solid` | `border-style: solid` | border-style: solid |
+| `border-dashed` | `border-style: dashed` | border-style: dashed |
+| `border-dotted` | `border-style: dotted` | border-style: dotted |
+| `border-double` | `border-style: double` | border-style: double |
+| `border-hidden` | `border-style: hidden` | border-style: hidden |
+| `border-none` | `border-style: none` | border-style: none |
+| `outline-none` | `outline: 2px solid transparent; outline-offset: 2px` | outline: 2px solid transparent; outline-offset: 2px |
+| `outline` | `outline-style: solid` | outline-style: solid |
+| `outline-dashed` | `outline-style: dashed` | outline-style: dashed |
+| `outline-dotted` | `outline-style: dotted` | outline-style: dotted |
+| `outline-double` | `outline-style: double` | outline-style: double |
+| `ring-inset` | `--tw-ring-inset: inset` | --tw-ring-inset: inset |
+| `divide-x-0` | `--tw-divide-x-reverse: 0; border-right-width: calc(0px * var(--tw-divide-x-reverse)); border-left-width: calc(0px * calc(1 - var(--tw-divide-x-reverse)))` | vertical divider width between children: 0px |
+| `divide-x-2` | `--tw-divide-x-reverse: 0; border-right-width: calc(2px * var(--tw-divide-x-reverse)); border-left-width: calc(2px * calc(1 - var(--tw-divide-x-reverse)))` | vertical divider width between children: 2px |
+| `divide-x-4` | `--tw-divide-x-reverse: 0; border-right-width: calc(4px * var(--tw-divide-x-reverse)); border-left-width: calc(4px * calc(1 - var(--tw-divide-x-reverse)))` | vertical divider width between children: 4px |
+| `divide-x-8` | `--tw-divide-x-reverse: 0; border-right-width: calc(8px * var(--tw-divide-x-reverse)); border-left-width: calc(8px * calc(1 - var(--tw-divide-x-reverse)))` | vertical divider width between children: 8px |
+| `divide-x` | `--tw-divide-x-reverse: 0; border-right-width: calc(1px * var(--tw-divide-x-reverse)); border-left-width: calc(1px * calc(1 - var(--tw-divide-x-reverse)))` | vertical divider width between children: 1px |
+| `divide-y-0` | `--tw-divide-y-reverse: 0; border-top-width: calc(0px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(0px * var(--tw-divide-y-reverse))` | horizontal divider width between children: 0px |
+| `divide-y-2` | `--tw-divide-y-reverse: 0; border-top-width: calc(2px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(2px * var(--tw-divide-y-reverse))` | horizontal divider width between children: 2px |
+| `divide-y-4` | `--tw-divide-y-reverse: 0; border-top-width: calc(4px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(4px * var(--tw-divide-y-reverse))` | horizontal divider width between children: 4px |
+| `divide-y-8` | `--tw-divide-y-reverse: 0; border-top-width: calc(8px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(8px * var(--tw-divide-y-reverse))` | horizontal divider width between children: 8px |
+| `divide-y` | `--tw-divide-y-reverse: 0; border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(1px * var(--tw-divide-y-reverse))` | horizontal divider width between children: 1px |
+| `border-0` | `border-width: 0px` | border-width: 0px |
+| `border-2` | `border-width: 2px` | border-width: 2px |
+| `border-4` | `border-width: 4px` | border-width: 4px |
+| `border-8` | `border-width: 8px` | border-width: 8px |
+| `border` | `border-width: 1px` | border-width: 1px |
+| `border-x-0` | `border-left-width: 0px; border-right-width: 0px` | border-left-width / border-right-width: 0px |
+| `border-x-2` | `border-left-width: 2px; border-right-width: 2px` | border-left-width / border-right-width: 2px |
+| `border-x-4` | `border-left-width: 4px; border-right-width: 4px` | border-left-width / border-right-width: 4px |
+| `border-x-8` | `border-left-width: 8px; border-right-width: 8px` | border-left-width / border-right-width: 8px |
+| `border-x` | `border-left-width: 1px; border-right-width: 1px` | border-left-width / border-right-width: 1px |
+| `border-y-0` | `border-top-width: 0px; border-bottom-width: 0px` | border-top-width / border-bottom-width: 0px |
+| `border-y-2` | `border-top-width: 2px; border-bottom-width: 2px` | border-top-width / border-bottom-width: 2px |
+| `border-y-4` | `border-top-width: 4px; border-bottom-width: 4px` | border-top-width / border-bottom-width: 4px |
+| `border-y-8` | `border-top-width: 8px; border-bottom-width: 8px` | border-top-width / border-bottom-width: 8px |
+| `border-y` | `border-top-width: 1px; border-bottom-width: 1px` | border-top-width / border-bottom-width: 1px |
+| `border-s-0` | `border-inline-start-width: 0px` | border-inline-start-width: 0px |
+| `border-s-2` | `border-inline-start-width: 2px` | border-inline-start-width: 2px |
+| `border-s-4` | `border-inline-start-width: 4px` | border-inline-start-width: 4px |
+| `border-s-8` | `border-inline-start-width: 8px` | border-inline-start-width: 8px |
+| `border-s` | `border-inline-start-width: 1px` | border-inline-start-width: 1px |
+| `border-e-0` | `border-inline-end-width: 0px` | border-inline-end-width: 0px |
+| `border-e-2` | `border-inline-end-width: 2px` | border-inline-end-width: 2px |
+| `border-e-4` | `border-inline-end-width: 4px` | border-inline-end-width: 4px |
+| `border-e-8` | `border-inline-end-width: 8px` | border-inline-end-width: 8px |
+| `border-e` | `border-inline-end-width: 1px` | border-inline-end-width: 1px |
+| `border-t-0` | `border-top-width: 0px` | border-top-width: 0px |
+| `border-t-2` | `border-top-width: 2px` | border-top-width: 2px |
+| `border-t-4` | `border-top-width: 4px` | border-top-width: 4px |
+| `border-t-8` | `border-top-width: 8px` | border-top-width: 8px |
+| `border-t` | `border-top-width: 1px` | border-top-width: 1px |
+| `border-r-0` | `border-right-width: 0px` | border-right-width: 0px |
+| `border-r-2` | `border-right-width: 2px` | border-right-width: 2px |
+| `border-r-4` | `border-right-width: 4px` | border-right-width: 4px |
+| `border-r-8` | `border-right-width: 8px` | border-right-width: 8px |
+| `border-r` | `border-right-width: 1px` | border-right-width: 1px |
+| `border-b-0` | `border-bottom-width: 0px` | border-bottom-width: 0px |
+| `border-b-2` | `border-bottom-width: 2px` | border-bottom-width: 2px |
+| `border-b-4` | `border-bottom-width: 4px` | border-bottom-width: 4px |
+| `border-b-8` | `border-bottom-width: 8px` | border-bottom-width: 8px |
+| `border-b` | `border-bottom-width: 1px` | border-bottom-width: 1px |
+| `border-l-0` | `border-left-width: 0px` | border-left-width: 0px |
+| `border-l-2` | `border-left-width: 2px` | border-left-width: 2px |
+| `border-l-4` | `border-left-width: 4px` | border-left-width: 4px |
+| `border-l-8` | `border-left-width: 8px` | border-left-width: 8px |
+| `border-l` | `border-left-width: 1px` | border-left-width: 1px |
+| `outline-0` | `outline-width: 0px` | outline-width: 0px |
+| `outline-1` | `outline-width: 1px` | outline-width: 1px |
+| `outline-2` | `outline-width: 2px` | outline-width: 2px |
+| `outline-4` | `outline-width: 4px` | outline-width: 4px |
+| `outline-8` | `outline-width: 8px` | outline-width: 8px |
+| `outline-offset-0` | `outline-offset: 0px` | outline-offset: 0px |
+| `-outline-offset-0` | `outline-offset: -0px` | outline-offset: -0px |
+| `outline-offset-1` | `outline-offset: 1px` | outline-offset: 1px |
+| `-outline-offset-1` | `outline-offset: -1px` | outline-offset: -1px |
+| `outline-offset-2` | `outline-offset: 2px` | outline-offset: 2px |
+| `-outline-offset-2` | `outline-offset: -2px` | outline-offset: -2px |
+| `outline-offset-4` | `outline-offset: 4px` | outline-offset: 4px |
+| `-outline-offset-4` | `outline-offset: -4px` | outline-offset: -4px |
+| `outline-offset-8` | `outline-offset: 8px` | outline-offset: 8px |
+| `-outline-offset-8` | `outline-offset: -8px` | outline-offset: -8px |
+| `ring-0` | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 0px |
+| `ring-1` | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 1px |
+| `ring-2` | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 2px |
+| `ring-4` | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 4px |
+| `ring-8` | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(8px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 8px |
+| `ring` | `--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)` | ring width: 3px |
+| `ring-offset-0` | `--tw-ring-offset-width: 0px` | --tw-ring-offset-width: 0px |
+| `ring-offset-1` | `--tw-ring-offset-width: 1px` | --tw-ring-offset-width: 1px |
+| `ring-offset-2` | `--tw-ring-offset-width: 2px` | --tw-ring-offset-width: 2px |
+| `ring-offset-4` | `--tw-ring-offset-width: 4px` | --tw-ring-offset-width: 4px |
+| `ring-offset-8` | `--tw-ring-offset-width: 8px` | --tw-ring-offset-width: 8px |
 
 ## Border Radius
 
 **150 utilities**
 
-| Class             | CSS                                                                         | Description                                                      |
-| ----------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `rounded-none`    | `border-radius: 0px`                                                        | border-radius: 0px                                               |
-| `rounded-sm`      | `border-radius: 0.125rem`                                                   | border-radius: 0.125rem                                          |
-| `rounded`         | `border-radius: 0.25rem`                                                    | border-radius: 0.25rem                                           |
-| `rounded-md`      | `border-radius: 0.375rem`                                                   | border-radius: 0.375rem                                          |
-| `rounded-lg`      | `border-radius: 0.5rem`                                                     | border-radius: 0.5rem                                            |
-| `rounded-xl`      | `border-radius: 0.75rem`                                                    | border-radius: 0.75rem                                           |
-| `rounded-2xl`     | `border-radius: 1rem`                                                       | border-radius: 1rem                                              |
-| `rounded-3xl`     | `border-radius: 1.5rem`                                                     | border-radius: 1.5rem                                            |
-| `rounded-full`    | `border-radius: 9999px`                                                     | border-radius: 9999px                                            |
-| `rounded-xs`      | `border-radius: 0.125rem`                                                   | border-radius: 0.125rem                                          |
-| `rounded-s-none`  | `border-start-start-radius: 0px; border-end-start-radius: 0px`              | border-start-start-radius / border-end-start-radius: 0px         |
-| `rounded-s-sm`    | `border-start-start-radius: 0.125rem; border-end-start-radius: 0.125rem`    | border-start-start-radius / border-end-start-radius: 0.125rem    |
-| `rounded-s`       | `border-start-start-radius: 0.25rem; border-end-start-radius: 0.25rem`      | border-start-start-radius / border-end-start-radius: 0.25rem     |
-| `rounded-s-md`    | `border-start-start-radius: 0.375rem; border-end-start-radius: 0.375rem`    | border-start-start-radius / border-end-start-radius: 0.375rem    |
-| `rounded-s-lg`    | `border-start-start-radius: 0.5rem; border-end-start-radius: 0.5rem`        | border-start-start-radius / border-end-start-radius: 0.5rem      |
-| `rounded-s-xl`    | `border-start-start-radius: 0.75rem; border-end-start-radius: 0.75rem`      | border-start-start-radius / border-end-start-radius: 0.75rem     |
-| `rounded-s-2xl`   | `border-start-start-radius: 1rem; border-end-start-radius: 1rem`            | border-start-start-radius / border-end-start-radius: 1rem        |
-| `rounded-s-3xl`   | `border-start-start-radius: 1.5rem; border-end-start-radius: 1.5rem`        | border-start-start-radius / border-end-start-radius: 1.5rem      |
-| `rounded-s-full`  | `border-start-start-radius: 9999px; border-end-start-radius: 9999px`        | border-start-start-radius / border-end-start-radius: 9999px      |
-| `rounded-s-xs`    | `border-start-start-radius: 0.125rem; border-end-start-radius: 0.125rem`    | border-start-start-radius / border-end-start-radius: 0.125rem    |
-| `rounded-e-none`  | `border-start-end-radius: 0px; border-end-end-radius: 0px`                  | border-start-end-radius / border-end-end-radius: 0px             |
-| `rounded-e-sm`    | `border-start-end-radius: 0.125rem; border-end-end-radius: 0.125rem`        | border-start-end-radius / border-end-end-radius: 0.125rem        |
-| `rounded-e`       | `border-start-end-radius: 0.25rem; border-end-end-radius: 0.25rem`          | border-start-end-radius / border-end-end-radius: 0.25rem         |
-| `rounded-e-md`    | `border-start-end-radius: 0.375rem; border-end-end-radius: 0.375rem`        | border-start-end-radius / border-end-end-radius: 0.375rem        |
-| `rounded-e-lg`    | `border-start-end-radius: 0.5rem; border-end-end-radius: 0.5rem`            | border-start-end-radius / border-end-end-radius: 0.5rem          |
-| `rounded-e-xl`    | `border-start-end-radius: 0.75rem; border-end-end-radius: 0.75rem`          | border-start-end-radius / border-end-end-radius: 0.75rem         |
-| `rounded-e-2xl`   | `border-start-end-radius: 1rem; border-end-end-radius: 1rem`                | border-start-end-radius / border-end-end-radius: 1rem            |
-| `rounded-e-3xl`   | `border-start-end-radius: 1.5rem; border-end-end-radius: 1.5rem`            | border-start-end-radius / border-end-end-radius: 1.5rem          |
-| `rounded-e-full`  | `border-start-end-radius: 9999px; border-end-end-radius: 9999px`            | border-start-end-radius / border-end-end-radius: 9999px          |
-| `rounded-e-xs`    | `border-start-end-radius: 0.125rem; border-end-end-radius: 0.125rem`        | border-start-end-radius / border-end-end-radius: 0.125rem        |
-| `rounded-t-none`  | `border-top-left-radius: 0px; border-top-right-radius: 0px`                 | border-top-left-radius / border-top-right-radius: 0px            |
-| `rounded-t-sm`    | `border-top-left-radius: 0.125rem; border-top-right-radius: 0.125rem`       | border-top-left-radius / border-top-right-radius: 0.125rem       |
-| `rounded-t`       | `border-top-left-radius: 0.25rem; border-top-right-radius: 0.25rem`         | border-top-left-radius / border-top-right-radius: 0.25rem        |
-| `rounded-t-md`    | `border-top-left-radius: 0.375rem; border-top-right-radius: 0.375rem`       | border-top-left-radius / border-top-right-radius: 0.375rem       |
-| `rounded-t-lg`    | `border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem`           | border-top-left-radius / border-top-right-radius: 0.5rem         |
-| `rounded-t-xl`    | `border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem`         | border-top-left-radius / border-top-right-radius: 0.75rem        |
-| `rounded-t-2xl`   | `border-top-left-radius: 1rem; border-top-right-radius: 1rem`               | border-top-left-radius / border-top-right-radius: 1rem           |
-| `rounded-t-3xl`   | `border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem`           | border-top-left-radius / border-top-right-radius: 1.5rem         |
-| `rounded-t-full`  | `border-top-left-radius: 9999px; border-top-right-radius: 9999px`           | border-top-left-radius / border-top-right-radius: 9999px         |
-| `rounded-t-xs`    | `border-top-left-radius: 0.125rem; border-top-right-radius: 0.125rem`       | border-top-left-radius / border-top-right-radius: 0.125rem       |
-| `rounded-r-none`  | `border-top-right-radius: 0px; border-bottom-right-radius: 0px`             | border-top-right-radius / border-bottom-right-radius: 0px        |
-| `rounded-r-sm`    | `border-top-right-radius: 0.125rem; border-bottom-right-radius: 0.125rem`   | border-top-right-radius / border-bottom-right-radius: 0.125rem   |
-| `rounded-r`       | `border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem`     | border-top-right-radius / border-bottom-right-radius: 0.25rem    |
-| `rounded-r-md`    | `border-top-right-radius: 0.375rem; border-bottom-right-radius: 0.375rem`   | border-top-right-radius / border-bottom-right-radius: 0.375rem   |
-| `rounded-r-lg`    | `border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem`       | border-top-right-radius / border-bottom-right-radius: 0.5rem     |
-| `rounded-r-xl`    | `border-top-right-radius: 0.75rem; border-bottom-right-radius: 0.75rem`     | border-top-right-radius / border-bottom-right-radius: 0.75rem    |
-| `rounded-r-2xl`   | `border-top-right-radius: 1rem; border-bottom-right-radius: 1rem`           | border-top-right-radius / border-bottom-right-radius: 1rem       |
-| `rounded-r-3xl`   | `border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem`       | border-top-right-radius / border-bottom-right-radius: 1.5rem     |
-| `rounded-r-full`  | `border-top-right-radius: 9999px; border-bottom-right-radius: 9999px`       | border-top-right-radius / border-bottom-right-radius: 9999px     |
-| `rounded-r-xs`    | `border-top-right-radius: 0.125rem; border-bottom-right-radius: 0.125rem`   | border-top-right-radius / border-bottom-right-radius: 0.125rem   |
-| `rounded-b-none`  | `border-bottom-right-radius: 0px; border-bottom-left-radius: 0px`           | border-bottom-right-radius / border-bottom-left-radius: 0px      |
-| `rounded-b-sm`    | `border-bottom-right-radius: 0.125rem; border-bottom-left-radius: 0.125rem` | border-bottom-right-radius / border-bottom-left-radius: 0.125rem |
-| `rounded-b`       | `border-bottom-right-radius: 0.25rem; border-bottom-left-radius: 0.25rem`   | border-bottom-right-radius / border-bottom-left-radius: 0.25rem  |
-| `rounded-b-md`    | `border-bottom-right-radius: 0.375rem; border-bottom-left-radius: 0.375rem` | border-bottom-right-radius / border-bottom-left-radius: 0.375rem |
-| `rounded-b-lg`    | `border-bottom-right-radius: 0.5rem; border-bottom-left-radius: 0.5rem`     | border-bottom-right-radius / border-bottom-left-radius: 0.5rem   |
-| `rounded-b-xl`    | `border-bottom-right-radius: 0.75rem; border-bottom-left-radius: 0.75rem`   | border-bottom-right-radius / border-bottom-left-radius: 0.75rem  |
-| `rounded-b-2xl`   | `border-bottom-right-radius: 1rem; border-bottom-left-radius: 1rem`         | border-bottom-right-radius / border-bottom-left-radius: 1rem     |
-| `rounded-b-3xl`   | `border-bottom-right-radius: 1.5rem; border-bottom-left-radius: 1.5rem`     | border-bottom-right-radius / border-bottom-left-radius: 1.5rem   |
-| `rounded-b-full`  | `border-bottom-right-radius: 9999px; border-bottom-left-radius: 9999px`     | border-bottom-right-radius / border-bottom-left-radius: 9999px   |
-| `rounded-b-xs`    | `border-bottom-right-radius: 0.125rem; border-bottom-left-radius: 0.125rem` | border-bottom-right-radius / border-bottom-left-radius: 0.125rem |
-| `rounded-l-none`  | `border-top-left-radius: 0px; border-bottom-left-radius: 0px`               | border-top-left-radius / border-bottom-left-radius: 0px          |
-| `rounded-l-sm`    | `border-top-left-radius: 0.125rem; border-bottom-left-radius: 0.125rem`     | border-top-left-radius / border-bottom-left-radius: 0.125rem     |
-| `rounded-l`       | `border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem`       | border-top-left-radius / border-bottom-left-radius: 0.25rem      |
-| `rounded-l-md`    | `border-top-left-radius: 0.375rem; border-bottom-left-radius: 0.375rem`     | border-top-left-radius / border-bottom-left-radius: 0.375rem     |
-| `rounded-l-lg`    | `border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem`         | border-top-left-radius / border-bottom-left-radius: 0.5rem       |
-| `rounded-l-xl`    | `border-top-left-radius: 0.75rem; border-bottom-left-radius: 0.75rem`       | border-top-left-radius / border-bottom-left-radius: 0.75rem      |
-| `rounded-l-2xl`   | `border-top-left-radius: 1rem; border-bottom-left-radius: 1rem`             | border-top-left-radius / border-bottom-left-radius: 1rem         |
-| `rounded-l-3xl`   | `border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem`         | border-top-left-radius / border-bottom-left-radius: 1.5rem       |
-| `rounded-l-full`  | `border-top-left-radius: 9999px; border-bottom-left-radius: 9999px`         | border-top-left-radius / border-bottom-left-radius: 9999px       |
-| `rounded-l-xs`    | `border-top-left-radius: 0.125rem; border-bottom-left-radius: 0.125rem`     | border-top-left-radius / border-bottom-left-radius: 0.125rem     |
-| `rounded-ss-none` | `border-start-start-radius: 0px`                                            | border-start-start-radius: 0px                                   |
-| `rounded-ss-sm`   | `border-start-start-radius: 0.125rem`                                       | border-start-start-radius: 0.125rem                              |
-| `rounded-ss`      | `border-start-start-radius: 0.25rem`                                        | border-start-start-radius: 0.25rem                               |
-| `rounded-ss-md`   | `border-start-start-radius: 0.375rem`                                       | border-start-start-radius: 0.375rem                              |
-| `rounded-ss-lg`   | `border-start-start-radius: 0.5rem`                                         | border-start-start-radius: 0.5rem                                |
-| `rounded-ss-xl`   | `border-start-start-radius: 0.75rem`                                        | border-start-start-radius: 0.75rem                               |
-| `rounded-ss-2xl`  | `border-start-start-radius: 1rem`                                           | border-start-start-radius: 1rem                                  |
-| `rounded-ss-3xl`  | `border-start-start-radius: 1.5rem`                                         | border-start-start-radius: 1.5rem                                |
-| `rounded-ss-full` | `border-start-start-radius: 9999px`                                         | border-start-start-radius: 9999px                                |
-| `rounded-ss-xs`   | `border-start-start-radius: 0.125rem`                                       | border-start-start-radius: 0.125rem                              |
-| `rounded-se-none` | `border-start-end-radius: 0px`                                              | border-start-end-radius: 0px                                     |
-| `rounded-se-sm`   | `border-start-end-radius: 0.125rem`                                         | border-start-end-radius: 0.125rem                                |
-| `rounded-se`      | `border-start-end-radius: 0.25rem`                                          | border-start-end-radius: 0.25rem                                 |
-| `rounded-se-md`   | `border-start-end-radius: 0.375rem`                                         | border-start-end-radius: 0.375rem                                |
-| `rounded-se-lg`   | `border-start-end-radius: 0.5rem`                                           | border-start-end-radius: 0.5rem                                  |
-| `rounded-se-xl`   | `border-start-end-radius: 0.75rem`                                          | border-start-end-radius: 0.75rem                                 |
-| `rounded-se-2xl`  | `border-start-end-radius: 1rem`                                             | border-start-end-radius: 1rem                                    |
-| `rounded-se-3xl`  | `border-start-end-radius: 1.5rem`                                           | border-start-end-radius: 1.5rem                                  |
-| `rounded-se-full` | `border-start-end-radius: 9999px`                                           | border-start-end-radius: 9999px                                  |
-| `rounded-se-xs`   | `border-start-end-radius: 0.125rem`                                         | border-start-end-radius: 0.125rem                                |
-| `rounded-ee-none` | `border-end-end-radius: 0px`                                                | border-end-end-radius: 0px                                       |
-| `rounded-ee-sm`   | `border-end-end-radius: 0.125rem`                                           | border-end-end-radius: 0.125rem                                  |
-| `rounded-ee`      | `border-end-end-radius: 0.25rem`                                            | border-end-end-radius: 0.25rem                                   |
-| `rounded-ee-md`   | `border-end-end-radius: 0.375rem`                                           | border-end-end-radius: 0.375rem                                  |
-| `rounded-ee-lg`   | `border-end-end-radius: 0.5rem`                                             | border-end-end-radius: 0.5rem                                    |
-| `rounded-ee-xl`   | `border-end-end-radius: 0.75rem`                                            | border-end-end-radius: 0.75rem                                   |
-| `rounded-ee-2xl`  | `border-end-end-radius: 1rem`                                               | border-end-end-radius: 1rem                                      |
-| `rounded-ee-3xl`  | `border-end-end-radius: 1.5rem`                                             | border-end-end-radius: 1.5rem                                    |
-| `rounded-ee-full` | `border-end-end-radius: 9999px`                                             | border-end-end-radius: 9999px                                    |
-| `rounded-ee-xs`   | `border-end-end-radius: 0.125rem`                                           | border-end-end-radius: 0.125rem                                  |
-| `rounded-es-none` | `border-end-start-radius: 0px`                                              | border-end-start-radius: 0px                                     |
-| `rounded-es-sm`   | `border-end-start-radius: 0.125rem`                                         | border-end-start-radius: 0.125rem                                |
-| `rounded-es`      | `border-end-start-radius: 0.25rem`                                          | border-end-start-radius: 0.25rem                                 |
-| `rounded-es-md`   | `border-end-start-radius: 0.375rem`                                         | border-end-start-radius: 0.375rem                                |
-| `rounded-es-lg`   | `border-end-start-radius: 0.5rem`                                           | border-end-start-radius: 0.5rem                                  |
-| `rounded-es-xl`   | `border-end-start-radius: 0.75rem`                                          | border-end-start-radius: 0.75rem                                 |
-| `rounded-es-2xl`  | `border-end-start-radius: 1rem`                                             | border-end-start-radius: 1rem                                    |
-| `rounded-es-3xl`  | `border-end-start-radius: 1.5rem`                                           | border-end-start-radius: 1.5rem                                  |
-| `rounded-es-full` | `border-end-start-radius: 9999px`                                           | border-end-start-radius: 9999px                                  |
-| `rounded-es-xs`   | `border-end-start-radius: 0.125rem`                                         | border-end-start-radius: 0.125rem                                |
-| `rounded-tl-none` | `border-top-left-radius: 0px`                                               | border-top-left-radius: 0px                                      |
-| `rounded-tl-sm`   | `border-top-left-radius: 0.125rem`                                          | border-top-left-radius: 0.125rem                                 |
-| `rounded-tl`      | `border-top-left-radius: 0.25rem`                                           | border-top-left-radius: 0.25rem                                  |
-| `rounded-tl-md`   | `border-top-left-radius: 0.375rem`                                          | border-top-left-radius: 0.375rem                                 |
-| `rounded-tl-lg`   | `border-top-left-radius: 0.5rem`                                            | border-top-left-radius: 0.5rem                                   |
-| `rounded-tl-xl`   | `border-top-left-radius: 0.75rem`                                           | border-top-left-radius: 0.75rem                                  |
-| `rounded-tl-2xl`  | `border-top-left-radius: 1rem`                                              | border-top-left-radius: 1rem                                     |
-| `rounded-tl-3xl`  | `border-top-left-radius: 1.5rem`                                            | border-top-left-radius: 1.5rem                                   |
-| `rounded-tl-full` | `border-top-left-radius: 9999px`                                            | border-top-left-radius: 9999px                                   |
-| `rounded-tl-xs`   | `border-top-left-radius: 0.125rem`                                          | border-top-left-radius: 0.125rem                                 |
-| `rounded-tr-none` | `border-top-right-radius: 0px`                                              | border-top-right-radius: 0px                                     |
-| `rounded-tr-sm`   | `border-top-right-radius: 0.125rem`                                         | border-top-right-radius: 0.125rem                                |
-| `rounded-tr`      | `border-top-right-radius: 0.25rem`                                          | border-top-right-radius: 0.25rem                                 |
-| `rounded-tr-md`   | `border-top-right-radius: 0.375rem`                                         | border-top-right-radius: 0.375rem                                |
-| `rounded-tr-lg`   | `border-top-right-radius: 0.5rem`                                           | border-top-right-radius: 0.5rem                                  |
-| `rounded-tr-xl`   | `border-top-right-radius: 0.75rem`                                          | border-top-right-radius: 0.75rem                                 |
-| `rounded-tr-2xl`  | `border-top-right-radius: 1rem`                                             | border-top-right-radius: 1rem                                    |
-| `rounded-tr-3xl`  | `border-top-right-radius: 1.5rem`                                           | border-top-right-radius: 1.5rem                                  |
-| `rounded-tr-full` | `border-top-right-radius: 9999px`                                           | border-top-right-radius: 9999px                                  |
-| `rounded-tr-xs`   | `border-top-right-radius: 0.125rem`                                         | border-top-right-radius: 0.125rem                                |
-| `rounded-br-none` | `border-bottom-right-radius: 0px`                                           | border-bottom-right-radius: 0px                                  |
-| `rounded-br-sm`   | `border-bottom-right-radius: 0.125rem`                                      | border-bottom-right-radius: 0.125rem                             |
-| `rounded-br`      | `border-bottom-right-radius: 0.25rem`                                       | border-bottom-right-radius: 0.25rem                              |
-| `rounded-br-md`   | `border-bottom-right-radius: 0.375rem`                                      | border-bottom-right-radius: 0.375rem                             |
-| `rounded-br-lg`   | `border-bottom-right-radius: 0.5rem`                                        | border-bottom-right-radius: 0.5rem                               |
-| `rounded-br-xl`   | `border-bottom-right-radius: 0.75rem`                                       | border-bottom-right-radius: 0.75rem                              |
-| `rounded-br-2xl`  | `border-bottom-right-radius: 1rem`                                          | border-bottom-right-radius: 1rem                                 |
-| `rounded-br-3xl`  | `border-bottom-right-radius: 1.5rem`                                        | border-bottom-right-radius: 1.5rem                               |
-| `rounded-br-full` | `border-bottom-right-radius: 9999px`                                        | border-bottom-right-radius: 9999px                               |
-| `rounded-br-xs`   | `border-bottom-right-radius: 0.125rem`                                      | border-bottom-right-radius: 0.125rem                             |
-| `rounded-bl-none` | `border-bottom-left-radius: 0px`                                            | border-bottom-left-radius: 0px                                   |
-| `rounded-bl-sm`   | `border-bottom-left-radius: 0.125rem`                                       | border-bottom-left-radius: 0.125rem                              |
-| `rounded-bl`      | `border-bottom-left-radius: 0.25rem`                                        | border-bottom-left-radius: 0.25rem                               |
-| `rounded-bl-md`   | `border-bottom-left-radius: 0.375rem`                                       | border-bottom-left-radius: 0.375rem                              |
-| `rounded-bl-lg`   | `border-bottom-left-radius: 0.5rem`                                         | border-bottom-left-radius: 0.5rem                                |
-| `rounded-bl-xl`   | `border-bottom-left-radius: 0.75rem`                                        | border-bottom-left-radius: 0.75rem                               |
-| `rounded-bl-2xl`  | `border-bottom-left-radius: 1rem`                                           | border-bottom-left-radius: 1rem                                  |
-| `rounded-bl-3xl`  | `border-bottom-left-radius: 1.5rem`                                         | border-bottom-left-radius: 1.5rem                                |
-| `rounded-bl-full` | `border-bottom-left-radius: 9999px`                                         | border-bottom-left-radius: 9999px                                |
-| `rounded-bl-xs`   | `border-bottom-left-radius: 0.125rem`                                       | border-bottom-left-radius: 0.125rem                              |
+| Class | CSS | Description |
+| --- | --- | --- |
+| `rounded-none` | `border-radius: 0px` | border-radius: 0px |
+| `rounded-sm` | `border-radius: 0.125rem` | border-radius: 0.125rem |
+| `rounded` | `border-radius: 0.25rem` | border-radius: 0.25rem |
+| `rounded-md` | `border-radius: 0.375rem` | border-radius: 0.375rem |
+| `rounded-lg` | `border-radius: 0.5rem` | border-radius: 0.5rem |
+| `rounded-xl` | `border-radius: 0.75rem` | border-radius: 0.75rem |
+| `rounded-2xl` | `border-radius: 1rem` | border-radius: 1rem |
+| `rounded-3xl` | `border-radius: 1.5rem` | border-radius: 1.5rem |
+| `rounded-full` | `border-radius: 9999px` | border-radius: 9999px |
+| `rounded-xs` | `border-radius: 0.125rem` | border-radius: 0.125rem |
+| `rounded-s-none` | `border-start-start-radius: 0px; border-end-start-radius: 0px` | border-start-start-radius / border-end-start-radius: 0px |
+| `rounded-s-sm` | `border-start-start-radius: 0.125rem; border-end-start-radius: 0.125rem` | border-start-start-radius / border-end-start-radius: 0.125rem |
+| `rounded-s` | `border-start-start-radius: 0.25rem; border-end-start-radius: 0.25rem` | border-start-start-radius / border-end-start-radius: 0.25rem |
+| `rounded-s-md` | `border-start-start-radius: 0.375rem; border-end-start-radius: 0.375rem` | border-start-start-radius / border-end-start-radius: 0.375rem |
+| `rounded-s-lg` | `border-start-start-radius: 0.5rem; border-end-start-radius: 0.5rem` | border-start-start-radius / border-end-start-radius: 0.5rem |
+| `rounded-s-xl` | `border-start-start-radius: 0.75rem; border-end-start-radius: 0.75rem` | border-start-start-radius / border-end-start-radius: 0.75rem |
+| `rounded-s-2xl` | `border-start-start-radius: 1rem; border-end-start-radius: 1rem` | border-start-start-radius / border-end-start-radius: 1rem |
+| `rounded-s-3xl` | `border-start-start-radius: 1.5rem; border-end-start-radius: 1.5rem` | border-start-start-radius / border-end-start-radius: 1.5rem |
+| `rounded-s-full` | `border-start-start-radius: 9999px; border-end-start-radius: 9999px` | border-start-start-radius / border-end-start-radius: 9999px |
+| `rounded-s-xs` | `border-start-start-radius: 0.125rem; border-end-start-radius: 0.125rem` | border-start-start-radius / border-end-start-radius: 0.125rem |
+| `rounded-e-none` | `border-start-end-radius: 0px; border-end-end-radius: 0px` | border-start-end-radius / border-end-end-radius: 0px |
+| `rounded-e-sm` | `border-start-end-radius: 0.125rem; border-end-end-radius: 0.125rem` | border-start-end-radius / border-end-end-radius: 0.125rem |
+| `rounded-e` | `border-start-end-radius: 0.25rem; border-end-end-radius: 0.25rem` | border-start-end-radius / border-end-end-radius: 0.25rem |
+| `rounded-e-md` | `border-start-end-radius: 0.375rem; border-end-end-radius: 0.375rem` | border-start-end-radius / border-end-end-radius: 0.375rem |
+| `rounded-e-lg` | `border-start-end-radius: 0.5rem; border-end-end-radius: 0.5rem` | border-start-end-radius / border-end-end-radius: 0.5rem |
+| `rounded-e-xl` | `border-start-end-radius: 0.75rem; border-end-end-radius: 0.75rem` | border-start-end-radius / border-end-end-radius: 0.75rem |
+| `rounded-e-2xl` | `border-start-end-radius: 1rem; border-end-end-radius: 1rem` | border-start-end-radius / border-end-end-radius: 1rem |
+| `rounded-e-3xl` | `border-start-end-radius: 1.5rem; border-end-end-radius: 1.5rem` | border-start-end-radius / border-end-end-radius: 1.5rem |
+| `rounded-e-full` | `border-start-end-radius: 9999px; border-end-end-radius: 9999px` | border-start-end-radius / border-end-end-radius: 9999px |
+| `rounded-e-xs` | `border-start-end-radius: 0.125rem; border-end-end-radius: 0.125rem` | border-start-end-radius / border-end-end-radius: 0.125rem |
+| `rounded-t-none` | `border-top-left-radius: 0px; border-top-right-radius: 0px` | border-top-left-radius / border-top-right-radius: 0px |
+| `rounded-t-sm` | `border-top-left-radius: 0.125rem; border-top-right-radius: 0.125rem` | border-top-left-radius / border-top-right-radius: 0.125rem |
+| `rounded-t` | `border-top-left-radius: 0.25rem; border-top-right-radius: 0.25rem` | border-top-left-radius / border-top-right-radius: 0.25rem |
+| `rounded-t-md` | `border-top-left-radius: 0.375rem; border-top-right-radius: 0.375rem` | border-top-left-radius / border-top-right-radius: 0.375rem |
+| `rounded-t-lg` | `border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem` | border-top-left-radius / border-top-right-radius: 0.5rem |
+| `rounded-t-xl` | `border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem` | border-top-left-radius / border-top-right-radius: 0.75rem |
+| `rounded-t-2xl` | `border-top-left-radius: 1rem; border-top-right-radius: 1rem` | border-top-left-radius / border-top-right-radius: 1rem |
+| `rounded-t-3xl` | `border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem` | border-top-left-radius / border-top-right-radius: 1.5rem |
+| `rounded-t-full` | `border-top-left-radius: 9999px; border-top-right-radius: 9999px` | border-top-left-radius / border-top-right-radius: 9999px |
+| `rounded-t-xs` | `border-top-left-radius: 0.125rem; border-top-right-radius: 0.125rem` | border-top-left-radius / border-top-right-radius: 0.125rem |
+| `rounded-r-none` | `border-top-right-radius: 0px; border-bottom-right-radius: 0px` | border-top-right-radius / border-bottom-right-radius: 0px |
+| `rounded-r-sm` | `border-top-right-radius: 0.125rem; border-bottom-right-radius: 0.125rem` | border-top-right-radius / border-bottom-right-radius: 0.125rem |
+| `rounded-r` | `border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem` | border-top-right-radius / border-bottom-right-radius: 0.25rem |
+| `rounded-r-md` | `border-top-right-radius: 0.375rem; border-bottom-right-radius: 0.375rem` | border-top-right-radius / border-bottom-right-radius: 0.375rem |
+| `rounded-r-lg` | `border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem` | border-top-right-radius / border-bottom-right-radius: 0.5rem |
+| `rounded-r-xl` | `border-top-right-radius: 0.75rem; border-bottom-right-radius: 0.75rem` | border-top-right-radius / border-bottom-right-radius: 0.75rem |
+| `rounded-r-2xl` | `border-top-right-radius: 1rem; border-bottom-right-radius: 1rem` | border-top-right-radius / border-bottom-right-radius: 1rem |
+| `rounded-r-3xl` | `border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem` | border-top-right-radius / border-bottom-right-radius: 1.5rem |
+| `rounded-r-full` | `border-top-right-radius: 9999px; border-bottom-right-radius: 9999px` | border-top-right-radius / border-bottom-right-radius: 9999px |
+| `rounded-r-xs` | `border-top-right-radius: 0.125rem; border-bottom-right-radius: 0.125rem` | border-top-right-radius / border-bottom-right-radius: 0.125rem |
+| `rounded-b-none` | `border-bottom-right-radius: 0px; border-bottom-left-radius: 0px` | border-bottom-right-radius / border-bottom-left-radius: 0px |
+| `rounded-b-sm` | `border-bottom-right-radius: 0.125rem; border-bottom-left-radius: 0.125rem` | border-bottom-right-radius / border-bottom-left-radius: 0.125rem |
+| `rounded-b` | `border-bottom-right-radius: 0.25rem; border-bottom-left-radius: 0.25rem` | border-bottom-right-radius / border-bottom-left-radius: 0.25rem |
+| `rounded-b-md` | `border-bottom-right-radius: 0.375rem; border-bottom-left-radius: 0.375rem` | border-bottom-right-radius / border-bottom-left-radius: 0.375rem |
+| `rounded-b-lg` | `border-bottom-right-radius: 0.5rem; border-bottom-left-radius: 0.5rem` | border-bottom-right-radius / border-bottom-left-radius: 0.5rem |
+| `rounded-b-xl` | `border-bottom-right-radius: 0.75rem; border-bottom-left-radius: 0.75rem` | border-bottom-right-radius / border-bottom-left-radius: 0.75rem |
+| `rounded-b-2xl` | `border-bottom-right-radius: 1rem; border-bottom-left-radius: 1rem` | border-bottom-right-radius / border-bottom-left-radius: 1rem |
+| `rounded-b-3xl` | `border-bottom-right-radius: 1.5rem; border-bottom-left-radius: 1.5rem` | border-bottom-right-radius / border-bottom-left-radius: 1.5rem |
+| `rounded-b-full` | `border-bottom-right-radius: 9999px; border-bottom-left-radius: 9999px` | border-bottom-right-radius / border-bottom-left-radius: 9999px |
+| `rounded-b-xs` | `border-bottom-right-radius: 0.125rem; border-bottom-left-radius: 0.125rem` | border-bottom-right-radius / border-bottom-left-radius: 0.125rem |
+| `rounded-l-none` | `border-top-left-radius: 0px; border-bottom-left-radius: 0px` | border-top-left-radius / border-bottom-left-radius: 0px |
+| `rounded-l-sm` | `border-top-left-radius: 0.125rem; border-bottom-left-radius: 0.125rem` | border-top-left-radius / border-bottom-left-radius: 0.125rem |
+| `rounded-l` | `border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem` | border-top-left-radius / border-bottom-left-radius: 0.25rem |
+| `rounded-l-md` | `border-top-left-radius: 0.375rem; border-bottom-left-radius: 0.375rem` | border-top-left-radius / border-bottom-left-radius: 0.375rem |
+| `rounded-l-lg` | `border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem` | border-top-left-radius / border-bottom-left-radius: 0.5rem |
+| `rounded-l-xl` | `border-top-left-radius: 0.75rem; border-bottom-left-radius: 0.75rem` | border-top-left-radius / border-bottom-left-radius: 0.75rem |
+| `rounded-l-2xl` | `border-top-left-radius: 1rem; border-bottom-left-radius: 1rem` | border-top-left-radius / border-bottom-left-radius: 1rem |
+| `rounded-l-3xl` | `border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem` | border-top-left-radius / border-bottom-left-radius: 1.5rem |
+| `rounded-l-full` | `border-top-left-radius: 9999px; border-bottom-left-radius: 9999px` | border-top-left-radius / border-bottom-left-radius: 9999px |
+| `rounded-l-xs` | `border-top-left-radius: 0.125rem; border-bottom-left-radius: 0.125rem` | border-top-left-radius / border-bottom-left-radius: 0.125rem |
+| `rounded-ss-none` | `border-start-start-radius: 0px` | border-start-start-radius: 0px |
+| `rounded-ss-sm` | `border-start-start-radius: 0.125rem` | border-start-start-radius: 0.125rem |
+| `rounded-ss` | `border-start-start-radius: 0.25rem` | border-start-start-radius: 0.25rem |
+| `rounded-ss-md` | `border-start-start-radius: 0.375rem` | border-start-start-radius: 0.375rem |
+| `rounded-ss-lg` | `border-start-start-radius: 0.5rem` | border-start-start-radius: 0.5rem |
+| `rounded-ss-xl` | `border-start-start-radius: 0.75rem` | border-start-start-radius: 0.75rem |
+| `rounded-ss-2xl` | `border-start-start-radius: 1rem` | border-start-start-radius: 1rem |
+| `rounded-ss-3xl` | `border-start-start-radius: 1.5rem` | border-start-start-radius: 1.5rem |
+| `rounded-ss-full` | `border-start-start-radius: 9999px` | border-start-start-radius: 9999px |
+| `rounded-ss-xs` | `border-start-start-radius: 0.125rem` | border-start-start-radius: 0.125rem |
+| `rounded-se-none` | `border-start-end-radius: 0px` | border-start-end-radius: 0px |
+| `rounded-se-sm` | `border-start-end-radius: 0.125rem` | border-start-end-radius: 0.125rem |
+| `rounded-se` | `border-start-end-radius: 0.25rem` | border-start-end-radius: 0.25rem |
+| `rounded-se-md` | `border-start-end-radius: 0.375rem` | border-start-end-radius: 0.375rem |
+| `rounded-se-lg` | `border-start-end-radius: 0.5rem` | border-start-end-radius: 0.5rem |
+| `rounded-se-xl` | `border-start-end-radius: 0.75rem` | border-start-end-radius: 0.75rem |
+| `rounded-se-2xl` | `border-start-end-radius: 1rem` | border-start-end-radius: 1rem |
+| `rounded-se-3xl` | `border-start-end-radius: 1.5rem` | border-start-end-radius: 1.5rem |
+| `rounded-se-full` | `border-start-end-radius: 9999px` | border-start-end-radius: 9999px |
+| `rounded-se-xs` | `border-start-end-radius: 0.125rem` | border-start-end-radius: 0.125rem |
+| `rounded-ee-none` | `border-end-end-radius: 0px` | border-end-end-radius: 0px |
+| `rounded-ee-sm` | `border-end-end-radius: 0.125rem` | border-end-end-radius: 0.125rem |
+| `rounded-ee` | `border-end-end-radius: 0.25rem` | border-end-end-radius: 0.25rem |
+| `rounded-ee-md` | `border-end-end-radius: 0.375rem` | border-end-end-radius: 0.375rem |
+| `rounded-ee-lg` | `border-end-end-radius: 0.5rem` | border-end-end-radius: 0.5rem |
+| `rounded-ee-xl` | `border-end-end-radius: 0.75rem` | border-end-end-radius: 0.75rem |
+| `rounded-ee-2xl` | `border-end-end-radius: 1rem` | border-end-end-radius: 1rem |
+| `rounded-ee-3xl` | `border-end-end-radius: 1.5rem` | border-end-end-radius: 1.5rem |
+| `rounded-ee-full` | `border-end-end-radius: 9999px` | border-end-end-radius: 9999px |
+| `rounded-ee-xs` | `border-end-end-radius: 0.125rem` | border-end-end-radius: 0.125rem |
+| `rounded-es-none` | `border-end-start-radius: 0px` | border-end-start-radius: 0px |
+| `rounded-es-sm` | `border-end-start-radius: 0.125rem` | border-end-start-radius: 0.125rem |
+| `rounded-es` | `border-end-start-radius: 0.25rem` | border-end-start-radius: 0.25rem |
+| `rounded-es-md` | `border-end-start-radius: 0.375rem` | border-end-start-radius: 0.375rem |
+| `rounded-es-lg` | `border-end-start-radius: 0.5rem` | border-end-start-radius: 0.5rem |
+| `rounded-es-xl` | `border-end-start-radius: 0.75rem` | border-end-start-radius: 0.75rem |
+| `rounded-es-2xl` | `border-end-start-radius: 1rem` | border-end-start-radius: 1rem |
+| `rounded-es-3xl` | `border-end-start-radius: 1.5rem` | border-end-start-radius: 1.5rem |
+| `rounded-es-full` | `border-end-start-radius: 9999px` | border-end-start-radius: 9999px |
+| `rounded-es-xs` | `border-end-start-radius: 0.125rem` | border-end-start-radius: 0.125rem |
+| `rounded-tl-none` | `border-top-left-radius: 0px` | border-top-left-radius: 0px |
+| `rounded-tl-sm` | `border-top-left-radius: 0.125rem` | border-top-left-radius: 0.125rem |
+| `rounded-tl` | `border-top-left-radius: 0.25rem` | border-top-left-radius: 0.25rem |
+| `rounded-tl-md` | `border-top-left-radius: 0.375rem` | border-top-left-radius: 0.375rem |
+| `rounded-tl-lg` | `border-top-left-radius: 0.5rem` | border-top-left-radius: 0.5rem |
+| `rounded-tl-xl` | `border-top-left-radius: 0.75rem` | border-top-left-radius: 0.75rem |
+| `rounded-tl-2xl` | `border-top-left-radius: 1rem` | border-top-left-radius: 1rem |
+| `rounded-tl-3xl` | `border-top-left-radius: 1.5rem` | border-top-left-radius: 1.5rem |
+| `rounded-tl-full` | `border-top-left-radius: 9999px` | border-top-left-radius: 9999px |
+| `rounded-tl-xs` | `border-top-left-radius: 0.125rem` | border-top-left-radius: 0.125rem |
+| `rounded-tr-none` | `border-top-right-radius: 0px` | border-top-right-radius: 0px |
+| `rounded-tr-sm` | `border-top-right-radius: 0.125rem` | border-top-right-radius: 0.125rem |
+| `rounded-tr` | `border-top-right-radius: 0.25rem` | border-top-right-radius: 0.25rem |
+| `rounded-tr-md` | `border-top-right-radius: 0.375rem` | border-top-right-radius: 0.375rem |
+| `rounded-tr-lg` | `border-top-right-radius: 0.5rem` | border-top-right-radius: 0.5rem |
+| `rounded-tr-xl` | `border-top-right-radius: 0.75rem` | border-top-right-radius: 0.75rem |
+| `rounded-tr-2xl` | `border-top-right-radius: 1rem` | border-top-right-radius: 1rem |
+| `rounded-tr-3xl` | `border-top-right-radius: 1.5rem` | border-top-right-radius: 1.5rem |
+| `rounded-tr-full` | `border-top-right-radius: 9999px` | border-top-right-radius: 9999px |
+| `rounded-tr-xs` | `border-top-right-radius: 0.125rem` | border-top-right-radius: 0.125rem |
+| `rounded-br-none` | `border-bottom-right-radius: 0px` | border-bottom-right-radius: 0px |
+| `rounded-br-sm` | `border-bottom-right-radius: 0.125rem` | border-bottom-right-radius: 0.125rem |
+| `rounded-br` | `border-bottom-right-radius: 0.25rem` | border-bottom-right-radius: 0.25rem |
+| `rounded-br-md` | `border-bottom-right-radius: 0.375rem` | border-bottom-right-radius: 0.375rem |
+| `rounded-br-lg` | `border-bottom-right-radius: 0.5rem` | border-bottom-right-radius: 0.5rem |
+| `rounded-br-xl` | `border-bottom-right-radius: 0.75rem` | border-bottom-right-radius: 0.75rem |
+| `rounded-br-2xl` | `border-bottom-right-radius: 1rem` | border-bottom-right-radius: 1rem |
+| `rounded-br-3xl` | `border-bottom-right-radius: 1.5rem` | border-bottom-right-radius: 1.5rem |
+| `rounded-br-full` | `border-bottom-right-radius: 9999px` | border-bottom-right-radius: 9999px |
+| `rounded-br-xs` | `border-bottom-right-radius: 0.125rem` | border-bottom-right-radius: 0.125rem |
+| `rounded-bl-none` | `border-bottom-left-radius: 0px` | border-bottom-left-radius: 0px |
+| `rounded-bl-sm` | `border-bottom-left-radius: 0.125rem` | border-bottom-left-radius: 0.125rem |
+| `rounded-bl` | `border-bottom-left-radius: 0.25rem` | border-bottom-left-radius: 0.25rem |
+| `rounded-bl-md` | `border-bottom-left-radius: 0.375rem` | border-bottom-left-radius: 0.375rem |
+| `rounded-bl-lg` | `border-bottom-left-radius: 0.5rem` | border-bottom-left-radius: 0.5rem |
+| `rounded-bl-xl` | `border-bottom-left-radius: 0.75rem` | border-bottom-left-radius: 0.75rem |
+| `rounded-bl-2xl` | `border-bottom-left-radius: 1rem` | border-bottom-left-radius: 1rem |
+| `rounded-bl-3xl` | `border-bottom-left-radius: 1.5rem` | border-bottom-left-radius: 1.5rem |
+| `rounded-bl-full` | `border-bottom-left-radius: 9999px` | border-bottom-left-radius: 9999px |
+| `rounded-bl-xs` | `border-bottom-left-radius: 0.125rem` | border-bottom-left-radius: 0.125rem |
 
 ---
 

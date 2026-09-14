@@ -2,8 +2,8 @@
 
 // src/cli.ts
 import { Command } from "commander";
-import { existsSync as existsSync4, mkdirSync as mkdirSync2, realpathSync, writeFileSync as writeFileSync2 } from "fs";
-import { dirname as dirname4, isAbsolute as isAbsolute3, join as join4, resolve as resolve5 } from "path";
+import { existsSync as existsSync6, mkdirSync as mkdirSync2, readFileSync as readFileSync6, realpathSync, writeFileSync as writeFileSync3 } from "fs";
+import { dirname as dirname5, isAbsolute as isAbsolute4, join as join6, resolve as resolve6 } from "path";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
 
@@ -8029,7 +8029,7 @@ var metadata = {
 
 // src/build.ts
 import { existsSync as existsSync2, mkdirSync, readFileSync as readFileSync2, statSync as statSync2, writeFileSync } from "fs";
-import { dirname, isAbsolute, join, resolve as resolve2 } from "path";
+import { basename, dirname, isAbsolute, join, resolve as resolve2 } from "path";
 
 // src/content.ts
 import { existsSync, readFileSync, statSync } from "fs";
@@ -8069,6 +8069,7 @@ var SOURCE_RE = /@nakshora\s+source\s*;?/g;
 var UTILITIES_RE = /@nakshora\s+utilities\s*;?/g;
 var AUTHOR_RE = /@apply\b|@screen\b|\b(?:theme|screen)\(/;
 async function runBuild(input) {
+  const started = performance.now();
   const cwd = input.cwd ?? process.cwd();
   const config = input.config;
   const generator = new CSSGenerator(config);
@@ -8086,16 +8087,19 @@ async function runBuild(input) {
     css = generator.generate({ ...options, mode: "full" });
     classes = countClasses(css);
   }
-  if (input.input) {
-    const absInput = isAbsolute(input.input) ? input.input : resolve2(cwd, input.input);
-    if (existsSync2(absInput)) {
-      let source = readFileSync2(absInput, "utf-8");
+  const absInput = input.input && input.input !== "-" ? isAbsolute(input.input) ? input.input : resolve2(cwd, input.input) : void 0;
+  if (input.inputCss !== void 0 || absInput && existsSync2(absInput)) {
+    {
+      let source = input.inputCss ?? readFileSync2(absInput, "utf-8");
       const authorPass = AUTHOR_RE.test(source);
       if (authorPass) {
         try {
           source = generator.processCss(source);
         } catch (err) {
-          if (err instanceof ApplyError) throw new Error(`${input.input}: ${err.message}`);
+          if (err instanceof ApplyError)
+            throw new Error(
+              `${input.input && input.input !== "-" ? input.input : "<stdin>"}: ${err.message}`
+            );
           throw err;
         }
       }
@@ -8112,18 +8116,57 @@ async function runBuild(input) {
       }
     }
   }
+  let mapFile;
   if (input.output) {
     const outPath = isAbsolute(input.output) ? input.output : resolve2(cwd, input.output);
-    mkdirSync(dirname(outPath), { recursive: true });
-    writeFileSync(outPath, css, "utf-8");
-  } else {
+    if (input.sourceMap) {
+      mapFile = `${outPath}.map`;
+      const map = generatedSourceMap(
+        css,
+        basename(outPath),
+        input.input && input.input !== "-" ? input.input : void 0
+      );
+      css += `
+/*# sourceMappingURL=${basename(mapFile)} */
+`;
+      if (!input.dryRun) {
+        mkdirSync(dirname(outPath), { recursive: true });
+        writeFileSync(mapFile, JSON.stringify(map), "utf-8");
+      }
+    }
+    if (!input.dryRun) {
+      mkdirSync(dirname(outPath), { recursive: true });
+      writeFileSync(outPath, css, "utf-8");
+    }
+  } else if (!input.dryRun) {
     process.stdout.write(css);
   }
+  const unknown = mode === "jit" ? [...candidates].filter(
+    (c) => generator.engine.compile(c).length === 0 && !isComponentClass(generator, c)
+  ) : [];
   return {
     css,
     classes,
     sizeBytes: Buffer.byteLength(css, "utf-8"),
-    minifiedSizeBytes: Buffer.byteLength(minifyCss(css), "utf-8")
+    minifiedSizeBytes: Buffer.byteLength(minifyCss(css), "utf-8"),
+    candidates: candidates.size,
+    unknown,
+    durationMs: performance.now() - started,
+    mapFile
+  };
+}
+function isComponentClass(generator, cls) {
+  return generator.getComponents().includes(`.${cls.replace(/[^\w-]/g, "")}`);
+}
+function generatedSourceMap(css, file, inputFile) {
+  const lines = css.split("\n").length;
+  const mappings = Array.from({ length: lines }, () => "AAAA").join(";");
+  return {
+    version: 3,
+    file,
+    sources: [inputFile ?? "nakshora:generated"],
+    names: [],
+    mappings
   };
 }
 function countClasses(css) {
@@ -8307,6 +8350,375 @@ function createWatcher(paths, onChange) {
   };
 }
 
+// src/doctor.ts
+import { existsSync as existsSync4, readFileSync as readFileSync4, statSync as statSync4 } from "fs";
+import { dirname as dirname4, isAbsolute as isAbsolute3, join as join4, resolve as resolve5 } from "path";
+import { globby as globby2 } from "globby";
+var CSS_AT_RULES = /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/g;
+async function diagnose(cwd = process.cwd(), explicitConfig) {
+  const findings = [];
+  const push = (level, check, message, hint) => {
+    findings.push({ level, check, message, hint });
+  };
+  const major = Number(process.versions.node.split(".")[0]);
+  if (major >= 18) push("ok", "node", `Node ${process.version}`);
+  else push("error", "node", `Node ${process.version} is too old`, "Nakshora needs Node >= 18");
+  push("ok", "version", `@nakshora/core ${version}`);
+  const file = explicitConfig ? isAbsolute3(explicitConfig) ? explicitConfig : resolve5(cwd, explicitConfig) : findConfigFile(cwd);
+  let config = null;
+  if (!file) {
+    push(
+      "warn",
+      "config",
+      "no nakshora.config.{js,mjs,cjs,ts,json} found (walking up from the current directory)",
+      "run `nakshora init`, or pass --content to build in JIT mode without a config"
+    );
+  } else if (!existsSync4(file)) {
+    push("error", "config", `config file not found: ${file}`);
+  } else {
+    try {
+      config = await loadConfigFile(file);
+      push("ok", "config", `loaded ${file}`);
+    } catch (err) {
+      push("error", "config", `failed to load ${file}: ${err.message}`);
+    }
+  }
+  if (config) {
+    const content = config.content ?? config.purge;
+    if (!content || Array.isArray(content) && content.length === 0) {
+      push(
+        "warn",
+        "content",
+        "no `content` configured \u2014 builds run in FULL mode (every utility, ~6 MB)",
+        "add content: ['./src/**/*.{html,js,ts,jsx,tsx,vue,svelte}'] for JIT output"
+      );
+    } else {
+      const entries = Array.isArray(content) ? content : [content];
+      const base = file ? dirname4(file) : cwd;
+      let total = 0;
+      for (const entry of entries) {
+        if (/[*{[]/.test(entry)) {
+          const files = await globby2(entry, { cwd: base, absolute: true });
+          total += files.length;
+          if (files.length === 0)
+            push(
+              "warn",
+              "content",
+              `glob matches no files: ${entry}`,
+              `resolved relative to ${base}`
+            );
+          else if (!/node_modules/.test(entry) && files.some((f) => f.includes("/node_modules/")))
+            push(
+              "warn",
+              "content",
+              `glob reaches into node_modules: ${entry}`,
+              "this scans thousands of files on every build; narrow it"
+            );
+          else push("ok", "content", `${entry} \u2192 ${files.length} file(s)`);
+        } else if (existsSync4(resolve5(base, entry)) && statSync4(resolve5(base, entry)).isFile()) {
+          total++;
+          push("ok", "content", `${entry} (file)`);
+        } else {
+          push(
+            "warn",
+            "content",
+            `"${entry.slice(0, 40)}${entry.length > 40 ? "\u2026" : ""}" is neither a glob nor an existing file \u2014 treated as raw template text`
+          );
+        }
+      }
+      if (total > 5e3)
+        push(
+          "warn",
+          "content",
+          `${total} files matched \u2014 large content sets slow down every rebuild`,
+          "exclude build output / vendored directories"
+        );
+      if (config.purge && !config.content)
+        push(
+          "warn",
+          "config",
+          "`purge` is the legacy name",
+          "rename it to `content` (identical semantics)"
+        );
+    }
+    try {
+      const gen = new CSSGenerator(config);
+      const screens = Object.keys(gen.theme.screens);
+      push(
+        "ok",
+        "theme",
+        `${gen.getUtilities().length} utilities, ${screens.length} screens (${screens.join(" ")})`
+      );
+      const safelist = config.safelist ?? [];
+      const badSafe = safelist.filter(
+        (s) => typeof s === "string" && gen.engine.compile(s).length === 0
+      );
+      if (badSafe.length)
+        push("warn", "safelist", `safelist entries that produce no CSS: ${badSafe.join(" ")}`);
+      if (config.important === true)
+        push(
+          "warn",
+          "config",
+          "`important: true` marks every declaration !important",
+          "prefer important: '#app' (selector strategy) when you only need to win over third-party CSS"
+        );
+      const unknownVariantKeys = Object.keys(config.variants ?? {}).filter(
+        (k) => ![
+          "hover",
+          "focus",
+          "focusVisible",
+          "focusWithin",
+          "active",
+          "visited",
+          "disabled",
+          "firstChild",
+          "lastChild",
+          "group",
+          "groupHover",
+          "groupFocus",
+          "peer",
+          "peerHover",
+          "peerFocus",
+          "dark",
+          "responsive",
+          "maxResponsive",
+          "containerQueries"
+        ].includes(k)
+      );
+      if (unknownVariantKeys.length)
+        push(
+          "warn",
+          "variants",
+          `unknown variants keys are ignored: ${unknownVariantKeys.join(", ")}`
+        );
+    } catch (err) {
+      push("error", "config", `config rejected by the compiler: ${err.message}`);
+    }
+  }
+  const cssFiles = await globby2(
+    ["**/*.css", "!node_modules/**", "!dist/**", "!build/**", "!**/*.min.css"],
+    {
+      cwd,
+      absolute: true
+    }
+  );
+  const withAtRule = cssFiles.filter((f) => CSS_AT_RULES.test(readFileSync4(f, "utf-8")));
+  CSS_AT_RULES.lastIndex = 0;
+  if (cssFiles.length && withAtRule.length === 0 && config)
+    push(
+      "warn",
+      "css",
+      `none of ${cssFiles.length} stylesheet(s) contain \`@nakshora source;\``,
+      'add `@nakshora source;` to your entry CSS (or import "virtual:nakshora" with the Vite plugin)'
+    );
+  else if (withAtRule.length)
+    push(
+      "ok",
+      "css",
+      `@nakshora at-rules in ${withAtRule.map((f) => f.replace(cwd + "/", "")).join(", ")}`
+    );
+  if (config) {
+    const gen = new CSSGenerator(config);
+    for (const f of cssFiles.slice(0, 200)) {
+      const css = readFileSync4(f, "utf-8");
+      if (!/@apply\b|theme\(|@screen\b/.test(css)) continue;
+      try {
+        gen.processCss(css);
+        push("ok", "apply", `${f.replace(cwd + "/", "")}: @apply / theme() resolve`);
+      } catch (err) {
+        if (err instanceof ApplyError)
+          push("error", "apply", `${f.replace(cwd + "/", "")}: ${err.message}`);
+      }
+    }
+  }
+  const pkgPath = join4(cwd, "package.json");
+  if (existsSync4(pkgPath)) {
+    const pkg = JSON.parse(readFileSync4(pkgPath, "utf-8"));
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+    const has = (n) => n in deps;
+    if (has("@nakshora/vite-plugin") && !has("vite"))
+      push("warn", "deps", "@nakshora/vite-plugin is installed but vite is not");
+    if (has("@nakshora/postcss") && !has("postcss"))
+      push(
+        "warn",
+        "deps",
+        "@nakshora/postcss needs the postcss peer dependency",
+        "npm i -D postcss"
+      );
+    if (has("tailwindcss") && (has("@nakshora/cli") || has("@nakshora/postcss") || has("@nakshora/vite-plugin")))
+      push(
+        "warn",
+        "deps",
+        "both tailwindcss and Nakshora are installed",
+        "run `nakshora migrate` to port tailwind.config.* and remove tailwindcss to avoid double-processing"
+      );
+    if (!Object.keys(deps).some((d) => d.startsWith("@nakshora/")))
+      push(
+        "warn",
+        "deps",
+        "no @nakshora/* package in package.json",
+        "npm i -D @nakshora/cli (or @nakshora/vite-plugin / @nakshora/postcss)"
+      );
+  }
+  return { findings, config, configFile: file ?? null };
+}
+function formatFindings(findings) {
+  const icon = { ok: "\u2714", warn: "\u25B2", error: "\u2716" };
+  return findings.map(
+    (f) => `${icon[f.level]} ${f.check.padEnd(9)} ${f.message}${f.hint ? `
+            \u21B3 ${f.hint}` : ""}`
+  ).join("\n");
+}
+
+// src/migrate.ts
+import { readFileSync as readFileSync5, writeFileSync as writeFileSync2, existsSync as existsSync5 } from "fs";
+import { join as join5 } from "path";
+import { globby as globby3 } from "globby";
+var V1_RENAMES = {
+  "card-neon": "neon-card",
+  "btn-neon": "neon-btn",
+  "animate-neonGlow": "animate-neon-glow",
+  uhd: "4xl",
+  k8: "5xl"
+};
+var TAILWIND_RENAMES = {
+  "flex-grow": "grow",
+  "flex-grow-0": "grow-0",
+  "flex-shrink": "shrink",
+  "flex-shrink-0": "shrink-0",
+  "overflow-ellipsis": "text-ellipsis",
+  "decoration-slice": "box-decoration-slice",
+  "decoration-clone": "box-decoration-clone"
+};
+function migrateSource(text, from) {
+  const table = from === "v1" ? V1_RENAMES : TAILWIND_RENAMES;
+  const counts = /* @__PURE__ */ new Map();
+  const out = text.replace(
+    /(class(?:Name)?\s*=\s*)(["'`])([\s\S]*?)\2/g,
+    (_m, attr, q, body) => {
+      const rewritten = body.split(/(\s+)/).map((tok) => {
+        if (!tok.trim()) return tok;
+        const parts = tok.split(":");
+        const mapped = parts.map((p, i) => {
+          const bare = p.replace(/^!/, "").replace(/!$/, "");
+          const isVariant = i < parts.length - 1;
+          const to = table[bare];
+          if (!to) return p;
+          if (isVariant && from !== "v1") return p;
+          counts.set(bare, (counts.get(bare) ?? 0) + 1);
+          return p.replace(bare, to);
+        });
+        return mapped.join(":");
+      }).join("");
+      return `${attr}${q}${rewritten}${q}`;
+    }
+  );
+  return {
+    text: out,
+    changes: [...counts].map(([f, count]) => ({ from: f, to: table[f], count }))
+  };
+}
+function migrateTailwindConfig(source) {
+  const notes = [];
+  let text = source;
+  text = text.replace(
+    /\/\*\*\s*@type\s*\{import\(['"]tailwindcss['"]\)\.Config\}\s*\*\//,
+    "/** @type {import('@nakshora/core').NakshoraConfig} */"
+  );
+  text = text.replace(
+    /import\s+type\s+\{\s*Config\s*\}\s+from\s+['"]tailwindcss['"];?/g,
+    "import type { NakshoraConfig } from '@nakshora/core';"
+  );
+  text = text.replace(/satisfies\s+Config\b/g, "satisfies NakshoraConfig").replace(/:\s*Config\b/g, ": NakshoraConfig");
+  if (/tailwindcss\/defaultTheme/.test(text)) {
+    text = text.replace(
+      /const\s+defaultTheme\s*=\s*require\(['"]tailwindcss\/defaultTheme['"]\);?/g,
+      "const { defaultTheme } = require('@nakshora/core');"
+    ).replace(
+      /import\s+defaultTheme\s+from\s+['"]tailwindcss\/defaultTheme['"];?/g,
+      "import { defaultTheme } from '@nakshora/core';"
+    );
+    notes.push(
+      "`tailwindcss/defaultTheme` \u2192 `defaultTheme` from @nakshora/core (same keys, Tailwind values)"
+    );
+  }
+  if (/tailwindcss\/colors/.test(text)) {
+    text = text.replace(
+      /const\s+colors\s*=\s*require\(['"]tailwindcss\/colors['"]\);?/g,
+      "const { defaultColors: colors } = require('@nakshora/core');"
+    ).replace(
+      /import\s+colors\s+from\s+['"]tailwindcss\/colors['"];?/g,
+      "import { defaultColors as colors } from '@nakshora/core';"
+    );
+    notes.push("`tailwindcss/colors` \u2192 `defaultColors` from @nakshora/core");
+  }
+  if (/tailwindcss\/plugin/.test(text)) {
+    text = text.replace(
+      /const\s+plugin\s*=\s*require\(['"]tailwindcss\/plugin['"]\);?/g,
+      "const { plugin } = require('@nakshora/core');"
+    ).replace(
+      /import\s+plugin\s+from\s+['"]tailwindcss\/plugin['"];?/g,
+      "import { plugin } from '@nakshora/core';"
+    );
+    notes.push("`tailwindcss/plugin` \u2192 `plugin` from @nakshora/core (same API incl. withOptions)");
+  }
+  for (const p of ["typography", "forms", "aspect-ratio", "container-queries"])
+    if (text.includes(`@tailwindcss/${p}`))
+      notes.push(
+        `@tailwindcss/${p} works unchanged through the plugin adapter (keep the dependency)`
+      );
+  if (/\bpresets\s*:/.test(text))
+    notes.push("`presets` accepted: Tailwind preset objects and Nakshora theme presets both work");
+  if (/screens\s*:\s*\{/.test(text))
+    notes.push(
+      "`theme.screens` REPLACES the 10-step scale (Tailwind semantics); use `theme.breakpoints` to extend it instead"
+    );
+  if (/darkMode\s*:\s*['"]media['"]/.test(text))
+    notes.push("darkMode: 'media' kept \u2014 Nakshora's default is 'class' (`:is(.dark *)`)");
+  if (!/darkMode\s*:/.test(text))
+    notes.push(
+      "no darkMode key: Tailwind defaults to 'media', Nakshora to 'class' \u2014 add darkMode: 'media' to keep behaviour"
+    );
+  if (/future\s*:|experimental\s*:/.test(text))
+    notes.push("`future` / `experimental` keys are ignored");
+  if (/separator\s*:/.test(text))
+    notes.push("`separator` is not configurable (always `:`) \u2014 the key is ignored");
+  return { text, notes };
+}
+async function runMigrate(o) {
+  const out = [];
+  const files = await globby3(o.globs, {
+    cwd: o.cwd,
+    absolute: true,
+    ignore: ["**/node_modules/**", "**/dist/**"]
+  });
+  for (const f of files) {
+    const src = readFileSync5(f, "utf-8");
+    const res = migrateSource(src, o.from);
+    if (res.changes.length === 0) continue;
+    out.push({ file: f, changes: res.changes });
+    if (o.write) writeFileSync2(f, res.text);
+  }
+  let config;
+  if (o.from === "tailwind") {
+    const candidates = [
+      "tailwind.config.js",
+      "tailwind.config.cjs",
+      "tailwind.config.mjs",
+      "tailwind.config.ts"
+    ];
+    const found = candidates.find((c) => existsSync5(join5(o.cwd, c)));
+    if (found) {
+      const ext = found.endsWith(".ts") ? ".ts" : found.endsWith(".cjs") ? ".cjs" : found.endsWith(".mjs") ? ".mjs" : ".js";
+      const to = join5(o.cwd, `nakshora.config${ext}`);
+      const res = migrateTailwindConfig(readFileSync5(join5(o.cwd, found), "utf-8"));
+      if (o.write && !existsSync5(to)) writeFileSync2(to, res.text);
+      config = { from: found, to: `nakshora.config${ext}`, notes: res.notes };
+    }
+  }
+  return { files: out, config };
+}
+
 // src/cli.ts
 var program = new Command();
 program.name("nakshora").description("The modern, ultra-fast, utility-first CSS framework with a JIT compiler").version(version, "-v, --version", "output the version number").showHelpAfterError("(run without args for help)");
@@ -8321,7 +8733,7 @@ program.command("init").description("scaffold a nakshora.config.js and starter s
   const dir = process.cwd();
   const cfgFile = opts.json ? "nakshora.config.json" : "nakshora.config.js";
   const cssFile = "nakshora.css";
-  if ((existsSync4(join4(dir, cfgFile)) || existsSync4(join4(dir, cssFile))) && !opts.force) {
+  if ((existsSync6(join6(dir, cfgFile)) || existsSync6(join6(dir, cssFile))) && !opts.force) {
     console.error(
       chalk.red(`A Nakshora config already exists. Use ${chalk.bold("--force")} to overwrite.`)
     );
@@ -8357,9 +8769,9 @@ export default {
   plugins: [],
 };
 `;
-  writeFileSync2(join4(dir, cfgFile), configContent);
-  writeFileSync2(
-    join4(dir, cssFile),
+  writeFileSync3(join6(dir, cfgFile), configContent);
+  writeFileSync3(
+    join6(dir, cssFile),
     `/* Nakshora entry point
    Consume this file in your bundler \u2014 or run: nakshora build nakshora.css -o dist/nakshora.css --minify
    Layers: @nakshora source | base | variables | keyframes | utilities | components
@@ -8375,25 +8787,119 @@ export default {
     chalk.dim("   (JIT mode compiles only the classes it finds in your content globs)")
   );
 });
-program.command("build [input]").description("compile Nakshora CSS (JIT by default when content is configured)").option("-c, --config <path>", "path to nakshora config").option("-o, --output <file>", "output file (default: stdout)").option("-m, --minify", "minify the output").option("--mode <mode>", "full | jit", void 0).option("--watch", "rebuild on change").action(async (input, opts) => {
+function buildOptions(cmd) {
+  return cmd.option("-c, --config <path>", "path to nakshora config").option("-o, --output <file>", "output file (default: stdout)").option("-m, --minify", "minify the output").option("--mode <mode>", "full | jit", void 0).option("--content <globs...>", "JIT content globs / files (overrides config.content)").option("--safelist <classes...>", "classes to always emit (added to config.safelist)").option("--source-map", "write <output>.map next to the output").option("--stats", "print build statistics (candidates, unknown classes, sizes) to stderr").option("--diff", "do not write; show which selectors would change in the output file").option("--watch", "rebuild on change");
+}
+buildOptions(
+  program.command("build [input]").description(
+    "compile Nakshora CSS (JIT by default when content is configured); input may be a .css file or `-` for stdin"
+  )
+).action(async (input, opts) => {
   await doBuild(input, opts);
 });
+async function readStdin() {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  return Buffer.concat(chunks).toString("utf-8");
+}
+function applyCliOverrides(config, opts) {
+  const out = { ...config };
+  if (opts.content?.length) out.content = opts.content;
+  if (opts.safelist?.length) {
+    const safe = /* @__PURE__ */ new Set([
+      ...config.safelist ?? [],
+      ...opts.safelist.flatMap((s) => s.split(/[\s,]+/)).filter(Boolean)
+    ]);
+    out.safelist = [...safe];
+  }
+  return out;
+}
+function diffSelectors(before, after) {
+  const sel = (css) => new Set(
+    (css.match(/(^|[}{;\n])\s*([^{}@;/][^{}]*?)\s*\{/g) ?? []).map(
+      (m) => m.replace(/^[}{;\n]\s*/, "").replace(/\s*\{$/, "").replace(/\s+/g, " ")
+    )
+  );
+  const a = sel(before);
+  const b = sel(after);
+  return {
+    added: [...b].filter((x) => !a.has(x)).sort(),
+    removed: [...a].filter((x) => !b.has(x)).sort()
+  };
+}
+function printStats(result, output) {
+  const lines = [
+    `${chalk.bold("build")}       ${result.durationMs.toFixed(1)} ms`,
+    `${chalk.bold("classes")}     ${result.classes}`,
+    `${chalk.bold("candidates")}  ${result.candidates}`,
+    `${chalk.bold("size")}        ${result.sizeBytes} B (${result.minifiedSizeBytes} B minified)`,
+    ...output ? [`${chalk.bold("output")}      ${output}`] : [],
+    ...result.mapFile ? [`${chalk.bold("source map")}  ${result.mapFile}`] : []
+  ];
+  if (result.unknown.length) {
+    const shown = result.unknown.slice(0, 25);
+    lines.push(
+      `${chalk.bold("unknown")}     ${result.unknown.length} candidate(s) produced no CSS` + chalk.dim(
+        ` (plain words are expected): ${shown.join(" ")}${result.unknown.length > shown.length ? " \u2026" : ""}`
+      )
+    );
+  }
+  console.error(lines.join("\n"));
+}
 async function doBuild(input, opts, forceWatch = false) {
-  const { config } = await withConfig({ opts: () => opts });
+  const loaded = await withConfig({ opts: () => opts });
+  const config = applyCliOverrides(loaded.config, opts);
   const mode = opts.mode ?? void 0;
   if (mode && mode !== "full" && mode !== "jit") {
     console.error(chalk.red(`Invalid --mode "${mode}" (expected full or jit)`));
     process.exit(1);
   }
+  const inputCss = input === "-" ? await readStdin() : void 0;
+  const base = {
+    input,
+    inputCss,
+    output: opts.output,
+    minify: opts.minify,
+    mode,
+    config,
+    sourceMap: opts.sourceMap
+  };
+  if (opts.diff) {
+    const result2 = await runBuild({ ...base, dryRun: true });
+    const outPath = opts.output ? resolve6(process.cwd(), opts.output) : void 0;
+    const before = outPath && existsSync6(outPath) ? readFileSync6(outPath, "utf-8") : "";
+    const { added, removed } = diffSelectors(before, result2.css);
+    for (const r of removed) console.log(chalk.red(`- ${r}`));
+    for (const a of added) console.log(chalk.green(`+ ${a}`));
+    console.error(
+      chalk.dim(
+        `${added.length} added, ${removed.length} removed${outPath ? ` vs ${opts.output}` : " (no --output: compared against empty)"}`
+      )
+    );
+    if (opts.stats) printStats(result2, opts.output);
+    return;
+  }
   const started = Date.now();
-  const result = await runBuild({ input, output: opts.output, minify: opts.minify, mode, config });
+  const result = await runBuild(base);
   const line = chalk.green(`\u2714 ${summarize(result, opts.output)} in ${Date.now() - started}ms`);
   if (!opts.output) console.error(line);
+  if (opts.stats) printStats(result, opts.output);
   if (opts.watch || forceWatch) {
+    if (input === "-") {
+      console.error(chalk.red("--watch cannot be combined with stdin input"));
+      process.exit(1);
+    }
     const paths = await collectWatchPaths(config, { input, config });
     console.log(chalk.dim(`Watching ${paths.length} path(s)\u2026 press Ctrl+C to stop`));
     const watcher = createWatcher(paths, () => {
-      runBuild({ input, output: opts.output, minify: opts.minify, mode, config }).then((res) => console.error(chalk.green(`\u2714 rebuilt ${summarize(res, opts.output)}`))).catch((err) => console.error(chalk.red(`Build error: ${err.message}`)));
+      runBuild(base).then((res) => {
+        console.error(
+          chalk.green(
+            `\u2714 rebuilt ${summarize(res, opts.output)} in ${res.durationMs.toFixed(0)}ms`
+          )
+        );
+        if (opts.stats) printStats(res, opts.output);
+      }).catch((err) => console.error(chalk.red(`Build error: ${err.message}`)));
     });
     process.on("SIGINT", () => {
       watcher.close();
@@ -8401,7 +8907,9 @@ async function doBuild(input, opts, forceWatch = false) {
     });
   }
 }
-program.command("dev [input]").description("build with --watch (development mode)").option("-c, --config <path>", "path to nakshora config").option("-o, --output <file>", "output file (default: stdout)").option("-m, --minify", "minify the output").option("--mode <mode>", "full | jit", void 0).action(async (input, opts) => {
+buildOptions(
+  program.command("dev [input]").description("build with --watch (development mode)")
+).action(async (input, opts) => {
   await doBuild(input, opts, true);
 });
 program.command("inspect").description("print the full generated CSS to stdout").option("-c, --config <path>", "path to nakshora config").action(async (opts) => {
@@ -8421,14 +8929,56 @@ program.command("export:ai").description("export the utility corpus for AI/LLM t
     out = JSON.stringify(corpus, null, 2);
     fileName = opts.out;
   }
-  const abs = isAbsolute3(fileName) ? fileName : resolve5(process.cwd(), fileName);
-  mkdirSync2(dirname4(abs), { recursive: true });
-  writeFileSync2(abs, out);
+  const abs = isAbsolute4(fileName) ? fileName : resolve6(process.cwd(), fileName);
+  mkdirSync2(dirname5(abs), { recursive: true });
+  writeFileSync3(abs, out);
   console.log(
     chalk.green(
       `\u2714 Exported ${corpus.utilityCount} utilities (${corpus.categories.length} categories) \u2192 ${fileName}`
     )
   );
+});
+program.command("doctor").description(
+  "diagnose the project set-up: config, content globs, stylesheets, @apply, dependencies"
+).option("-c, --config <path>", "path to nakshora config").option("--json", "machine-readable output").action(async (opts) => {
+  const { findings } = await diagnose(process.cwd(), opts.config);
+  if (opts.json) console.log(JSON.stringify(findings, null, 2));
+  else console.log(formatFindings(findings));
+  const errors = findings.filter((f) => f.level === "error").length;
+  const warns = findings.filter((f) => f.level === "warn").length;
+  if (!opts.json)
+    console.log(
+      `
+${errors ? chalk.red(`${errors} error(s)`) : chalk.green("no errors")}, ${warns ? chalk.yellow(`${warns} warning(s)`) : "no warnings"}`
+    );
+  if (errors) process.exit(1);
+});
+program.command("migrate [globs...]").description(
+  "codemod: rename Nakshora v1 classes (--from v1) or port a Tailwind project (--from tailwind)"
+).option("--from <source>", "v1 | tailwind", "tailwind").option("--write", "apply changes (default: dry run)").action(async (globs, opts) => {
+  if (opts.from !== "v1" && opts.from !== "tailwind") {
+    console.error(chalk.red(`--from must be v1 or tailwind`));
+    process.exit(1);
+  }
+  const patterns = globs.length ? globs : ["**/*.{html,js,jsx,ts,tsx,vue,svelte,astro,md,mdx,php}"];
+  const res = await runMigrate({
+    cwd: process.cwd(),
+    from: opts.from,
+    globs: patterns,
+    write: !!opts.write
+  });
+  for (const f of res.files)
+    console.log(
+      `${opts.write ? chalk.green("\u2714") : chalk.yellow("~")} ${f.file.replace(process.cwd() + "/", "")}  ` + chalk.dim(f.changes.map((c) => `${c.from}\u2192${c.to}\xD7${c.count}`).join(" "))
+    );
+  if (res.config) {
+    console.log(
+      `${opts.write ? chalk.green("\u2714") : chalk.yellow("~")} ${res.config.from} \u2192 ${res.config.to}`
+    );
+    for (const n of res.config.notes) console.log(chalk.dim(`   \xB7 ${n}`));
+  }
+  if (!res.files.length && !res.config) console.log(chalk.dim("nothing to migrate"));
+  else if (!opts.write) console.log(chalk.dim("\ndry run \u2014 re-run with --write to apply"));
 });
 program.action(() => {
   program.outputHelp();
@@ -8451,8 +9001,10 @@ if (isEntryPoint()) {
   });
 }
 export {
+  applyCliOverrides,
   createWatcher,
   cli_default as default,
+  diffSelectors,
   metadata,
   resolveConfig,
   runBuild
