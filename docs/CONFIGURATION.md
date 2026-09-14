@@ -49,29 +49,29 @@ Useful for class names built dynamically at runtime.
 
 Deep-merged over the defaults — override only what you change.
 
-| Section                    | Default keys                                       | Notes                                                                   |
-| -------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------- |
-| `colors`                   | 22 palettes × shades 50–950                        | `brand: {500: '#hex'}` or `blue: {500: '#hex'}` (single-shade override) |
-| `spacing`                  | `0 px 0.5 1 … 96`                                  | key → CSS length                                                        |
-| `typography.fontSize`      | `xs sm base lg xl 2xl 3xl 4xl 5xl 6xl 7xl 8xl 9xl` | value or `[size, lineHeight]`                                           |
-| `typography.fontWeight`    | `thin … black`                                     | 100–900                                                                 |
-| `typography.lineHeight`    | `none tight snug base relaxed loose`               |                                                                         |
-| `typography.letterSpacing` | `tighter tight normal wide wider widest`           |                                                                         |
-| `fontFamily`               | `sans, mono`                                       |                                                                         |
-| `breakpoints`              | `xs:0 sm:640 md:768 lg:1024 xl:1280 2xl:1536`      | px; add your own (`wide: 1800`)                                         |
-| `shadows`                  | `none sm base md lg xl 2xl inner glow`             |                                                                         |
-| `borderRadius`             | `none xs sm md lg xl 2xl 3xl full`                 |                                                                         |
-| `zIndex`                   | `auto hide 0 10 20 30 40 50`                       |                                                                         |
-| `opacity`                  | `0 5 10 20 … 100`                                  |                                                                         |
-| `duration`                 | `0 75 100 150 200 300 500 700 1000`                | ms                                                                      |
-| `easing`                   | `linear in out in-out back`                        |                                                                         |
-| `animation`                | `spin ping pulse bounce fade slide shimmer`        | name → shorthand                                                        |
-| `keyframes`                | matches the animation names                        | name → keyframe body                                                    |
+| Section                    | Default keys                                                                       | Notes                                                                   |
+| -------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `colors`                   | 22 palettes × shades 50–950                                                        | `brand: {500: '#hex'}` or `blue: {500: '#hex'}` (single-shade override) |
+| `spacing`                  | `0 px 0.5 1 … 96`                                                                  | key → CSS length                                                        |
+| `typography.fontSize`      | `xs sm base lg xl 2xl 3xl 4xl 5xl 6xl 7xl 8xl 9xl`                                 | value or `[size, lineHeight]`                                           |
+| `typography.fontWeight`    | `thin … black`                                                                     | 100–900                                                                 |
+| `typography.lineHeight`    | `none tight snug base relaxed loose`                                               |                                                                         |
+| `typography.letterSpacing` | `tighter tight normal wide wider widest`                                           |                                                                         |
+| `fontFamily`               | `sans, mono`                                                                       |                                                                         |
+| `breakpoints`              | `xxs:200 xs:400 sm:640 md:768 lg:1024 xl:1280 2xl:1536 3xl:1920 4xl:2560 5xl:5000` | px, merged + re-sorted; `null` removes; `screens` replaces (Tailwind)   |
+| `shadows`                  | `none sm base md lg xl 2xl inner glow`                                             |                                                                         |
+| `borderRadius`             | `none xs sm md lg xl 2xl 3xl full`                                                 |                                                                         |
+| `zIndex`                   | `auto hide 0 10 20 30 40 50`                                                       |                                                                         |
+| `opacity`                  | `0 5 10 20 … 100`                                                                  |                                                                         |
+| `duration`                 | `0 75 100 150 200 300 500 700 1000`                                                | ms                                                                      |
+| `easing`                   | `linear in out in-out back`                                                        |                                                                         |
+| `animation`                | `spin ping pulse bounce fade slide shimmer`                                        | name → shorthand                                                        |
+| `keyframes`                | matches the animation names                                                        | name → keyframe body                                                    |
 
 ```js
 theme: {
   colors: { brand: { 500: '#6d28d9' } },
-  breakpoints: { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536, wide: 1800 },
+  breakpoints: { wide: 1800, xxs: null }, // adds wide:/max-wide:, drops xxs:
   animation: { wiggle: 'wiggle 1s ease-in-out infinite' },
   keyframes: {
     wiggle: '0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); }',
@@ -84,8 +84,11 @@ theme: {
 ```
 hover, focus, focusVisible, focusWithin, active, visited, disabled,
 firstChild, lastChild, group, groupHover, groupFocus,
-peer, peerHover, peerFocus, dark, responsive
+peer, peerHover, peerFocus, dark, responsive, maxResponsive, containerQueries
 ```
+
+`responsive: false` removes every screen prefix (min, max, arbitrary) and the
+`.container` caps; `maxResponsive: false` removes only `max-*`.
 
 ```js
 variants: { visited: false, focusWithin: false } // shrink full builds / disable

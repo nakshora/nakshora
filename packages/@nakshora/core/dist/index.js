@@ -2833,7 +2833,9 @@ function resolveTheme(userTheme = {}, options = {}) {
     merged[k] = typeof v === "function" ? v : mergeScale(merged[k] ?? {}, v);
   }
   if (breakpointsMerge)
-    merged.screens = normaliseScreens(mergeScale(merged.screens, breakpointsMerge));
+    merged.screens = sortScreens(
+      normaliseScreens(mergeScale(merged.screens, breakpointsMerge))
+    );
   if (extend) {
     for (const [k, v] of Object.entries(extend)) {
       if (v === void 0) continue;
@@ -3077,6 +3079,13 @@ function resolveTheme(userTheme = {}, options = {}) {
     merged[k] = { ...merged[src] ?? {}, ...merged[k] ?? {} };
   }
   return merged;
+}
+function sortScreens(screens) {
+  const px = (v) => {
+    const n = screenToPx(v);
+    return Number.isNaN(n) ? Infinity : n;
+  };
+  return Object.fromEntries(Object.entries(screens).sort((a, b) => px(a[1]) - px(b[1])));
 }
 function normaliseScreens(v) {
   const out = {};
@@ -5387,16 +5396,52 @@ var Engine = class {
       modifier,
       compare: compareContainers
     });
+    const containerSize = (value) => {
+      if (value.startsWith("[") && value.endsWith("]")) return normalizeValue(value.slice(1, -1));
+      return containers[value] ?? null;
+    };
+    push({
+      name: "@max",
+      key: "containerQueries",
+      functional: true,
+      slots: containerKeys.length,
+      match: (value, modifier) => {
+        const size = containerSize(value);
+        if (size === null) return null;
+        const px = screenToPx(size);
+        const slot = containerKeys.indexOf(value);
+        return {
+          branches: [
+            {
+              atrules: [
+                {
+                  kind: "container",
+                  params: `${modifier ? `${modifier} ` : ""}(width < ${size})`,
+                  sort: MEDIA_SORT.container - (Number.isNaN(px) ? 0 : px / 10),
+                  max: px
+                }
+              ]
+            }
+          ],
+          slot: slot === -1 ? containerKeys.length : slot,
+          fn: {
+            ...containerHook(size, modifier),
+            id: "@container-max",
+            compare: (a, b) => -compareContainers(a, b)
+          }
+        };
+      },
+      description: "@container max-size query"
+    });
     push({
       name: "@",
       key: "containerQueries",
       functional: true,
       slots: containerKeys.length,
-      match: (value, modifier) => {
-        let size;
-        if (value.startsWith("[") && value.endsWith("]")) size = normalizeValue(value.slice(1, -1));
-        else if (containers[value] !== void 0) size = containers[value];
-        else return null;
+      match: (raw, modifier) => {
+        const value = raw.startsWith("min-") ? raw.slice(4) : raw;
+        const size = containerSize(value);
+        if (size === null) return null;
         const px = screenToPx(size);
         const slot = containerKeys.indexOf(value);
         return {
@@ -5891,6 +5936,7 @@ var Engine = class {
   }
   variantAllowed(def) {
     if (!this.options.variantEnabled(def.key)) return false;
+    if (def.key === "maxResponsive" && !this.options.variantEnabled("responsive")) return false;
     if (def.name !== def.key && !this.options.variantEnabled(def.name)) return false;
     if ((def.name.startsWith("group-") || def.name === "group") && !this.options.variantEnabled("group"))
       return false;
@@ -5943,8 +5989,10 @@ var Engine = class {
     }
     for (const fv of this.functionalVariants) {
       let rest = null;
-      if (fv.name === "@") {
-        if (name.startsWith("@")) rest = name.slice(1);
+      if (fv.name === "@max") {
+        if (name.startsWith("@max-")) rest = name.slice(5);
+      } else if (fv.name === "@") {
+        if (name.startsWith("@") && !name.startsWith("@max-")) rest = name.slice(1);
       } else if (name === fv.name && !fv.functional) rest = "";
       else if (name.startsWith(`${fv.name}-`)) rest = name.slice(fv.name.length + 1);
       else if (name.startsWith(`${fv.name}/`)) rest = name.slice(fv.name.length);
@@ -6227,6 +6275,7 @@ var Engine = class {
         sort: { plugin: plugin2, utility: 0, value: 0 }
       }
     ];
+    if (!this.options.variantEnabled("responsive")) return rules;
     let i = 1;
     for (const [name, value] of screens) {
       const px = screenToPx(value);
@@ -7438,7 +7487,7 @@ var CSSGenerator = class {
       extraStatic: collector.statics,
       extraFunctional: collector.functional,
       extraVariants: collector.variants,
-      combineMedia: true
+      combineMedia: this.config.combineMedia !== false
     });
   }
   // ───────────────────────────────────────────── API ─────────────────────────────────────────────
@@ -7452,7 +7501,8 @@ var CSSGenerator = class {
    */
   generate(options = {}) {
     const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
-    if (mode === "jit") return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
+    if (mode === "jit")
+      return this.generateJIT(options.content ?? this.getContentFromConfig(), options);
     const css = this.generateFull(options);
     return options.minify ? minifyCss(css) : css;
   }
@@ -7553,12 +7603,9 @@ var CSSGenerator = class {
     for (const bp of this.fullBuildScreens(options.screens)) {
       const wrapped = [];
       const vm = this.engine.resolveVariant(bp.name);
-      const at = vm?.branches[0]?.atrules?.[0] ?? {
-        kind: "media",
-        params: `(min-width: ${bp.value})`,
-        sort: 1e3 + bp.px / 10,
-        min: bp.px
-      };
+      if (!vm) continue;
+      const at = vm.branches[0]?.atrules?.[0];
+      if (!at) continue;
       for (const rule of base) {
         const from = `.${escapeClass(rule.candidate)}`;
         const to = `.${escapeClass(`${bp.name}:${rule.candidate}`)}`;
@@ -7569,8 +7616,8 @@ var CSSGenerator = class {
           sort: {
             ...rule.sort,
             variant: 1,
-            variants: vm ? [vm.sort] : [],
-            hooks: vm?.fn ? [{ ...vm.fn, bit: vm.sort }] : void 0
+            variants: [vm.sort],
+            hooks: vm.fn ? [{ ...vm.fn, bit: vm.sort }] : void 0
           }
         });
       }
@@ -8545,10 +8592,10 @@ function buildAICorpus(config = {}, version2 = "3.0.0") {
     framework: "nakshora",
     version: version2,
     generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
-    description: 'Nakshora is a modern, utility-first CSS framework with a JIT compiler, built-in design-paradigm components (glass, neon, brutalist, minimalist), five theme presets, responsive breakpoints and rich state variants. Classes are applied directly in HTML: <div class="flex items-center gap-4 p-6 bg-blue-500 text-white rounded-lg">. Responsive classes use mobile-first prefixes (sm:, md:, lg:, xl:, 2xl:). State classes use prefixes like hover:, focus:, active:, dark:, group-hover:, peer-focus:. JIT mode compiles only the classes found in your source files.',
+    description: 'Nakshora is a modern, utility-first CSS framework with a JIT compiler, built-in design-paradigm components (glass, neon, brutalist, minimalist), five theme presets, responsive breakpoints and rich state variants. Classes are applied directly in HTML: <div class="flex items-center gap-4 p-6 bg-blue-500 text-white rounded-lg">. Responsive classes use mobile-first prefixes across ten screens (xxs: 200px, xs: 400px, sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px, 3xl: 1920px, 4xl: 2560px, 5xl: 5000px) plus max-<screen>: for below-a-width rules and @container / @md: / @min-md: / @max-md: for container queries. State classes use prefixes like hover:, focus:, active:, dark:, group-hover:, peer-focus:. JIT mode compiles only the classes found in your source files.',
     howToUse: [
       "Always prefer Nakshora utility classes over custom CSS when a class exists.",
-      "Use mobile-first responsive prefixes: base styles for small screens, then xxs:/xs:/sm:/md:/lg:/xl:/2xl:/3xl:/4xl:/5xl: overrides; max-md: targets below a breakpoint.",
+      "Use mobile-first responsive prefixes: base styles for small screens, then xxs:/xs:/sm:/md:/lg:/xl:/2xl:/3xl:/4xl:/5xl: overrides; max-md: targets below a breakpoint (max-width: 767.98px); stacked media prefixes such as print:md: collapse into one @media query.",
       "Variants stack without limit and combine into one media query, e.g. md:dark:hover:bg-blue-600 or print:md:hidden.",
       "Arbitrary values use brackets: w-[37rem], bg-[#1da1f2], grid-cols-[repeat(3,minmax(0,1fr))]; opacity modifiers use a slash: bg-blue-500/50.",
       "Use built-in components for design paradigms: .glass, .neon-card, .brutalist-card, .minimalist-card, .skeleton-rect.",

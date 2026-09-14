@@ -81,6 +81,10 @@ with your actual markup (typically a few KB).
 
 - Every emitted rule is 1:1 with a real utility (no dead CSS)
 - State variants work with any base utility
-- Responsive + state combinations (`md:hover:x`) work
+- All 10 screens (`xxs:`…`5xl:`) plus `max-*`, `min-[…]`/`max-[…]` and
+  container queries (`@md:`, `@min-*`, `@max-*`) are available — the full
+  build only pre-generates `sm`–`2xl` (`screens: 'all'` opts in)
+- Responsive + state combinations (`md:hover:x`, `print:md:x`) work and
+  stacked media variants collapse into one `@media`
 - Keyframes are emitted only for animations you actually use
 - Deterministic output (same content → same bytes)

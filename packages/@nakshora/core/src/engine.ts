@@ -572,16 +572,56 @@ export class Engine {
       modifier,
       compare: compareContainers,
     });
+    const containerSize = (value: string): string | null => {
+      if (value.startsWith('[') && value.endsWith(']')) return normalizeValue(value.slice(1, -1));
+      return containers[value] ?? null;
+    };
+    // `@max-md:` / `@max-[400px]:` — Tailwind v4 container-query grammar.
+    // Container queries and range syntax ship together in every engine, so
+    // `(width < 28rem)` is exact (no `- 0.02px` fudge needed for `rem`).
+    push({
+      name: '@max',
+      key: 'containerQueries',
+      functional: true,
+      slots: containerKeys.length,
+      match: (value, modifier) => {
+        const size = containerSize(value);
+        if (size === null) return null;
+        const px = screenToPx(size);
+        const slot = containerKeys.indexOf(value);
+        return {
+          branches: [
+            {
+              atrules: [
+                {
+                  kind: 'container',
+                  params: `${modifier ? `${modifier} ` : ''}(width < ${size})`,
+                  sort: MEDIA_SORT.container - (Number.isNaN(px) ? 0 : px / 10),
+                  max: px,
+                },
+              ],
+            },
+          ],
+          slot: slot === -1 ? containerKeys.length : slot,
+          fn: {
+            ...containerHook(size, modifier),
+            id: '@container-max',
+            compare: (a, b) => -compareContainers(a, b),
+          },
+        };
+      },
+      description: '@container max-size query',
+    });
+    // `@md:` (Tailwind 3 plugin / v4) and its explicit alias `@min-md:` (v4)
     push({
       name: '@',
       key: 'containerQueries',
       functional: true,
       slots: containerKeys.length,
-      match: (value, modifier) => {
-        let size: string;
-        if (value.startsWith('[') && value.endsWith(']')) size = normalizeValue(value.slice(1, -1));
-        else if (containers[value] !== undefined) size = containers[value];
-        else return null;
+      match: (raw, modifier) => {
+        const value = raw.startsWith('min-') ? raw.slice(4) : raw;
+        const size = containerSize(value);
+        if (size === null) return null;
         const px = screenToPx(size);
         const slot = containerKeys.indexOf(value);
         return {
@@ -1166,6 +1206,9 @@ export class Engine {
 
   private variantAllowed(def: VariantDefinition): boolean {
     if (!this.options.variantEnabled(def.key)) return false;
+    // `responsive: false` switches off the whole screen system (min-*, max-*,
+    // `min-[…]`, `max-[…]`); `maxResponsive: false` only the max-width half.
+    if (def.key === 'maxResponsive' && !this.options.variantEnabled('responsive')) return false;
     if (def.name !== def.key && !this.options.variantEnabled(def.name)) return false;
     if (
       (def.name.startsWith('group-') || def.name === 'group') &&
@@ -1235,8 +1278,10 @@ export class Engine {
     // functional: `<name>-<value>[/modifier]` or `<name>/<modifier>` (group/nav)
     for (const fv of this.functionalVariants) {
       let rest: string | null = null;
-      if (fv.name === '@') {
-        if (name.startsWith('@')) rest = name.slice(1);
+      if (fv.name === '@max') {
+        if (name.startsWith('@max-')) rest = name.slice(5);
+      } else if (fv.name === '@') {
+        if (name.startsWith('@') && !name.startsWith('@max-')) rest = name.slice(1);
       } else if (name === fv.name && !fv.functional) rest = '';
       else if (name.startsWith(`${fv.name}-`)) rest = name.slice(fv.name.length + 1);
       else if (name.startsWith(`${fv.name}/`)) rest = name.slice(fv.name.length);
@@ -1584,6 +1629,9 @@ export class Engine {
         sort: { plugin, utility: 0, value: 0 },
       },
     ];
+    // `variants.responsive: false` removes every min-width query, including
+    // the container's per-screen max-widths.
+    if (!this.options.variantEnabled('responsive')) return rules;
     let i = 1;
     for (const [name, value] of screens) {
       const px = screenToPx(value);

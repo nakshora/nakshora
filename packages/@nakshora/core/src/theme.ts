@@ -337,7 +337,9 @@ export function resolveTheme(
     merged[k] = typeof v === 'function' ? v : mergeScale((merged[k] as Scale) ?? {}, v);
   }
   if (breakpointsMerge)
-    merged.screens = normaliseScreens(mergeScale(merged.screens as Scale, breakpointsMerge));
+    merged.screens = sortScreens(
+      normaliseScreens(mergeScale(merged.screens as Scale, breakpointsMerge)),
+    );
   if (extend) {
     for (const [k, v] of Object.entries(extend)) {
       if (v === undefined) continue;
@@ -595,6 +597,15 @@ export function resolveTheme(
   }
 
   return merged as ResolvedTheme;
+}
+
+/** Ascending by pixel width (unparseable values keep their position at the end). */
+function sortScreens(screens: Record<string, string>): Record<string, string> {
+  const px = (v: string): number => {
+    const n = screenToPx(v);
+    return Number.isNaN(n) ? Infinity : n;
+  };
+  return Object.fromEntries(Object.entries(screens).sort((a, b) => px(a[1]) - px(b[1])));
 }
 
 function normaliseScreens(v: Scale): Record<string, string> {

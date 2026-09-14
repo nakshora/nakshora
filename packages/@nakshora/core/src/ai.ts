@@ -91,10 +91,10 @@ export function buildAICorpus(config: Partial<NakshoraConfig> = {}, version = '3
     version,
     generatedAt: new Date().toISOString(),
     description:
-      'Nakshora is a modern, utility-first CSS framework with a JIT compiler, built-in design-paradigm components (glass, neon, brutalist, minimalist), five theme presets, responsive breakpoints and rich state variants. Classes are applied directly in HTML: <div class="flex items-center gap-4 p-6 bg-blue-500 text-white rounded-lg">. Responsive classes use mobile-first prefixes (sm:, md:, lg:, xl:, 2xl:). State classes use prefixes like hover:, focus:, active:, dark:, group-hover:, peer-focus:. JIT mode compiles only the classes found in your source files.',
+      'Nakshora is a modern, utility-first CSS framework with a JIT compiler, built-in design-paradigm components (glass, neon, brutalist, minimalist), five theme presets, responsive breakpoints and rich state variants. Classes are applied directly in HTML: <div class="flex items-center gap-4 p-6 bg-blue-500 text-white rounded-lg">. Responsive classes use mobile-first prefixes across ten screens (xxs: 200px, xs: 400px, sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px, 3xl: 1920px, 4xl: 2560px, 5xl: 5000px) plus max-<screen>: for below-a-width rules and @container / @md: / @min-md: / @max-md: for container queries. State classes use prefixes like hover:, focus:, active:, dark:, group-hover:, peer-focus:. JIT mode compiles only the classes found in your source files.',
     howToUse: [
       'Always prefer Nakshora utility classes over custom CSS when a class exists.',
-      'Use mobile-first responsive prefixes: base styles for small screens, then xxs:/xs:/sm:/md:/lg:/xl:/2xl:/3xl:/4xl:/5xl: overrides; max-md: targets below a breakpoint.',
+      'Use mobile-first responsive prefixes: base styles for small screens, then xxs:/xs:/sm:/md:/lg:/xl:/2xl:/3xl:/4xl:/5xl: overrides; max-md: targets below a breakpoint (max-width: 767.98px); stacked media prefixes such as print:md: collapse into one @media query.',
       'Variants stack without limit and combine into one media query, e.g. md:dark:hover:bg-blue-600 or print:md:hidden.',
       'Arbitrary values use brackets: w-[37rem], bg-[#1da1f2], grid-cols-[repeat(3,minmax(0,1fr))]; opacity modifiers use a slash: bg-blue-500/50.',
       'Use built-in components for design paradigms: .glass, .neon-card, .brutalist-card, .minimalist-card, .skeleton-rect.',

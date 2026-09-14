@@ -288,7 +288,7 @@ export class CSSGenerator {
       extraStatic: collector.statics,
       extraFunctional: collector.functional,
       extraVariants: collector.variants,
-      combineMedia: true,
+      combineMedia: this.config.combineMedia !== false,
     });
   }
 
@@ -429,12 +429,10 @@ export class CSSGenerator {
     for (const bp of this.fullBuildScreens(options.screens)) {
       const wrapped: CompiledRule[] = [];
       const vm = this.engine.resolveVariant(bp.name);
-      const at = vm?.branches[0]?.atrules?.[0] ?? {
-        kind: 'media' as const,
-        params: `(min-width: ${bp.value})`,
-        sort: 1000 + bp.px / 10,
-        min: bp.px,
-      };
+      // `variants.responsive: false` (or a disabled screen) → no responsive layer
+      if (!vm) continue;
+      const at = vm.branches[0]?.atrules?.[0];
+      if (!at) continue;
       for (const rule of base) {
         const from = `.${escapeClass(rule.candidate)}`;
         const to = `.${escapeClass(`${bp.name}:${rule.candidate}`)}`;
@@ -445,8 +443,8 @@ export class CSSGenerator {
           sort: {
             ...rule.sort,
             variant: 1,
-            variants: vm ? [vm.sort] : [],
-            hooks: vm?.fn ? [{ ...vm.fn, bit: vm.sort }] : undefined,
+            variants: [vm.sort],
+            hooks: vm.fn ? [{ ...vm.fn, bit: vm.sort }] : undefined,
           },
         });
       }

@@ -63,7 +63,11 @@ CSS generated: `.dark .dark\:bg-slate-900 { background-color: #0f172a; }`
 
 ## Responsive + state (JIT)
 
-One responsive prefix + one state prefix can be combined, in either order:
+Any of the 10 screens (`xxs:` … `5xl:`), their `max-*` twins, and state
+prefixes can be combined in any order. Media variants collapse into a single
+`@media` (`print:md:flex` → `@media print and (min-width: 768px)`); stacking
+two screens keeps the tighter bound (`lg:xl:` → `(min-width: 1280px)`). See
+[Responsive](RESPONSIVE.md) for the full policy.
 
 ```html
 <button class="bg-blue-500 hover:bg-blue-600 md:hover:bg-indigo-600">…</button>
@@ -103,6 +107,9 @@ export default {
     visited: false, // never emit visited:
     focusWithin: false,
     dark: false, // or disable dark mode entirely
+    responsive: false, // no screen prefixes at all (min-*, max-*, min-[…], max-[…])
+    maxResponsive: false, // keep md: … but drop max-md: …
+    containerQueries: false, // @container, @md:, @min-*, @max-*
   },
 };
 ```

@@ -405,6 +405,12 @@ export interface NakshoraConfig {
   prefix?: string;
   /** Emit real `@layer base/components/utilities` blocks (opt-in) */
   layers?: boolean;
+  /**
+   * Collapse stacked media variants into one query
+   * (`print:md:flex` → `@media print and (min-width: 768px)`; default true).
+   * `false` nests them like Tailwind (`@media print { @media (min-width: 768px) { … } }`).
+   */
+  combineMedia?: boolean;
   /** Include the preflight reset in `base` (default true) */
   preflight?: boolean;
   /**
