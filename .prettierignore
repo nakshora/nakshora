@@ -11,3 +11,8 @@ llms-full.md
 *.tgz
 CHANGELOG.md
 docs/utilities
+# test-time caches (git-ignored by nested .gitignore files; prettier only reads the root one)
+packages/@nakshora/core/test/compat/.cache
+ai/cache
+perf/report.json
+perf/report.md

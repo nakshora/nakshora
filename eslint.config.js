@@ -18,6 +18,7 @@ export default tseslint.config(
       'ai/corpus.jsonl',
       'img/**',
       '.changeset/**',
+      'packages/@nakshora/core/test/compat/.cache/**',
     ],
   },
   js.configs.recommended,
