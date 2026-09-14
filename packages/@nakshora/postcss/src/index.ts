@@ -3,7 +3,7 @@
 //   postcss.config.js
 //   module.exports = { plugins: [require('@nakshora/postcss')({ config: { content: [...] } })] }
 
-import type { AtRule, Plugin } from 'postcss';
+import type { AtRule, Container, Plugin } from 'postcss';
 import postcss from 'postcss';
 import { globby } from 'globby';
 import { readFileSync } from 'node:fs';
@@ -71,12 +71,41 @@ function layerCss(layer: string, generator: CSSGenerator): string {
       return generator.getKeyframes();
     case 'utilities':
     case 'utils':
-      return generator.getUtilitiesFull();
+      // Same utilities layer as `@nakshora source;` (responsive variants on the
+      // core screens, no state variants — those are emitted in JIT mode only).
+      return generator.getUtilitiesFull(false);
     case 'components':
       return generator.getComponents();
     default:
       return '';
   }
+}
+
+/**
+ * Replace `atRule` with the nodes parsed from `css` in O(n).
+ *
+ * `atRule.replaceWith(...nodes)` inserts one node at a time (each insert is an
+ * `indexOf` + array splice plus index bookkeeping) and spreads every node onto
+ * the call stack — with a full build (hundreds of thousands of rules) that is
+ * quadratic and overflows the stack. Rebuilding the parent's node list once
+ * keeps document order and is linear.
+ */
+export function spliceCss(atRule: AtRule, css: string): void {
+  const parent = atRule.parent as Container | undefined;
+  if (!parent) return;
+  const parsed = postcss.parse(css, { from: undefined });
+  const fresh = parsed.nodes;
+  parsed.nodes = [];
+  for (const n of fresh) n.parent = parent;
+  // keep the at-rule's leading whitespace so the output stays readable
+  if (fresh[0] && !fresh[0].raws.before) fresh[0].raws.before = atRule.raws.before;
+  const nodes = parent.nodes ?? [];
+  const idx = parent.index(atRule);
+  atRule.parent = undefined;
+  parent.nodes = nodes.slice(0, idx).concat(fresh, nodes.slice(idx + 1));
+  // `markDirty` is protected; the public way to invalidate the cached
+  // "clean" flags is to mutate any raw-independent property.
+  (parent as unknown as { markDirty(): void }).markDirty();
 }
 
 /**
@@ -110,7 +139,12 @@ export default function nakshora(options: NakshoraPostCSSOptions = {}): Plugin {
       const useJIT = config.content !== undefined || config.purge !== undefined;
       const content = await resolveContent(config.content ?? config.purge, baseDir);
 
+      // collect first: splicing large blocks while walking would re-walk them
+      const atRules: AtRule[] = [];
       root.walkAtRules('nakshora', (atRule: AtRule) => {
+        atRules.push(atRule);
+      });
+      for (const atRule of atRules) {
         const param = atRule.params.trim().toLowerCase();
         let css: string;
         if (
@@ -124,11 +158,11 @@ export default function nakshora(options: NakshoraPostCSSOptions = {}): Plugin {
           if (options.minify) css = generator.minify(css);
         }
         if (css) {
-          atRule.replaceWith(...postcss.parse(css, { from: undefined }).nodes);
+          spliceCss(atRule, css);
         } else {
           atRule.remove();
         }
-      });
+      }
     },
   };
 }

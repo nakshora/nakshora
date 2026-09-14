@@ -37,7 +37,9 @@ describe('@nakshora/vite-plugin', () => {
     const p = asTestPlugin(nakshora({ content: '<div class="p-4 bg-emerald-500">x</div>' }));
     const css = (await p.load('\0virtual:nakshora')) as string;
     expect(css).toContain('.p-4 { padding: 1rem; }');
-    expect(css).toContain('.bg-emerald-500 { background-color: #10b981; }');
+    expect(css).toContain(
+      '.bg-emerald-500 { --tw-bg-opacity: 1; background-color: rgb(16 185 129 / var(--tw-bg-opacity, 1)); }',
+    );
     expect(css).not.toContain('.flex { display: flex; }');
   });
 

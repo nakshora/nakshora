@@ -1,4 +1,4 @@
-import { Plugin } from 'postcss';
+import { Plugin, AtRule } from 'postcss';
 import { NakshoraConfig } from '@nakshora/core';
 
 interface NakshoraPostCSSOptions {
@@ -12,6 +12,16 @@ interface NakshoraPostCSSOptions {
     /** Minify the generated CSS */
     minify?: boolean;
 }
+/**
+ * Replace `atRule` with the nodes parsed from `css` in O(n).
+ *
+ * `atRule.replaceWith(...nodes)` inserts one node at a time (each insert is an
+ * `indexOf` + array splice plus index bookkeeping) and spreads every node onto
+ * the call stack — with a full build (hundreds of thousands of rules) that is
+ * quadratic and overflows the stack. Rebuilding the parent's node list once
+ * keeps document order and is linear.
+ */
+declare function spliceCss(atRule: AtRule, css: string): void;
 /**
  * Nakshora PostCSS plugin.
  *
@@ -28,4 +38,4 @@ interface NakshoraPostCSSOptions {
  */
 declare function nakshora(options?: NakshoraPostCSSOptions): Plugin;
 
-export { type NakshoraPostCSSOptions, nakshora as default };
+export { type NakshoraPostCSSOptions, nakshora as default, spliceCss };

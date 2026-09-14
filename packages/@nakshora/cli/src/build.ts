@@ -65,10 +65,11 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
         // JIT build (base + variables + keyframes + used utilities + components)
         // when content is configured, otherwise the full build.
         const sourceCss = hasJitContent ? css : generator.generate({ minify: false, mode: 'full' });
-        // `@nakshora utilities;` → just the utilities layer for the active mode.
+        // `@nakshora utilities;` → just the utilities layer for the active mode
+        // (full mode: same layer as `@nakshora source;`, no state variants).
         const utilCss = hasJitContent
           ? generator.generateJIT(content, { minify: false }, { utilitiesOnly: true })
-          : generator.getUtilitiesFull(true);
+          : generator.getUtilitiesFull(false);
         const out = source.replace(SOURCE_RE, () => sourceCss).replace(UTILITIES_RE, () => utilCss);
         css = input.minify ? minifyCss(out) : out;
       }

@@ -3,8 +3,10 @@
 // fine-tuned (SFT) or augmented (RAG) with accurate Nakshora knowledge.
 
 import type { NakshoraConfig, UtilityRule } from './types';
+import { escapeClassName } from './values';
 import { CSSGenerator, STATE_VARIANTS } from './generator';
-import { GROUP_CATEGORIES } from './registry';
+import { GROUP_CATEGORIES, categoryForPlugin } from './registry';
+import { SCREEN_GUIDE } from './theme';
 
 export interface AIUtilityEntry {
   class: string;
@@ -29,26 +31,19 @@ export interface AICorpus {
   description: string;
   howToUse: string[];
   variants: { prefix: string; description: string; example: string }[];
-  breakpoints: { name: string; min: string; example: string }[];
+  breakpoints: { name: string; min: string; example: string; description?: string }[];
   categories: AICategory[];
   utilityCount: number;
 }
 
-const BREAKPOINT_DOCS = [
-  { name: 'xs', min: '0px' },
-  { name: 'sm', min: '640px' },
-  { name: 'md', min: '768px' },
-  { name: 'lg', min: '1024px' },
-  { name: 'xl', min: '1280px' },
-  { name: '2xl', min: '1536px' },
-];
-
-function cssFor(rule: UtilityRule): string {
+function cssFor(generator: CSSGenerator, rule: UtilityRule): string {
+  const compiled = generator.compileClass(rule.class).trim();
+  if (compiled) return compiled;
   const decls = Object.entries(rule.decls)
     .filter(([, v]) => v !== undefined)
     .map(([k, v]) => `${k}: ${v}`)
     .join('; ');
-  return `.${rule.class.replace(/([.:])/g, '\\$1')} { ${decls}; }`;
+  return `.${escapeClassName(rule.class)} { ${decls}; }`;
 }
 
 function exampleFor(rule: UtilityRule): string {
@@ -64,10 +59,11 @@ export function buildAICorpus(config: Partial<NakshoraConfig> = {}, version = '3
 
   const byCategory = new Map<string, AIUtilityEntry[]>();
   for (const rule of rules) {
-    const category = GROUP_CATEGORIES[rule.group] ?? rule.category ?? rule.group;
+    const categoryId = GROUP_CATEGORIES[rule.group] ? rule.group : categoryForPlugin(rule.group);
+    const category = GROUP_CATEGORIES[categoryId] ?? rule.category ?? rule.group;
     const entry: AIUtilityEntry = {
       class: rule.class,
-      css: cssFor(rule),
+      css: cssFor(generator, rule),
       description: rule.description ?? `${rule.class} utility`,
       category,
       example: exampleFor(rule),
@@ -81,11 +77,14 @@ export function buildAICorpus(config: Partial<NakshoraConfig> = {}, version = '3
     byCategory.set(category, list);
   }
 
-  const categories: AICategory[] = [...byCategory.entries()].map(([id, utilities]) => ({
-    id: id.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-    name: id,
+  const idFor = new Map<string, string>();
+  for (const [id, label] of Object.entries(GROUP_CATEGORIES)) idFor.set(label, id);
+  const categories: AICategory[] = [...byCategory.entries()].map(([label, utilities]) => ({
+    id: idFor.get(label) ?? label.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    name: label,
     utilities,
   }));
+  const breakpoints = generator.getBreakpoints();
 
   return {
     framework: 'nakshora',
@@ -95,8 +94,9 @@ export function buildAICorpus(config: Partial<NakshoraConfig> = {}, version = '3
       'Nakshora is a modern, utility-first CSS framework with a JIT compiler, built-in design-paradigm components (glass, neon, brutalist, minimalist), five theme presets, responsive breakpoints and rich state variants. Classes are applied directly in HTML: <div class="flex items-center gap-4 p-6 bg-blue-500 text-white rounded-lg">. Responsive classes use mobile-first prefixes (sm:, md:, lg:, xl:, 2xl:). State classes use prefixes like hover:, focus:, active:, dark:, group-hover:, peer-focus:. JIT mode compiles only the classes found in your source files.',
     howToUse: [
       'Always prefer Nakshora utility classes over custom CSS when a class exists.',
-      'Use mobile-first responsive prefixes: base styles for small screens, then sm:/md:/lg:/xl:/2xl: overrides.',
-      'Combine at most one responsive prefix and one state prefix, e.g. md:hover:bg-blue-600.',
+      'Use mobile-first responsive prefixes: base styles for small screens, then xxs:/xs:/sm:/md:/lg:/xl:/2xl:/3xl:/4xl:/5xl: overrides; max-md: targets below a breakpoint.',
+      'Variants stack without limit and combine into one media query, e.g. md:dark:hover:bg-blue-600 or print:md:hidden.',
+      'Arbitrary values use brackets: w-[37rem], bg-[#1da1f2], grid-cols-[repeat(3,minmax(0,1fr))]; opacity modifiers use a slash: bg-blue-500/50.',
       'Use built-in components for design paradigms: .glass, .neon-card, .brutalist-card, .minimalist-card, .skeleton-rect.',
       'For dark mode, add class="dark" to <html> and use the dark: prefix.',
       'Color syntax: <prefix>-<palette>-<shade>, e.g. text-blue-500, bg-slate-900, border-rose-200, from-indigo-400.',
@@ -107,10 +107,11 @@ export function buildAICorpus(config: Partial<NakshoraConfig> = {}, version = '3
       description: v.description,
       example: `<div class="${v.prefix}:opacity-75">…</div>`,
     })),
-    breakpoints: BREAKPOINT_DOCS.map((b) => ({
+    breakpoints: breakpoints.map((b) => ({
       name: b.name,
-      min: b.min,
+      min: b.value,
       example: `<div class="${b.name}:grid-cols-4">…</div>`,
+      description: SCREEN_GUIDE[b.name],
     })),
     categories,
     utilityCount: rules.length,

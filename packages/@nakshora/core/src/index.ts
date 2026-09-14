@@ -1,7 +1,20 @@
 // Nakshora Core — public API
 // The JIT CSS compiler & engine, themes, config helpers and AI assets.
 
-import { CSSGenerator, createGenerator, STATE_VARIANTS } from './generator';
+import { CSSGenerator, createGenerator, STATE_VARIANTS, preflight } from './generator';
+import {
+  Engine,
+  applyFormat,
+  finalizeSelector,
+  candidatePermutations,
+  maxWidthValue,
+} from './engine';
+import { resolveTheme, DEFAULT_SCREENS, SCREEN_GUIDE, splitPath, screenToPx } from './theme';
+import { plugin } from './plugin-api';
+import { parseCss, serializeCss, minifyCssSafe } from './css-ast';
+import { processAuthorCss, ApplyError } from './apply';
+import { escapeClassName, normalizeValue, coerceValue } from './values';
+import { parseColor, formatColor, withAlphaValue, withAlphaVariable } from './color';
 import {
   defaultTheme,
   defaultVariants,
@@ -11,7 +24,7 @@ import {
   deepMerge,
 } from './config';
 import { defaultColors } from './palette';
-import { buildUtilityList, GROUP_CATEGORIES } from './registry';
+import { buildUtilityList, GROUP_CATEGORIES, categoryForPlugin } from './registry';
 import { componentCss, componentNames } from './components';
 import {
   extractClasses,
@@ -30,8 +43,28 @@ import { minimalistTheme } from './themes/minimalist';
 import { natureTheme } from './themes/nature';
 import { buildAICorpus, corpusToSFT } from './ai';
 
-export { CSSGenerator, createGenerator, STATE_VARIANTS };
+export { CSSGenerator, createGenerator, STATE_VARIANTS, preflight };
 export type { VariantDef, ResolvedBreakpoint } from './generator';
+export { Engine, applyFormat, finalizeSelector, candidatePermutations, maxWidthValue };
+export type {
+  CompiledRule,
+  VariantDefinition,
+  VariantBranch,
+  AtRuleCond,
+  EngineOptions,
+  CatalogEntry,
+} from './engine';
+export { resolveTheme, DEFAULT_SCREENS, SCREEN_GUIDE, splitPath, screenToPx };
+export type { ResolvedTheme } from './theme';
+export { plugin };
+export type { PluginAPI, TailwindPluginObject } from './plugin-api';
+export { parseCss, serializeCss, minifyCssSafe };
+export type { CssNode, CssRoot, CssRule, CssDecl, CssAtRule } from './css-ast';
+export { processAuthorCss, ApplyError };
+export { escapeClassName, normalizeValue, coerceValue };
+export { parseColor, formatColor, withAlphaValue, withAlphaVariable };
+export type { FunctionalUtility } from './utilities';
+export type { StaticUtilityDef } from './static-utilities';
 export type {
   NakshoraConfig,
   ThemeConfig,
@@ -44,6 +77,10 @@ export type {
   TypographyConfig,
   BreakpointConfig,
   Breakpoint,
+  ScreensConfig,
+  ContainerConfig,
+  DarkMode,
+  ThemeScale,
   ShadowConfig,
   BorderRadiusConfig,
   ZIndexConfig,
@@ -65,7 +102,7 @@ export type {
 } from './types';
 export { defaultTheme, defaultVariants, mergeConfig, resolveThemeValue, applyPreset, deepMerge };
 export { defaultColors };
-export { buildUtilityList, GROUP_CATEGORIES };
+export { buildUtilityList, GROUP_CATEGORIES, categoryForPlugin };
 export { componentCss, componentNames };
 export {
   extractClasses,

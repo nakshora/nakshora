@@ -6,6 +6,11 @@ import { resolve } from "path";
 
 // ../core/dist/index.js
 var defaultColors = {
+  inherit: "inherit",
+  current: "currentColor",
+  transparent: "transparent",
+  black: "#000",
+  white: "#fff",
   slate: {
     50: "#f8fafc",
     100: "#f1f5f9",
@@ -288,189 +293,9 @@ var defaultColors = {
     500: "#f43f5e",
     600: "#e11d48",
     700: "#be123c",
-    800: "#881337",
-    900: "#4c0519",
-    950: "#1c020c"
-  }
-};
-var palette_default = defaultColors;
-var defaultTheme = {
-  colors: palette_default,
-  spacing: {
-    0: "0",
-    px: "1px",
-    0.5: "0.125rem",
-    1: "0.25rem",
-    1.5: "0.375rem",
-    2: "0.5rem",
-    2.5: "0.625rem",
-    3: "0.75rem",
-    3.5: "0.875rem",
-    4: "1rem",
-    5: "1.25rem",
-    6: "1.5rem",
-    7: "1.75rem",
-    8: "2rem",
-    9: "2.25rem",
-    10: "2.5rem",
-    11: "2.75rem",
-    12: "3rem",
-    14: "3.5rem",
-    16: "4rem",
-    20: "5rem",
-    24: "6rem",
-    28: "7rem",
-    32: "8rem",
-    36: "9rem",
-    40: "10rem",
-    44: "11rem",
-    48: "12rem",
-    56: "14rem",
-    64: "16rem",
-    72: "18rem",
-    80: "20rem",
-    96: "24rem"
-  },
-  typography: {
-    fontSize: {
-      xs: ["0.75rem", "1rem"],
-      sm: ["0.875rem", "1.25rem"],
-      base: ["1rem", "1.5rem"],
-      lg: ["1.125rem", "1.75rem"],
-      xl: ["1.25rem", "1.75rem"],
-      "2xl": ["1.5rem", "2rem"],
-      "3xl": ["1.875rem", "2.25rem"],
-      "4xl": ["2.25rem", "2.5rem"],
-      "5xl": ["3rem", "1"],
-      "6xl": ["3.75rem", "1"],
-      "7xl": ["4.5rem", "1"],
-      "8xl": ["6rem", "1"],
-      "9xl": ["8rem", "1"]
-    },
-    fontWeight: {
-      thin: 100,
-      extralight: 200,
-      light: 300,
-      normal: 400,
-      medium: 500,
-      semibold: 600,
-      bold: 700,
-      extrabold: 800,
-      black: 900
-    },
-    lineHeight: {
-      none: "1",
-      tight: "1.25",
-      snug: "1.375",
-      base: "1.5",
-      relaxed: "1.625",
-      loose: "2"
-    },
-    letterSpacing: {
-      tighter: "-0.05em",
-      tight: "-0.025em",
-      normal: "0em",
-      wide: "0.025em",
-      wider: "0.05em",
-      widest: "0.1em"
-    }
-  },
-  fontFamily: {
-    sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-    mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
-  },
-  breakpoints: {
-    xs: 0,
-    sm: 640,
-    md: 768,
-    lg: 1024,
-    xl: 1280,
-    "2xl": 1536
-  },
-  shadows: {
-    none: "none",
-    sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-    base: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-    md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-    "2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-    inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
-    glow: "0 0 20px 0 rgba(59, 130, 246, 0.5)"
-  },
-  borderRadius: {
-    none: "0",
-    xs: "0.125rem",
-    sm: "0.25rem",
-    md: "0.375rem",
-    lg: "0.5rem",
-    xl: "0.75rem",
-    "2xl": "1rem",
-    "3xl": "1.5rem",
-    full: "9999px"
-  },
-  zIndex: {
-    auto: "auto",
-    hide: -1,
-    0: 0,
-    10: 10,
-    20: 20,
-    30: 30,
-    40: 40,
-    50: 50
-  },
-  opacity: {
-    0: 0,
-    5: 0.05,
-    10: 0.1,
-    20: 0.2,
-    25: 0.25,
-    30: 0.3,
-    40: 0.4,
-    50: 0.5,
-    60: 0.6,
-    70: 0.7,
-    75: 0.75,
-    80: 0.8,
-    90: 0.9,
-    95: 0.95,
-    100: 1
-  },
-  duration: {
-    0: "0ms",
-    75: "75ms",
-    100: "100ms",
-    150: "150ms",
-    200: "200ms",
-    300: "300ms",
-    500: "500ms",
-    700: "700ms",
-    1e3: "1000ms"
-  },
-  easing: {
-    linear: "linear",
-    in: "cubic-bezier(0.4, 0, 1, 1)",
-    out: "cubic-bezier(0, 0, 0.2, 1)",
-    "in-out": "cubic-bezier(0.4, 0, 0.2, 1)",
-    back: "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
-  },
-  animation: {
-    spin: "spin 1s linear infinite",
-    ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
-    pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-    bounce: "bounce 1s infinite",
-    fade: "fade 300ms ease-out",
-    slide: "slide 300ms ease-out",
-    shimmer: "shimmer 1.5s linear infinite"
-  },
-  keyframes: {
-    spin: "from { transform: rotate(0deg); } to { transform: rotate(360deg); }",
-    ping: "75%, 100% { transform: scale(2); opacity: 0; }",
-    pulse: "50% { opacity: 0.5; }",
-    bounce: "0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); } 50% { transform: none; animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }",
-    fade: "from { opacity: 0; } to { opacity: 1; }",
-    slide: "from { transform: translateY(1rem); opacity: 0; } to { transform: translateY(0); opacity: 1; }",
-    shimmer: "from { background-position: 200% 0; } to { background-position: -200% 0; }"
+    800: "#9f1239",
+    900: "#881337",
+    950: "#4c0519"
   }
 };
 var defaultVariants = {
@@ -490,7 +315,10 @@ var defaultVariants = {
   peerHover: true,
   peerFocus: true,
   dark: true,
-  responsive: true
+  responsive: true,
+  maxResponsive: true,
+  containerQueries: true,
+  arbitraryVariants: true
 };
 function deepMerge(base, override) {
   if (base === null || override === null || typeof base !== "object" || typeof override !== "object" || Array.isArray(base) || Array.isArray(override)) {
@@ -503,982 +331,6 @@ function deepMerge(base, override) {
     result[key] = existing !== void 0 && typeof existing === "object" && existing !== null && !Array.isArray(existing) ? deepMerge(existing, value) : value;
   }
   return result;
-}
-function spacingKeys(spacing) {
-  return spacing ? Object.keys(spacing) : [];
-}
-function colorEntries(colors) {
-  const out = [];
-  if (!colors) return out;
-  for (const [name, value] of Object.entries(colors)) {
-    if (typeof value === "string") {
-      out.push([name, "", value]);
-    } else if (value && typeof value === "object") {
-      for (const [shade, color] of Object.entries(value)) {
-        if (typeof color === "string") out.push([name, shade, color]);
-      }
-    }
-  }
-  return out;
-}
-function buildUtilityList(theme) {
-  const rules = [];
-  const add = (className, group, decls, category, description) => {
-    rules.push({ class: className, group, decls, category, description });
-  };
-  const spacing = theme.spacing;
-  const sKeys = spacingKeys(spacing);
-  const displays = [
-    ["block", "block", "Block-level element"],
-    ["inline-block", "inline-block", "Inline block-level element"],
-    ["inline", "inline", "Inline element"],
-    ["flex", "flex", "Flex container"],
-    ["inline-flex", "inline-flex", "Inline flex container"],
-    ["grid", "grid", "Grid container"],
-    ["inline-grid", "inline-grid", "Inline grid container"],
-    ["contents", "contents", "Element becomes transparent to its children"],
-    ["hidden", "none", "Visually hidden (display: none)"]
-  ];
-  for (const [cls, value, desc] of displays) {
-    add(cls, "display", { display: value }, "display", desc);
-  }
-  for (const pos of ["static", "relative", "absolute", "fixed", "sticky"]) {
-    add(pos, "position", { position: pos }, "position", `position: ${pos}`);
-  }
-  for (const key of sKeys) {
-    const v = spacing[key];
-    add(`inset-${key}`, "inset", { inset: v }, "inset", `inset on all sides`);
-    add(`inset-x-${key}`, "inset", { "inset-inline": v }, "inset", "inset on the horizontal axis");
-    add(`inset-y-${key}`, "inset", { "inset-block": v }, "inset", "inset on the vertical axis");
-    add(`top-${key}`, "inset", { top: v }, "inset", "top offset");
-    add(`right-${key}`, "inset", { right: v }, "inset", "right offset");
-    add(`bottom-${key}`, "inset", { bottom: v }, "inset", "bottom offset");
-    add(`left-${key}`, "inset", { left: v }, "inset", "left offset");
-  }
-  for (const [key, value] of Object.entries(theme.zIndex)) {
-    add(`z-${key}`, "zIndex", { "z-index": String(value) }, "zIndex", `z-index: ${value}`);
-  }
-  for (const value of ["auto", "scroll", "hidden", "visible", "clip"]) {
-    add(`overflow-${value}`, "overflow", { overflow: value }, "overflow", `overflow: ${value}`);
-    add(
-      `overflow-x-${value}`,
-      "overflow",
-      { "overflow-x": value },
-      "overflow",
-      `overflow-x: ${value}`
-    );
-    add(
-      `overflow-y-${value}`,
-      "overflow",
-      { "overflow-y": value },
-      "overflow",
-      `overflow-y: ${value}`
-    );
-  }
-  add("visible", "visibility", { visibility: "visible" }, "visibility", "visible");
-  add("invisible", "visibility", { visibility: "hidden" }, "visibility", "invisible");
-  add(
-    "sr-only",
-    "visibility",
-    {
-      position: "absolute",
-      width: "1px",
-      height: "1px",
-      padding: "0",
-      margin: "-1px",
-      overflow: "hidden",
-      clip: "rect(0, 0, 0, 0)",
-      whiteSpace: "nowrap",
-      border: "0"
-    },
-    "visibility",
-    "Visually hidden but accessible to screen readers"
-  );
-  add(
-    "not-sr-only",
-    "visibility",
-    {
-      position: "static",
-      width: "auto",
-      height: "auto",
-      padding: "0",
-      margin: "0",
-      overflow: "visible",
-      clip: "auto",
-      whiteSpace: "normal"
-    },
-    "visibility",
-    "Restore an sr-only element"
-  );
-  for (const key of sKeys) {
-    const v = spacing[key];
-    add(`w-${key}`, "sizing", { width: v }, "sizing", `width`);
-    add(`h-${key}`, "sizing", { height: v }, "sizing", "height");
-    add(`min-w-${key}`, "sizing", { "min-width": v }, "sizing", "min-width");
-    add(`min-h-${key}`, "sizing", { "min-height": v }, "sizing", "min-height");
-    add(`max-w-${key}`, "sizing", { "max-width": v }, "sizing", "max-width");
-    add(`max-h-${key}`, "sizing", { "max-height": v }, "sizing", "max-height");
-  }
-  add("w-auto", "sizing", { width: "auto" }, "sizing", "width: auto");
-  add("h-auto", "sizing", { height: "auto" }, "sizing", "height: auto");
-  add("w-full", "sizing", { width: "100%" }, "sizing", "width: 100%");
-  add("h-full", "sizing", { height: "100%" }, "sizing", "height: 100%");
-  add("w-screen", "sizing", { width: "100vw" }, "sizing", "width: viewport width");
-  add("h-screen", "sizing", { height: "100vh" }, "sizing", "height: viewport height");
-  add("w-fit", "sizing", { width: "fit-content" }, "sizing", "width: fit-content");
-  add("h-fit", "sizing", { height: "fit-content" }, "sizing", "height: fit-content");
-  add("min-w-0", "sizing", { "min-width": "0" }, "sizing", "min-width: 0");
-  add("min-h-0", "sizing", { "min-height": "0" }, "sizing", "min-height: 0");
-  add("min-w-full", "sizing", { "min-width": "100%" }, "sizing", "min-width: 100%");
-  add("min-h-full", "sizing", { "min-height": "100%" }, "sizing", "min-height: 100%");
-  add("min-h-screen", "sizing", { "min-height": "100vh" }, "sizing", "min-height: viewport height");
-  add(
-    "min-h-svh",
-    "sizing",
-    { "min-height": "100svh" },
-    "sizing",
-    "min-height: small viewport height"
-  );
-  add("max-w-full", "sizing", { "max-width": "100%" }, "sizing", "max-width: 100%");
-  add("max-w-none", "sizing", { "max-width": "none" }, "sizing", "max-width: none");
-  add("max-h-full", "sizing", { "max-height": "100%" }, "sizing", "max-height: 100%");
-  add("max-h-screen", "sizing", { "max-height": "100vh" }, "sizing", "max-height: viewport height");
-  const maxWidths = {
-    xs: "20rem",
-    sm: "24rem",
-    md: "28rem",
-    lg: "32rem",
-    xl: "36rem",
-    "2xl": "42rem",
-    "3xl": "48rem",
-    "4xl": "56rem",
-    "5xl": "64rem",
-    "6xl": "72rem",
-    "7xl": "80rem",
-    full: "100%"
-  };
-  for (const [key, value] of Object.entries(maxWidths)) {
-    add(`max-w-${key}`, "sizing", { "max-width": value }, "sizing", `max-width: ${value}`);
-  }
-  for (const key of sKeys) {
-    const v = spacing[key];
-    add(`m-${key}`, "margin", { margin: v }, "spacing", "margin on all sides");
-    add(
-      `mx-${key}`,
-      "margin",
-      { "margin-left": v, "margin-right": v },
-      "spacing",
-      "horizontal margin"
-    );
-    add(
-      `my-${key}`,
-      "margin",
-      { "margin-top": v, "margin-bottom": v },
-      "spacing",
-      "vertical margin"
-    );
-    add(`mt-${key}`, "margin", { "margin-top": v }, "spacing", "top margin");
-    add(`mb-${key}`, "margin", { "margin-bottom": v }, "spacing", "bottom margin");
-    add(`ml-${key}`, "margin", { "margin-left": v }, "spacing", "left margin");
-    add(`mr-${key}`, "margin", { "margin-right": v }, "spacing", "right margin");
-  }
-  for (const key of sKeys) {
-    const v = spacing[key];
-    add(`p-${key}`, "padding", { padding: v }, "spacing", "padding on all sides");
-    add(
-      `px-${key}`,
-      "padding",
-      { "padding-left": v, "padding-right": v },
-      "spacing",
-      "horizontal padding"
-    );
-    add(
-      `py-${key}`,
-      "padding",
-      { "padding-top": v, "padding-bottom": v },
-      "spacing",
-      "vertical padding"
-    );
-    add(`pt-${key}`, "padding", { "padding-top": v }, "spacing", "top padding");
-    add(`pb-${key}`, "padding", { "padding-bottom": v }, "spacing", "bottom padding");
-    add(`pl-${key}`, "padding", { "padding-left": v }, "spacing", "left padding");
-    add(`pr-${key}`, "padding", { "padding-right": v }, "spacing", "right padding");
-  }
-  for (const key of sKeys) {
-    const v = spacing[key];
-    add(`gap-${key}`, "gap", { gap: v }, "spacing", "gap on all axes");
-    add(`gap-x-${key}`, "gap", { "column-gap": v }, "spacing", "column gap");
-    add(`gap-y-${key}`, "gap", { "row-gap": v }, "spacing", "row gap");
-  }
-  const flexDirect = ["row", "row-reverse", "col", "col-reverse"];
-  for (const d of flexDirect) {
-    add(`flex-${d}`, "flex", { "flex-direction": d }, "flexbox", `flex-direction: ${d}`);
-  }
-  for (const [cls, val] of [
-    ["flex-wrap", "wrap"],
-    ["flex-nowrap", "nowrap"],
-    ["flex-wrap-reverse", "wrap-reverse"]
-  ]) {
-    add(cls, "flex", { "flex-wrap": val }, "flexbox", `flex-wrap: ${val}`);
-  }
-  for (const v of ["start", "center", "end", "between", "around", "evenly"]) {
-    add(
-      `justify-${v === "between" ? "between" : v}`,
-      "flex",
-      {
-        "justify-content": v === "start" ? "flex-start" : v === "end" ? "flex-end" : `space-${v}`
-      },
-      "flexbox",
-      `justify-content: ${v === "start" ? "flex-start" : v === "end" ? "flex-end" : `space-${v}`}`
-    );
-  }
-  for (const v of ["start", "center", "end", "stretch", "baseline"]) {
-    add(
-      `items-${v}`,
-      "flex",
-      { "align-items": v === "start" ? "flex-start" : v === "end" ? "flex-end" : v },
-      "flexbox",
-      `align-items`
-    );
-  }
-  for (const v of ["start", "center", "end", "between", "around", "stretch"]) {
-    add(
-      `content-${v}`,
-      "flex",
-      {
-        "align-content": v === "start" ? "flex-start" : v === "end" ? "flex-end" : v === "between" ? "space-between" : v === "around" ? "space-around" : v
-      },
-      "flexbox",
-      "align-content"
-    );
-  }
-  for (const v of ["auto", "start", "center", "end", "stretch"]) {
-    add(
-      `self-${v}`,
-      "flex",
-      { "align-self": v === "start" ? "flex-start" : v === "end" ? "flex-end" : v },
-      "flexbox",
-      "align-self"
-    );
-  }
-  add("flex-1", "flex", { flex: "1 1 0%" }, "flexbox", "flex: 1 1 0%");
-  add("flex-auto", "flex", { flex: "1 1 auto" }, "flexbox", "flex: 1 1 auto");
-  add("flex-initial", "flex", { flex: "0 1 auto" }, "flexbox", "flex: 0 1 auto");
-  add("flex-none", "flex", { flex: "none" }, "flexbox", "flex: none");
-  add("grow", "flex", { "flex-grow": "1" }, "flexbox", "flex-grow: 1");
-  add("grow-0", "flex", { "flex-grow": "0" }, "flexbox", "flex-grow: 0");
-  add("shrink", "flex", { "flex-shrink": "1" }, "flexbox", "flex-shrink: 1");
-  add("shrink-0", "flex", { "flex-shrink": "0" }, "flexbox", "flex-shrink: 0");
-  for (let i = -6; i <= 6; i++) {
-    add(`order-${i}`, "flex", { order: String(i) }, "flexbox", `order: ${i}`);
-  }
-  for (let i = 1; i <= 12; i++) {
-    add(
-      `grid-cols-${i}`,
-      "grid",
-      { "grid-template-columns": `repeat(${i}, minmax(0, 1fr))` },
-      "grid",
-      `${i} equal columns`
-    );
-    add(
-      `col-span-${i}`,
-      "grid",
-      { "grid-column": `span ${i} / span ${i}` },
-      "grid",
-      `span ${i} columns`
-    );
-  }
-  add("col-span-full", "grid", { "grid-column": "1 / -1" }, "grid", "span all columns");
-  for (let i = 1; i <= 6; i++) {
-    add(
-      `grid-rows-${i}`,
-      "grid",
-      { "grid-template-rows": `repeat(${i}, minmax(0, 1fr))` },
-      "grid",
-      `${i} equal rows`
-    );
-    add(`row-span-${i}`, "grid", { "grid-row": `span ${i} / span ${i}` }, "grid", `span ${i} rows`);
-  }
-  add("row-span-full", "grid", { "grid-row": "1 / -1" }, "grid", "span all rows");
-  add("col-start-1", "grid", { "grid-column-start": "1" }, "grid", "column start 1");
-  add("col-end-1", "grid", { "grid-column-end": "1" }, "grid", "column end 1");
-  for (const v of ["row", "col", "row-dense", "col-dense", "dense"]) {
-    add(`grid-flow-${v}`, "grid", { "grid-auto-flow": v }, "grid", `grid-auto-flow: ${v}`);
-  }
-  for (const v of ["auto", "min", "max", "fr"]) {
-    add(`auto-cols-${v}`, "grid", { "grid-auto-columns": v }, "grid", `grid-auto-columns: ${v}`);
-    add(`auto-rows-${v}`, "grid", { "grid-auto-rows": v }, "grid", `grid-auto-rows: ${v}`);
-  }
-  const typo = theme.typography;
-  if (typo?.fontSize) {
-    for (const [size, value] of Object.entries(typo.fontSize)) {
-      if (Array.isArray(value)) {
-        const [fs, lh] = value;
-        add(
-          `text-${size}`,
-          "typography",
-          { "font-size": fs, "line-height": lh },
-          "typography",
-          `font-size: ${fs}`
-        );
-      } else {
-        add(
-          `text-${size}`,
-          "typography",
-          { "font-size": value },
-          "typography",
-          `font-size: ${value}`
-        );
-      }
-    }
-  }
-  if (typo?.fontWeight) {
-    for (const [weight, value] of Object.entries(typo.fontWeight)) {
-      add(
-        `font-${weight}`,
-        "typography",
-        { "font-weight": String(value) },
-        "typography",
-        `font-weight: ${value}`
-      );
-    }
-  }
-  if (theme.fontFamily) {
-    for (const [family, value] of Object.entries(theme.fontFamily)) {
-      add(
-        `font-${family}`,
-        "typography",
-        { "font-family": value },
-        "typography",
-        `font-family: ${family}`
-      );
-    }
-  }
-  if (typo?.lineHeight) {
-    for (const [height, value] of Object.entries(typo.lineHeight)) {
-      add(
-        `leading-${height}`,
-        "typography",
-        { "line-height": value },
-        "typography",
-        `line-height: ${value}`
-      );
-    }
-  }
-  if (typo?.letterSpacing) {
-    for (const [spacingName, value] of Object.entries(typo.letterSpacing)) {
-      add(
-        `tracking-${spacingName}`,
-        "typography",
-        { "letter-spacing": value },
-        "typography",
-        `letter-spacing: ${value}`
-      );
-    }
-  }
-  for (const [align, cls] of [
-    ["left", "text-left"],
-    ["center", "text-center"],
-    ["right", "text-right"],
-    ["justify", "text-justify"],
-    ["start", "text-start"],
-    ["end", "text-end"]
-  ]) {
-    add(cls, "typography", { "text-align": align }, "typography", `text-align: ${align}`);
-  }
-  for (const [transform, cls] of [
-    ["uppercase", "uppercase"],
-    ["lowercase", "lowercase"],
-    ["capitalize", "capitalize"],
-    ["none", "normal-case"]
-  ]) {
-    add(
-      cls,
-      "typography",
-      { "text-transform": transform },
-      "typography",
-      `text-transform: ${transform}`
-    );
-  }
-  add("italic", "typography", { fontStyle: "italic" }, "typography", "italic");
-  add("not-italic", "typography", { fontStyle: "normal" }, "typography", "not-italic");
-  add(
-    "truncate",
-    "typography",
-    {
-      overflow: "hidden",
-      "text-overflow": "ellipsis",
-      whiteSpace: "nowrap"
-    },
-    "typography",
-    "single-line ellipsis"
-  );
-  add(
-    "text-ellipsis",
-    "typography",
-    { "text-overflow": "ellipsis" },
-    "typography",
-    "text-overflow: ellipsis"
-  );
-  add("text-clip", "typography", { "text-overflow": "clip" }, "typography", "text-overflow: clip");
-  add(
-    "antialiased",
-    "typography",
-    {
-      "-webkit-font-smoothing": "antialiased",
-      "-moz-osx-font-smoothing": "grayscale"
-    },
-    "typography",
-    "font smoothing"
-  );
-  for (const [deco, cls] of [
-    ["underline", "underline"],
-    ["overline", "overline"],
-    ["line-through", "line-through"],
-    ["none", "no-underline"]
-  ]) {
-    add(
-      cls,
-      "textDecoration",
-      { "text-decoration-line": deco },
-      "textDecoration",
-      `text-decoration-line: ${deco}`
-    );
-  }
-  for (const w of ["thin", "2", "4", "8"]) {
-    add(
-      `decoration-${w}`,
-      "textDecoration",
-      {
-        "text-decoration-thickness": w === "thin" ? "1px" : `${w}px`
-      },
-      "textDecoration",
-      "decoration thickness"
-    );
-  }
-  for (const off of ["0", "1", "2", "4", "8"]) {
-    add(
-      `underline-offset-${off}`,
-      "textDecoration",
-      { "text-underline-offset": `${off}px` },
-      "textDecoration",
-      "underline offset"
-    );
-  }
-  const colorTokens = colorEntries(theme.colors);
-  for (const [name, shade, value] of colorTokens) {
-    const suffix = shade ? `${name}-${shade}` : name;
-    add(`text-${suffix}`, "textColor", { color: value }, "colors", `color: ${value}`);
-    add(
-      `bg-${suffix}`,
-      "backgroundColor",
-      { "background-color": value },
-      "colors",
-      `background-color: ${value}`
-    );
-    add(
-      `border-${suffix}`,
-      "borderColor",
-      { "border-color": value },
-      "colors",
-      `border-color: ${value}`
-    );
-    add(
-      `from-${suffix}`,
-      "gradients",
-      { "--tw-gradient-from": value },
-      "colors",
-      `gradient from: ${value}`
-    );
-    add(
-      `via-${suffix}`,
-      "gradients",
-      { "--tw-gradient-via": value },
-      "colors",
-      `gradient via: ${value}`
-    );
-    add(
-      `to-${suffix}`,
-      "gradients",
-      { "--tw-gradient-to": value },
-      "colors",
-      `gradient to: ${value}`
-    );
-  }
-  add("border", "borders", { border: "1px solid" }, "borders", "1px solid border (all sides)");
-  add("border-0", "borders", { border: "0 solid" }, "borders", "no border");
-  for (const w of ["2", "4", "8"]) {
-    add(`border-${w}`, "borders", { border: `${w}px solid` }, "borders", `${w}px solid border`);
-  }
-  for (const side of ["t", "r", "b", "l"]) {
-    add(
-      `border-${side}`,
-      "borders",
-      { [`border-${side}-width`]: "1px", [`border-${side}-style`]: "solid" },
-      "borders",
-      `${side} border`
-    );
-  }
-  for (const side of ["x", "y"]) {
-    add(
-      `border-${side}`,
-      "borders",
-      {
-        ...side === "x" ? { "border-left": "1px solid", "border-right": "1px solid" } : { "border-top": "1px solid", "border-bottom": "1px solid" }
-      },
-      "borders",
-      `${side === "x" ? "left+right" : "top+bottom"} border`
-    );
-  }
-  for (const style of ["solid", "dashed", "dotted", "double", "none"]) {
-    add(
-      `border-${style}`,
-      "borders",
-      { "border-style": style },
-      "borders",
-      `border-style: ${style}`
-    );
-  }
-  const radiusEntries = Object.entries(theme.borderRadius);
-  add(
-    "rounded",
-    "borderRadius",
-    { "border-radius": "0.25rem" },
-    "borders",
-    "border-radius: 0.25rem"
-  );
-  for (const [key, value] of radiusEntries) {
-    add(
-      `rounded-${key}`,
-      "borderRadius",
-      { "border-radius": value },
-      "borders",
-      `border-radius: ${value}`
-    );
-  }
-  const corners = ["t", "r", "b", "l", "tl", "tr", "bl", "br"];
-  for (const corner of corners) {
-    add(
-      `rounded-${corner}`,
-      "borderRadius",
-      { [borderCornerProp(corner)]: "0.25rem" },
-      "borders",
-      `${corner} corner radius`
-    );
-    for (const [key, value] of radiusEntries) {
-      add(
-        `rounded-${corner}-${key}`,
-        "borderRadius",
-        { [borderCornerProp(corner)]: value },
-        "borders",
-        `${corner} corner radius: ${value}`
-      );
-    }
-  }
-  function borderCornerProp(corner) {
-    if (corner === "t") return "border-top-left-radius";
-    if (corner === "r") return "border-top-right-radius";
-    if (corner === "b") return "border-bottom-right-radius";
-    if (corner === "l") return "border-bottom-left-radius";
-    if (corner === "tl") return "border-top-left-radius";
-    if (corner === "tr") return "border-top-right-radius";
-    if (corner === "bl") return "border-bottom-left-radius";
-    return "border-bottom-right-radius";
-  }
-  for (const pos of ["top", "left", "center", "right", "bottom"]) {
-    add(
-      `bg-${pos}`,
-      "backgrounds",
-      { "background-position": pos },
-      "backgrounds",
-      `background-position: ${pos}`
-    );
-  }
-  for (const [rep, cls] of [
-    ["no-repeat", "bg-no-repeat"],
-    ["repeat", "bg-repeat"],
-    ["repeat-x", "bg-repeat-x"],
-    ["repeat-y", "bg-repeat-y"],
-    ["round", "bg-repeat-round"],
-    ["space", "bg-repeat-space"]
-  ]) {
-    add(
-      cls,
-      "backgrounds",
-      { "background-repeat": rep },
-      "backgrounds",
-      `background-repeat: ${rep}`
-    );
-  }
-  for (const size of ["auto", "cover", "contain"]) {
-    add(
-      `bg-${size}`,
-      "backgrounds",
-      { "background-size": size },
-      "backgrounds",
-      `background-size: ${size}`
-    );
-  }
-  for (const attach of ["fixed", "local", "scroll"]) {
-    add(
-      `bg-${attach}`,
-      "backgrounds",
-      { "background-attachment": attach },
-      "backgrounds",
-      `background-attachment: ${attach}`
-    );
-  }
-  for (const dir of ["t", "tr", "r", "br", "b", "bl", "l", "tl"]) {
-    add(
-      `bg-gradient-to-${dir}`,
-      "backgrounds",
-      {
-        backgroundImage: `linear-gradient(to ${dir === "t" ? "top" : dir === "tr" ? "top right" : dir === "r" ? "right" : dir === "br" ? "bottom right" : dir === "b" ? "bottom" : dir === "bl" ? "bottom left" : dir === "l" ? "left" : "top left"}, var(--tw-gradient-from), var(--tw-gradient-via, transparent), var(--tw-gradient-to))`
-      },
-      "backgrounds",
-      `linear gradient to ${dir}`
-    );
-  }
-  for (const [key, value] of Object.entries(theme.shadows)) {
-    const cls = key === "base" ? "shadow" : `shadow-${key}`;
-    add(cls, "shadows", { "box-shadow": value }, "effects", `box-shadow: ${value}`);
-  }
-  for (const [key, value] of Object.entries(theme.opacity)) {
-    add(`opacity-${key}`, "opacity", { opacity: String(value) }, "effects", `opacity: ${value}`);
-  }
-  add("blur-0", "filters", { filter: "none", "backdrop-filter": "none" }, "effects", "no blur");
-  for (const [px, cls] of [
-    ["4", "blur-sm"],
-    ["8", "blur"],
-    ["12", "blur-md"],
-    ["16", "blur-lg"],
-    ["24", "blur-xl"],
-    ["40", "blur-2xl"]
-  ]) {
-    add(
-      cls,
-      "filters",
-      { backdropFilter: `blur(${px}px)`, filter: `blur(${px}px)` },
-      "effects",
-      `backdrop-blur(${px}px)`
-    );
-  }
-  add("brightness-0", "filters", { filter: "brightness(0)" }, "effects", "brightness 0");
-  for (const p of ["50", "75", "90", "95", "100", "105", "110", "125", "150", "200"]) {
-    add(
-      `brightness-${p}`,
-      "filters",
-      { filter: `brightness(${p}%)` },
-      "effects",
-      `brightness ${p}%`
-    );
-  }
-  add("grayscale", "filters", { filter: "grayscale(100%)" }, "effects", "grayscale");
-  add("invert", "filters", { filter: "invert(100%)" }, "effects", "invert colors");
-  add("saturate-0", "filters", { filter: "saturate(0)" }, "effects", "saturate 0");
-  for (const p of ["50", "100", "150", "200"]) {
-    add(`saturate-${p}`, "filters", { filter: `saturate(${p}%)` }, "effects", `saturate ${p}%`);
-  }
-  add("contrast-more", "filters", { filter: "contrast(1.2)" }, "effects", "contrast +20%");
-  add("contrast-less", "filters", { filter: "contrast(0.8)" }, "effects", "contrast -20%");
-  add(
-    "drop-shadow",
-    "filters",
-    { filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))" },
-    "effects",
-    "drop shadow"
-  );
-  add(
-    "drop-shadow-lg",
-    "filters",
-    { filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.2))" },
-    "effects",
-    "large drop shadow"
-  );
-  add("backdrop-blur", "filters", { "backdrop-filter": "blur(8px)" }, "effects", "backdrop blur");
-  add(
-    "backdrop-grayscale",
-    "filters",
-    { "backdrop-filter": "grayscale(100%)" },
-    "effects",
-    "backdrop grayscale"
-  );
-  add(
-    "backdrop-invert",
-    "filters",
-    { "backdrop-filter": "invert(100%)" },
-    "effects",
-    "backdrop invert"
-  );
-  for (const v of [
-    "50",
-    "75",
-    "90",
-    "95",
-    "100",
-    "105",
-    "110",
-    "125",
-    "150",
-    "175",
-    "200"
-  ]) {
-    add(
-      `scale-${v}`,
-      "transforms",
-      { transform: `scale(${Number(v) / 100})` },
-      "transforms",
-      `scale ${v}%`
-    );
-  }
-  for (const d of ["0", "45", "90", "135", "180", "225", "270", "315", "360"]) {
-    add(
-      `rotate-${d}`,
-      "transforms",
-      { transform: `rotate(${d}deg)` },
-      "transforms",
-      `rotate ${d}deg`
-    );
-  }
-  add("-rotate-45", "transforms", { transform: "rotate(-45deg)" }, "transforms", "rotate -45deg");
-  add("-rotate-90", "transforms", { transform: "rotate(-90deg)" }, "transforms", "rotate -90deg");
-  add(
-    "-rotate-180",
-    "transforms",
-    { transform: "rotate(-180deg)" },
-    "transforms",
-    "rotate -180deg"
-  );
-  for (const key of sKeys) {
-    const v = spacing[key];
-    add(
-      `translate-x-${key}`,
-      "transforms",
-      { transform: `translateX(${v})` },
-      "transforms",
-      "translateX"
-    );
-    add(
-      `translate-y-${key}`,
-      "transforms",
-      { transform: `translateY(${v})` },
-      "transforms",
-      "translateY"
-    );
-    add(
-      `-translate-x-${key}`,
-      "transforms",
-      { transform: `translateX(calc(-1 * ${v}))` },
-      "transforms",
-      "-translateX"
-    );
-    add(
-      `-translate-y-${key}`,
-      "transforms",
-      { transform: `translateY(calc(-1 * ${v}))` },
-      "transforms",
-      "-translateY"
-    );
-  }
-  add(
-    "transform",
-    "transforms",
-    {
-      transform: "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate))"
-    },
-    "transforms",
-    "enable transform"
-  );
-  add(
-    "transform-gpu",
-    "transforms",
-    { transform: "translate3d(var(--tw-translate-x), var(--tw-translate-y), 0)" },
-    "transforms",
-    "GPU transform"
-  );
-  add("transform-none", "transforms", { transform: "none" }, "transforms", "no transform");
-  add(
-    "transition",
-    "transitions",
-    {
-      transitionProperty: "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "150ms"
-    },
-    "transitions",
-    "standard transition set"
-  );
-  add(
-    "transition-all",
-    "transitions",
-    {
-      transitionProperty: "all",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "150ms"
-    },
-    "transitions",
-    "transition: all"
-  );
-  add(
-    "transition-none",
-    "transitions",
-    { transitionProperty: "none" },
-    "transitions",
-    "no transition"
-  );
-  add(
-    "transition-colors",
-    "transitions",
-    {
-      transitionProperty: "color, background-color, border-color, text-decoration-color, fill, stroke",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "150ms"
-    },
-    "transitions",
-    "color transitions"
-  );
-  add(
-    "transition-opacity",
-    "transitions",
-    {
-      transitionProperty: "opacity",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "150ms"
-    },
-    "transitions",
-    "opacity transitions"
-  );
-  add(
-    "transition-shadow",
-    "transitions",
-    {
-      transitionProperty: "box-shadow",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "150ms"
-    },
-    "transitions",
-    "box-shadow transitions"
-  );
-  add(
-    "transition-transform",
-    "transitions",
-    {
-      transitionProperty: "transform",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "150ms"
-    },
-    "transitions",
-    "transform transitions"
-  );
-  for (const [key, value] of Object.entries(theme.duration)) {
-    add(
-      `duration-${key}`,
-      "transitions",
-      { transitionDuration: value },
-      "transitions",
-      `transition-duration: ${value}`
-    );
-  }
-  for (const [key, value] of Object.entries(theme.easing)) {
-    add(
-      `ease-${key}`,
-      "transitions",
-      { "transition-timing-function": value },
-      "transitions",
-      `transition-timing-function: ${value}`
-    );
-  }
-  for (const [name, value] of Object.entries(theme.animation)) {
-    add(`animate-${name}`, "animations", { animation: value }, "animations", `animation: ${value}`);
-  }
-  add("animate-none", "animations", { animation: "none" }, "animations", "no animation");
-  for (const [play, cls] of [
-    ["paused", "animation-paused"],
-    ["running", "animation-running"]
-  ]) {
-    add(
-      cls,
-      "animations",
-      { "animation-play-state": play },
-      "animations",
-      `animation-play-state: ${play}`
-    );
-  }
-  for (const cursor of [
-    "default",
-    "pointer",
-    "wait",
-    "text",
-    "move",
-    "help",
-    "not-allowed",
-    "resize",
-    "zoom-in",
-    "zoom-out"
-  ]) {
-    add(`cursor-${cursor}`, "cursors", { cursor }, "cursors", `cursor: ${cursor}`);
-  }
-  for (const [mode, cls] of [
-    ["normal", "whitespace-normal"],
-    ["nowrap", "whitespace-nowrap"],
-    ["pre", "whitespace-pre"],
-    ["pre-line", "whitespace-pre-line"],
-    ["pre-wrap", "whitespace-pre-wrap"],
-    ["break-spaces", "break-spaces"]
-  ]) {
-    add(cls, "whitespace", { whiteSpace: mode }, "whitespace", `white-space: ${mode}`);
-  }
-  for (const [val, cls] of [
-    ["left", "float-left"],
-    ["right", "float-right"],
-    ["none", "float-none"]
-  ]) {
-    add(cls, "whitespace", { float: val }, "whitespace", `float: ${val}`);
-  }
-  add("clear-left", "whitespace", { clear: "left" }, "whitespace", "clear: left");
-  add("clear-right", "whitespace", { clear: "right" }, "whitespace", "clear: right");
-  add("clear-both", "whitespace", { clear: "both" }, "whitespace", "clear: both");
-  for (const val of ["none", "disc", "decimal"]) {
-    add(`list-${val}`, "whitespace", { listStyleType: val }, "whitespace", `list-style: ${val}`);
-  }
-  add(
-    "list-none",
-    "whitespace",
-    { "list-style": "none", "list-style-type": "none" },
-    "whitespace",
-    "remove list styling"
-  );
-  for (const val of ["none", "visible", "collapse", "hidden", "scroll"]) {
-    add(
-      `resize-${val}`,
-      "whitespace",
-      { resize: val },
-      "whitespace",
-      `resize: ${val}`
-    );
-  }
-  add(
-    "select-none",
-    "whitespace",
-    { userSelect: "none" },
-    "whitespace",
-    "user-select: none"
-  );
-  add(
-    "select-text",
-    "whitespace",
-    { userSelect: "text" },
-    "whitespace",
-    "user-select: text"
-  );
-  add(
-    "select-all",
-    "whitespace",
-    { userSelect: "all" },
-    "whitespace",
-    "user-select: all"
-  );
-  return rules;
 }
 var componentCss = {
   glass: `
@@ -1673,8 +525,1074 @@ var componentCss = {
 `
 };
 var componentNames = Object.keys(componentCss);
+var HEX = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i;
+var SHORT_HEX = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i;
+var VALUE = `(?:\\d+|\\d*\\.\\d+)%?`;
+var SEP = `(?:\\s*,\\s*|\\s+)`;
+var ALPHA_SEP = `\\s*[,/]\\s*`;
+var CUSTOM_PROPERTY = `var\\(--(?:[^ )]*?)(?:,(?:[^ )]*?|var\\(--[^ )]*?\\)))?\\)`;
+var RGB = new RegExp(
+  `^(rgba?)\\(\\s*(${VALUE}|${CUSTOM_PROPERTY})(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${ALPHA_SEP}(${VALUE}|${CUSTOM_PROPERTY}))?\\s*\\)$`
+);
+var HSL = new RegExp(
+  `^(hsla?)\\(\\s*((?:${VALUE})(?:deg|rad|grad|turn)?|${CUSTOM_PROPERTY})(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${SEP}(${VALUE}|${CUSTOM_PROPERTY}))?(?:${ALPHA_SEP}(${VALUE}|${CUSTOM_PROPERTY}))?\\s*\\)$`
+);
+var NAMED_COLORS = {
+  black: [0, 0, 0],
+  white: [255, 255, 255],
+  red: [255, 0, 0],
+  green: [0, 128, 0],
+  blue: [0, 0, 255],
+  yellow: [255, 255, 0],
+  cyan: [0, 255, 255],
+  magenta: [255, 0, 255],
+  gray: [128, 128, 128],
+  grey: [128, 128, 128],
+  silver: [192, 192, 192],
+  maroon: [128, 0, 0],
+  olive: [128, 128, 0],
+  lime: [0, 255, 0],
+  aqua: [0, 255, 255],
+  teal: [0, 128, 128],
+  navy: [0, 0, 128],
+  fuchsia: [255, 0, 255],
+  purple: [128, 0, 128],
+  orange: [255, 165, 0],
+  hotpink: [255, 105, 180],
+  rebeccapurple: [102, 51, 153],
+  tomato: [255, 99, 71],
+  gold: [255, 215, 0],
+  coral: [255, 127, 80],
+  salmon: [250, 128, 114],
+  crimson: [220, 20, 60],
+  indigo: [75, 0, 130],
+  violet: [238, 130, 238],
+  pink: [255, 192, 203],
+  brown: [165, 42, 42],
+  tan: [210, 180, 140],
+  khaki: [240, 230, 140],
+  turquoise: [64, 224, 208],
+  skyblue: [135, 206, 235],
+  steelblue: [70, 130, 180],
+  slategray: [112, 128, 144],
+  darkgray: [169, 169, 169],
+  lightgray: [211, 211, 211],
+  whitesmoke: [245, 245, 245],
+  ivory: [255, 255, 240],
+  beige: [245, 245, 220],
+  wheat: [245, 222, 179],
+  chocolate: [210, 105, 30],
+  firebrick: [178, 34, 34],
+  darkred: [139, 0, 0],
+  darkgreen: [0, 100, 0],
+  darkblue: [0, 0, 139],
+  royalblue: [65, 105, 225],
+  dodgerblue: [30, 144, 255],
+  deepskyblue: [0, 191, 255],
+  limegreen: [50, 205, 50],
+  forestgreen: [34, 139, 34],
+  seagreen: [46, 139, 87],
+  springgreen: [0, 255, 127],
+  orangered: [255, 69, 0],
+  darkorange: [255, 140, 0],
+  plum: [221, 160, 221],
+  orchid: [218, 112, 214],
+  lavender: [230, 230, 250],
+  mintcream: [245, 255, 250],
+  azure: [240, 255, 255],
+  aliceblue: [240, 248, 255],
+  honeydew: [240, 255, 240],
+  linen: [250, 240, 230],
+  snow: [255, 250, 250],
+  seashell: [255, 245, 238],
+  transparent: [0, 0, 0]
+};
+function parseColor(value, { loose = false } = {}) {
+  if (typeof value !== "string") return null;
+  value = value.trim();
+  if (value === "transparent") return { mode: "rgb", color: ["0", "0", "0"], alpha: "0" };
+  const named = NAMED_COLORS[value.toLowerCase()];
+  if (named && value !== "transparent") return { mode: "rgb", color: named.map(String) };
+  const hex = value.replace(SHORT_HEX, (_, r, g, b, a) => ["#", r, r, g, g, b, b, a ? a + a : ""].join("")).match(HEX);
+  if (hex !== null) {
+    return {
+      mode: "rgb",
+      color: [parseInt(hex[1], 16), parseInt(hex[2], 16), parseInt(hex[3], 16)].map(String),
+      alpha: hex[4] ? (parseInt(hex[4], 16) / 255).toString() : void 0
+    };
+  }
+  const match = value.match(RGB) ?? value.match(HSL);
+  if (match === null) return null;
+  const color = [match[2], match[3], match[4]].filter(Boolean).map(String);
+  if (color.length === 2 && color[0].startsWith("var(")) {
+    return { mode: match[1], color: [color[0]], alpha: color[1] };
+  }
+  if (!loose && color.length !== 3) return null;
+  if (color.length < 3 && !color.some((p) => /^var\(.*?\)$/.test(p))) return null;
+  return { mode: match[1].replace("a", ""), color, alpha: match[5]?.toString() };
+}
+function formatColor({ mode, color, alpha }) {
+  const hasAlpha = alpha !== void 0;
+  return `${mode}(${color.join(" ")}${hasAlpha ? ` / ${alpha}` : ""})`;
+}
+function withAlphaValue(color, alpha, defaultValue) {
+  const parsed = parseColor(color, { loose: true });
+  if (parsed === null) return defaultValue ?? color;
+  return formatColor({ ...parsed, alpha });
+}
+function withAlphaVariable(color, properties, variable) {
+  const props = Array.isArray(properties) ? properties : [properties];
+  const parsed = parseColor(color);
+  if (parsed === null || parsed.alpha !== void 0) {
+    return Object.fromEntries(props.map((p) => [p, color]));
+  }
+  const value = formatColor({ ...parsed, alpha: `var(${variable}, 1)` });
+  return { [variable]: "1", ...Object.fromEntries(props.map((p) => [p, value])) };
+}
+function escapeClassName(className) {
+  const SINGLE_ESCAPE = /[ -,./:-@[\]^`{-~]/;
+  let output = "";
+  for (let i = 0; i < className.length; i++) {
+    const ch = className.charAt(i);
+    const code = className.charCodeAt(i);
+    if (code < 32 || code > 126) {
+      const cp = className.codePointAt(i);
+      if (cp > 65535) i++;
+      output += `\\${cp.toString(16).toUpperCase()} `;
+    } else if (ch === "\\" || SINGLE_ESCAPE.test(ch)) {
+      output += `\\${ch}`;
+    } else {
+      output += ch;
+    }
+  }
+  const first = className.charAt(0);
+  if (/^-[-\d]/.test(output)) output = `\\-${output.slice(1)}`;
+  else if (/\d/.test(first)) output = `\\3${first} ${output.slice(1)}`;
+  output = output.replace(
+    /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g,
+    (m, bs, esc) => bs && bs.length % 2 ? m : `${bs ?? ""}${esc}`
+  );
+  return output.replace(/\\,/g, "\\2c ");
+}
+var MATH_FUNCTIONS = [
+  "calc",
+  "min",
+  "max",
+  "clamp",
+  "mod",
+  "rem",
+  "sin",
+  "cos",
+  "tan",
+  "asin",
+  "acos",
+  "atan",
+  "atan2",
+  "pow",
+  "sqrt",
+  "hypot",
+  "log",
+  "exp",
+  "round"
+];
+var AUTO_VAR_INJECTION_EXCEPTIONS = /* @__PURE__ */ new Set([
+  "scroll-timeline-name",
+  "timeline-scope",
+  "view-timeline-name",
+  "font-palette",
+  "anchor-name",
+  "anchor-scope",
+  "position-anchor",
+  "position-try-options",
+  "scroll-timeline",
+  "animation-timeline",
+  "view-timeline",
+  "position-try"
+]);
+var CSS_FUNCTIONS = ["min", "max", "clamp", "calc"];
+function isCSSFunction(value) {
+  return CSS_FUNCTIONS.some((fn) => new RegExp(`^${fn}\\(.*\\)`).test(value));
+}
+function splitAtTopLevelOnly(input, sep) {
+  const parts = [];
+  let depth = 0;
+  let quote = null;
+  let last = 0;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (quote) {
+      if (ch === "\\") i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") quote = ch;
+    else if (ch === "(" || ch === "[" || ch === "{") depth++;
+    else if (ch === ")" || ch === "]" || ch === "}") depth--;
+    else if (depth === 0 && input.startsWith(sep, i)) {
+      parts.push(input.slice(last, i));
+      i += sep.length - 1;
+      last = i + 1;
+    }
+  }
+  parts.push(input.slice(last));
+  return parts;
+}
+function addWhitespaceAroundMathOperators(input) {
+  if (!MATH_FUNCTIONS.some((fn) => input.includes(fn))) return input;
+  let result = "";
+  const formattable = [];
+  let valuePos = null;
+  let lastValuePos = null;
+  const isDigit = (c) => c >= 48 && c <= 57;
+  const isLower = (c) => c >= 97 && c <= 122;
+  const isUpper = (c) => c >= 65 && c <= 90;
+  const isOp = (c) => c === 43 || c === 42 || c === 47 || c === 45;
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i);
+    if (isDigit(char)) valuePos = i;
+    else if (valuePos !== null && (char === 37 || isLower(char) || isUpper(char))) valuePos = i;
+    else {
+      lastValuePos = valuePos;
+      valuePos = null;
+    }
+    if (char === 40) {
+      result += input[i];
+      let start = i;
+      for (let j = i - 1; j >= 0; j--) {
+        const inner = input.charCodeAt(j);
+        if (isDigit(inner) || isLower(inner)) start = j;
+        else break;
+      }
+      const fn = input.slice(start, i);
+      if (MATH_FUNCTIONS.includes(fn)) {
+        formattable.unshift(true);
+        continue;
+      } else if (formattable[0] && fn === "") {
+        formattable.unshift(true);
+        continue;
+      }
+      formattable.unshift(false);
+      continue;
+    } else if (char === 41) {
+      result += input[i];
+      formattable.shift();
+    } else if (char === 44 && formattable[0]) {
+      result += ", ";
+      continue;
+    } else if (char === 32 && formattable[0] && result.charCodeAt(result.length - 1) === 32) {
+      continue;
+    } else if (isOp(char) && formattable[0]) {
+      const trimmed = result.trimEnd();
+      const prev = trimmed.charCodeAt(trimmed.length - 1);
+      const prevPrev = trimmed.charCodeAt(trimmed.length - 2);
+      const next = input.charCodeAt(i + 1);
+      if ((prev === 101 || prev === 69) && isDigit(prevPrev)) {
+        result += input[i];
+        continue;
+      } else if (isOp(prev)) {
+        result += input[i];
+        continue;
+      } else if (prev === 40 || prev === 44) {
+        result += input[i];
+        continue;
+      } else if (input.charCodeAt(i - 1) === 32) {
+        result += `${input[i]} `;
+      } else if (isDigit(prev) || isDigit(next) || prev === 41 || next === 40 || isOp(next) || lastValuePos !== null && lastValuePos === i - 1) {
+        result += ` ${input[i]} `;
+      } else {
+        result += input[i];
+      }
+    } else {
+      result += input[i];
+    }
+  }
+  return result;
+}
+function normalizeValue(value, context, isRoot = true) {
+  const isVarException = context?.property !== void 0 && AUTO_VAR_INJECTION_EXCEPTIONS.has(context.property);
+  if (value.startsWith("--") && !isVarException) return `var(${value})`;
+  if (value.includes("url(")) {
+    return value.split(/(url\(.*?\))/g).filter(Boolean).map((part) => /^url\(.*?\)$/.test(part) ? part : normalizeValue(part, context, false)).join("");
+  }
+  value = value.replace(/([^\\])_+/g, (full, before) => before + " ".repeat(full.length - 1)).replace(/^_/g, " ").replace(/\\_/g, "_");
+  if (isRoot) value = value.trim();
+  return addWhitespaceAroundMathOperators(value);
+}
+function normalizeAttributeSelectors(value) {
+  if (!value.includes("=")) return value;
+  return value.replace(/(=.*)/g, (_full, match) => {
+    if (match[1] === "'" || match[1] === '"') return match;
+    if (match.length > 2) {
+      const trailing = match[match.length - 1];
+      if (match[match.length - 2] === " " && /^[isIS]$/.test(trailing)) {
+        return `="${match.slice(1, -2)}" ${trailing}`;
+      }
+    }
+    return `="${match.slice(1)}"`;
+  });
+}
+var LENGTH_UNITS = [
+  "cm",
+  "mm",
+  "Q",
+  "in",
+  "pc",
+  "pt",
+  "px",
+  "em",
+  "ex",
+  "ch",
+  "rem",
+  "lh",
+  "rlh",
+  "vw",
+  "vh",
+  "vmin",
+  "vmax",
+  "vb",
+  "vi",
+  "svw",
+  "svh",
+  "lvw",
+  "lvh",
+  "dvw",
+  "dvh",
+  "cqw",
+  "cqh",
+  "cqi",
+  "cqb",
+  "cqmin",
+  "cqmax"
+];
+var LENGTH_RE = new RegExp(
+  `^[+-]?[0-9]*\\.?[0-9]+(?:[eE][+-]?[0-9]+)?(?:${LENGTH_UNITS.join("|")})$`
+);
+var typeCheckers = {
+  any: () => true,
+  url: (v) => v.startsWith("url("),
+  number: (v) => !isNaN(Number(v)) || isCSSFunction(v),
+  integer: (v) => /^-?\d+$/.test(v),
+  percentage: (v) => v.endsWith("%") && !isNaN(Number(v.slice(0, -1))) || isCSSFunction(v),
+  length: (v) => v === "0" || LENGTH_RE.test(v) || isCSSFunction(v),
+  "line-width": (v) => ["thin", "medium", "thick"].includes(v),
+  shadow: (v) => {
+    const SHADOW_KEYWORDS2 = /* @__PURE__ */ new Set(["inset", "inherit", "initial", "revert", "unset"]);
+    return splitAtTopLevelOnly(normalizeValue(v), ",").every((shadow) => {
+      const parts = shadow.trim().split(/ +(?![^(]*\))/g);
+      let lengths = 0;
+      let seenKeyword = false;
+      for (const part of parts) {
+        if (!seenKeyword && SHADOW_KEYWORDS2.has(part)) seenKeyword = true;
+        else if (/^-?(\d+|\.\d+)(.*?)$/.test(part)) lengths++;
+      }
+      return lengths >= 2;
+    });
+  },
+  color: (v) => {
+    let colors = 0;
+    const ok = splitAtTopLevelOnly(v, "_").every((part) => {
+      part = normalizeValue(part);
+      if (part.startsWith("var(")) return true;
+      if (parseColor(part, { loose: true }) !== null) return colors++, true;
+      return false;
+    });
+    return ok && colors > 0;
+  },
+  image: (v) => {
+    let images = 0;
+    const ok = splitAtTopLevelOnly(v, ",").every((part) => {
+      part = normalizeValue(part);
+      if (part.startsWith("var(")) return true;
+      if (part.startsWith("url(") || typeCheckers.gradient(part) || ["element(", "image(", "cross-fade(", "image-set("].some((fn) => part.startsWith(fn))) {
+        images++;
+        return true;
+      }
+      return false;
+    });
+    return ok && images > 0;
+  },
+  gradient: (v) => {
+    v = normalizeValue(v);
+    return [
+      "conic-gradient",
+      "linear-gradient",
+      "radial-gradient",
+      "repeating-conic-gradient",
+      "repeating-linear-gradient",
+      "repeating-radial-gradient"
+    ].some((t) => v.startsWith(`${t}(`));
+  },
+  position: (v) => {
+    let positions = 0;
+    const ok = splitAtTopLevelOnly(v, "_").every((part) => {
+      part = normalizeValue(part);
+      if (part.startsWith("var(")) return true;
+      if (["center", "top", "right", "bottom", "left"].includes(part) || typeCheckers.length(part) || typeCheckers.percentage(part)) {
+        positions++;
+        return true;
+      }
+      return false;
+    });
+    return ok && positions > 0;
+  },
+  "family-name": (v) => {
+    let fonts = 0;
+    const ok = splitAtTopLevelOnly(v, ",").every((part) => {
+      part = normalizeValue(part);
+      if (part.startsWith("var(")) return true;
+      if (part.includes(" ") && !/(['"])([^"']+)\1/g.test(part)) return false;
+      if (/^\d/g.test(part)) return false;
+      fonts++;
+      return true;
+    });
+    return ok && fonts > 0;
+  },
+  "generic-name": (v) => [
+    "serif",
+    "sans-serif",
+    "monospace",
+    "cursive",
+    "fantasy",
+    "system-ui",
+    "ui-serif",
+    "ui-sans-serif",
+    "ui-monospace",
+    "ui-rounded",
+    "math",
+    "emoji",
+    "fangsong"
+  ].includes(v),
+  "absolute-size": (v) => [
+    "xx-small",
+    "x-small",
+    "small",
+    "medium",
+    "large",
+    "x-large",
+    "xx-large",
+    "xxx-large"
+  ].includes(v),
+  "relative-size": (v) => ["larger", "smaller"].includes(v),
+  size: (v) => typeCheckers["bg-size"](v),
+  "bg-size": (v) => {
+    const parts = splitAtTopLevelOnly(normalizeValue(v), ",");
+    return parts.every(
+      (p) => splitAtTopLevelOnly(p.trim(), " ").every(
+        (s) => ["auto", "cover", "contain"].includes(s) || typeCheckers.length(s) || typeCheckers.percentage(s)
+      )
+    );
+  },
+  angle: (v) => /^[+-]?[0-9]*\.?[0-9]+(deg|rad|grad|turn)$/.test(v) || v === "0" || isCSSFunction(v),
+  time: (v) => /^[+-]?[0-9]*\.?[0-9]+(ms|s)$/.test(v) || isCSSFunction(v),
+  lookup: () => false
+};
+var TYPE_HINTS = /* @__PURE__ */ new Set([
+  "color",
+  "url",
+  "image",
+  "length",
+  "percentage",
+  "position",
+  "family-name",
+  "generic-name",
+  "number",
+  "line-width",
+  "absolute-size",
+  "relative-size",
+  "shadow",
+  "size",
+  "angle",
+  "time",
+  "integer",
+  "any"
+]);
+function splitTypeHint(raw) {
+  const m = /^([a-z-]+):(.+)$/s.exec(raw);
+  if (m && TYPE_HINTS.has(m[1])) return { hint: m[1], value: m[2] };
+  return { value: raw };
+}
+function coerceValue(raw, types, context) {
+  const { hint, value } = splitTypeHint(raw);
+  if (hint) {
+    if (!types.includes(hint) && !(hint === "any")) return null;
+    return { type: hint, value: normalizeValue(value, context) };
+  }
+  const normalized = normalizeValue(value, context);
+  for (const type of types) {
+    const check = typeCheckers[type];
+    if (check && check(value)) return { type, value: normalized };
+  }
+  return null;
+}
+function negateValue(value) {
+  if (typeof value !== "string") return null;
+  value = value.trim();
+  if (value === "-") return null;
+  if (/^-?[0-9]*\.?[0-9]+(?:[eE][+-]?[0-9]+)?[a-zA-Z%]*$/.test(value)) {
+    const v = value;
+    if (/^0+(\.0+)?$/.test(v)) return v;
+    if (v.startsWith("-")) return v.slice(1);
+    return `-${v}`;
+  }
+  if (/^(calc|min|max|clamp|var)\(/.test(value)) return `calc(${value} * -1)`;
+  return null;
+}
+var SPECIALS = /([[\]'"`])([^[\]'"`])?/g;
+var ALLOWED_CLASS_CHARACTERS = /[^"'`\s<>\]]+/;
+function any(sources) {
+  return `(?:${sources.map(toSource).join("|")})`;
+}
+function optional(source) {
+  return `(?:${toSource(source)})?`;
+}
+function pattern(source) {
+  return new RegExp(toSource(source), "g");
+}
+function toSource(source) {
+  const list = Array.isArray(source) ? source : [source];
+  return list.map((s) => s instanceof RegExp ? s.source : s).join("");
+}
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function* buildRegExps(prefix, separator) {
+  const prefixPattern = prefix !== "" ? optional(pattern([/-?/, escapeRegex(prefix)])) : "";
+  const utility = any([
+    // Arbitrary properties (without square brackets)
+    /\[[^\s:'"`]+:[^\s\[\]]+\]/,
+    // Arbitrary properties with balanced square brackets
+    /\[[^\s:'"`\]]+:[^\s]+?\[[^\s]+\][^\s]+?\]/,
+    // Utilities
+    pattern([
+      // Utility Name / Group Name
+      any([/-?(?:\w+)/, /@(?:\w+)/]),
+      // Normal/Arbitrary values
+      optional(
+        any([
+          pattern([
+            // Arbitrary values
+            any([
+              /-(?:\w+-)*\['[^\s]+'\]/,
+              /-(?:\w+-)*\["[^\s]+"\]/,
+              /-(?:\w+-)*\[`[^\s]+`\]/,
+              /-(?:\w+-)*\[(?:[^\s\[\]]+\[[^\s\[\]]+\])*[^\s:\[\]]+\]/
+            ]),
+            // Not immediately followed by an `{[(`
+            /(?![{([]])/,
+            // optionally followed by an opacity modifier
+            /(?:\/[^\s'"`\\><$]*)?/
+          ]),
+          pattern([
+            // Arbitrary values
+            any([
+              /-(?:\w+-)*\['[^\s]+'\]/,
+              /-(?:\w+-)*\["[^\s]+"\]/,
+              /-(?:\w+-)*\[`[^\s]+`\]/,
+              /-(?:\w+-)*\[(?:[^\s\[\]]+\[[^\s\[\]]+\])*[^\s\[\]]+\]/
+            ]),
+            // Not immediately followed by an `{[(`
+            /(?![{([]])/,
+            // optionally followed by an opacity modifier
+            /(?:\/[^\s'"`\\$]*)?/
+          ]),
+          // Normal values w/o quotes — may include an opacity modifier
+          /[-\/][^\s'"`\\$={><]*/
+        ])
+      )
+    ])
+  ]);
+  const variantPatterns = [
+    // Without quotes
+    any([
+      // This is here to provide special support for the `@` variant
+      pattern([/@\[[^\s"'`]+\](\/[^\s"'`]+)?/, separator]),
+      // With variant modifier (e.g.: group-[..]/modifier)
+      pattern([/([^\s"'`\[\\]+-)?\[[^\s"'`]+\]\/[\w_-]+/, separator]),
+      pattern([/([^\s"'`\[\\]+-)?\[[^\s"'`]+\]/, separator]),
+      pattern([/[^\s"'`\[\\]+/, separator])
+    ]),
+    // With quotes allowed
+    any([
+      // With variant modifier (e.g.: group-[..]/modifier)
+      pattern([/([^\s"'`\[\\]+-)?\[[^\s`]+\]\/[\w_-]+/, separator]),
+      pattern([/([^\s"'`\[\\]+-)?\[[^\s`]+\]/, separator]),
+      pattern([/[^\s`\[\\]+/, separator])
+    ])
+  ];
+  for (const variantPattern of variantPatterns) {
+    yield pattern([
+      // Variants
+      "((?=((",
+      variantPattern,
+      ")+))\\2)?",
+      // Important (optional)
+      /!?/,
+      prefixPattern,
+      utility
+    ]);
+  }
+  yield /[^<>"'`\s.(){}[\]#=%$][^<>"'`\s(){}[\]#=%$]*[^<>"'`\s.(){}[\]#=%:$]/g;
+}
+function clipAtBalancedParens(input) {
+  if (!input.includes("-[")) return input;
+  let depth = 0;
+  const openStringTypes = [];
+  const matches = Array.from(input.matchAll(SPECIALS)).flatMap((match) => {
+    const [, ...groups] = match;
+    return groups.map((group, idx) => ({ char: group, index: (match.index ?? 0) + idx }));
+  });
+  for (const match of matches) {
+    const char = match.char;
+    const inStringType = openStringTypes[openStringTypes.length - 1];
+    if (char === inStringType) openStringTypes.pop();
+    else if (char === "'" || char === '"' || char === "`") openStringTypes.push(char);
+    if (inStringType) continue;
+    if (char === "[") {
+      depth++;
+      continue;
+    }
+    if (char === "]") {
+      depth--;
+      continue;
+    }
+    if (depth < 0) return input.substring(0, match.index - 1);
+    if (depth === 0 && char !== void 0 && !ALLOWED_CLASS_CHARACTERS.test(char)) {
+      return input.substring(0, match.index);
+    }
+  }
+  return input;
+}
+function splitAtTopLevelDot(input) {
+  const parts = [];
+  let depth = 0;
+  let last = 0;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (ch === "[" || ch === "(") depth++;
+    else if (ch === "]" || ch === ")") depth--;
+    else if (ch === "." && depth === 0) {
+      parts.push(input.slice(last, i));
+      last = i + 1;
+    }
+  }
+  parts.push(input.slice(last));
+  return parts;
+}
+var cache = /* @__PURE__ */ new Map();
+function createExtractor(options = {}) {
+  const prefix = options.prefix ?? "";
+  const separator = options.separator ?? ":";
+  const key = `${prefix}\0${separator}`;
+  let patterns = cache.get(key);
+  if (!patterns) {
+    patterns = Array.from(buildRegExps(prefix, escapeRegex(separator)));
+    cache.set(key, patterns);
+  }
+  const compiled = patterns;
+  return (content) => {
+    const results = [];
+    for (const p of compiled) {
+      for (const result of content.match(p) ?? []) results.push(clipAtBalancedParens(result));
+    }
+    for (const result of results.slice()) {
+      const segments = splitAtTopLevelDot(result);
+      for (let idx = 0; idx < segments.length; idx++) {
+        const segment = segments[idx];
+        if (idx >= segments.length - 1) {
+          results.push(segment);
+          continue;
+        }
+        const next = Number(segments[idx + 1]);
+        if (Number.isNaN(next)) results.push(segment);
+        else idx++;
+      }
+    }
+    return results;
+  };
+}
+function extractCandidates(chunks, options = {}) {
+  const out = /* @__PURE__ */ new Set();
+  if (options.pattern) {
+    const regex = new RegExp(options.pattern, "g");
+    for (const chunk of chunks)
+      for (const m of chunk.matchAll(regex)) if (m[0].length > 1) out.add(m[0]);
+    return out;
+  }
+  const extract = createExtractor(options);
+  for (const chunk of chunks) {
+    if (!chunk) continue;
+    for (const token of extract(chunk)) {
+      if (token.length < 2 || token.length > 256) continue;
+      const unescaped = token.includes("\\") ? token.replace(/\\([:./[\]#!])/g, "$1") : token;
+      out.add(unescaped);
+    }
+  }
+  return out;
+}
+function parseCss(css) {
+  const root = { type: "root", nodes: [] };
+  const stack = [root];
+  let i = 0;
+  const n = css.length;
+  const top = () => stack[stack.length - 1].nodes;
+  const readUntil = (stops) => {
+    let depth = 0;
+    let quote = null;
+    const start = i;
+    while (i < n) {
+      const ch = css[i];
+      if (quote) {
+        if (ch === "\\") i++;
+        else if (ch === quote) quote = null;
+      } else if (ch === "\\")
+        i++;
+      else if (ch === '"' || ch === "'") quote = ch;
+      else if (ch === "(" || ch === "[") depth++;
+      else if (ch === ")" || ch === "]") depth = Math.max(0, depth - 1);
+      else if (ch === "/" && css[i + 1] === "*") {
+        const end = css.indexOf("*/", i + 2);
+        i = end === -1 ? n : end + 1;
+      } else if (depth === 0 && stops.includes(ch)) break;
+      i++;
+    }
+    return css.slice(start, i);
+  };
+  while (i < n) {
+    const ch = css[i];
+    if (/\s/.test(ch)) {
+      i++;
+      continue;
+    }
+    if (ch === "/" && css[i + 1] === "*") {
+      const end = css.indexOf("*/", i + 2);
+      const text2 = css.slice(i + 2, end === -1 ? n : end);
+      top().push({ type: "comment", text: text2 });
+      i = end === -1 ? n : end + 2;
+      continue;
+    }
+    if (ch === "}") {
+      if (stack.length > 1) stack.pop();
+      i++;
+      continue;
+    }
+    if (ch === ";") {
+      i++;
+      continue;
+    }
+    if (ch === "@") {
+      const head2 = readUntil("{;}").trim();
+      const m = /^@([\w-]+)\s*([\s\S]*)$/.exec(head2);
+      const name = m ? m[1] : head2.slice(1);
+      const params = m ? m[2].trim() : "";
+      if (css[i] === "{") {
+        const node = { type: "atrule", name, params, nodes: [] };
+        top().push(node);
+        stack.push(node);
+        i++;
+      } else {
+        top().push({ type: "atrule", name, params });
+        if (css[i] === ";") i++;
+      }
+      continue;
+    }
+    const head = readUntil("{;}");
+    if (css[i] === "{") {
+      const node = { type: "rule", selector: head.trim(), nodes: [] };
+      top().push(node);
+      stack.push(node);
+      i++;
+      continue;
+    }
+    const text = head.trim();
+    if (text) {
+      const colon = text.indexOf(":");
+      if (colon > 0) {
+        const prop = text.slice(0, colon).trim();
+        let value = text.slice(colon + 1).trim();
+        let important = false;
+        if (/!\s*important$/i.test(value)) {
+          important = true;
+          value = value.replace(/\s*!\s*important$/i, "").trim();
+        }
+        top().push({ type: "decl", prop, value, important });
+      }
+    }
+    if (css[i] === ";") i++;
+  }
+  return root;
+}
+function serializeCss(root, options = {}) {
+  const nodes = Array.isArray(root) ? root : root.nodes;
+  const minify = options.minify ?? false;
+  const out = [];
+  const emit = (list, depth) => {
+    const pad = minify ? "" : "  ".repeat(depth);
+    for (const node of list) {
+      if (node.type === "comment") {
+        if (!minify || node.text.startsWith("!"))
+          out.push(`${pad}/*${node.text}*/${minify ? "" : "\n"}`);
+        continue;
+      }
+      if (node.type === "decl") {
+        out.push(
+          `${pad}${node.prop}:${minify ? "" : " "}${node.value}${node.important ? minify ? "!important" : " !important" : ""};${minify ? "" : "\n"}`
+        );
+        continue;
+      }
+      if (node.type === "atrule") {
+        if (node.nodes === void 0) {
+          out.push(
+            `${pad}@${node.name}${node.params ? ` ${node.params}` : ""};${minify ? "" : "\n"}`
+          );
+          continue;
+        }
+        const head = `@${node.name}${node.params ? ` ${node.params}` : ""}`;
+        const onlyDecls2 = node.nodes.every((c) => c.type === "decl");
+        if (onlyDecls2 && !minify) {
+          out.push(
+            `${pad}${head} { ${node.nodes.map((d) => declText(d)).join(" ")} }
+`
+          );
+          continue;
+        }
+        out.push(`${pad}${head}${minify ? "{" : " {\n"}`);
+        emit(node.nodes, depth + 1);
+        out.push(`${pad}}${minify ? "" : "\n"}`);
+        continue;
+      }
+      const onlyDecls = node.nodes.every((c) => c.type === "decl");
+      if (minify) {
+        const sel = compactSelector(node.selector);
+        if (onlyDecls) {
+          out.push(`${sel}{${node.nodes.map((d) => declText(d, true)).join("")}}`);
+        } else {
+          out.push(`${sel}{`);
+          emit(node.nodes, depth + 1);
+          out.push("}");
+        }
+        continue;
+      }
+      if (onlyDecls) {
+        out.push(
+          `${pad}${node.selector} { ${node.nodes.map((d) => declText(d)).join(" ")} }
+`
+        );
+      } else {
+        out.push(`${pad}${node.selector} {
+`);
+        emit(node.nodes, depth + 1);
+        out.push(`${pad}}
+`);
+      }
+    }
+  };
+  emit(nodes, 0);
+  return out.join("");
+}
+function compactSelector(selector) {
+  let out = "";
+  let depth = 0;
+  let quote = null;
+  for (let i = 0; i < selector.length; i++) {
+    const ch = selector[i];
+    if (quote) {
+      out += ch;
+      if (ch === "\\") out += selector[++i] ?? "";
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === "\\") {
+      out += ch + (selector[++i] ?? "");
+      continue;
+    }
+    if (ch === '"' || ch === "'") quote = ch;
+    else if (ch === "(" || ch === "[") depth++;
+    else if (ch === ")" || ch === "]") depth--;
+    if (depth === 0 && (ch === ">" || ch === "+" || ch === "~" || ch === ",")) {
+      out = out.trimEnd() + ch;
+      while (selector[i + 1] === " ") i++;
+      continue;
+    }
+    out += ch;
+  }
+  return out;
+}
+function declText(d, minify = false) {
+  return `${d.prop}:${minify ? "" : " "}${d.value}${d.important ? minify ? "!important" : " !important" : ""};`;
+}
+function minifyCssSafe(css) {
+  return serializeCss(parseCss(css), { minify: true });
+}
+function kebabProp(prop) {
+  if (prop.startsWith("--")) return prop;
+  return prop.replace(/^(Webkit|Moz|Ms|O)(?=[A-Z])/, (m) => `-${m.toLowerCase()}`).replace(/([a-z\d])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();
+}
+var UNITLESS = /* @__PURE__ */ new Set([
+  "box-flex",
+  "box-flex-group",
+  "column-count",
+  "flex",
+  "flex-grow",
+  "flex-positive",
+  "flex-shrink",
+  "flex-negative",
+  "font-weight",
+  "line-clamp",
+  "line-height",
+  "opacity",
+  "order",
+  "orphans",
+  "tab-size",
+  "widows",
+  "z-index",
+  "zoom",
+  "fill-opacity",
+  "stroke-dashoffset",
+  "stroke-opacity",
+  "stroke-width"
+]);
+function numberToCss(prop, value) {
+  if (value === 0 || prop.startsWith("--") || UNITLESS.has(prop)) return String(value);
+  return `${value}px`;
+}
+function cssInJsToNodes(input, parentSelector) {
+  const out = [];
+  const list = Array.isArray(input) ? input : [input];
+  for (const obj of list) {
+    if (!obj || typeof obj !== "object") continue;
+    let run = [];
+    const flush = () => {
+      if (run.length === 0) return;
+      if (parentSelector === void 0) out.push(...run);
+      else out.push({ type: "rule", selector: parentSelector, nodes: run });
+      run = [];
+    };
+    for (const [key, value] of Object.entries(obj)) {
+      if (value === void 0 || value === null) continue;
+      if (typeof value === "string" || typeof value === "number") {
+        const prop = kebabProp(key);
+        let v = typeof value === "number" ? numberToCss(prop, value) : value;
+        let important = false;
+        if (/!important$/i.test(v)) {
+          important = true;
+          v = v.replace(/\s*!important$/i, "");
+        }
+        run.push({ type: "decl", prop, value: v, important });
+        continue;
+      }
+      if (Array.isArray(value) && value.every((v) => typeof v === "string" || typeof v === "number")) {
+        const prop = kebabProp(key);
+        for (const v of value)
+          run.push({
+            type: "decl",
+            prop,
+            value: typeof v === "number" ? numberToCss(prop, v) : String(v)
+          });
+        continue;
+      }
+      flush();
+      if (key.startsWith("@")) {
+        const m = /^@([\w-]+)\s*([\s\S]*)$/.exec(key.trim());
+        const name = m ? m[1] : key.slice(1);
+        const params = m ? m[2].trim() : "";
+        const inner2 = cssInJsToNodes(value, parentSelector);
+        out.push({ type: "atrule", name, params, nodes: inner2 });
+        continue;
+      }
+      const selectors = splitSelectorList(key);
+      const resolved = selectors.map((sel) => {
+        if (parentSelector === void 0) return sel;
+        const parents = splitSelectorList(parentSelector);
+        if (sel.includes("&")) return parents.map((p) => sel.replace(/&/g, p)).join(", ");
+        return parents.map((p) => `${p} ${sel}`).join(", ");
+      }).join(", ");
+      const inner = cssInJsToNodes(value, resolved);
+      if (inner.length === 0) out.push({ type: "rule", selector: resolved, nodes: [] });
+      else out.push(...inner);
+    }
+    flush();
+  }
+  return out;
+}
+function collapseAdjacentRules(nodes) {
+  const out = [];
+  const ws = (s) => s.replace(/\s+/g, " ");
+  for (const node of nodes) {
+    const prev = out[out.length - 1];
+    if (prev && node.type === "rule" && prev.type === "rule" && ws(prev.selector) === ws(node.selector)) {
+      prev.nodes.push(...node.nodes);
+      continue;
+    }
+    if (prev && node.type === "atrule" && prev.type === "atrule" && node.name !== "font-face" && prev.name === node.name && ws(prev.params) === ws(node.params) && prev.nodes && node.nodes) {
+      prev.nodes.push(...node.nodes);
+      continue;
+    }
+    out.push(node.type === "atrule" && node.nodes ? { ...node, nodes: [...node.nodes] } : node);
+  }
+  for (const node of out)
+    if (node.type === "atrule" && node.nodes) node.nodes = collapseAdjacentRules(node.nodes);
+  return out;
+}
+function splitSelectorList(selector) {
+  const parts = [];
+  let depth = 0;
+  let quote = null;
+  let cur = "";
+  for (let i = 0; i < selector.length; i++) {
+    const ch = selector[i];
+    if (quote) {
+      cur += ch;
+      if (ch === "\\" && i + 1 < selector.length) cur += selector[++i];
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") quote = ch;
+    else if (ch === "(" || ch === "[") depth++;
+    else if (ch === ")" || ch === "]") depth--;
+    else if (ch === "," && depth === 0) {
+      parts.push(cur.trim());
+      cur = "";
+      continue;
+    }
+    cur += ch;
+  }
+  if (cur.trim()) parts.push(cur.trim());
+  return parts;
+}
+function flattenNodes(nodes) {
+  const out = [];
+  for (const node of nodes) {
+    if (node.type === "rule") {
+      const decls = node.nodes.filter((n) => n.type === "decl" || n.type === "comment");
+      const nested = node.nodes.filter((n) => n.type !== "decl" && n.type !== "comment");
+      if (decls.length || nested.length === 0)
+        out.push({ type: "rule", selector: node.selector, nodes: decls });
+      for (const child of nested) {
+        if (child.type === "rule") {
+          const sel = child.selector.includes("&") ? child.selector.replace(/&/g, node.selector) : `${node.selector} ${child.selector}`;
+          out.push(...flattenNodes([{ type: "rule", selector: sel, nodes: child.nodes }]));
+        } else if (child.type === "atrule" && child.nodes) {
+          out.push({
+            type: "atrule",
+            name: child.name,
+            params: child.params,
+            nodes: flattenNodes([{ type: "rule", selector: node.selector, nodes: child.nodes }])
+          });
+        }
+      }
+    } else if (node.type === "atrule" && node.nodes) {
+      out.push({
+        type: "atrule",
+        name: node.name,
+        params: node.params,
+        nodes: flattenNodes(node.nodes)
+      });
+    } else out.push(node);
+  }
+  return out;
+}
 function escapeClass(className) {
-  return className.replace(/([.:#[\]\\])/g, "\\$1");
+  return escapeClassName(className);
 }
 function stringifyDecls(decls, important = false) {
   const parts = [];
@@ -1685,603 +1603,4728 @@ function stringifyDecls(decls, important = false) {
   }
   return parts.join("; ");
 }
-var DEFAULT_EXTRACTOR = /[[\w\\:/.-]+/g;
-function extractClasses(content, pattern) {
-  const regex = pattern ? new RegExp(pattern, "g") : DEFAULT_EXTRACTOR;
-  const classes = /* @__PURE__ */ new Set();
-  for (const chunk of content) {
-    if (!chunk) continue;
-    for (const match of chunk.matchAll(regex)) {
-      const token = match[0];
-      if (token.length > 64) continue;
-      const unescaped = token.replace(/\\:/g, ":").replace(/\\\\/g, "\\");
-      const cleaned = unescaped.replace(/^\.+/, "");
-      if (cleaned.length > 1) classes.add(cleaned);
-    }
-  }
-  return classes;
-}
-function splitClass(token) {
-  if (!token.includes(":")) return { prefixes: [], base: token };
-  const parts = token.split(":");
-  return { prefixes: parts.slice(0, -1), base: parts[parts.length - 1] };
+function extractClasses(content, pattern2) {
+  return extractCandidates(content, { pattern: pattern2 });
 }
 function minifyCss(css) {
-  return css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").replace(/\s*([{}:;,>~])\s*/g, "$1").replace(/\s{2,}/g, " ").replace(/\s+\}/g, "}").trim();
+  return minifyCssSafe(css);
 }
 function byteLength(str) {
   return Buffer.byteLength(str, "utf-8");
 }
-var STATE_VARIANTS = [
-  {
-    prefix: "hover",
-    suffix: ":hover",
-    ancestor: "",
-    configKey: "hover",
-    description: "applies on hover"
+var tailwindDefaults = {
+  animation: {
+    none: "none",
+    spin: "spin 1s linear infinite",
+    ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
+    pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+    bounce: "bounce 1s infinite"
   },
-  {
-    prefix: "focus",
-    suffix: ":focus",
-    ancestor: "",
-    configKey: "focus",
-    description: "applies on focus"
+  aspectRatio: {
+    auto: "auto",
+    square: "1 / 1",
+    video: "16 / 9"
   },
-  {
-    prefix: "focus-visible",
-    suffix: ":focus-visible",
-    ancestor: "",
-    configKey: "focusVisible",
-    description: "applies on keyboard focus"
+  backgroundImage: {
+    none: "none",
+    "gradient-to-t": "linear-gradient(to top, var(--tw-gradient-stops))",
+    "gradient-to-tr": "linear-gradient(to top right, var(--tw-gradient-stops))",
+    "gradient-to-r": "linear-gradient(to right, var(--tw-gradient-stops))",
+    "gradient-to-br": "linear-gradient(to bottom right, var(--tw-gradient-stops))",
+    "gradient-to-b": "linear-gradient(to bottom, var(--tw-gradient-stops))",
+    "gradient-to-bl": "linear-gradient(to bottom left, var(--tw-gradient-stops))",
+    "gradient-to-l": "linear-gradient(to left, var(--tw-gradient-stops))",
+    "gradient-to-tl": "linear-gradient(to top left, var(--tw-gradient-stops))"
   },
-  {
-    prefix: "focus-within",
-    suffix: ":focus-within",
-    ancestor: "",
-    configKey: "focusWithin",
-    description: "applies when a descendant has focus"
+  backgroundPosition: {
+    bottom: "bottom",
+    center: "center",
+    left: "left",
+    "left-bottom": "left bottom",
+    "left-top": "left top",
+    right: "right",
+    "right-bottom": "right bottom",
+    "right-top": "right top",
+    top: "top"
   },
-  {
-    prefix: "active",
-    suffix: ":active",
-    ancestor: "",
-    configKey: "active",
-    description: "applies while the element is active (pressed)"
+  backgroundSize: {
+    auto: "auto",
+    cover: "cover",
+    contain: "contain"
   },
-  {
-    prefix: "visited",
-    suffix: ":visited",
-    ancestor: "",
-    configKey: "visited",
-    description: "applies to visited links"
+  blur: {
+    "0": "0",
+    none: "",
+    sm: "4px",
+    DEFAULT: "8px",
+    md: "12px",
+    lg: "16px",
+    xl: "24px",
+    "2xl": "40px",
+    "3xl": "64px"
   },
-  {
-    prefix: "disabled",
-    suffix: ":disabled",
-    ancestor: "",
-    configKey: "disabled",
-    description: "applies when disabled"
+  borderRadius: {
+    none: "0px",
+    sm: "0.125rem",
+    DEFAULT: "0.25rem",
+    md: "0.375rem",
+    lg: "0.5rem",
+    xl: "0.75rem",
+    "2xl": "1rem",
+    "3xl": "1.5rem",
+    full: "9999px"
   },
-  {
-    prefix: "first",
-    suffix: ":first-child",
-    ancestor: "",
-    configKey: "firstChild",
-    description: "applies to the first child"
+  borderWidth: {
+    "0": "0px",
+    "2": "2px",
+    "4": "4px",
+    "8": "8px",
+    DEFAULT: "1px"
   },
-  {
-    prefix: "last",
-    suffix: ":last-child",
-    ancestor: "",
-    configKey: "lastChild",
-    description: "applies to the last child"
+  boxShadow: {
+    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+    md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+    "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+    inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
+    none: "none"
   },
-  {
-    prefix: "group-hover",
-    suffix: "",
-    ancestor: ".group:hover",
-    configKey: "groupHover",
-    description: "applies when the .group parent is hovered"
+  brightness: {
+    "0": "0",
+    "50": ".5",
+    "75": ".75",
+    "90": ".9",
+    "95": ".95",
+    "100": "1",
+    "105": "1.05",
+    "110": "1.1",
+    "125": "1.25",
+    "150": "1.5",
+    "200": "2"
   },
-  {
-    prefix: "group-focus",
-    suffix: "",
-    ancestor: ".group:focus",
-    configKey: "groupFocus",
-    description: "applies when the .group parent has focus"
+  contrast: {
+    "0": "0",
+    "50": ".5",
+    "75": ".75",
+    "100": "1",
+    "125": "1.25",
+    "150": "1.5",
+    "200": "2"
   },
-  {
-    prefix: "peer-hover",
-    suffix: "",
-    ancestor: ".peer:hover ~",
-    configKey: "peerHover",
-    description: "applies when the preceding .peer sibling is hovered"
+  cursor: {
+    auto: "auto",
+    default: "default",
+    pointer: "pointer",
+    wait: "wait",
+    text: "text",
+    move: "move",
+    help: "help",
+    "not-allowed": "not-allowed",
+    none: "none",
+    "context-menu": "context-menu",
+    progress: "progress",
+    cell: "cell",
+    crosshair: "crosshair",
+    "vertical-text": "vertical-text",
+    alias: "alias",
+    copy: "copy",
+    "no-drop": "no-drop",
+    grab: "grab",
+    grabbing: "grabbing",
+    "all-scroll": "all-scroll",
+    "col-resize": "col-resize",
+    "row-resize": "row-resize",
+    "n-resize": "n-resize",
+    "e-resize": "e-resize",
+    "s-resize": "s-resize",
+    "w-resize": "w-resize",
+    "ne-resize": "ne-resize",
+    "nw-resize": "nw-resize",
+    "se-resize": "se-resize",
+    "sw-resize": "sw-resize",
+    "ew-resize": "ew-resize",
+    "ns-resize": "ns-resize",
+    "nesw-resize": "nesw-resize",
+    "nwse-resize": "nwse-resize",
+    "zoom-in": "zoom-in",
+    "zoom-out": "zoom-out"
   },
-  {
-    prefix: "peer-focus",
-    suffix: "",
-    ancestor: ".peer:focus ~",
-    configKey: "peerFocus",
-    description: "applies when the preceding .peer sibling has focus"
+  dropShadow: {
+    sm: "0 1px 1px rgb(0 0 0 / 0.05)",
+    DEFAULT: ["0 1px 2px rgb(0 0 0 / 0.1)", "0 1px 1px rgb(0 0 0 / 0.06)"],
+    md: ["0 4px 3px rgb(0 0 0 / 0.07)", "0 2px 2px rgb(0 0 0 / 0.06)"],
+    lg: ["0 10px 8px rgb(0 0 0 / 0.04)", "0 4px 3px rgb(0 0 0 / 0.1)"],
+    xl: ["0 20px 13px rgb(0 0 0 / 0.03)", "0 8px 5px rgb(0 0 0 / 0.08)"],
+    "2xl": "0 25px 25px rgb(0 0 0 / 0.15)",
+    none: "0 0 #0000"
   },
-  {
-    prefix: "dark",
-    suffix: "",
-    ancestor: ".dark",
-    configKey: "dark",
-    description: "applies inside a .dark ancestor (class dark mode)"
-  }
-];
-var variantByPrefix = new Map(STATE_VARIANTS.map((v) => [v.prefix, v]));
-var CSSGenerator = class {
-  config;
-  theme;
-  variantCfg;
-  utilities;
-  breakpoints;
-  utilityByClass;
-  extraBase;
-  extraComponents;
-  constructor(config = {}) {
-    const draft = { ...config };
-    const plugins = config.plugins ?? [];
-    for (const plugin of plugins) {
-      if (plugin.config) plugin.config(draft);
+  flex: {
+    "1": "1 1 0%",
+    auto: "1 1 auto",
+    initial: "0 1 auto",
+    none: "none"
+  },
+  flexGrow: {
+    "0": "0",
+    DEFAULT: "1"
+  },
+  flexShrink: {
+    "0": "0",
+    DEFAULT: "1"
+  },
+  fontFamily: {
+    sans: [
+      "ui-sans-serif",
+      "system-ui",
+      "sans-serif",
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+      '"Noto Color Emoji"'
+    ],
+    serif: ["ui-serif", "Georgia", "Cambria", '"Times New Roman"', "Times", "serif"],
+    mono: [
+      "ui-monospace",
+      "SFMono-Regular",
+      "Menlo",
+      "Monaco",
+      "Consolas",
+      '"Liberation Mono"',
+      '"Courier New"',
+      "monospace"
+    ]
+  },
+  fontSize: {
+    xs: [
+      "0.75rem",
+      {
+        lineHeight: "1rem"
+      }
+    ],
+    sm: [
+      "0.875rem",
+      {
+        lineHeight: "1.25rem"
+      }
+    ],
+    base: [
+      "1rem",
+      {
+        lineHeight: "1.5rem"
+      }
+    ],
+    lg: [
+      "1.125rem",
+      {
+        lineHeight: "1.75rem"
+      }
+    ],
+    xl: [
+      "1.25rem",
+      {
+        lineHeight: "1.75rem"
+      }
+    ],
+    "2xl": [
+      "1.5rem",
+      {
+        lineHeight: "2rem"
+      }
+    ],
+    "3xl": [
+      "1.875rem",
+      {
+        lineHeight: "2.25rem"
+      }
+    ],
+    "4xl": [
+      "2.25rem",
+      {
+        lineHeight: "2.5rem"
+      }
+    ],
+    "5xl": [
+      "3rem",
+      {
+        lineHeight: "1"
+      }
+    ],
+    "6xl": [
+      "3.75rem",
+      {
+        lineHeight: "1"
+      }
+    ],
+    "7xl": [
+      "4.5rem",
+      {
+        lineHeight: "1"
+      }
+    ],
+    "8xl": [
+      "6rem",
+      {
+        lineHeight: "1"
+      }
+    ],
+    "9xl": [
+      "8rem",
+      {
+        lineHeight: "1"
+      }
+    ]
+  },
+  fontWeight: {
+    thin: "100",
+    extralight: "200",
+    light: "300",
+    normal: "400",
+    medium: "500",
+    semibold: "600",
+    bold: "700",
+    extrabold: "800",
+    black: "900"
+  },
+  gradientColorStopPositions: {
+    "0%": "0%",
+    "5%": "5%",
+    "10%": "10%",
+    "15%": "15%",
+    "20%": "20%",
+    "25%": "25%",
+    "30%": "30%",
+    "35%": "35%",
+    "40%": "40%",
+    "45%": "45%",
+    "50%": "50%",
+    "55%": "55%",
+    "60%": "60%",
+    "65%": "65%",
+    "70%": "70%",
+    "75%": "75%",
+    "80%": "80%",
+    "85%": "85%",
+    "90%": "90%",
+    "95%": "95%",
+    "100%": "100%"
+  },
+  grayscale: {
+    "0": "0",
+    DEFAULT: "100%"
+  },
+  gridAutoColumns: {
+    auto: "auto",
+    min: "min-content",
+    max: "max-content",
+    fr: "minmax(0, 1fr)"
+  },
+  gridAutoRows: {
+    auto: "auto",
+    min: "min-content",
+    max: "max-content",
+    fr: "minmax(0, 1fr)"
+  },
+  gridColumn: {
+    auto: "auto",
+    "span-1": "span 1 / span 1",
+    "span-2": "span 2 / span 2",
+    "span-3": "span 3 / span 3",
+    "span-4": "span 4 / span 4",
+    "span-5": "span 5 / span 5",
+    "span-6": "span 6 / span 6",
+    "span-7": "span 7 / span 7",
+    "span-8": "span 8 / span 8",
+    "span-9": "span 9 / span 9",
+    "span-10": "span 10 / span 10",
+    "span-11": "span 11 / span 11",
+    "span-12": "span 12 / span 12",
+    "span-full": "1 / -1"
+  },
+  gridColumnEnd: {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "11": "11",
+    "12": "12",
+    "13": "13",
+    auto: "auto"
+  },
+  gridColumnStart: {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "11": "11",
+    "12": "12",
+    "13": "13",
+    auto: "auto"
+  },
+  gridRow: {
+    auto: "auto",
+    "span-1": "span 1 / span 1",
+    "span-2": "span 2 / span 2",
+    "span-3": "span 3 / span 3",
+    "span-4": "span 4 / span 4",
+    "span-5": "span 5 / span 5",
+    "span-6": "span 6 / span 6",
+    "span-7": "span 7 / span 7",
+    "span-8": "span 8 / span 8",
+    "span-9": "span 9 / span 9",
+    "span-10": "span 10 / span 10",
+    "span-11": "span 11 / span 11",
+    "span-12": "span 12 / span 12",
+    "span-full": "1 / -1"
+  },
+  gridRowEnd: {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "11": "11",
+    "12": "12",
+    "13": "13",
+    auto: "auto"
+  },
+  gridRowStart: {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "11": "11",
+    "12": "12",
+    "13": "13",
+    auto: "auto"
+  },
+  gridTemplateColumns: {
+    "1": "repeat(1, minmax(0, 1fr))",
+    "2": "repeat(2, minmax(0, 1fr))",
+    "3": "repeat(3, minmax(0, 1fr))",
+    "4": "repeat(4, minmax(0, 1fr))",
+    "5": "repeat(5, minmax(0, 1fr))",
+    "6": "repeat(6, minmax(0, 1fr))",
+    "7": "repeat(7, minmax(0, 1fr))",
+    "8": "repeat(8, minmax(0, 1fr))",
+    "9": "repeat(9, minmax(0, 1fr))",
+    "10": "repeat(10, minmax(0, 1fr))",
+    "11": "repeat(11, minmax(0, 1fr))",
+    "12": "repeat(12, minmax(0, 1fr))",
+    none: "none",
+    subgrid: "subgrid"
+  },
+  gridTemplateRows: {
+    "1": "repeat(1, minmax(0, 1fr))",
+    "2": "repeat(2, minmax(0, 1fr))",
+    "3": "repeat(3, minmax(0, 1fr))",
+    "4": "repeat(4, minmax(0, 1fr))",
+    "5": "repeat(5, minmax(0, 1fr))",
+    "6": "repeat(6, minmax(0, 1fr))",
+    "7": "repeat(7, minmax(0, 1fr))",
+    "8": "repeat(8, minmax(0, 1fr))",
+    "9": "repeat(9, minmax(0, 1fr))",
+    "10": "repeat(10, minmax(0, 1fr))",
+    "11": "repeat(11, minmax(0, 1fr))",
+    "12": "repeat(12, minmax(0, 1fr))",
+    none: "none",
+    subgrid: "subgrid"
+  },
+  hueRotate: {
+    "0": "0deg",
+    "15": "15deg",
+    "30": "30deg",
+    "60": "60deg",
+    "90": "90deg",
+    "180": "180deg"
+  },
+  invert: {
+    "0": "0",
+    DEFAULT: "100%"
+  },
+  keyframes: {
+    spin: {
+      to: {
+        transform: "rotate(360deg)"
+      }
+    },
+    ping: {
+      "75%, 100%": {
+        transform: "scale(2)",
+        opacity: "0"
+      }
+    },
+    pulse: {
+      "50%": {
+        opacity: ".5"
+      }
+    },
+    bounce: {
+      "0%, 100%": {
+        transform: "translateY(-25%)",
+        animationTimingFunction: "cubic-bezier(0.8,0,1,1)"
+      },
+      "50%": {
+        transform: "none",
+        animationTimingFunction: "cubic-bezier(0,0,0.2,1)"
+      }
     }
-    this.config = {
-      theme: deepMerge(defaultTheme, draft.theme ?? {}),
-      variants: { ...defaultVariants, ...draft.variants },
-      content: draft.content,
-      purge: draft.purge ?? [],
-      safelist: draft.safelist ?? [],
-      plugins,
-      important: draft.important ?? false,
-      corePlugins: draft.corePlugins ?? {},
-      extractorPattern: draft.extractorPattern
+  },
+  letterSpacing: {
+    tighter: "-0.05em",
+    tight: "-0.025em",
+    normal: "0em",
+    wide: "0.025em",
+    wider: "0.05em",
+    widest: "0.1em"
+  },
+  lineHeight: {
+    "3": ".75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "7": "1.75rem",
+    "8": "2rem",
+    "9": "2.25rem",
+    "10": "2.5rem",
+    none: "1",
+    tight: "1.25",
+    snug: "1.375",
+    normal: "1.5",
+    relaxed: "1.625",
+    loose: "2"
+  },
+  listStyleType: {
+    none: "none",
+    disc: "disc",
+    decimal: "decimal"
+  },
+  objectPosition: {
+    bottom: "bottom",
+    center: "center",
+    left: "left",
+    "left-bottom": "left bottom",
+    "left-top": "left top",
+    right: "right",
+    "right-bottom": "right bottom",
+    "right-top": "right top",
+    top: "top"
+  },
+  opacity: {
+    "0": "0",
+    "5": "0.05",
+    "10": "0.1",
+    "15": "0.15",
+    "20": "0.2",
+    "25": "0.25",
+    "30": "0.3",
+    "35": "0.35",
+    "40": "0.4",
+    "45": "0.45",
+    "50": "0.5",
+    "55": "0.55",
+    "60": "0.6",
+    "65": "0.65",
+    "70": "0.7",
+    "75": "0.75",
+    "80": "0.8",
+    "85": "0.85",
+    "90": "0.9",
+    "95": "0.95",
+    "100": "1"
+  },
+  order: {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "11": "11",
+    "12": "12",
+    first: "-9999",
+    last: "9999",
+    none: "0"
+  },
+  outlineOffset: {
+    "0": "0px",
+    "1": "1px",
+    "2": "2px",
+    "4": "4px",
+    "8": "8px"
+  },
+  outlineWidth: {
+    "0": "0px",
+    "1": "1px",
+    "2": "2px",
+    "4": "4px",
+    "8": "8px"
+  },
+  ringWidth: {
+    "0": "0px",
+    "1": "1px",
+    "2": "2px",
+    "4": "4px",
+    "8": "8px",
+    DEFAULT: "3px"
+  },
+  rotate: {
+    "0": "0deg",
+    "1": "1deg",
+    "2": "2deg",
+    "3": "3deg",
+    "6": "6deg",
+    "12": "12deg",
+    "45": "45deg",
+    "90": "90deg",
+    "180": "180deg"
+  },
+  saturate: {
+    "0": "0",
+    "50": ".5",
+    "100": "1",
+    "150": "1.5",
+    "200": "2"
+  },
+  scale: {
+    "0": "0",
+    "50": ".5",
+    "75": ".75",
+    "90": ".9",
+    "95": ".95",
+    "100": "1",
+    "105": "1.05",
+    "110": "1.1",
+    "125": "1.25",
+    "150": "1.5"
+  },
+  sepia: {
+    "0": "0",
+    DEFAULT: "100%"
+  },
+  skew: {
+    "0": "0deg",
+    "1": "1deg",
+    "2": "2deg",
+    "3": "3deg",
+    "6": "6deg",
+    "12": "12deg"
+  },
+  spacing: {
+    "0": "0px",
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "7": "1.75rem",
+    "8": "2rem",
+    "9": "2.25rem",
+    "10": "2.5rem",
+    "11": "2.75rem",
+    "12": "3rem",
+    "14": "3.5rem",
+    "16": "4rem",
+    "20": "5rem",
+    "24": "6rem",
+    "28": "7rem",
+    "32": "8rem",
+    "36": "9rem",
+    "40": "10rem",
+    "44": "11rem",
+    "48": "12rem",
+    "52": "13rem",
+    "56": "14rem",
+    "60": "15rem",
+    "64": "16rem",
+    "72": "18rem",
+    "80": "20rem",
+    "96": "24rem",
+    px: "1px",
+    "0.5": "0.125rem",
+    "1.5": "0.375rem",
+    "2.5": "0.625rem",
+    "3.5": "0.875rem"
+  },
+  textDecorationThickness: {
+    "0": "0px",
+    "1": "1px",
+    "2": "2px",
+    "4": "4px",
+    "8": "8px",
+    auto: "auto",
+    "from-font": "from-font"
+  },
+  transformOrigin: {
+    center: "center",
+    top: "top",
+    "top-right": "top right",
+    right: "right",
+    "bottom-right": "bottom right",
+    bottom: "bottom",
+    "bottom-left": "bottom left",
+    left: "left",
+    "top-left": "top left"
+  },
+  transitionDuration: {
+    "0": "0s",
+    "75": "75ms",
+    "100": "100ms",
+    "150": "150ms",
+    "200": "200ms",
+    "300": "300ms",
+    "500": "500ms",
+    "700": "700ms",
+    "1000": "1000ms",
+    DEFAULT: "150ms"
+  },
+  transitionProperty: {
+    none: "none",
+    all: "all",
+    DEFAULT: "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+    colors: "color, background-color, border-color, text-decoration-color, fill, stroke",
+    opacity: "opacity",
+    shadow: "box-shadow",
+    transform: "transform"
+  },
+  transitionTimingFunction: {
+    DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
+    linear: "linear",
+    in: "cubic-bezier(0.4, 0, 1, 1)",
+    out: "cubic-bezier(0, 0, 0.2, 1)",
+    "in-out": "cubic-bezier(0.4, 0, 0.2, 1)"
+  },
+  willChange: {
+    auto: "auto",
+    scroll: "scroll-position",
+    contents: "contents",
+    transform: "transform"
+  },
+  zIndex: {
+    "0": "0",
+    "10": "10",
+    "20": "20",
+    "30": "30",
+    "40": "40",
+    "50": "50",
+    auto: "auto"
+  }
+};
+var DEFAULT_SCREENS = {
+  xxs: "200px",
+  xs: "400px",
+  sm: "640px",
+  md: "768px",
+  lg: "1024px",
+  xl: "1280px",
+  "2xl": "1536px",
+  "3xl": "1920px",
+  "4xl": "2560px",
+  "5xl": "5000px"
+};
+var DEFAULT_CONTAINER_MIN_SCREEN = "sm";
+var DEFAULT_CONTAINER_MAX_SCREEN = "2xl";
+var FRACTIONS = {
+  "1/2": "50%",
+  "1/3": "33.333333%",
+  "2/3": "66.666667%",
+  "1/4": "25%",
+  "2/4": "50%",
+  "3/4": "75%",
+  "1/5": "20%",
+  "2/5": "40%",
+  "3/5": "60%",
+  "4/5": "80%",
+  "1/6": "16.666667%",
+  "2/6": "33.333333%",
+  "3/6": "50%",
+  "4/6": "66.666667%",
+  "5/6": "83.333333%",
+  "1/12": "8.333333%",
+  "2/12": "16.666667%",
+  "3/12": "25%",
+  "4/12": "33.333333%",
+  "5/12": "41.666667%",
+  "6/12": "50%",
+  "7/12": "58.333333%",
+  "8/12": "66.666667%",
+  "9/12": "75%",
+  "10/12": "83.333333%",
+  "11/12": "91.666667%"
+};
+var FRACTIONS_SMALL = Object.fromEntries(
+  Object.entries(FRACTIONS).filter(
+    ([k]) => !k.endsWith("/5") && !k.endsWith("/6") && !k.endsWith("/12")
+  )
+);
+var FRACTIONS_SIXTHS = Object.fromEntries(
+  Object.entries(FRACTIONS).filter(([k]) => !k.endsWith("/12"))
+);
+var NAKSHORA_EXTRAS = {
+  boxShadow: { glow: "0 0 20px 0 rgba(59, 130, 246, 0.5)" },
+  borderRadius: { xs: "0.125rem" },
+  zIndex: { hide: "-1" },
+  transitionTimingFunction: { back: "cubic-bezier(0.68, -0.55, 0.265, 1.55)" },
+  animation: {
+    fade: "fade 300ms ease-out",
+    slide: "slide 300ms ease-out",
+    shimmer: "shimmer 1.5s linear infinite"
+  },
+  keyframes: {
+    fade: { from: { opacity: "0" }, to: { opacity: "1" } },
+    slide: {
+      from: { transform: "translateY(1rem)", opacity: "0" },
+      to: { transform: "translateY(0)", opacity: "1" }
+    },
+    shimmer: {
+      from: { "background-position": "200% 0" },
+      to: { "background-position": "-200% 0" }
+    }
+  },
+  lineHeight: { base: "1.5" },
+  scale: { 175: "1.75", 200: "2" },
+  rotate: { 135: "135deg", 225: "225deg", 270: "270deg", 315: "315deg", 360: "360deg" },
+  textDecorationThickness: { thin: "1px" }
+};
+function isObj(v) {
+  return v !== null && typeof v === "object" && !Array.isArray(v);
+}
+function mergeScale(base, override) {
+  if (!isObj(base) || !isObj(override)) {
+    return override === void 0 ? base : override;
+  }
+  const out = { ...base };
+  for (const [k, v] of Object.entries(override)) {
+    if (v === void 0) continue;
+    if (v === null) {
+      delete out[k];
+      continue;
+    }
+    const cur = out[k];
+    out[k] = isObj(cur) && isObj(v) ? mergeScale(cur, v) : v;
+  }
+  return out;
+}
+function normalizeFontSize(value) {
+  if (Array.isArray(value)) {
+    const [size, rest] = value;
+    if (isObj(rest)) {
+      return {
+        size,
+        lineHeight: rest.lineHeight,
+        letterSpacing: rest.letterSpacing,
+        fontWeight: rest.fontWeight === void 0 ? void 0 : String(rest.fontWeight)
+      };
+    }
+    return { size, lineHeight: rest };
+  }
+  return { size: String(value) };
+}
+function fontFamilyToString(value) {
+  if (Array.isArray(value)) return value.join(", ");
+  if (isObj(value) && "fontFamily" in value) return String(value.fontFamily);
+  return String(value);
+}
+function spacingDerived(spacing, extra) {
+  return { ...spacing, ...extra };
+}
+function normalizeUserTheme(user) {
+  const out = { ...user };
+  const typography = user.typography;
+  if (typography) {
+    delete out.typography;
+    const nakKeys = ["fontSize", "fontWeight", "lineHeight", "letterSpacing"];
+    if (nakKeys.some((k) => k in typography)) {
+      for (const k of nakKeys) if (typography[k] !== void 0) out[k] = typography[k];
+      const rest = Object.fromEntries(
+        Object.entries(typography).filter(([k]) => !nakKeys.includes(k))
+      );
+      if (Object.keys(rest).length) out.typography = rest;
+    } else {
+      out.typography = typography;
+    }
+  }
+  if (user.breakpoints !== void 0) {
+    delete out.breakpoints;
+    const bp = {};
+    for (const [k, v] of Object.entries(user.breakpoints)) {
+      if (v === void 0) continue;
+      bp[k] = v === null ? null : typeof v === "number" ? v <= 0 ? null : `${v}px` : v;
+    }
+    out.breakpointsMerge = bp;
+  }
+  if (user.shadows !== void 0) {
+    delete out.shadows;
+    out.boxShadow = mergeScale(out.boxShadow ?? {}, user.shadows);
+  }
+  if (user.duration !== void 0) {
+    delete out.duration;
+    out.transitionDuration = mergeScale(out.transitionDuration ?? {}, user.duration);
+  }
+  if (user.easing !== void 0) {
+    delete out.easing;
+    out.transitionTimingFunction = mergeScale(
+      out.transitionTimingFunction ?? {},
+      user.easing
+    );
+  }
+  return out;
+}
+function parseKeyframeString(body) {
+  const out = {};
+  const re = /([^{}]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = re.exec(body)) !== null) {
+    const sel = m[1].trim();
+    const decls = {};
+    for (const part of m[2].split(";")) {
+      const idx = part.indexOf(":");
+      if (idx === -1) continue;
+      decls[part.slice(0, idx).trim()] = part.slice(idx + 1).trim();
+    }
+    out[sel] = decls;
+  }
+  return out;
+}
+function resolveTheme(userTheme = {}, options = {}) {
+  let merged = {};
+  for (const [k, v] of Object.entries(tailwindDefaults)) merged[k] = v;
+  merged.colors = defaultColors;
+  merged.screens = { ...DEFAULT_SCREENS };
+  merged.container = {};
+  merged.containers = {
+    xs: "20rem",
+    sm: "24rem",
+    md: "28rem",
+    lg: "32rem",
+    xl: "36rem",
+    "2xl": "42rem",
+    "3xl": "48rem",
+    "4xl": "56rem",
+    "5xl": "64rem",
+    "6xl": "72rem",
+    "7xl": "80rem"
+  };
+  merged.aria = tailwindDefaults.aria ?? {
+    busy: 'busy="true"',
+    checked: 'checked="true"',
+    disabled: 'disabled="true"',
+    expanded: 'expanded="true"',
+    hidden: 'hidden="true"',
+    pressed: 'pressed="true"',
+    readonly: 'readonly="true"',
+    required: 'required="true"',
+    selected: 'selected="true"'
+  };
+  merged.supports = {};
+  merged.data = {};
+  for (const [k, v] of Object.entries(NAKSHORA_EXTRAS)) {
+    merged[k] = mergeScale(merged[k] ?? {}, v);
+  }
+  for (const pt of options.pluginTheme ?? []) {
+    const { extend: extend2, ...rest2 } = pt;
+    for (const [k, v] of Object.entries(rest2)) {
+      merged[k] = typeof v === "function" ? v : mergeScale(merged[k] ?? {}, v);
+    }
+    if (extend2)
+      for (const [k, v] of Object.entries(extend2))
+        merged[k] = mergeScale(merged[k] ?? {}, v);
+  }
+  const user = normalizeUserTheme({ ...userTheme });
+  const { extend, breakpointsMerge, ...rest } = user;
+  for (const [k, v] of Object.entries(rest)) {
+    if (v === void 0) continue;
+    if (k === "screens" || k === "container") {
+      merged[k] = typeof v === "function" ? v : normaliseScreens(v);
+      continue;
+    }
+    if (k === "keyframes" && isObj(v)) {
+      const kf = {};
+      for (const [name, body] of Object.entries(v))
+        kf[name] = typeof body === "string" ? parseKeyframeString(body) : body;
+      merged[k] = mergeScale(merged[k] ?? {}, kf);
+      continue;
+    }
+    merged[k] = typeof v === "function" ? v : mergeScale(merged[k] ?? {}, v);
+  }
+  if (breakpointsMerge)
+    merged.screens = normaliseScreens(mergeScale(merged.screens, breakpointsMerge));
+  if (extend) {
+    for (const [k, v] of Object.entries(extend)) {
+      if (v === void 0) continue;
+      merged[k] = typeof v === "function" ? v : mergeScale(merged[k] ?? {}, v);
+    }
+  }
+  const resolved = {};
+  const resolving = /* @__PURE__ */ new Set();
+  const themeFn = (path, fallback) => {
+    const value = lookup2(path);
+    return value === void 0 ? fallback : value;
+  };
+  const getScale = (key) => {
+    if (key in resolved) return resolved[key];
+    let value = merged[key];
+    if (typeof value === "function") {
+      if (resolving.has(key)) return {};
+      resolving.add(key);
+      value = value({
+        theme: themeFn,
+        colors: defaultColors,
+        breakpoints: (screens2) => Object.fromEntries(Object.entries(screens2).map(([k, v]) => [`screen-${k}`, v]))
+      });
+      resolving.delete(key);
+    }
+    resolved[key] = value;
+    return value;
+  };
+  const lookup2 = (path) => {
+    const [head, ...tail] = splitPath(path);
+    let cur = getScale(head);
+    for (const key of tail) {
+      if (!isObj(cur)) return void 0;
+      cur = cur[key];
+    }
+    return cur;
+  };
+  for (const key of Object.keys(merged)) getScale(key);
+  merged = resolved;
+  const spacing = merged.spacing;
+  const derive = (key, extra) => {
+    merged[key] = spacingDerived(spacing, {
+      ...extra,
+      ...merged[key] ?? {}
+    });
+  };
+  derive("inset", { auto: "auto", ...FRACTIONS_SMALL, full: "100%" });
+  derive("margin", { auto: "auto" });
+  derive("padding", {});
+  derive("gap", {});
+  derive("space", {});
+  derive("scrollMargin", {});
+  derive("scrollPadding", {});
+  derive("borderSpacing", {});
+  derive("textIndent", {});
+  derive("translate", { ...FRACTIONS_SMALL, full: "100%" });
+  derive("width", {
+    auto: "auto",
+    ...FRACTIONS,
+    full: "100%",
+    screen: "100vw",
+    svw: "100svw",
+    lvw: "100lvw",
+    dvw: "100dvw",
+    min: "min-content",
+    max: "max-content",
+    fit: "fit-content"
+  });
+  derive("height", {
+    auto: "auto",
+    ...FRACTIONS_SIXTHS,
+    full: "100%",
+    screen: "100vh",
+    svh: "100svh",
+    lvh: "100lvh",
+    dvh: "100dvh",
+    min: "min-content",
+    max: "max-content",
+    fit: "fit-content"
+  });
+  derive("size", {
+    auto: "auto",
+    ...FRACTIONS,
+    full: "100%",
+    min: "min-content",
+    max: "max-content",
+    fit: "fit-content"
+  });
+  derive("minWidth", { full: "100%", min: "min-content", max: "max-content", fit: "fit-content" });
+  derive("minHeight", {
+    full: "100%",
+    screen: "100vh",
+    svh: "100svh",
+    lvh: "100lvh",
+    dvh: "100dvh",
+    min: "min-content",
+    max: "max-content",
+    fit: "fit-content"
+  });
+  derive("maxHeight", {
+    none: "none",
+    full: "100%",
+    screen: "100vh",
+    svh: "100svh",
+    lvh: "100lvh",
+    dvh: "100dvh",
+    min: "min-content",
+    max: "max-content",
+    fit: "fit-content"
+  });
+  derive("flexBasis", { auto: "auto", ...FRACTIONS, full: "100%" });
+  const screens = merged.screens;
+  const screenMax = Object.fromEntries(Object.entries(screens).map(([k, v]) => [`screen-${k}`, v]));
+  derive("maxWidth", {
+    none: "none",
+    xs: "20rem",
+    sm: "24rem",
+    md: "28rem",
+    lg: "32rem",
+    xl: "36rem",
+    "2xl": "42rem",
+    "3xl": "48rem",
+    "4xl": "56rem",
+    "5xl": "64rem",
+    "6xl": "72rem",
+    "7xl": "80rem",
+    full: "100%",
+    min: "min-content",
+    max: "max-content",
+    fit: "fit-content",
+    prose: "65ch",
+    ...screenMax
+  });
+  merged.columns = {
+    auto: "auto",
+    1: "1",
+    2: "2",
+    3: "3",
+    4: "4",
+    5: "5",
+    6: "6",
+    7: "7",
+    8: "8",
+    9: "9",
+    10: "10",
+    11: "11",
+    12: "12",
+    "3xs": "16rem",
+    "2xs": "18rem",
+    xs: "20rem",
+    sm: "24rem",
+    md: "28rem",
+    lg: "32rem",
+    xl: "36rem",
+    "2xl": "42rem",
+    "3xl": "48rem",
+    "4xl": "56rem",
+    "5xl": "64rem",
+    "6xl": "72rem",
+    "7xl": "80rem",
+    ...merged.columns ?? {}
+  };
+  merged.lineClamp = merged.lineClamp ?? { 1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6" };
+  merged.divideWidth = {
+    ...merged.borderWidth ?? {},
+    ...merged.divideWidth ?? {}
+  };
+  merged.ringOffsetWidth = merged.ringOffsetWidth ?? {
+    0: "0px",
+    1: "1px",
+    2: "2px",
+    4: "4px",
+    8: "8px"
+  };
+  merged.strokeWidth = merged.strokeWidth ?? { 0: "0", 1: "1", 2: "2" };
+  merged.textUnderlineOffset = merged.textUnderlineOffset ?? {
+    0: "0px",
+    1: "1px",
+    2: "2px",
+    4: "4px",
+    8: "8px",
+    auto: "auto"
+  };
+  merged.transitionDelay = merged.transitionDelay ?? {
+    0: "0s",
+    75: "75ms",
+    100: "100ms",
+    150: "150ms",
+    200: "200ms",
+    300: "300ms",
+    500: "500ms",
+    700: "700ms",
+    1e3: "1000ms"
+  };
+  merged.listStyleImage = merged.listStyleImage ?? { none: "none" };
+  merged.content = merged.content ?? { none: "none" };
+  const colors = merged.colors;
+  const colorScale = (key, extra = {}) => {
+    merged[key] = { ...colors, ...extra, ...merged[key] ?? {} };
+  };
+  colorScale("accentColor", { auto: "auto" });
+  colorScale("backgroundColor");
+  colorScale("borderColor", {
+    DEFAULT: colors.gray?.[200] ?? "currentColor"
+  });
+  colorScale("boxShadowColor");
+  colorScale("caretColor");
+  colorScale("divideColor", { DEFAULT: merged.borderColor.DEFAULT });
+  colorScale("fill", { none: "none" });
+  colorScale("gradientColorStops");
+  colorScale("outlineColor");
+  colorScale("placeholderColor");
+  colorScale("ringColor", { DEFAULT: colors.blue?.[500] ?? "#3b82f6" });
+  colorScale("ringOffsetColor");
+  colorScale("stroke", { none: "none" });
+  colorScale("textColor");
+  colorScale("textDecorationColor");
+  const opacity = merged.opacity;
+  for (const key of [
+    "backgroundOpacity",
+    "borderOpacity",
+    "divideOpacity",
+    "placeholderOpacity",
+    "ringOpacity",
+    "textOpacity",
+    "backdropOpacity"
+  ]) {
+    merged[key] = { ...opacity, ...merged[key] ?? {} };
+  }
+  merged.ringOpacity.DEFAULT ??= "0.5";
+  for (const [k, src] of [
+    ["backdropBlur", "blur"],
+    ["backdropBrightness", "brightness"],
+    ["backdropContrast", "contrast"],
+    ["backdropGrayscale", "grayscale"],
+    ["backdropHueRotate", "hueRotate"],
+    ["backdropInvert", "invert"],
+    ["backdropSaturate", "saturate"],
+    ["backdropSepia", "sepia"]
+  ]) {
+    merged[k] = { ...merged[src] ?? {}, ...merged[k] ?? {} };
+  }
+  return merged;
+}
+function normaliseScreens(v) {
+  const out = {};
+  for (const [k, val] of Object.entries(v)) {
+    if (val === null || val === void 0) continue;
+    if (typeof val === "number") {
+      if (val > 0) out[k] = `${val}px`;
+      continue;
+    }
+    if (isObj(val)) {
+      if (typeof val.min === "string") out[k] = val.min;
+      else if (typeof val.raw === "string") out[k] = val.raw;
+      continue;
+    }
+    out[k] = String(val);
+  }
+  return out;
+}
+function splitPath(path) {
+  const keys = [];
+  let cur = "";
+  let i = 0;
+  while (i < path.length) {
+    const ch = path[i];
+    if (ch === "[") {
+      const end = path.indexOf("]", i);
+      if (cur) {
+        keys.push(cur);
+        cur = "";
+      }
+      keys.push(path.slice(i + 1, end === -1 ? void 0 : end).replace(/^['"]|['"]$/g, ""));
+      i = end === -1 ? path.length : end + 1;
+      if (path[i] === ".") i++;
+      continue;
+    }
+    if (ch === ".") {
+      keys.push(cur);
+      cur = "";
+    } else cur += ch;
+    i++;
+  }
+  if (cur) keys.push(cur);
+  return keys.filter((k) => k !== "");
+}
+function screenToPx(value) {
+  const m = /^(\d+(?:\.\d+)?)(px|rem|em)?$/.exec(value.trim());
+  if (!m) return NaN;
+  const n = parseFloat(m[1]);
+  return m[2] === "rem" || m[2] === "em" ? n * 16 : n;
+}
+var STATIC_UTILITIES = [
+  {
+    p: "accessibility",
+    c: "sr-only",
+    d: [
+      ["position", "absolute"],
+      ["width", "1px"],
+      ["height", "1px"],
+      ["padding", "0"],
+      ["margin", "-1px"],
+      ["overflow", "hidden"],
+      ["clip", "rect(0, 0, 0, 0)"],
+      ["white-space", "nowrap"],
+      ["border-width", "0"]
+    ]
+  },
+  {
+    p: "accessibility",
+    c: "not-sr-only",
+    d: [
+      ["position", "static"],
+      ["width", "auto"],
+      ["height", "auto"],
+      ["padding", "0"],
+      ["margin", "0"],
+      ["overflow", "visible"],
+      ["clip", "auto"],
+      ["white-space", "normal"]
+    ]
+  },
+  { p: "pointerEvents", c: "pointer-events-none", d: [["pointer-events", "none"]] },
+  { p: "pointerEvents", c: "pointer-events-auto", d: [["pointer-events", "auto"]] },
+  { p: "visibility", c: "visible", d: [["visibility", "visible"]] },
+  { p: "visibility", c: "invisible", d: [["visibility", "hidden"]] },
+  { p: "visibility", c: "collapse", d: [["visibility", "collapse"]] },
+  { p: "position", c: "static", d: [["position", "static"]] },
+  { p: "position", c: "fixed", d: [["position", "fixed"]] },
+  { p: "position", c: "absolute", d: [["position", "absolute"]] },
+  { p: "position", c: "relative", d: [["position", "relative"]] },
+  { p: "position", c: "sticky", d: [["position", "sticky"]] },
+  { p: "isolation", c: "isolate", d: [["isolation", "isolate"]] },
+  { p: "isolation", c: "isolation-auto", d: [["isolation", "auto"]] },
+  { p: "float", c: "float-start", d: [["float", "inline-start"]] },
+  { p: "float", c: "float-end", d: [["float", "inline-end"]] },
+  { p: "float", c: "float-right", d: [["float", "right"]] },
+  { p: "float", c: "float-left", d: [["float", "left"]] },
+  { p: "float", c: "float-none", d: [["float", "none"]] },
+  { p: "clear", c: "clear-start", d: [["clear", "inline-start"]] },
+  { p: "clear", c: "clear-end", d: [["clear", "inline-end"]] },
+  { p: "clear", c: "clear-left", d: [["clear", "left"]] },
+  { p: "clear", c: "clear-right", d: [["clear", "right"]] },
+  { p: "clear", c: "clear-both", d: [["clear", "both"]] },
+  { p: "clear", c: "clear-none", d: [["clear", "none"]] },
+  { p: "boxSizing", c: "box-border", d: [["box-sizing", "border-box"]] },
+  { p: "boxSizing", c: "box-content", d: [["box-sizing", "content-box"]] },
+  {
+    p: "lineClamp",
+    c: "line-clamp-none",
+    d: [
+      ["overflow", "visible"],
+      ["display", "block"],
+      ["-webkit-box-orient", "horizontal"],
+      ["-webkit-line-clamp", "none"]
+    ]
+  },
+  { p: "display", c: "block", d: [["display", "block"]] },
+  { p: "display", c: "inline-block", d: [["display", "inline-block"]] },
+  { p: "display", c: "inline", d: [["display", "inline"]] },
+  { p: "display", c: "flex", d: [["display", "flex"]] },
+  { p: "display", c: "inline-flex", d: [["display", "inline-flex"]] },
+  { p: "display", c: "table", d: [["display", "table"]] },
+  { p: "display", c: "inline-table", d: [["display", "inline-table"]] },
+  { p: "display", c: "table-caption", d: [["display", "table-caption"]] },
+  { p: "display", c: "table-cell", d: [["display", "table-cell"]] },
+  { p: "display", c: "table-column", d: [["display", "table-column"]] },
+  { p: "display", c: "table-column-group", d: [["display", "table-column-group"]] },
+  { p: "display", c: "table-footer-group", d: [["display", "table-footer-group"]] },
+  { p: "display", c: "table-header-group", d: [["display", "table-header-group"]] },
+  { p: "display", c: "table-row-group", d: [["display", "table-row-group"]] },
+  { p: "display", c: "table-row", d: [["display", "table-row"]] },
+  { p: "display", c: "flow-root", d: [["display", "flow-root"]] },
+  { p: "display", c: "grid", d: [["display", "grid"]] },
+  { p: "display", c: "inline-grid", d: [["display", "inline-grid"]] },
+  { p: "display", c: "contents", d: [["display", "contents"]] },
+  { p: "display", c: "list-item", d: [["display", "list-item"]] },
+  { p: "display", c: "hidden", d: [["display", "none"]] },
+  { p: "tableLayout", c: "table-auto", d: [["table-layout", "auto"]] },
+  { p: "tableLayout", c: "table-fixed", d: [["table-layout", "fixed"]] },
+  { p: "captionSide", c: "caption-top", d: [["caption-side", "top"]] },
+  { p: "captionSide", c: "caption-bottom", d: [["caption-side", "bottom"]] },
+  { p: "borderCollapse", c: "border-collapse", d: [["border-collapse", "collapse"]] },
+  { p: "borderCollapse", c: "border-separate", d: [["border-collapse", "separate"]] },
+  {
+    p: "transform",
+    c: "transform",
+    d: [
+      [
+        "transform",
+        "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+      ]
+    ],
+    df: "transform"
+  },
+  {
+    p: "transform",
+    c: "transform-cpu",
+    d: [
+      [
+        "transform",
+        "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+      ]
+    ]
+  },
+  {
+    p: "transform",
+    c: "transform-gpu",
+    d: [
+      [
+        "transform",
+        "translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+      ]
+    ]
+  },
+  { p: "transform", c: "transform-none", d: [["transform", "none"]] },
+  { p: "touchAction", c: "touch-auto", d: [["touch-action", "auto"]] },
+  { p: "touchAction", c: "touch-none", d: [["touch-action", "none"]] },
+  {
+    p: "touchAction",
+    c: "touch-pan-x",
+    d: [
+      ["--tw-pan-x", "pan-x"],
+      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+    ],
+    df: "touch-action"
+  },
+  {
+    p: "touchAction",
+    c: "touch-pan-left",
+    d: [
+      ["--tw-pan-x", "pan-left"],
+      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+    ],
+    df: "touch-action"
+  },
+  {
+    p: "touchAction",
+    c: "touch-pan-right",
+    d: [
+      ["--tw-pan-x", "pan-right"],
+      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+    ],
+    df: "touch-action"
+  },
+  {
+    p: "touchAction",
+    c: "touch-pan-y",
+    d: [
+      ["--tw-pan-y", "pan-y"],
+      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+    ],
+    df: "touch-action"
+  },
+  {
+    p: "touchAction",
+    c: "touch-pan-up",
+    d: [
+      ["--tw-pan-y", "pan-up"],
+      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+    ],
+    df: "touch-action"
+  },
+  {
+    p: "touchAction",
+    c: "touch-pan-down",
+    d: [
+      ["--tw-pan-y", "pan-down"],
+      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+    ],
+    df: "touch-action"
+  },
+  {
+    p: "touchAction",
+    c: "touch-pinch-zoom",
+    d: [
+      ["--tw-pinch-zoom", "pinch-zoom"],
+      ["touch-action", "var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)"]
+    ],
+    df: "touch-action"
+  },
+  { p: "touchAction", c: "touch-manipulation", d: [["touch-action", "manipulation"]] },
+  { p: "userSelect", c: "select-none", d: [["user-select", "none"]] },
+  { p: "userSelect", c: "select-text", d: [["user-select", "text"]] },
+  { p: "userSelect", c: "select-all", d: [["user-select", "all"]] },
+  { p: "userSelect", c: "select-auto", d: [["user-select", "auto"]] },
+  { p: "resize", c: "resize-none", d: [["resize", "none"]] },
+  { p: "resize", c: "resize-y", d: [["resize", "vertical"]] },
+  { p: "resize", c: "resize-x", d: [["resize", "horizontal"]] },
+  { p: "resize", c: "resize", d: [["resize", "both"]] },
+  { p: "scrollSnapType", c: "snap-none", d: [["scroll-snap-type", "none"]] },
+  {
+    p: "scrollSnapType",
+    c: "snap-x",
+    d: [["scroll-snap-type", "x var(--tw-scroll-snap-strictness)"]],
+    df: "scroll-snap-type"
+  },
+  {
+    p: "scrollSnapType",
+    c: "snap-y",
+    d: [["scroll-snap-type", "y var(--tw-scroll-snap-strictness)"]],
+    df: "scroll-snap-type"
+  },
+  {
+    p: "scrollSnapType",
+    c: "snap-both",
+    d: [["scroll-snap-type", "both var(--tw-scroll-snap-strictness)"]],
+    df: "scroll-snap-type"
+  },
+  { p: "scrollSnapType", c: "snap-mandatory", d: [["--tw-scroll-snap-strictness", "mandatory"]] },
+  { p: "scrollSnapType", c: "snap-proximity", d: [["--tw-scroll-snap-strictness", "proximity"]] },
+  { p: "scrollSnapAlign", c: "snap-start", d: [["scroll-snap-align", "start"]] },
+  { p: "scrollSnapAlign", c: "snap-end", d: [["scroll-snap-align", "end"]] },
+  { p: "scrollSnapAlign", c: "snap-center", d: [["scroll-snap-align", "center"]] },
+  { p: "scrollSnapAlign", c: "snap-align-none", d: [["scroll-snap-align", "none"]] },
+  { p: "scrollSnapStop", c: "snap-normal", d: [["scroll-snap-stop", "normal"]] },
+  { p: "scrollSnapStop", c: "snap-always", d: [["scroll-snap-stop", "always"]] },
+  { p: "listStylePosition", c: "list-inside", d: [["list-style-position", "inside"]] },
+  { p: "listStylePosition", c: "list-outside", d: [["list-style-position", "outside"]] },
+  { p: "appearance", c: "appearance-none", d: [["appearance", "none"]] },
+  { p: "appearance", c: "appearance-auto", d: [["appearance", "auto"]] },
+  { p: "breakBefore", c: "break-before-auto", d: [["break-before", "auto"]] },
+  { p: "breakBefore", c: "break-before-avoid", d: [["break-before", "avoid"]] },
+  { p: "breakBefore", c: "break-before-all", d: [["break-before", "all"]] },
+  { p: "breakBefore", c: "break-before-avoid-page", d: [["break-before", "avoid-page"]] },
+  { p: "breakBefore", c: "break-before-page", d: [["break-before", "page"]] },
+  { p: "breakBefore", c: "break-before-left", d: [["break-before", "left"]] },
+  { p: "breakBefore", c: "break-before-right", d: [["break-before", "right"]] },
+  { p: "breakBefore", c: "break-before-column", d: [["break-before", "column"]] },
+  { p: "breakInside", c: "break-inside-auto", d: [["break-inside", "auto"]] },
+  { p: "breakInside", c: "break-inside-avoid", d: [["break-inside", "avoid"]] },
+  { p: "breakInside", c: "break-inside-avoid-page", d: [["break-inside", "avoid-page"]] },
+  { p: "breakInside", c: "break-inside-avoid-column", d: [["break-inside", "avoid-column"]] },
+  { p: "breakAfter", c: "break-after-auto", d: [["break-after", "auto"]] },
+  { p: "breakAfter", c: "break-after-avoid", d: [["break-after", "avoid"]] },
+  { p: "breakAfter", c: "break-after-all", d: [["break-after", "all"]] },
+  { p: "breakAfter", c: "break-after-avoid-page", d: [["break-after", "avoid-page"]] },
+  { p: "breakAfter", c: "break-after-page", d: [["break-after", "page"]] },
+  { p: "breakAfter", c: "break-after-left", d: [["break-after", "left"]] },
+  { p: "breakAfter", c: "break-after-right", d: [["break-after", "right"]] },
+  { p: "breakAfter", c: "break-after-column", d: [["break-after", "column"]] },
+  { p: "gridAutoFlow", c: "grid-flow-row", d: [["grid-auto-flow", "row"]] },
+  { p: "gridAutoFlow", c: "grid-flow-col", d: [["grid-auto-flow", "column"]] },
+  { p: "gridAutoFlow", c: "grid-flow-dense", d: [["grid-auto-flow", "dense"]] },
+  { p: "gridAutoFlow", c: "grid-flow-row-dense", d: [["grid-auto-flow", "row dense"]] },
+  { p: "gridAutoFlow", c: "grid-flow-col-dense", d: [["grid-auto-flow", "column dense"]] },
+  { p: "flexDirection", c: "flex-row", d: [["flex-direction", "row"]] },
+  { p: "flexDirection", c: "flex-row-reverse", d: [["flex-direction", "row-reverse"]] },
+  { p: "flexDirection", c: "flex-col", d: [["flex-direction", "column"]] },
+  { p: "flexDirection", c: "flex-col-reverse", d: [["flex-direction", "column-reverse"]] },
+  { p: "flexWrap", c: "flex-wrap", d: [["flex-wrap", "wrap"]] },
+  { p: "flexWrap", c: "flex-wrap-reverse", d: [["flex-wrap", "wrap-reverse"]] },
+  { p: "flexWrap", c: "flex-nowrap", d: [["flex-wrap", "nowrap"]] },
+  { p: "placeContent", c: "place-content-center", d: [["place-content", "center"]] },
+  { p: "placeContent", c: "place-content-start", d: [["place-content", "start"]] },
+  { p: "placeContent", c: "place-content-end", d: [["place-content", "end"]] },
+  { p: "placeContent", c: "place-content-between", d: [["place-content", "space-between"]] },
+  { p: "placeContent", c: "place-content-around", d: [["place-content", "space-around"]] },
+  { p: "placeContent", c: "place-content-evenly", d: [["place-content", "space-evenly"]] },
+  { p: "placeContent", c: "place-content-baseline", d: [["place-content", "baseline"]] },
+  { p: "placeContent", c: "place-content-stretch", d: [["place-content", "stretch"]] },
+  { p: "placeItems", c: "place-items-start", d: [["place-items", "start"]] },
+  { p: "placeItems", c: "place-items-end", d: [["place-items", "end"]] },
+  { p: "placeItems", c: "place-items-center", d: [["place-items", "center"]] },
+  { p: "placeItems", c: "place-items-baseline", d: [["place-items", "baseline"]] },
+  { p: "placeItems", c: "place-items-stretch", d: [["place-items", "stretch"]] },
+  { p: "alignContent", c: "content-normal", d: [["align-content", "normal"]] },
+  { p: "alignContent", c: "content-center", d: [["align-content", "center"]] },
+  { p: "alignContent", c: "content-start", d: [["align-content", "flex-start"]] },
+  { p: "alignContent", c: "content-end", d: [["align-content", "flex-end"]] },
+  { p: "alignContent", c: "content-between", d: [["align-content", "space-between"]] },
+  { p: "alignContent", c: "content-around", d: [["align-content", "space-around"]] },
+  { p: "alignContent", c: "content-evenly", d: [["align-content", "space-evenly"]] },
+  { p: "alignContent", c: "content-baseline", d: [["align-content", "baseline"]] },
+  { p: "alignContent", c: "content-stretch", d: [["align-content", "stretch"]] },
+  { p: "alignItems", c: "items-start", d: [["align-items", "flex-start"]] },
+  { p: "alignItems", c: "items-end", d: [["align-items", "flex-end"]] },
+  { p: "alignItems", c: "items-center", d: [["align-items", "center"]] },
+  { p: "alignItems", c: "items-baseline", d: [["align-items", "baseline"]] },
+  { p: "alignItems", c: "items-stretch", d: [["align-items", "stretch"]] },
+  { p: "justifyContent", c: "justify-normal", d: [["justify-content", "normal"]] },
+  { p: "justifyContent", c: "justify-start", d: [["justify-content", "flex-start"]] },
+  { p: "justifyContent", c: "justify-end", d: [["justify-content", "flex-end"]] },
+  { p: "justifyContent", c: "justify-center", d: [["justify-content", "center"]] },
+  { p: "justifyContent", c: "justify-between", d: [["justify-content", "space-between"]] },
+  { p: "justifyContent", c: "justify-around", d: [["justify-content", "space-around"]] },
+  { p: "justifyContent", c: "justify-evenly", d: [["justify-content", "space-evenly"]] },
+  { p: "justifyContent", c: "justify-stretch", d: [["justify-content", "stretch"]] },
+  { p: "justifyItems", c: "justify-items-start", d: [["justify-items", "start"]] },
+  { p: "justifyItems", c: "justify-items-end", d: [["justify-items", "end"]] },
+  { p: "justifyItems", c: "justify-items-center", d: [["justify-items", "center"]] },
+  { p: "justifyItems", c: "justify-items-stretch", d: [["justify-items", "stretch"]] },
+  {
+    p: "space",
+    c: "space-y-reverse",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["--tw-space-y-reverse", "1"]]
+  },
+  {
+    p: "space",
+    c: "space-x-reverse",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["--tw-space-x-reverse", "1"]]
+  },
+  {
+    p: "divideWidth",
+    c: "divide-y-reverse",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["--tw-divide-y-reverse", "1"]],
+    df: "border-width"
+  },
+  {
+    p: "divideWidth",
+    c: "divide-x-reverse",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["--tw-divide-x-reverse", "1"]],
+    df: "border-width"
+  },
+  {
+    p: "divideStyle",
+    c: "divide-solid",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["border-style", "solid"]]
+  },
+  {
+    p: "divideStyle",
+    c: "divide-dashed",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["border-style", "dashed"]]
+  },
+  {
+    p: "divideStyle",
+    c: "divide-dotted",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["border-style", "dotted"]]
+  },
+  {
+    p: "divideStyle",
+    c: "divide-double",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["border-style", "double"]]
+  },
+  {
+    p: "divideStyle",
+    c: "divide-none",
+    s: " > :not([hidden]) ~ :not([hidden])",
+    d: [["border-style", "none"]]
+  },
+  { p: "placeSelf", c: "place-self-auto", d: [["place-self", "auto"]] },
+  { p: "placeSelf", c: "place-self-start", d: [["place-self", "start"]] },
+  { p: "placeSelf", c: "place-self-end", d: [["place-self", "end"]] },
+  { p: "placeSelf", c: "place-self-center", d: [["place-self", "center"]] },
+  { p: "placeSelf", c: "place-self-stretch", d: [["place-self", "stretch"]] },
+  { p: "alignSelf", c: "self-auto", d: [["align-self", "auto"]] },
+  { p: "alignSelf", c: "self-start", d: [["align-self", "flex-start"]] },
+  { p: "alignSelf", c: "self-end", d: [["align-self", "flex-end"]] },
+  { p: "alignSelf", c: "self-center", d: [["align-self", "center"]] },
+  { p: "alignSelf", c: "self-stretch", d: [["align-self", "stretch"]] },
+  { p: "alignSelf", c: "self-baseline", d: [["align-self", "baseline"]] },
+  { p: "justifySelf", c: "justify-self-auto", d: [["justify-self", "auto"]] },
+  { p: "justifySelf", c: "justify-self-start", d: [["justify-self", "start"]] },
+  { p: "justifySelf", c: "justify-self-end", d: [["justify-self", "end"]] },
+  { p: "justifySelf", c: "justify-self-center", d: [["justify-self", "center"]] },
+  { p: "justifySelf", c: "justify-self-stretch", d: [["justify-self", "stretch"]] },
+  { p: "overflow", c: "overflow-auto", d: [["overflow", "auto"]] },
+  { p: "overflow", c: "overflow-hidden", d: [["overflow", "hidden"]] },
+  { p: "overflow", c: "overflow-clip", d: [["overflow", "clip"]] },
+  { p: "overflow", c: "overflow-visible", d: [["overflow", "visible"]] },
+  { p: "overflow", c: "overflow-scroll", d: [["overflow", "scroll"]] },
+  { p: "overflow", c: "overflow-x-auto", d: [["overflow-x", "auto"]] },
+  { p: "overflow", c: "overflow-y-auto", d: [["overflow-y", "auto"]] },
+  { p: "overflow", c: "overflow-x-hidden", d: [["overflow-x", "hidden"]] },
+  { p: "overflow", c: "overflow-y-hidden", d: [["overflow-y", "hidden"]] },
+  { p: "overflow", c: "overflow-x-clip", d: [["overflow-x", "clip"]] },
+  { p: "overflow", c: "overflow-y-clip", d: [["overflow-y", "clip"]] },
+  { p: "overflow", c: "overflow-x-visible", d: [["overflow-x", "visible"]] },
+  { p: "overflow", c: "overflow-y-visible", d: [["overflow-y", "visible"]] },
+  { p: "overflow", c: "overflow-x-scroll", d: [["overflow-x", "scroll"]] },
+  { p: "overflow", c: "overflow-y-scroll", d: [["overflow-y", "scroll"]] },
+  { p: "overscrollBehavior", c: "overscroll-auto", d: [["overscroll-behavior", "auto"]] },
+  { p: "overscrollBehavior", c: "overscroll-contain", d: [["overscroll-behavior", "contain"]] },
+  { p: "overscrollBehavior", c: "overscroll-none", d: [["overscroll-behavior", "none"]] },
+  { p: "overscrollBehavior", c: "overscroll-y-auto", d: [["overscroll-behavior-y", "auto"]] },
+  { p: "overscrollBehavior", c: "overscroll-y-contain", d: [["overscroll-behavior-y", "contain"]] },
+  { p: "overscrollBehavior", c: "overscroll-y-none", d: [["overscroll-behavior-y", "none"]] },
+  { p: "overscrollBehavior", c: "overscroll-x-auto", d: [["overscroll-behavior-x", "auto"]] },
+  { p: "overscrollBehavior", c: "overscroll-x-contain", d: [["overscroll-behavior-x", "contain"]] },
+  { p: "overscrollBehavior", c: "overscroll-x-none", d: [["overscroll-behavior-x", "none"]] },
+  { p: "scrollBehavior", c: "scroll-auto", d: [["scroll-behavior", "auto"]] },
+  { p: "scrollBehavior", c: "scroll-smooth", d: [["scroll-behavior", "smooth"]] },
+  {
+    p: "textOverflow",
+    c: "truncate",
+    d: [
+      ["overflow", "hidden"],
+      ["text-overflow", "ellipsis"],
+      ["white-space", "nowrap"]
+    ]
+  },
+  { p: "textOverflow", c: "overflow-ellipsis", d: [["text-overflow", "ellipsis"]] },
+  { p: "textOverflow", c: "text-ellipsis", d: [["text-overflow", "ellipsis"]] },
+  { p: "textOverflow", c: "text-clip", d: [["text-overflow", "clip"]] },
+  { p: "hyphens", c: "hyphens-none", d: [["hyphens", "none"]] },
+  { p: "hyphens", c: "hyphens-manual", d: [["hyphens", "manual"]] },
+  { p: "hyphens", c: "hyphens-auto", d: [["hyphens", "auto"]] },
+  { p: "whitespace", c: "whitespace-normal", d: [["white-space", "normal"]] },
+  { p: "whitespace", c: "whitespace-nowrap", d: [["white-space", "nowrap"]] },
+  { p: "whitespace", c: "whitespace-pre", d: [["white-space", "pre"]] },
+  { p: "whitespace", c: "whitespace-pre-line", d: [["white-space", "pre-line"]] },
+  { p: "whitespace", c: "whitespace-pre-wrap", d: [["white-space", "pre-wrap"]] },
+  { p: "whitespace", c: "whitespace-break-spaces", d: [["white-space", "break-spaces"]] },
+  { p: "textWrap", c: "text-wrap", d: [["text-wrap", "wrap"]] },
+  { p: "textWrap", c: "text-nowrap", d: [["text-wrap", "nowrap"]] },
+  { p: "textWrap", c: "text-balance", d: [["text-wrap", "balance"]] },
+  { p: "textWrap", c: "text-pretty", d: [["text-wrap", "pretty"]] },
+  {
+    p: "wordBreak",
+    c: "break-normal",
+    d: [
+      ["overflow-wrap", "normal"],
+      ["word-break", "normal"]
+    ]
+  },
+  { p: "wordBreak", c: "break-words", d: [["overflow-wrap", "break-word"]] },
+  { p: "wordBreak", c: "break-all", d: [["word-break", "break-all"]] },
+  { p: "wordBreak", c: "break-keep", d: [["word-break", "keep-all"]] },
+  { p: "borderStyle", c: "border-solid", d: [["border-style", "solid"]] },
+  { p: "borderStyle", c: "border-dashed", d: [["border-style", "dashed"]] },
+  { p: "borderStyle", c: "border-dotted", d: [["border-style", "dotted"]] },
+  { p: "borderStyle", c: "border-double", d: [["border-style", "double"]] },
+  { p: "borderStyle", c: "border-hidden", d: [["border-style", "hidden"]] },
+  { p: "borderStyle", c: "border-none", d: [["border-style", "none"]] },
+  { p: "boxDecorationBreak", c: "decoration-slice", d: [["box-decoration-break", "slice"]] },
+  { p: "boxDecorationBreak", c: "decoration-clone", d: [["box-decoration-break", "clone"]] },
+  { p: "boxDecorationBreak", c: "box-decoration-slice", d: [["box-decoration-break", "slice"]] },
+  { p: "boxDecorationBreak", c: "box-decoration-clone", d: [["box-decoration-break", "clone"]] },
+  { p: "backgroundAttachment", c: "bg-fixed", d: [["background-attachment", "fixed"]] },
+  { p: "backgroundAttachment", c: "bg-local", d: [["background-attachment", "local"]] },
+  { p: "backgroundAttachment", c: "bg-scroll", d: [["background-attachment", "scroll"]] },
+  { p: "backgroundClip", c: "bg-clip-border", d: [["background-clip", "border-box"]] },
+  { p: "backgroundClip", c: "bg-clip-padding", d: [["background-clip", "padding-box"]] },
+  { p: "backgroundClip", c: "bg-clip-content", d: [["background-clip", "content-box"]] },
+  { p: "backgroundClip", c: "bg-clip-text", d: [["background-clip", "text"]] },
+  { p: "backgroundRepeat", c: "bg-repeat", d: [["background-repeat", "repeat"]] },
+  { p: "backgroundRepeat", c: "bg-no-repeat", d: [["background-repeat", "no-repeat"]] },
+  { p: "backgroundRepeat", c: "bg-repeat-x", d: [["background-repeat", "repeat-x"]] },
+  { p: "backgroundRepeat", c: "bg-repeat-y", d: [["background-repeat", "repeat-y"]] },
+  { p: "backgroundRepeat", c: "bg-repeat-round", d: [["background-repeat", "round"]] },
+  { p: "backgroundRepeat", c: "bg-repeat-space", d: [["background-repeat", "space"]] },
+  { p: "backgroundOrigin", c: "bg-origin-border", d: [["background-origin", "border-box"]] },
+  { p: "backgroundOrigin", c: "bg-origin-padding", d: [["background-origin", "padding-box"]] },
+  { p: "backgroundOrigin", c: "bg-origin-content", d: [["background-origin", "content-box"]] },
+  { p: "objectFit", c: "object-contain", d: [["object-fit", "contain"]] },
+  { p: "objectFit", c: "object-cover", d: [["object-fit", "cover"]] },
+  { p: "objectFit", c: "object-fill", d: [["object-fit", "fill"]] },
+  { p: "objectFit", c: "object-none", d: [["object-fit", "none"]] },
+  { p: "objectFit", c: "object-scale-down", d: [["object-fit", "scale-down"]] },
+  { p: "textAlign", c: "text-left", d: [["text-align", "left"]] },
+  { p: "textAlign", c: "text-center", d: [["text-align", "center"]] },
+  { p: "textAlign", c: "text-right", d: [["text-align", "right"]] },
+  { p: "textAlign", c: "text-justify", d: [["text-align", "justify"]] },
+  { p: "textAlign", c: "text-start", d: [["text-align", "start"]] },
+  { p: "textAlign", c: "text-end", d: [["text-align", "end"]] },
+  { p: "verticalAlign", c: "align-baseline", d: [["vertical-align", "baseline"]] },
+  { p: "verticalAlign", c: "align-top", d: [["vertical-align", "top"]] },
+  { p: "verticalAlign", c: "align-middle", d: [["vertical-align", "middle"]] },
+  { p: "verticalAlign", c: "align-bottom", d: [["vertical-align", "bottom"]] },
+  { p: "verticalAlign", c: "align-text-top", d: [["vertical-align", "text-top"]] },
+  { p: "verticalAlign", c: "align-text-bottom", d: [["vertical-align", "text-bottom"]] },
+  { p: "verticalAlign", c: "align-sub", d: [["vertical-align", "sub"]] },
+  { p: "verticalAlign", c: "align-super", d: [["vertical-align", "super"]] },
+  { p: "textTransform", c: "uppercase", d: [["text-transform", "uppercase"]] },
+  { p: "textTransform", c: "lowercase", d: [["text-transform", "lowercase"]] },
+  { p: "textTransform", c: "capitalize", d: [["text-transform", "capitalize"]] },
+  { p: "textTransform", c: "normal-case", d: [["text-transform", "none"]] },
+  { p: "fontStyle", c: "italic", d: [["font-style", "italic"]] },
+  { p: "fontStyle", c: "not-italic", d: [["font-style", "normal"]] },
+  { p: "fontVariantNumeric", c: "normal-nums", d: [["font-variant-numeric", "normal"]] },
+  {
+    p: "fontVariantNumeric",
+    c: "ordinal",
+    d: [
+      ["--tw-ordinal", "ordinal"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  {
+    p: "fontVariantNumeric",
+    c: "slashed-zero",
+    d: [
+      ["--tw-slashed-zero", "slashed-zero"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  {
+    p: "fontVariantNumeric",
+    c: "lining-nums",
+    d: [
+      ["--tw-numeric-figure", "lining-nums"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  {
+    p: "fontVariantNumeric",
+    c: "oldstyle-nums",
+    d: [
+      ["--tw-numeric-figure", "oldstyle-nums"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  {
+    p: "fontVariantNumeric",
+    c: "proportional-nums",
+    d: [
+      ["--tw-numeric-spacing", "proportional-nums"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  {
+    p: "fontVariantNumeric",
+    c: "tabular-nums",
+    d: [
+      ["--tw-numeric-spacing", "tabular-nums"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  {
+    p: "fontVariantNumeric",
+    c: "diagonal-fractions",
+    d: [
+      ["--tw-numeric-fraction", "diagonal-fractions"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  {
+    p: "fontVariantNumeric",
+    c: "stacked-fractions",
+    d: [
+      ["--tw-numeric-fraction", "stacked-fractions"],
+      [
+        "font-variant-numeric",
+        "var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)"
+      ]
+    ],
+    df: "font-variant-numeric"
+  },
+  { p: "textDecoration", c: "underline", d: [["text-decoration-line", "underline"]] },
+  { p: "textDecoration", c: "overline", d: [["text-decoration-line", "overline"]] },
+  { p: "textDecoration", c: "line-through", d: [["text-decoration-line", "line-through"]] },
+  { p: "textDecoration", c: "no-underline", d: [["text-decoration-line", "none"]] },
+  { p: "textDecorationStyle", c: "decoration-solid", d: [["text-decoration-style", "solid"]] },
+  { p: "textDecorationStyle", c: "decoration-double", d: [["text-decoration-style", "double"]] },
+  { p: "textDecorationStyle", c: "decoration-dotted", d: [["text-decoration-style", "dotted"]] },
+  { p: "textDecorationStyle", c: "decoration-dashed", d: [["text-decoration-style", "dashed"]] },
+  { p: "textDecorationStyle", c: "decoration-wavy", d: [["text-decoration-style", "wavy"]] },
+  {
+    p: "fontSmoothing",
+    c: "antialiased",
+    d: [
+      ["-webkit-font-smoothing", "antialiased"],
+      ["-moz-osx-font-smoothing", "grayscale"]
+    ]
+  },
+  {
+    p: "fontSmoothing",
+    c: "subpixel-antialiased",
+    d: [
+      ["-webkit-font-smoothing", "auto"],
+      ["-moz-osx-font-smoothing", "auto"]
+    ]
+  },
+  { p: "backgroundBlendMode", c: "bg-blend-normal", d: [["background-blend-mode", "normal"]] },
+  { p: "backgroundBlendMode", c: "bg-blend-multiply", d: [["background-blend-mode", "multiply"]] },
+  { p: "backgroundBlendMode", c: "bg-blend-screen", d: [["background-blend-mode", "screen"]] },
+  { p: "backgroundBlendMode", c: "bg-blend-overlay", d: [["background-blend-mode", "overlay"]] },
+  { p: "backgroundBlendMode", c: "bg-blend-darken", d: [["background-blend-mode", "darken"]] },
+  { p: "backgroundBlendMode", c: "bg-blend-lighten", d: [["background-blend-mode", "lighten"]] },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-color-dodge",
+    d: [["background-blend-mode", "color-dodge"]]
+  },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-color-burn",
+    d: [["background-blend-mode", "color-burn"]]
+  },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-hard-light",
+    d: [["background-blend-mode", "hard-light"]]
+  },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-soft-light",
+    d: [["background-blend-mode", "soft-light"]]
+  },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-difference",
+    d: [["background-blend-mode", "difference"]]
+  },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-exclusion",
+    d: [["background-blend-mode", "exclusion"]]
+  },
+  { p: "backgroundBlendMode", c: "bg-blend-hue", d: [["background-blend-mode", "hue"]] },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-saturation",
+    d: [["background-blend-mode", "saturation"]]
+  },
+  { p: "backgroundBlendMode", c: "bg-blend-color", d: [["background-blend-mode", "color"]] },
+  {
+    p: "backgroundBlendMode",
+    c: "bg-blend-luminosity",
+    d: [["background-blend-mode", "luminosity"]]
+  },
+  { p: "mixBlendMode", c: "mix-blend-normal", d: [["mix-blend-mode", "normal"]] },
+  { p: "mixBlendMode", c: "mix-blend-multiply", d: [["mix-blend-mode", "multiply"]] },
+  { p: "mixBlendMode", c: "mix-blend-screen", d: [["mix-blend-mode", "screen"]] },
+  { p: "mixBlendMode", c: "mix-blend-overlay", d: [["mix-blend-mode", "overlay"]] },
+  { p: "mixBlendMode", c: "mix-blend-darken", d: [["mix-blend-mode", "darken"]] },
+  { p: "mixBlendMode", c: "mix-blend-lighten", d: [["mix-blend-mode", "lighten"]] },
+  { p: "mixBlendMode", c: "mix-blend-color-dodge", d: [["mix-blend-mode", "color-dodge"]] },
+  { p: "mixBlendMode", c: "mix-blend-color-burn", d: [["mix-blend-mode", "color-burn"]] },
+  { p: "mixBlendMode", c: "mix-blend-hard-light", d: [["mix-blend-mode", "hard-light"]] },
+  { p: "mixBlendMode", c: "mix-blend-soft-light", d: [["mix-blend-mode", "soft-light"]] },
+  { p: "mixBlendMode", c: "mix-blend-difference", d: [["mix-blend-mode", "difference"]] },
+  { p: "mixBlendMode", c: "mix-blend-exclusion", d: [["mix-blend-mode", "exclusion"]] },
+  { p: "mixBlendMode", c: "mix-blend-hue", d: [["mix-blend-mode", "hue"]] },
+  { p: "mixBlendMode", c: "mix-blend-saturation", d: [["mix-blend-mode", "saturation"]] },
+  { p: "mixBlendMode", c: "mix-blend-color", d: [["mix-blend-mode", "color"]] },
+  { p: "mixBlendMode", c: "mix-blend-luminosity", d: [["mix-blend-mode", "luminosity"]] },
+  { p: "mixBlendMode", c: "mix-blend-plus-darker", d: [["mix-blend-mode", "plus-darker"]] },
+  { p: "mixBlendMode", c: "mix-blend-plus-lighter", d: [["mix-blend-mode", "plus-lighter"]] },
+  {
+    p: "outlineStyle",
+    c: "outline-none",
+    d: [
+      ["outline", "2px solid transparent"],
+      ["outline-offset", "2px"]
+    ]
+  },
+  { p: "outlineStyle", c: "outline", d: [["outline-style", "solid"]] },
+  { p: "outlineStyle", c: "outline-dashed", d: [["outline-style", "dashed"]] },
+  { p: "outlineStyle", c: "outline-dotted", d: [["outline-style", "dotted"]] },
+  { p: "outlineStyle", c: "outline-double", d: [["outline-style", "double"]] },
+  { p: "ringWidth", c: "ring-inset", d: [["--tw-ring-inset", "inset"]], df: "ring-width" },
+  {
+    p: "filter",
+    c: "filter",
+    d: [
+      [
+        "filter",
+        "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
+      ]
+    ],
+    df: "filter"
+  },
+  { p: "filter", c: "filter-none", d: [["filter", "none"]] },
+  {
+    p: "backdropFilter",
+    c: "backdrop-filter",
+    d: [
+      [
+        "-webkit-backdrop-filter",
+        "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+      ],
+      [
+        "backdrop-filter",
+        "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+      ]
+    ],
+    df: "backdrop-filter"
+  },
+  {
+    p: "backdropFilter",
+    c: "backdrop-filter-none",
+    d: [
+      ["-webkit-backdrop-filter", "none"],
+      ["backdrop-filter", "none"]
+    ]
+  },
+  { p: "contain", c: "contain-none", d: [["contain", "none"]] },
+  { p: "contain", c: "contain-content", d: [["contain", "content"]] },
+  { p: "contain", c: "contain-strict", d: [["contain", "strict"]] },
+  {
+    p: "contain",
+    c: "contain-size",
+    d: [
+      ["--tw-contain-size", "size"],
+      [
+        "contain",
+        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+      ]
+    ],
+    df: "contain"
+  },
+  {
+    p: "contain",
+    c: "contain-inline-size",
+    d: [
+      ["--tw-contain-size", "inline-size"],
+      [
+        "contain",
+        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+      ]
+    ],
+    df: "contain"
+  },
+  {
+    p: "contain",
+    c: "contain-layout",
+    d: [
+      ["--tw-contain-layout", "layout"],
+      [
+        "contain",
+        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+      ]
+    ],
+    df: "contain"
+  },
+  {
+    p: "contain",
+    c: "contain-paint",
+    d: [
+      ["--tw-contain-paint", "paint"],
+      [
+        "contain",
+        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+      ]
+    ],
+    df: "contain"
+  },
+  {
+    p: "contain",
+    c: "contain-style",
+    d: [
+      ["--tw-contain-style", "style"],
+      [
+        "contain",
+        "var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)"
+      ]
+    ],
+    df: "contain"
+  },
+  { p: "forcedColorAdjust", c: "forced-color-adjust-auto", d: [["forced-color-adjust", "auto"]] },
+  { p: "forcedColorAdjust", c: "forced-color-adjust-none", d: [["forced-color-adjust", "none"]] }
+];
+var TRANSFORM_VALUE = "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))";
+var FILTER_VALUE = "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)";
+var BACKDROP_VALUE = "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)";
+var CHILD_SELECTOR = " > :not([hidden]) ~ :not([hidden])";
+function transformThemeValue(themeKey, value) {
+  if (typeof value === "function") value = value({});
+  if (themeKey === "fontSize" || themeKey === "outline") {
+    return String(Array.isArray(value) ? value[0] : value);
+  }
+  if (themeKey === "fontFamily") return fontFamilyToString(value);
+  if ([
+    "boxShadow",
+    "transitionProperty",
+    "transitionDuration",
+    "transitionDelay",
+    "transitionTimingFunction",
+    "backgroundImage",
+    "backgroundSize",
+    "backgroundColor",
+    "cursor",
+    "animation"
+  ].includes(themeKey)) {
+    return String(Array.isArray(value) ? value.join(", ") : value);
+  }
+  if (["gridTemplateColumns", "gridTemplateRows", "objectPosition"].includes(themeKey)) {
+    return typeof value === "string" ? splitComma(value).join(" ") : String(value);
+  }
+  return String(value);
+}
+function splitComma(value) {
+  const out = [];
+  let depth = 0;
+  let cur = "";
+  for (const ch of value) {
+    if (ch === "(") depth++;
+    if (ch === ")") depth--;
+    if (ch === "," && depth === 0) {
+      out.push(cur.trim());
+      cur = "";
+    } else cur += ch;
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
+function flattenColorPalette(colors) {
+  const out = {};
+  for (const [name, value] of Object.entries(colors ?? {})) {
+    if (value && typeof value === "object") {
+      for (const [shade, v] of Object.entries(
+        flattenColorPalette(value)
+      )) {
+        out[shade === "DEFAULT" ? name : `${name}-${shade}`] = v;
+      }
+    } else if (value !== void 0 && value !== null) {
+      out[name] = String(value);
+    }
+  }
+  return out;
+}
+function toColorValue(value) {
+  return typeof value === "function" ? String(value({})) : String(value);
+}
+function transparentTo(value) {
+  return withAlphaValue(value, "0", "rgb(255 255 255 / 0)");
+}
+function buildFunctionalUtilities(theme, options) {
+  const t = theme;
+  const list = [];
+  const scale = (key) => t[key] ?? {};
+  const withoutDefault = (v) => {
+    const { DEFAULT: _d, ...rest } = v;
+    return rest;
+  };
+  const simple = (plugin2, prefix, themeKey, props, opts = {}) => {
+    const { filterDefault, ...rest } = opts;
+    let values = scale(themeKey);
+    if (filterDefault) values = withoutDefault(values);
+    list.push({
+      plugin: plugin2,
+      prefix,
+      values,
+      types: [],
+      describe: opts.describe ?? `${props.join(" / ")}: {value}`,
+      build: (value) => {
+        const v = transformThemeValue(themeKey, value);
+        return Object.fromEntries(props.map((p) => [p, v]));
+      },
+      ...rest
+    });
+  };
+  const colorUtility = (plugin2, prefix, themeKey, props, opacityVar, opacityPlugin, extra = {}) => {
+    const useVar = opacityVar !== null && (opacityPlugin === null || options.pluginEnabled(opacityPlugin));
+    list.push({
+      plugin: plugin2,
+      prefix,
+      values: withoutDefault(flattenColorPalette(scale(themeKey))),
+      types: ["color", "any"],
+      modifier: "color",
+      describe: `${props.join(" / ")}: {value}`,
+      build: (value, { modifier }) => {
+        const color = toColorValue(value);
+        if (!useVar || modifier !== null) return Object.fromEntries(props.map((p) => [p, color]));
+        return withAlphaVariable(color, props, opacityVar);
+      },
+      ...extra
+    });
+  };
+  const opacityUtility = (plugin2, prefix, themeKey, variable, extra = {}) => {
+    list.push({
+      plugin: plugin2,
+      prefix,
+      values: scale(themeKey),
+      types: [],
+      describe: `${variable}: {value}`,
+      build: (value) => ({ [variable]: String(value) }),
+      ...extra
+    });
+  };
+  const transformUtility = (plugin2, prefix, themeKey, vars, negative = true) => {
+    list.push({
+      plugin: plugin2,
+      prefix,
+      values: scale(themeKey),
+      types: [],
+      negative,
+      defaults: "transform",
+      describe: `${vars.join(" / ")}: {value}`,
+      build: (value) => ({
+        ...Object.fromEntries(vars.map((v) => [v, String(value)])),
+        transform: TRANSFORM_VALUE
+      })
+    });
+  };
+  const filterUtility = (plugin2, prefix, themeKey, variable, fn, negative = false) => {
+    list.push({
+      plugin: plugin2,
+      prefix,
+      values: scale(themeKey),
+      types: [],
+      negative,
+      defaults: "filter",
+      describe: `${variable}: ${fn}({value})`,
+      build: (value) => ({
+        [variable]: value === "" ? " " : `${fn}(${String(value)})`,
+        filter: FILTER_VALUE
+      })
+    });
+  };
+  const backdropUtility = (plugin2, prefix, themeKey, variable, fn, negative = false) => {
+    list.push({
+      plugin: plugin2,
+      prefix,
+      values: scale(themeKey),
+      types: [],
+      negative,
+      defaults: "backdrop-filter",
+      describe: `${variable}: ${fn}({value})`,
+      build: (value) => ({
+        [variable]: value === "" ? " " : `${fn}(${String(value)})`,
+        "-webkit-backdrop-filter": BACKDROP_VALUE,
+        "backdrop-filter": BACKDROP_VALUE
+      })
+    });
+  };
+  simple("inset", "inset", "inset", ["inset"], { negative: true });
+  simple("inset", "inset-x", "inset", ["left", "right"], { negative: true });
+  simple("inset", "inset-y", "inset", ["top", "bottom"], { negative: true });
+  simple("inset", "start", "inset", ["inset-inline-start"], { negative: true });
+  simple("inset", "end", "inset", ["inset-inline-end"], { negative: true });
+  for (const side of ["top", "right", "bottom", "left"])
+    simple("inset", side, "inset", [side], { negative: true });
+  simple("zIndex", "z", "zIndex", ["z-index"], { negative: true });
+  simple("order", "order", "order", ["order"], { negative: true });
+  simple("gridColumn", "col", "gridColumn", ["grid-column"]);
+  simple("gridColumnStart", "col-start", "gridColumnStart", ["grid-column-start"], {
+    negative: true
+  });
+  simple("gridColumnEnd", "col-end", "gridColumnEnd", ["grid-column-end"], { negative: true });
+  simple("gridRow", "row", "gridRow", ["grid-row"]);
+  simple("gridRowStart", "row-start", "gridRowStart", ["grid-row-start"], { negative: true });
+  simple("gridRowEnd", "row-end", "gridRowEnd", ["grid-row-end"], { negative: true });
+  simple("margin", "m", "margin", ["margin"], { negative: true });
+  simple("margin", "mx", "margin", ["margin-left", "margin-right"], { negative: true });
+  simple("margin", "my", "margin", ["margin-top", "margin-bottom"], { negative: true });
+  simple("margin", "ms", "margin", ["margin-inline-start"], { negative: true });
+  simple("margin", "me", "margin", ["margin-inline-end"], { negative: true });
+  simple("margin", "mt", "margin", ["margin-top"], { negative: true });
+  simple("margin", "mr", "margin", ["margin-right"], { negative: true });
+  simple("margin", "mb", "margin", ["margin-bottom"], { negative: true });
+  simple("margin", "ml", "margin", ["margin-left"], { negative: true });
+  list.push({
+    plugin: "lineClamp",
+    prefix: "line-clamp",
+    values: scale("lineClamp"),
+    types: [],
+    describe: "clamp text to {value} lines",
+    build: (value) => ({
+      overflow: "hidden",
+      display: "-webkit-box",
+      "-webkit-box-orient": "vertical",
+      "-webkit-line-clamp": String(value)
+    })
+  });
+  simple("aspectRatio", "aspect", "aspectRatio", ["aspect-ratio"]);
+  simple("size", "size", "size", ["width", "height"]);
+  simple("height", "h", "height", ["height"]);
+  simple("maxHeight", "max-h", "maxHeight", ["max-height"]);
+  simple("minHeight", "min-h", "minHeight", ["min-height"]);
+  simple("width", "w", "width", ["width"]);
+  simple("minWidth", "min-w", "minWidth", ["min-width"]);
+  simple("maxWidth", "max-w", "maxWidth", ["max-width"]);
+  simple("flex", "flex", "flex", ["flex"]);
+  simple("flexShrink", "flex-shrink", "flexShrink", ["flex-shrink"]);
+  simple("flexShrink", "shrink", "flexShrink", ["flex-shrink"]);
+  simple("flexGrow", "flex-grow", "flexGrow", ["flex-grow"]);
+  simple("flexGrow", "grow", "flexGrow", ["flex-grow"]);
+  simple("flexBasis", "basis", "flexBasis", ["flex-basis"]);
+  for (const [prefix, vars] of [
+    ["border-spacing", ["--tw-border-spacing-x", "--tw-border-spacing-y"]],
+    ["border-spacing-x", ["--tw-border-spacing-x"]],
+    ["border-spacing-y", ["--tw-border-spacing-y"]]
+  ]) {
+    list.push({
+      plugin: "borderSpacing",
+      prefix,
+      values: scale("borderSpacing"),
+      types: [],
+      defaults: "border-spacing",
+      describe: "border-spacing: {value}",
+      build: (value) => ({
+        ...Object.fromEntries(vars.map((v) => [v, String(value)])),
+        "border-spacing": "var(--tw-border-spacing-x) var(--tw-border-spacing-y)"
+      })
+    });
+  }
+  simple("transformOrigin", "origin", "transformOrigin", ["transform-origin"]);
+  transformUtility("translate", "translate-x", "translate", ["--tw-translate-x"]);
+  transformUtility("translate", "translate-y", "translate", ["--tw-translate-y"]);
+  transformUtility("rotate", "rotate", "rotate", ["--tw-rotate"]);
+  transformUtility("skew", "skew-x", "skew", ["--tw-skew-x"]);
+  transformUtility("skew", "skew-y", "skew", ["--tw-skew-y"]);
+  transformUtility("scale", "scale", "scale", ["--tw-scale-x", "--tw-scale-y"]);
+  transformUtility("scale", "scale-x", "scale", ["--tw-scale-x"]);
+  transformUtility("scale", "scale-y", "scale", ["--tw-scale-y"]);
+  simple("animation", "animate", "animation", ["animation"]);
+  simple("cursor", "cursor", "cursor", ["cursor"]);
+  simple("scrollMargin", "scroll-m", "scrollMargin", ["scroll-margin"], { negative: true });
+  simple(
+    "scrollMargin",
+    "scroll-mx",
+    "scrollMargin",
+    ["scroll-margin-left", "scroll-margin-right"],
+    { negative: true }
+  );
+  simple(
+    "scrollMargin",
+    "scroll-my",
+    "scrollMargin",
+    ["scroll-margin-top", "scroll-margin-bottom"],
+    { negative: true }
+  );
+  simple("scrollMargin", "scroll-ms", "scrollMargin", ["scroll-margin-inline-start"], {
+    negative: true
+  });
+  simple("scrollMargin", "scroll-me", "scrollMargin", ["scroll-margin-inline-end"], {
+    negative: true
+  });
+  simple("scrollMargin", "scroll-mt", "scrollMargin", ["scroll-margin-top"], { negative: true });
+  simple("scrollMargin", "scroll-mr", "scrollMargin", ["scroll-margin-right"], { negative: true });
+  simple("scrollMargin", "scroll-mb", "scrollMargin", ["scroll-margin-bottom"], { negative: true });
+  simple("scrollMargin", "scroll-ml", "scrollMargin", ["scroll-margin-left"], { negative: true });
+  simple("scrollPadding", "scroll-p", "scrollPadding", ["scroll-padding"]);
+  simple("scrollPadding", "scroll-px", "scrollPadding", [
+    "scroll-padding-left",
+    "scroll-padding-right"
+  ]);
+  simple("scrollPadding", "scroll-py", "scrollPadding", [
+    "scroll-padding-top",
+    "scroll-padding-bottom"
+  ]);
+  simple("scrollPadding", "scroll-ps", "scrollPadding", ["scroll-padding-inline-start"]);
+  simple("scrollPadding", "scroll-pe", "scrollPadding", ["scroll-padding-inline-end"]);
+  simple("scrollPadding", "scroll-pt", "scrollPadding", ["scroll-padding-top"]);
+  simple("scrollPadding", "scroll-pr", "scrollPadding", ["scroll-padding-right"]);
+  simple("scrollPadding", "scroll-pb", "scrollPadding", ["scroll-padding-bottom"]);
+  simple("scrollPadding", "scroll-pl", "scrollPadding", ["scroll-padding-left"]);
+  simple("listStyleType", "list", "listStyleType", ["list-style-type"]);
+  simple("listStyleImage", "list-image", "listStyleImage", ["list-style-image"]);
+  simple("columns", "columns", "columns", ["columns"]);
+  simple("gridAutoColumns", "auto-cols", "gridAutoColumns", ["grid-auto-columns"]);
+  simple("gridAutoRows", "auto-rows", "gridAutoRows", ["grid-auto-rows"]);
+  simple("gridTemplateColumns", "grid-cols", "gridTemplateColumns", ["grid-template-columns"]);
+  simple("gridTemplateRows", "grid-rows", "gridTemplateRows", ["grid-template-rows"]);
+  simple("gap", "gap", "gap", ["gap"]);
+  simple("gap", "gap-x", "gap", ["column-gap"]);
+  simple("gap", "gap-y", "gap", ["row-gap"]);
+  list.push({
+    plugin: "space",
+    prefix: "space-x",
+    values: scale("space"),
+    types: [],
+    negative: true,
+    selector: CHILD_SELECTOR,
+    describe: "horizontal space between children: {value}",
+    build: (value) => ({
+      "--tw-space-x-reverse": "0",
+      "margin-right": `calc(${String(value)} * var(--tw-space-x-reverse))`,
+      "margin-left": `calc(${String(value)} * calc(1 - var(--tw-space-x-reverse)))`
+    })
+  });
+  list.push({
+    plugin: "space",
+    prefix: "space-y",
+    values: scale("space"),
+    types: [],
+    negative: true,
+    selector: CHILD_SELECTOR,
+    describe: "vertical space between children: {value}",
+    build: (value) => ({
+      "--tw-space-y-reverse": "0",
+      "margin-top": `calc(${String(value)} * calc(1 - var(--tw-space-y-reverse)))`,
+      "margin-bottom": `calc(${String(value)} * var(--tw-space-y-reverse))`
+    })
+  });
+  list.push({
+    plugin: "divideWidth",
+    prefix: "divide-x",
+    values: scale("divideWidth"),
+    types: ["line-width", "length", "any"],
+    selector: CHILD_SELECTOR,
+    defaults: "border-width",
+    describe: "vertical divider width between children: {value}",
+    build: (value) => ({
+      "--tw-divide-x-reverse": "0",
+      "border-right-width": `calc(${String(value)} * var(--tw-divide-x-reverse))`,
+      "border-left-width": `calc(${String(value)} * calc(1 - var(--tw-divide-x-reverse)))`
+    })
+  });
+  list.push({
+    plugin: "divideWidth",
+    prefix: "divide-y",
+    values: scale("divideWidth"),
+    types: ["line-width", "length", "any"],
+    selector: CHILD_SELECTOR,
+    defaults: "border-width",
+    describe: "horizontal divider width between children: {value}",
+    build: (value) => ({
+      "--tw-divide-y-reverse": "0",
+      "border-top-width": `calc(${String(value)} * calc(1 - var(--tw-divide-y-reverse)))`,
+      "border-bottom-width": `calc(${String(value)} * var(--tw-divide-y-reverse))`
+    })
+  });
+  colorUtility(
+    "divideColor",
+    "divide",
+    "divideColor",
+    ["border-color"],
+    "--tw-divide-opacity",
+    "divideOpacity",
+    {
+      selector: CHILD_SELECTOR
+    }
+  );
+  opacityUtility("divideOpacity", "divide-opacity", "divideOpacity", "--tw-divide-opacity", {
+    selector: CHILD_SELECTOR
+  });
+  simple("borderRadius", "rounded", "borderRadius", ["border-radius"]);
+  simple("borderRadius", "rounded-s", "borderRadius", [
+    "border-start-start-radius",
+    "border-end-start-radius"
+  ]);
+  simple("borderRadius", "rounded-e", "borderRadius", [
+    "border-start-end-radius",
+    "border-end-end-radius"
+  ]);
+  simple("borderRadius", "rounded-t", "borderRadius", [
+    "border-top-left-radius",
+    "border-top-right-radius"
+  ]);
+  simple("borderRadius", "rounded-r", "borderRadius", [
+    "border-top-right-radius",
+    "border-bottom-right-radius"
+  ]);
+  simple("borderRadius", "rounded-b", "borderRadius", [
+    "border-bottom-right-radius",
+    "border-bottom-left-radius"
+  ]);
+  simple("borderRadius", "rounded-l", "borderRadius", [
+    "border-top-left-radius",
+    "border-bottom-left-radius"
+  ]);
+  simple("borderRadius", "rounded-ss", "borderRadius", ["border-start-start-radius"]);
+  simple("borderRadius", "rounded-se", "borderRadius", ["border-start-end-radius"]);
+  simple("borderRadius", "rounded-ee", "borderRadius", ["border-end-end-radius"]);
+  simple("borderRadius", "rounded-es", "borderRadius", ["border-end-start-radius"]);
+  simple("borderRadius", "rounded-tl", "borderRadius", ["border-top-left-radius"]);
+  simple("borderRadius", "rounded-tr", "borderRadius", ["border-top-right-radius"]);
+  simple("borderRadius", "rounded-br", "borderRadius", ["border-bottom-right-radius"]);
+  simple("borderRadius", "rounded-bl", "borderRadius", ["border-bottom-left-radius"]);
+  const lw = { types: ["line-width", "length"] };
+  simple("borderWidth", "border", "borderWidth", ["border-width"], lw);
+  simple("borderWidth", "border-x", "borderWidth", ["border-left-width", "border-right-width"], lw);
+  simple("borderWidth", "border-y", "borderWidth", ["border-top-width", "border-bottom-width"], lw);
+  simple("borderWidth", "border-s", "borderWidth", ["border-inline-start-width"], lw);
+  simple("borderWidth", "border-e", "borderWidth", ["border-inline-end-width"], lw);
+  simple("borderWidth", "border-t", "borderWidth", ["border-top-width"], lw);
+  simple("borderWidth", "border-r", "borderWidth", ["border-right-width"], lw);
+  simple("borderWidth", "border-b", "borderWidth", ["border-bottom-width"], lw);
+  simple("borderWidth", "border-l", "borderWidth", ["border-left-width"], lw);
+  colorUtility(
+    "borderColor",
+    "border",
+    "borderColor",
+    ["border-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-x",
+    "borderColor",
+    ["border-left-color", "border-right-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-y",
+    "borderColor",
+    ["border-top-color", "border-bottom-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-s",
+    "borderColor",
+    ["border-inline-start-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-e",
+    "borderColor",
+    ["border-inline-end-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-t",
+    "borderColor",
+    ["border-top-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-r",
+    "borderColor",
+    ["border-right-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-b",
+    "borderColor",
+    ["border-bottom-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  colorUtility(
+    "borderColor",
+    "border-l",
+    "borderColor",
+    ["border-left-color"],
+    "--tw-border-opacity",
+    "borderOpacity"
+  );
+  opacityUtility("borderOpacity", "border-opacity", "borderOpacity", "--tw-border-opacity");
+  colorUtility(
+    "backgroundColor",
+    "bg",
+    "backgroundColor",
+    ["background-color"],
+    "--tw-bg-opacity",
+    "backgroundOpacity"
+  );
+  opacityUtility("backgroundOpacity", "bg-opacity", "backgroundOpacity", "--tw-bg-opacity");
+  simple("backgroundImage", "bg", "backgroundImage", ["background-image"], {
+    types: ["lookup", "image", "url"]
+  });
+  const stops = flattenColorPalette(scale("gradientColorStops"));
+  list.push({
+    plugin: "gradientColorStops",
+    prefix: "from",
+    values: stops,
+    types: ["color", "any"],
+    modifier: "color",
+    defaults: "gradient-color-stops",
+    describe: "gradient start colour: {value}",
+    build: (value) => {
+      const color = toColorValue(value);
+      return {
+        "--tw-gradient-from": `${color} var(--tw-gradient-from-position)`,
+        "--tw-gradient-to": `${transparentTo(color)} var(--tw-gradient-to-position)`,
+        "--tw-gradient-stops": "var(--tw-gradient-from), var(--tw-gradient-to)"
+      };
+    }
+  });
+  list.push({
+    plugin: "gradientColorStops",
+    prefix: "from",
+    values: scale("gradientColorStopPositions"),
+    types: ["length", "percentage"],
+    defaults: "gradient-color-stops",
+    describe: "gradient start position: {value}",
+    build: (value) => ({ "--tw-gradient-from-position": String(value) })
+  });
+  list.push({
+    plugin: "gradientColorStops",
+    prefix: "via",
+    values: stops,
+    types: ["color", "any"],
+    modifier: "color",
+    defaults: "gradient-color-stops",
+    describe: "gradient middle colour: {value}",
+    build: (value) => {
+      const color = toColorValue(value);
+      return {
+        "--tw-gradient-to": `${transparentTo(color)}  var(--tw-gradient-to-position)`,
+        "--tw-gradient-stops": `var(--tw-gradient-from), ${color} var(--tw-gradient-via-position), var(--tw-gradient-to)`
+      };
+    }
+  });
+  list.push({
+    plugin: "gradientColorStops",
+    prefix: "via",
+    values: scale("gradientColorStopPositions"),
+    types: ["length", "percentage"],
+    defaults: "gradient-color-stops",
+    describe: "gradient middle position: {value}",
+    build: (value) => ({ "--tw-gradient-via-position": String(value) })
+  });
+  list.push({
+    plugin: "gradientColorStops",
+    prefix: "to",
+    values: stops,
+    types: ["color", "any"],
+    modifier: "color",
+    defaults: "gradient-color-stops",
+    describe: "gradient end colour: {value}",
+    build: (value) => ({
+      "--tw-gradient-to": `${toColorValue(value)} var(--tw-gradient-to-position)`
+    })
+  });
+  list.push({
+    plugin: "gradientColorStops",
+    prefix: "to",
+    values: scale("gradientColorStopPositions"),
+    types: ["length", "percentage"],
+    defaults: "gradient-color-stops",
+    describe: "gradient end position: {value}",
+    build: (value) => ({ "--tw-gradient-to-position": String(value) })
+  });
+  simple("backgroundSize", "bg", "backgroundSize", ["background-size"], {
+    types: ["lookup", "length", "percentage", "size"]
+  });
+  simple("backgroundPosition", "bg", "backgroundPosition", ["background-position"], {
+    types: ["lookup", "position"],
+    preferOnConflict: true
+  });
+  colorUtility("fill", "fill", "fill", ["fill"], null, null);
+  colorUtility("stroke", "stroke", "stroke", ["stroke"], null, null, {
+    types: ["color", "url", "any"]
+  });
+  simple("strokeWidth", "stroke", "strokeWidth", ["stroke-width"], {
+    types: ["length", "number", "percentage"]
+  });
+  simple("objectPosition", "object", "objectPosition", ["object-position"]);
+  simple("padding", "p", "padding", ["padding"]);
+  simple("padding", "px", "padding", ["padding-left", "padding-right"]);
+  simple("padding", "py", "padding", ["padding-top", "padding-bottom"]);
+  simple("padding", "ps", "padding", ["padding-inline-start"]);
+  simple("padding", "pe", "padding", ["padding-inline-end"]);
+  simple("padding", "pt", "padding", ["padding-top"]);
+  simple("padding", "pr", "padding", ["padding-right"]);
+  simple("padding", "pb", "padding", ["padding-bottom"]);
+  simple("padding", "pl", "padding", ["padding-left"]);
+  simple("textIndent", "indent", "textIndent", ["text-indent"], { negative: true });
+  list.push({
+    plugin: "verticalAlign",
+    prefix: "align",
+    values: {},
+    types: [],
+    describe: "vertical-align: {value}",
+    build: (value) => ({ "vertical-align": String(value) })
+  });
+  simple("fontFamily", "font", "fontFamily", ["font-family"], {
+    types: ["lookup", "generic-name", "family-name"]
+  });
+  list.push({
+    plugin: "fontSize",
+    prefix: "text",
+    values: scale("fontSize"),
+    types: ["absolute-size", "relative-size", "length", "percentage"],
+    modifier: "lineHeight",
+    describe: "font-size: {value}",
+    build: (value, { modifier }) => {
+      const f = normalizeFontSize(value);
+      if (modifier !== null) return { "font-size": f.size, "line-height": modifier };
+      const out = { "font-size": f.size };
+      if (f.lineHeight !== void 0) out["line-height"] = f.lineHeight;
+      if (f.letterSpacing !== void 0) out["letter-spacing"] = f.letterSpacing;
+      if (f.fontWeight !== void 0) out["font-weight"] = f.fontWeight;
+      return out;
+    }
+  });
+  simple("fontWeight", "font", "fontWeight", ["font-weight"], {
+    types: ["lookup", "number", "any"]
+  });
+  simple("lineHeight", "leading", "lineHeight", ["line-height"]);
+  simple("letterSpacing", "tracking", "letterSpacing", ["letter-spacing"], { negative: true });
+  colorUtility("textColor", "text", "textColor", ["color"], "--tw-text-opacity", "textOpacity");
+  opacityUtility("textOpacity", "text-opacity", "textOpacity", "--tw-text-opacity");
+  colorUtility(
+    "textDecorationColor",
+    "decoration",
+    "textDecorationColor",
+    ["text-decoration-color"],
+    null,
+    null
+  );
+  simple(
+    "textDecorationThickness",
+    "decoration",
+    "textDecorationThickness",
+    ["text-decoration-thickness"],
+    {
+      types: ["length", "percentage"]
+    }
+  );
+  simple(
+    "textUnderlineOffset",
+    "underline-offset",
+    "textUnderlineOffset",
+    ["text-underline-offset"],
+    {
+      types: ["length", "percentage", "any"]
+    }
+  );
+  colorUtility(
+    "placeholderColor",
+    "placeholder",
+    "placeholderColor",
+    ["color"],
+    "--tw-placeholder-opacity",
+    "placeholderOpacity",
+    {
+      selector: "::placeholder"
+    }
+  );
+  opacityUtility(
+    "placeholderOpacity",
+    "placeholder-opacity",
+    "placeholderOpacity",
+    "--tw-placeholder-opacity",
+    {
+      selector: "::placeholder"
+    }
+  );
+  colorUtility("caretColor", "caret", "caretColor", ["caret-color"], null, null);
+  colorUtility("accentColor", "accent", "accentColor", ["accent-color"], null, null);
+  simple("opacity", "opacity", "opacity", ["opacity"]);
+  list.push({
+    plugin: "boxShadow",
+    prefix: "shadow",
+    values: scale("boxShadow"),
+    types: ["shadow"],
+    defaults: "box-shadow",
+    describe: "box-shadow: {value}",
+    build: (value) => {
+      const v = transformThemeValue("boxShadow", value);
+      return {
+        "--tw-shadow": v === "none" ? "0 0 #0000" : v,
+        "--tw-shadow-colored": v === "none" ? "0 0 #0000" : colorizeShadow(v),
+        "box-shadow": "var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+      };
+    }
+  });
+  list.push({
+    plugin: "boxShadowColor",
+    prefix: "shadow",
+    values: withoutDefault(flattenColorPalette(scale("boxShadowColor"))),
+    types: ["color", "any"],
+    modifier: "color",
+    describe: "shadow colour: {value}",
+    build: (value) => ({
+      "--tw-shadow-color": toColorValue(value),
+      "--tw-shadow": "var(--tw-shadow-colored)"
+    })
+  });
+  simple("outlineWidth", "outline", "outlineWidth", ["outline-width"], {
+    types: ["length", "number", "percentage"]
+  });
+  simple("outlineOffset", "outline-offset", "outlineOffset", ["outline-offset"], {
+    types: ["length", "number", "percentage", "any"],
+    negative: true
+  });
+  colorUtility("outlineColor", "outline", "outlineColor", ["outline-color"], null, null);
+  list.push({
+    plugin: "ringWidth",
+    prefix: "ring",
+    values: scale("ringWidth"),
+    types: ["length"],
+    defaults: "ring-width",
+    describe: "ring width: {value}",
+    build: (value) => ({
+      "--tw-ring-offset-shadow": "var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color)",
+      "--tw-ring-shadow": `var(--tw-ring-inset) 0 0 0 calc(${String(value)} + var(--tw-ring-offset-width)) var(--tw-ring-color)`,
+      "box-shadow": "var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)"
+    })
+  });
+  colorUtility(
+    "ringColor",
+    "ring",
+    "ringColor",
+    ["--tw-ring-color"],
+    "--tw-ring-opacity",
+    "ringOpacity"
+  );
+  opacityUtility("ringOpacity", "ring-opacity", "ringOpacity", "--tw-ring-opacity", {
+    values: withoutDefault(scale("ringOpacity"))
+  });
+  simple("ringOffsetWidth", "ring-offset", "ringOffsetWidth", ["--tw-ring-offset-width"], {
+    types: ["length"]
+  });
+  colorUtility(
+    "ringOffsetColor",
+    "ring-offset",
+    "ringOffsetColor",
+    ["--tw-ring-offset-color"],
+    null,
+    null
+  );
+  filterUtility("blur", "blur", "blur", "--tw-blur", "blur");
+  filterUtility("brightness", "brightness", "brightness", "--tw-brightness", "brightness");
+  filterUtility("contrast", "contrast", "contrast", "--tw-contrast", "contrast");
+  list.push({
+    plugin: "dropShadow",
+    prefix: "drop-shadow",
+    values: scale("dropShadow"),
+    types: [],
+    defaults: "filter",
+    describe: "drop-shadow filter: {value}",
+    build: (value) => ({
+      "--tw-drop-shadow": Array.isArray(value) ? value.map((v) => `drop-shadow(${v})`).join(" ") : `drop-shadow(${String(value)})`,
+      filter: FILTER_VALUE
+    })
+  });
+  filterUtility("grayscale", "grayscale", "grayscale", "--tw-grayscale", "grayscale");
+  filterUtility("hueRotate", "hue-rotate", "hueRotate", "--tw-hue-rotate", "hue-rotate", true);
+  filterUtility("invert", "invert", "invert", "--tw-invert", "invert");
+  filterUtility("saturate", "saturate", "saturate", "--tw-saturate", "saturate");
+  filterUtility("sepia", "sepia", "sepia", "--tw-sepia", "sepia");
+  backdropUtility("backdropBlur", "backdrop-blur", "backdropBlur", "--tw-backdrop-blur", "blur");
+  backdropUtility(
+    "backdropBrightness",
+    "backdrop-brightness",
+    "backdropBrightness",
+    "--tw-backdrop-brightness",
+    "brightness"
+  );
+  backdropUtility(
+    "backdropContrast",
+    "backdrop-contrast",
+    "backdropContrast",
+    "--tw-backdrop-contrast",
+    "contrast"
+  );
+  backdropUtility(
+    "backdropGrayscale",
+    "backdrop-grayscale",
+    "backdropGrayscale",
+    "--tw-backdrop-grayscale",
+    "grayscale"
+  );
+  backdropUtility(
+    "backdropHueRotate",
+    "backdrop-hue-rotate",
+    "backdropHueRotate",
+    "--tw-backdrop-hue-rotate",
+    "hue-rotate",
+    true
+  );
+  backdropUtility(
+    "backdropInvert",
+    "backdrop-invert",
+    "backdropInvert",
+    "--tw-backdrop-invert",
+    "invert"
+  );
+  backdropUtility(
+    "backdropOpacity",
+    "backdrop-opacity",
+    "backdropOpacity",
+    "--tw-backdrop-opacity",
+    "opacity"
+  );
+  backdropUtility(
+    "backdropSaturate",
+    "backdrop-saturate",
+    "backdropSaturate",
+    "--tw-backdrop-saturate",
+    "saturate"
+  );
+  backdropUtility(
+    "backdropSepia",
+    "backdrop-sepia",
+    "backdropSepia",
+    "--tw-backdrop-sepia",
+    "sepia"
+  );
+  list.push({
+    plugin: "transitionProperty",
+    prefix: "transition",
+    values: scale("transitionProperty"),
+    types: [],
+    describe: "transition-property: {value}",
+    build: (value) => {
+      const v = transformThemeValue("transitionProperty", value);
+      if (v === "none") return { "transition-property": "none" };
+      const duration = scale("transitionDuration").DEFAULT;
+      const timing = scale("transitionTimingFunction").DEFAULT;
+      return {
+        "transition-property": v,
+        ...timing === void 0 ? {} : {
+          "transition-timing-function": transformThemeValue("transitionTimingFunction", timing)
+        },
+        ...duration === void 0 ? {} : { "transition-duration": transformThemeValue("transitionDuration", duration) }
+      };
+    }
+  });
+  simple("transitionDelay", "delay", "transitionDelay", ["transition-delay"]);
+  simple("transitionDuration", "duration", "transitionDuration", ["transition-duration"], {
+    filterDefault: true
+  });
+  simple(
+    "transitionTimingFunction",
+    "ease",
+    "transitionTimingFunction",
+    ["transition-timing-function"],
+    { filterDefault: true }
+  );
+  simple("willChange", "will-change", "willChange", ["will-change"]);
+  list.push({
+    plugin: "content",
+    prefix: "content",
+    values: scale("content"),
+    types: [],
+    describe: "content: {value}",
+    build: (value) => ({ "--tw-content": String(value), content: "var(--tw-content)" })
+  });
+  list.push({
+    plugin: "containerQueries",
+    prefix: "@container",
+    values: { DEFAULT: "inline-size", normal: "normal" },
+    types: [],
+    modifier: "any",
+    describe: "container-type: {value}",
+    build: (value, { modifier }) => ({
+      "container-type": String(value),
+      ...modifier ? { "container-name": modifier } : {}
+    })
+  });
+  return list;
+}
+var SHADOW_KEYWORDS = /* @__PURE__ */ new Set(["inset", "inherit", "initial", "revert", "unset"]);
+var SHADOW_LENGTH = /^-?(\d+|\.\d+)(.*?)$/;
+function parseBoxShadowValue(input) {
+  return splitComma(input).map((shadow) => {
+    const value = shadow.trim();
+    const result = { raw: value, valid: false };
+    const parts = value.split(/ +(?![^(]*\))/g);
+    const seen = /* @__PURE__ */ new Set();
+    for (const part of parts) {
+      if (!seen.has("KEYWORD") && SHADOW_KEYWORDS.has(part)) {
+        result.keyword = part;
+        seen.add("KEYWORD");
+      } else if (SHADOW_LENGTH.test(part)) {
+        if (!seen.has("X")) {
+          result.x = part;
+          seen.add("X");
+        } else if (!seen.has("Y")) {
+          result.y = part;
+          seen.add("Y");
+        } else if (!seen.has("BLUR")) {
+          result.blur = part;
+          seen.add("BLUR");
+        } else if (!seen.has("SPREAD")) {
+          result.spread = part;
+          seen.add("SPREAD");
+        }
+      } else if (!result.color) {
+        result.color = part;
+      } else {
+        (result.unknown ??= []).push(part);
+      }
+    }
+    result.valid = result.x !== void 0 && result.y !== void 0;
+    return result;
+  });
+}
+function colorizeShadow(value) {
+  return parseBoxShadowValue(value).map((s) => {
+    if (!s.valid) return s.raw;
+    return [s.keyword, s.x, s.y, s.blur, s.spread, "var(--tw-shadow-color)", ...s.unknown ?? []].filter(Boolean).join(" ");
+  }).join(", ");
+}
+var CORE_PLUGIN_ORDER = [
+  "preflight",
+  "container",
+  "accessibility",
+  "pointerEvents",
+  "visibility",
+  "position",
+  "inset",
+  "isolation",
+  "zIndex",
+  "order",
+  "gridColumn",
+  "gridColumnStart",
+  "gridColumnEnd",
+  "gridRow",
+  "gridRowStart",
+  "gridRowEnd",
+  "float",
+  "clear",
+  "margin",
+  "boxSizing",
+  "lineClamp",
+  "display",
+  "aspectRatio",
+  "size",
+  "height",
+  "maxHeight",
+  "minHeight",
+  "width",
+  "minWidth",
+  "maxWidth",
+  "flex",
+  "flexShrink",
+  "flexGrow",
+  "flexBasis",
+  "tableLayout",
+  "captionSide",
+  "borderCollapse",
+  "borderSpacing",
+  "transformOrigin",
+  "translate",
+  "rotate",
+  "skew",
+  "scale",
+  "transform",
+  "animation",
+  "cursor",
+  "touchAction",
+  "userSelect",
+  "resize",
+  "scrollSnapType",
+  "scrollSnapAlign",
+  "scrollSnapStop",
+  "scrollMargin",
+  "scrollPadding",
+  "listStylePosition",
+  "listStyleType",
+  "listStyleImage",
+  "appearance",
+  "columns",
+  "breakBefore",
+  "breakInside",
+  "breakAfter",
+  "gridAutoColumns",
+  "gridAutoFlow",
+  "gridAutoRows",
+  "gridTemplateColumns",
+  "gridTemplateRows",
+  "flexDirection",
+  "flexWrap",
+  "placeContent",
+  "placeItems",
+  "alignContent",
+  "alignItems",
+  "justifyContent",
+  "justifyItems",
+  "gap",
+  "space",
+  "divideWidth",
+  "divideStyle",
+  "divideColor",
+  "divideOpacity",
+  "placeSelf",
+  "alignSelf",
+  "justifySelf",
+  "overflow",
+  "overscrollBehavior",
+  "scrollBehavior",
+  "textOverflow",
+  "hyphens",
+  "whitespace",
+  "textWrap",
+  "wordBreak",
+  "borderRadius",
+  "borderWidth",
+  "borderStyle",
+  "borderColor",
+  "borderOpacity",
+  "backgroundColor",
+  "backgroundOpacity",
+  "backgroundImage",
+  "gradientColorStops",
+  "boxDecorationBreak",
+  "backgroundSize",
+  "backgroundAttachment",
+  "backgroundClip",
+  "backgroundPosition",
+  "backgroundRepeat",
+  "backgroundOrigin",
+  "fill",
+  "stroke",
+  "strokeWidth",
+  "objectFit",
+  "objectPosition",
+  "padding",
+  "textAlign",
+  "textIndent",
+  "verticalAlign",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "textTransform",
+  "fontStyle",
+  "fontVariantNumeric",
+  "lineHeight",
+  "letterSpacing",
+  "textColor",
+  "textOpacity",
+  "textDecoration",
+  "textDecorationColor",
+  "textDecorationStyle",
+  "textDecorationThickness",
+  "textUnderlineOffset",
+  "fontSmoothing",
+  "placeholderColor",
+  "placeholderOpacity",
+  "caretColor",
+  "accentColor",
+  "opacity",
+  "backgroundBlendMode",
+  "mixBlendMode",
+  "boxShadow",
+  "boxShadowColor",
+  "outlineStyle",
+  "outlineWidth",
+  "outlineOffset",
+  "outlineColor",
+  "ringWidth",
+  "ringColor",
+  "ringOpacity",
+  "ringOffsetWidth",
+  "ringOffsetColor",
+  "blur",
+  "brightness",
+  "contrast",
+  "dropShadow",
+  "grayscale",
+  "hueRotate",
+  "invert",
+  "saturate",
+  "sepia",
+  "filter",
+  "backdropBlur",
+  "backdropBrightness",
+  "backdropContrast",
+  "backdropGrayscale",
+  "backdropHueRotate",
+  "backdropInvert",
+  "backdropOpacity",
+  "backdropSaturate",
+  "backdropSepia",
+  "backdropFilter",
+  "transitionProperty",
+  "transitionDelay",
+  "transitionDuration",
+  "transitionTimingFunction",
+  "willChange",
+  "contain",
+  "content",
+  "forcedColorAdjust",
+  // Nakshora built-ins that Tailwind ships as plugins
+  "containerQueries"
+];
+var DEFAULTS_GROUPS = {
+  "border-spacing": { "--tw-border-spacing-x": "0", "--tw-border-spacing-y": "0" },
+  transform: {
+    "--tw-translate-x": "0",
+    "--tw-translate-y": "0",
+    "--tw-rotate": "0",
+    "--tw-skew-x": "0",
+    "--tw-skew-y": "0",
+    "--tw-scale-x": "1",
+    "--tw-scale-y": "1"
+  },
+  "touch-action": { "--tw-pan-x": " ", "--tw-pan-y": " ", "--tw-pinch-zoom": " " },
+  "scroll-snap-type": { "--tw-scroll-snap-strictness": "proximity" },
+  "gradient-color-stops": {
+    "--tw-gradient-from-position": " ",
+    "--tw-gradient-via-position": " ",
+    "--tw-gradient-to-position": " "
+  },
+  "font-variant-numeric": {
+    "--tw-ordinal": " ",
+    "--tw-slashed-zero": " ",
+    "--tw-numeric-figure": " ",
+    "--tw-numeric-spacing": " ",
+    "--tw-numeric-fraction": " "
+  },
+  "box-shadow": {
+    "--tw-ring-offset-shadow": "0 0 #0000",
+    "--tw-ring-shadow": "0 0 #0000",
+    "--tw-shadow": "0 0 #0000",
+    "--tw-shadow-colored": "0 0 #0000"
+  },
+  "ring-width": {
+    "--tw-ring-inset": " ",
+    "--tw-ring-offset-width": "0px",
+    "--tw-ring-offset-color": "#fff",
+    "--tw-ring-color": "rgb(59 130 246 / 0.5)",
+    "--tw-ring-offset-shadow": "0 0 #0000",
+    "--tw-ring-shadow": "0 0 #0000",
+    "--tw-shadow": "0 0 #0000",
+    "--tw-shadow-colored": "0 0 #0000"
+  },
+  filter: {
+    "--tw-blur": " ",
+    "--tw-brightness": " ",
+    "--tw-contrast": " ",
+    "--tw-grayscale": " ",
+    "--tw-hue-rotate": " ",
+    "--tw-invert": " ",
+    "--tw-saturate": " ",
+    "--tw-sepia": " ",
+    "--tw-drop-shadow": " "
+  },
+  "backdrop-filter": {
+    "--tw-backdrop-blur": " ",
+    "--tw-backdrop-brightness": " ",
+    "--tw-backdrop-contrast": " ",
+    "--tw-backdrop-grayscale": " ",
+    "--tw-backdrop-hue-rotate": " ",
+    "--tw-backdrop-invert": " ",
+    "--tw-backdrop-opacity": " ",
+    "--tw-backdrop-saturate": " ",
+    "--tw-backdrop-sepia": " "
+  },
+  contain: {
+    "--tw-contain-size": " ",
+    "--tw-contain-layout": " ",
+    "--tw-contain-paint": " ",
+    "--tw-contain-style": " "
+  },
+  "border-width": {}
+};
+var PSEUDO_ELEMENTS = [
+  ["first-letter", "&::first-letter"],
+  ["first-line", "&::first-line"],
+  ["marker", ["& *::marker", "&::marker"], void 0, ["--tw-text-opacity"]],
+  ["selection", ["& *::selection", "&::selection"]],
+  ["file", "&::file-selector-button"],
+  ["placeholder", "&::placeholder"],
+  ["backdrop", "&::backdrop"],
+  ["before", "&::before", { content: "var(--tw-content)" }],
+  ["after", "&::after", { content: "var(--tw-content)" }]
+];
+var VISITED_STRIP = ["--tw-text-opacity", "--tw-border-opacity", "--tw-bg-opacity"];
+var PSEUDO_CLASSES = [
+  ["first", "&:first-child"],
+  ["last", "&:last-child"],
+  ["only", "&:only-child"],
+  ["odd", "&:nth-child(odd)"],
+  ["even", "&:nth-child(even)"],
+  ["first-of-type", "&:first-of-type"],
+  ["last-of-type", "&:last-of-type"],
+  ["only-of-type", "&:only-of-type"],
+  ["visited", "&:visited"],
+  ["target", "&:target"],
+  ["open", "&[open]"],
+  ["default", "&:default"],
+  ["checked", "&:checked"],
+  ["indeterminate", "&:indeterminate"],
+  ["placeholder-shown", "&:placeholder-shown"],
+  ["autofill", "&:autofill"],
+  ["optional", "&:optional"],
+  ["required", "&:required"],
+  ["valid", "&:valid"],
+  ["invalid", "&:invalid"],
+  ["in-range", "&:in-range"],
+  ["out-of-range", "&:out-of-range"],
+  ["read-only", "&:read-only"],
+  ["empty", "&:empty"],
+  ["focus-within", "&:focus-within"],
+  ["hover", "&:hover"],
+  ["focus", "&:focus"],
+  ["focus-visible", "&:focus-visible"],
+  ["active", "&:active"],
+  ["enabled", "&:enabled"],
+  ["disabled", "&:disabled"],
+  // Nakshora / v4 additions
+  ["inert", "&:is([inert], [inert] *)"],
+  ["nth-last-child", "&:nth-last-child"]
+];
+var LEGACY_VARIANT_KEYS = {
+  focusVisible: "focus-visible",
+  focusWithin: "focus-within",
+  firstChild: "first",
+  lastChild: "last",
+  groupHover: "group-hover",
+  groupFocus: "group-focus",
+  peerHover: "peer-hover",
+  peerFocus: "peer-focus"
+};
+var MEDIA_SORT = {
+  supports: 100,
+  motion: 200,
+  contrast: 300,
+  screen: 1e3,
+  container: 5e3,
+  orientation: 6e3,
+  dark: 6200,
+  forcedColors: 6300,
+  print: 6400,
+  starting: 6500,
+  arbitrary: 7e3
+};
+function minWidthCond(value, sortBase = MEDIA_SORT.screen) {
+  const px = screenToPx(value);
+  return {
+    kind: "media",
+    params: `(min-width: ${value})`,
+    sort: sortBase + (Number.isNaN(px) ? 0 : px / 10),
+    min: px
+  };
+}
+function maxWidthCond(value, sortBase = MEDIA_SORT.screen + 3e3) {
+  const px = screenToPx(value);
+  return {
+    kind: "media",
+    params: `(max-width: ${value})`,
+    sort: sortBase - (Number.isNaN(px) ? 0 : px / 10),
+    max: px
+  };
+}
+function maxWidthValue(minValue) {
+  const m = /^(\d+(?:\.\d+)?)(px|rem|em)$/.exec(minValue.trim());
+  if (!m) return minValue;
+  const n = parseFloat(m[1]);
+  const unit = m[2];
+  const step = unit === "px" ? 0.02 : 0.02 / 16;
+  const v = n - step;
+  return `${Number.isInteger(v) ? v : parseFloat(v.toFixed(4))}${unit}`;
+}
+var Engine = class {
+  theme;
+  options;
+  /** static class → defs (later wins for duplicates) */
+  /**
+   * class → every static rule registered for it. Core classes map to one rule;
+   * plugin components (e.g. typography's `.prose`) register dozens of rules
+   * for the same class (different selector suffixes / at-rules), all of which
+   * must be emitted.
+   */
+  staticMap = /* @__PURE__ */ new Map();
+  /** prefix → functional utilities */
+  functionalMap = /* @__PURE__ */ new Map();
+  functional;
+  statics;
+  variants = /* @__PURE__ */ new Map();
+  functionalVariants = [];
+  pluginIndex = /* @__PURE__ */ new Map();
+  screens;
+  cache = /* @__PURE__ */ new Map();
+  seq = 0;
+  constructor(options) {
+    this.options = options;
+    this.theme = options.theme;
+    CORE_PLUGIN_ORDER.forEach((p, i) => this.pluginIndex.set(p, i));
+    this.screens = Object.entries(this.theme.screens).sort(
+      (a, b) => screenToPx(a[1]) - screenToPx(b[1])
+    );
+    this.statics = [...STATIC_UTILITIES, ...NAKSHORA_STATIC, ...options.extraStatic ?? []].map(
+      (s, index) => ({ ...s, index })
+    );
+    for (const s of this.statics) {
+      if (!this.pluginIndex.has(s.p)) this.pluginIndex.set(s.p, this.pluginIndex.size + 1e3);
+      const list = this.staticMap.get(s.c);
+      if (list) list.push(s);
+      else this.staticMap.set(s.c, [s]);
+    }
+    this.functional = [
+      ...buildFunctionalUtilities(this.theme, { pluginEnabled: options.pluginEnabled }),
+      ...options.extraFunctional ?? []
+    ].map((f, index) => ({ ...f, index }));
+    for (const f of this.functional) {
+      if (!this.pluginIndex.has(f.plugin))
+        this.pluginIndex.set(f.plugin, this.pluginIndex.size + 1e3);
+      const list = this.functionalMap.get(f.prefix) ?? [];
+      list.push(f);
+      this.functionalMap.set(f.prefix, list);
+    }
+    this.buildVariants(options.extraVariants ?? []);
+  }
+  /** next free cascade weight (Tailwind variant bit) */
+  nextBit = 1;
+  /**
+   * Register a variant and reserve its cascade weights: one per static branch
+   * (`marker` → 2, `dark` with two formats → 2), or `slots + 1` for a
+   * functional variant (one per themed value, the last one for arbitrary
+   * values) — exactly what Tailwind's `Offsets.recordVariant` does.
+   */
+  registerVariant(input) {
+    const bit = this.nextBit;
+    const width = input.match ? (input.slots ?? 0) + 1 : input.branches?.length ?? 1;
+    this.nextBit += width;
+    const v = { ...input, sort: bit };
+    if (v.branches) v.branches = v.branches.map((b, i) => ({ ...b, bit: bit + i }));
+    this.variants.set(v.name, v);
+    if (v.match) this.functionalVariants.push(v);
+    this.functionalVariants.sort((a, b) => b.name.length - a.name.length);
+  }
+  // ───────────────────────── variant table ─────────────────────────
+  /**
+   * Variants in Tailwind 3.4's registration order — the order *is* the
+   * cascade: child → pseudo-elements → pseudo-classes → group-* → peer-* →
+   * has/aria/data → plugin variants (built-in `@container` first) → supports →
+   * motion/contrast → [dark when `class`] → screens (max-*, then min) →
+   * orientation → direction → [dark otherwise] → forced-colors → print.
+   * Nakshora extras (`inert`, `not-*`, `starting`) sit next to their
+   * closest relatives.
+   */
+  buildVariants(extra) {
+    const push = (v) => this.registerVariant(v);
+    push({
+      name: "*",
+      key: "child",
+      branches: [{ format: "& > *" }],
+      description: "direct children"
+    });
+    for (const [name, fmt, decls, stripAlpha] of PSEUDO_ELEMENTS) {
+      const formats = Array.isArray(fmt) ? fmt : [fmt];
+      push({
+        name,
+        key: name,
+        branches: formats.map((format) => ({ format, decls, stripAlpha })),
+        description: `::${name} pseudo-element`
+      });
+    }
+    const pseudoBranches = /* @__PURE__ */ new Map();
+    for (const [name, fmt] of PSEUDO_CLASSES) {
+      if (name === "nth-last-child") continue;
+      pseudoBranches.set(name, fmt);
+      push({
+        name,
+        key: name,
+        branches: [{ format: fmt, stripAlpha: name === "visited" ? VISITED_STRIP : void 0 }],
+        description: `${fmt.slice(1)} state`
+      });
+    }
+    push({
+      name: "not",
+      key: "not",
+      functional: true,
+      match: (value) => {
+        if (value.startsWith("[") && value.endsWith("]"))
+          return [{ format: `&:not(${normalizeValue(value.slice(1, -1))})` }];
+        const fmt = pseudoBranches.get(value);
+        if (!fmt) return null;
+        return [{ format: `&:not(${fmt.slice(1)})` }];
+      },
+      description: "negated state (`not-hover:`, `not-[\u2026]:`)"
+    });
+    for (const kind of ["group", "peer"]) {
+      const combinator = kind === "group" ? " &" : " ~ &";
+      for (const [name, fmt] of PSEUDO_CLASSES) {
+        if (name === "nth-last-child") continue;
+        const sel = fmt.slice(1);
+        push({
+          name: `${kind}-${name}`,
+          key: `${kind}-${name}`,
+          match: (_v, modifier) => [
+            { format: `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})${sel}${combinator}` }
+          ],
+          description: `${kind === "group" ? "parent .group" : "preceding .peer sibling"} ${sel}`
+        });
+      }
+      push({
+        name: kind,
+        key: kind,
+        functional: true,
+        match: (value, modifier) => {
+          if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+          const base = `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})`;
+          const sel = normalizeValue(value.slice(1, -1));
+          if (sel.includes("&")) return [{ format: sel.replace(/&/g, base) + combinator }];
+          return [{ format: `${base}${sel}${combinator}` }];
+        },
+        description: `${kind} arbitrary state (\`${kind}-[\u2026]:\`)`
+      });
+    }
+    const hasFamily = (kind) => {
+      const name = kind ? `${kind}-has` : "has";
+      push({
+        name,
+        key: name,
+        functional: true,
+        match: (value, modifier) => {
+          if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+          const has = `:has(${normalizeValue(value.slice(1, -1))})`;
+          if (!kind) return [{ format: `&${has}` }];
+          const base = `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})`;
+          return [{ format: `${base}${has}${kind === "group" ? " &" : " ~ &"}` }];
+        },
+        description: kind ? `${kind} :has() relational state` : ":has() relational state"
+      });
     };
-    this.theme = this.config.theme;
-    this.variantCfg = this.config.variants;
-    this.breakpoints = Object.entries(this.theme.breakpoints ?? {}).filter(([, px]) => typeof px === "number" && px > 0).map(([name, px]) => ({ name, px })).sort((a, b) => a.px - b.px);
-    this.utilities = buildUtilityList(this.theme);
-    this.extraBase = {};
-    this.extraComponents = {};
-    const gen = {
-      addUtilities: (utilities, group = "plugin") => {
-        for (const [cls, decls] of Object.entries(utilities)) {
-          this.utilities.push({
-            class: cls,
-            group,
-            category: GROUP_LABELS[group] ?? group,
-            decls,
-            description: `plugin utility ${cls}`
+    hasFamily("");
+    hasFamily("group");
+    hasFamily("peer");
+    for (const attr of ["aria", "data"]) {
+      const themed = Object.keys(this.theme[attr] ?? {});
+      for (const kind of ["", "group", "peer"]) {
+        const name = kind ? `${kind}-${attr}` : attr;
+        push({
+          name,
+          key: name,
+          functional: true,
+          slots: themed.length,
+          match: (value, modifier) => {
+            const selector = this.attrSelector(attr, value);
+            if (!selector) return null;
+            const slot = themed.indexOf(value);
+            const format = kind ? `:merge(.${kind}${modifier ? `\\/${modifier}` : ""})${selector}${kind === "group" ? " &" : " ~ &"}` : `&${selector}`;
+            return { branches: [{ format }], slot: slot === -1 ? themed.length : slot };
+          },
+          description: `${kind ? `${kind} ` : ""}${attr} attribute state`
+        });
+      }
+    }
+    const containers = this.theme.containers;
+    const containerKeys = Object.keys(containers);
+    const containerHook = (value, modifier) => ({
+      id: "@container",
+      value,
+      modifier,
+      compare: compareContainers
+    });
+    push({
+      name: "@",
+      key: "containerQueries",
+      functional: true,
+      slots: containerKeys.length,
+      match: (value, modifier) => {
+        let size;
+        if (value.startsWith("[") && value.endsWith("]")) size = normalizeValue(value.slice(1, -1));
+        else if (containers[value] !== void 0) size = containers[value];
+        else return null;
+        const px = screenToPx(size);
+        const slot = containerKeys.indexOf(value);
+        return {
+          branches: [
+            {
+              atrules: [
+                {
+                  kind: "container",
+                  params: `${modifier ? `${modifier} ` : ""}(min-width: ${size})`,
+                  sort: MEDIA_SORT.container + (Number.isNaN(px) ? 0 : px / 10),
+                  min: px
+                }
+              ]
+            }
+          ],
+          slot: slot === -1 ? containerKeys.length : slot,
+          fn: containerHook(size, modifier)
+        };
+      },
+      description: "@container size query"
+    });
+    for (const v of extra) push(v);
+    const media = (name, params, sort, description) => push({
+      name,
+      key: name,
+      branches: [{ atrules: [{ kind: "media", params, sort }] }],
+      description
+    });
+    const supportsThemed = Object.keys(this.theme.supports ?? {});
+    push({
+      name: "supports",
+      key: "supports",
+      functional: true,
+      slots: supportsThemed.length,
+      match: (value) => {
+        let check;
+        if (value.startsWith("[") && value.endsWith("]")) {
+          check = normalizeValue(value.slice(1, -1));
+        } else {
+          const themed = this.theme.supports[value];
+          if (themed === void 0) return null;
+          check = themed;
+        }
+        const isRaw = /^\w*\s*\(/.test(check);
+        if (isRaw)
+          check = check.replace(/\b(and|or|not)\b/g, " $1 ").replace(/\s+/g, " ").trim();
+        else check = check.includes(":") ? `(${check})` : `(${check}: var(--tw))`;
+        const slot = supportsThemed.indexOf(value);
+        return {
+          branches: [{ atrules: [{ kind: "supports", params: check, sort: MEDIA_SORT.supports }] }],
+          slot: slot === -1 ? supportsThemed.length : slot
+        };
+      },
+      description: "@supports feature query"
+    });
+    media(
+      "motion-safe",
+      "(prefers-reduced-motion: no-preference)",
+      MEDIA_SORT.motion,
+      "user allows motion"
+    );
+    media(
+      "motion-reduce",
+      "(prefers-reduced-motion: reduce)",
+      MEDIA_SORT.motion + 1,
+      "user prefers reduced motion"
+    );
+    media(
+      "contrast-more",
+      "(prefers-contrast: more)",
+      MEDIA_SORT.contrast,
+      "user prefers more contrast"
+    );
+    media(
+      "contrast-less",
+      "(prefers-contrast: less)",
+      MEDIA_SORT.contrast + 1,
+      "user prefers less contrast"
+    );
+    const dark = this.options.darkMode;
+    const legacyDark = dark === "class" || Array.isArray(dark) && dark[0] === "class";
+    const pushDark = () => {
+      if (dark === false) return;
+      const [mode, selector] = Array.isArray(dark) ? dark : [dark, void 0];
+      let branches;
+      if (mode === "media") {
+        branches = [
+          {
+            atrules: [
+              { kind: "media", params: "(prefers-color-scheme: dark)", sort: MEDIA_SORT.dark }
+            ]
+          }
+        ];
+      } else if (mode === "variant") {
+        const formats = Array.isArray(selector) ? selector : [selector ?? "&:is(.dark *)"];
+        branches = formats.map((format) => this.formatToBranch(format, MEDIA_SORT.dark));
+      } else if (mode === "selector") {
+        const sel = selector ?? ".dark";
+        branches = [{ format: `&:where(${sel}, ${sel} *)` }];
+      } else {
+        const sel = selector ?? ".dark";
+        branches = [{ format: `&:is(${sel} *)` }];
+      }
+      push({ name: "dark", key: "dark", branches, description: "dark mode" });
+    };
+    if (legacyDark) pushDark();
+    const minHook = (px) => ({
+      id: "min-screens",
+      value: px,
+      modifier: null,
+      compare: (a, b) => a.value - b.value
+    });
+    const maxHook = (px) => ({
+      id: "max-screens",
+      value: px,
+      modifier: null,
+      compare: (a, b) => b.value - a.value
+    });
+    for (const [name, value] of this.screens) {
+      push({
+        name: `max-${name}`,
+        key: "maxResponsive",
+        branches: [{ atrules: [maxWidthCond(maxWidthValue(value))] }],
+        fn: maxHook(screenToPx(value)),
+        description: `max-width ${maxWidthValue(value)}`
+      });
+    }
+    push({
+      name: "max",
+      key: "maxResponsive",
+      functional: true,
+      match: (value) => {
+        if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+        const v = normalizeValue(value.slice(1, -1));
+        if (!typeCheckers.length(v)) return null;
+        return { branches: [{ atrules: [maxWidthCond(v)] }], fn: maxHook(screenToPx(v)) };
+      },
+      description: "arbitrary max-width"
+    });
+    for (const [name, value] of this.screens) {
+      push({
+        name,
+        key: "responsive",
+        branches: [{ atrules: [minWidthCond(value)] }],
+        fn: minHook(screenToPx(value)),
+        description: `min-width ${value}`
+      });
+    }
+    push({
+      name: "min",
+      key: "responsive",
+      functional: true,
+      match: (value) => {
+        if (!(value.startsWith("[") && value.endsWith("]"))) return null;
+        const v = normalizeValue(value.slice(1, -1));
+        if (!typeCheckers.length(v)) return null;
+        return { branches: [{ atrules: [minWidthCond(v)] }], fn: minHook(screenToPx(v)) };
+      },
+      description: "arbitrary min-width"
+    });
+    media("portrait", "(orientation: portrait)", MEDIA_SORT.orientation, "portrait orientation");
+    media(
+      "landscape",
+      "(orientation: landscape)",
+      MEDIA_SORT.orientation + 1,
+      "landscape orientation"
+    );
+    push({
+      name: "ltr",
+      key: "ltr",
+      branches: [{ format: '&:where([dir="ltr"], [dir="ltr"] *)' }],
+      description: "left-to-right documents"
+    });
+    push({
+      name: "rtl",
+      key: "rtl",
+      branches: [{ format: '&:where([dir="rtl"], [dir="rtl"] *)' }],
+      description: "right-to-left documents"
+    });
+    if (!legacyDark) pushDark();
+    media(
+      "forced-colors",
+      "(forced-colors: active)",
+      MEDIA_SORT.forcedColors,
+      "forced colours mode"
+    );
+    media("print", "print", MEDIA_SORT.print, "print media");
+    push({
+      name: "starting",
+      key: "starting",
+      branches: [{ atrules: [{ kind: "starting", params: "", sort: MEDIA_SORT.starting }] }],
+      description: "@starting-style (entry transitions)"
+    });
+  }
+  /** `@media (…) { &:not(.light *) }` / `&:is(.dark *)` / `@media (…)` → branch */
+  formatToBranch(format, sort) {
+    const f = format.trim();
+    const m = /^@([\w-]+)\s*([^{]*?)\s*(?:\{\s*(.*?)\s*\})?$/.exec(f);
+    if (!m) return { format: f };
+    const kind = m[1] === "media" ? "media" : m[1] === "supports" ? "supports" : m[1] === "container" ? "container" : "raw";
+    const inner = m[3];
+    return {
+      atrules: [{ kind, params: kind === "raw" ? `${m[1]} ${m[2]}` : m[2], sort }],
+      format: inner && inner !== "&" ? inner : void 0
+    };
+  }
+  attrSelector(kind, value) {
+    if (value.startsWith("[") && value.endsWith("]")) {
+      return `[${kind}-${normalizeAttributeSelectors(normalizeValue(value.slice(1, -1)))}]`;
+    }
+    const themed = this.theme[kind]?.[value];
+    if (themed === void 0) return null;
+    return `[${kind}-${themed}]`;
+  }
+  /** Public: variant definitions (docs / IntelliSense). */
+  getVariants() {
+    return [...this.variants.values()];
+  }
+  getScreens() {
+    return this.screens;
+  }
+  // ───────────────────────── catalog ─────────────────────────
+  /** Every value-bearing utility class the theme defines (no variants, no arbitrary values). */
+  buildCatalog() {
+    const out = [];
+    const seenStatic = /* @__PURE__ */ new Set();
+    for (const s of this.statics) {
+      if (!this.options.pluginEnabled(s.p)) continue;
+      if (seenStatic.has(s.c)) continue;
+      seenStatic.add(s.c);
+      out.push({
+        class: s.c,
+        plugin: s.p,
+        decls: Object.fromEntries(s.d),
+        selector: s.s,
+        defaults: s.df,
+        description: s.d.map(([k, v]) => `${k}: ${v}`).join("; "),
+        sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 }
+      });
+    }
+    for (const f of this.functional) {
+      if (!this.options.pluginEnabled(f.plugin)) continue;
+      let vi = 0;
+      for (const [key, raw] of Object.entries(f.values)) {
+        vi++;
+        const cls = key === "DEFAULT" ? f.prefix : `${f.prefix}-${key}`;
+        const decls = f.build(raw, { modifier: null, key });
+        if (!decls) continue;
+        out.push({
+          class: cls,
+          plugin: f.plugin,
+          decls,
+          selector: f.selector,
+          defaults: f.defaults,
+          description: f.describe.replace("{value}", String(Array.isArray(raw) ? raw[0] : raw)),
+          sort: { plugin: this.pluginIndex.get(f.plugin) ?? 9999, utility: f.index, value: vi }
+        });
+        if (f.negative) {
+          const neg = this.negate(raw);
+          if (neg !== null) {
+            const nd = f.build(neg, { modifier: null, key });
+            if (nd)
+              out.push({
+                class: `-${cls}`,
+                plugin: f.plugin,
+                decls: nd,
+                selector: f.selector,
+                defaults: f.defaults,
+                description: f.describe.replace("{value}", neg),
+                sort: {
+                  plugin: this.pluginIndex.get(f.plugin) ?? 9999,
+                  utility: f.index,
+                  value: vi + 0.5
+                }
+              });
+          }
+        }
+      }
+    }
+    if (this.options.pluginEnabled("container")) {
+      out.push({
+        class: "container",
+        plugin: "container",
+        decls: { width: "100%" },
+        description: "responsive fixed-width container",
+        sort: { plugin: this.pluginIndex.get("container") ?? 1, utility: 0, value: 0 }
+      });
+    }
+    const seen = /* @__PURE__ */ new Map();
+    const result = [];
+    for (const e of out) {
+      const idx = seen.get(e.class);
+      if (idx !== void 0) result[idx] = e;
+      else {
+        seen.set(e.class, result.length);
+        result.push(e);
+      }
+    }
+    return result;
+  }
+  negate(raw) {
+    return negateValue(Array.isArray(raw) ? raw[0] : raw);
+  }
+  // ───────────────────────── compile ─────────────────────────
+  /** Compile one candidate into rules (empty when unknown). Cached. */
+  compile(candidate) {
+    const cached = this.cache.get(candidate);
+    if (cached) return cached;
+    const rules = this.compileUncached(candidate);
+    this.cache.set(candidate, rules);
+    return rules;
+  }
+  compileUncached(candidate) {
+    if (!candidate || candidate.length > 256) return [];
+    const parts = splitAtTopLevelOnly(candidate, ":");
+    let base = parts[parts.length - 1];
+    const variantNames = parts.slice(0, -1);
+    if (!base) return [];
+    let important = false;
+    if (base.startsWith("!")) {
+      important = true;
+      base = base.slice(1);
+    } else if (base.endsWith("!") && this.options.trailingImportant !== false) {
+      important = true;
+      base = base.slice(0, -1);
+    }
+    let negative = false;
+    if (base.startsWith("-")) {
+      negative = true;
+      base = base.slice(1);
+    }
+    if (!base || base.startsWith("-") || base.startsWith("!")) return [];
+    const resolved = this.resolveUtility(base, negative);
+    if (resolved.length === 0) return [];
+    const variantMatches = [];
+    for (let i = variantNames.length - 1; i >= 0; i--) {
+      const m = this.resolveVariant(variantNames[i]);
+      if (!m) return [];
+      variantMatches.push(m);
+    }
+    const rules = [];
+    const escaped = `.${escapeClassName(candidate)}`;
+    for (const u of resolved) {
+      const suffix = u.selector ?? "";
+      const isTemplate = suffix.includes("&");
+      let branches = [{ selector: escaped, atrules: [...u.atrules ?? []], decls: { ...u.decls } }];
+      const weights = [];
+      const hooks = [];
+      let parallel = 0;
+      for (const vm of variantMatches) {
+        if (vm.arbitrary) weights.push(vm.arbitrary);
+        else if (vm.functional || vm.branches.length === 1) weights.push(vm.sort);
+        if (vm.fn) hooks.push({ ...vm.fn, bit: vm.sort });
+        const next = [];
+        for (const b of branches) {
+          vm.branches.forEach((vb, bi) => {
+            if (!vm.arbitrary && !vm.functional && vm.branches.length > 1)
+              b.weights = [...b.weights ?? [], vb.bit ?? vm.sort + bi];
+            if (vm.functional && vm.branches.length > 1) parallel = Math.max(parallel, bi);
+            const selector = vb.format ? applyFormat(b.selector, vb.format) : b.selector;
+            let decls = vb.decls && !Object.keys(vb.decls).some((k) => k in b.decls) ? { ...vb.decls, ...b.decls } : b.decls;
+            if (vb.stripAlpha) decls = removeAlphaVariables(decls, vb.stripAlpha);
+            next.push({
+              selector,
+              atrules: [...b.atrules, ...vb.atrules ?? []],
+              decls,
+              weights: b.weights,
+              parallel: Math.max(b.parallel ?? 0, vm.functional ? bi : 0)
+            });
           });
         }
-      },
-      addComponents: (components) => {
-        Object.assign(this.extraComponents, components);
-      },
-      addBase: (base) => {
-        Object.assign(this.extraBase, base);
+        branches = next;
       }
-    };
-    for (const plugin of plugins) {
-      if (plugin.handler) plugin.handler(gen);
-    }
-    this.utilityByClass = /* @__PURE__ */ new Map();
-    for (const rule of this.utilities) this.utilityByClass.set(rule.class, rule);
-  }
-  // ───────────────────────────────────────────── API ─────────────────────────────────────────────
-  /**
-   * Generate the stylesheet.
-   *
-   * - `full` mode (default): base styles, CSS variables, keyframes, every
-   *   utility + its responsive variants, and the component set.
-   * - `jit` mode: only the utilities found in `options.content`
-   *   (state variants and variant combinations included).
-   */
-  generate(options = {}) {
-    const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
-    const css = mode === "jit" ? this.generateJIT(options.content ?? this.getContentFromConfig(), options) : this.generateFull(options);
-    return options.minify ? minifyCss(css) : css;
-  }
-  /** Generate JIT CSS from explicit content */
-  generateFromContent(content, options = {}) {
-    const css = this.generateJIT(content, options);
-    return options.minify ? minifyCss(css) : css;
-  }
-  /** All utility rules in catalog order */
-  getUtilities() {
-    return [...this.utilities];
-  }
-  /** Look up a single utility by (base) class name */
-  getUtility(className) {
-    return this.utilityByClass.get(className);
-  }
-  /** Statistics about a generated stylesheet */
-  getStats(css) {
-    const generated = css ?? this.generate();
-    const minified = minifyCss(generated);
-    const ruleCount = (generated.match(/\{[^{}]*\}/g) ?? []).length;
-    return {
-      utilities: this.utilities.length,
-      responsiveRules: (generated.match(/@media/g) ?? []).length,
-      variantRules: ruleCount,
-      totalRules: ruleCount,
-      sizeBytes: byteLength(generated),
-      minifiedSizeBytes: byteLength(minified)
-    };
-  }
-  minify(css) {
-    return minifyCss(css);
-  }
-  // ───────────────────────────── layer accessors ─────────────────────────────
-  // Exposed for bundler integrations (PostCSS, Vite) that need individual layers.
-  /** Base styles (reset, defaults, reduced-motion) */
-  getBase() {
-    return this.baseStyles();
-  }
-  /** `:root` CSS variables */
-  getVariables() {
-    return this.variables();
-  }
-  /** `@keyframes` for the referenced animations */
-  getKeyframes(names) {
-    return this.keyframes(names);
-  }
-  /**
-   * Full utility set.
-   * @param includeVariants when true (default) state variants are included
-   *   as well — the standard full build omits them (JIT-only) to stay lean.
-   */
-  getUtilitiesFull(includeVariants = true) {
-    let css = "";
-    const rules = this.utilities.filter((r) => this.isGroupEnabled(r.group));
-    const variants = includeVariants ? this.enabledVariants() : [];
-    const breakpoints = this.enabledBreakpoints();
-    let lastGroup = "";
-    for (const rule of rules) {
-      if (rule.group !== lastGroup) {
-        lastGroup = rule.group;
-        css += `
-/* ${GROUP_LABELS[rule.group] ?? rule.group} */
-`;
-      }
-      css += this.emitRule(rule);
-    }
-    for (const bp of breakpoints) {
-      css += `
-@media (min-width: ${bp.px}px) {
-`;
-      for (const rule of rules) {
-        if (rule.responsive === false) continue;
-        css += this.emitRule(rule, bp.name);
-      }
-      css += "}\n";
-    }
-    for (const variant of variants) {
-      css += `
-/* variant: ${variant.prefix} */
-`;
-      for (const rule of rules) {
-        if (rule.variantable === false) continue;
-        css += this.emitRule(rule, variant.prefix);
+      for (const b of branches) {
+        const withSuffix = suffix ? isTemplate ? suffix.replace(/&/g, b.selector) : splitAtTopLevelOnly(b.selector, ",").map((part) => part.trim() + suffix).join(", ") : b.selector;
+        let selector = finalizeSelector(withSuffix);
+        if (u.siblings?.length && variantMatches.length === 0) {
+          const ownParts = splitAtTopLevelOnly(selector, ",").map((p) => p.trim());
+          let i = 0;
+          selector = u.siblings.map((part) => part === "&" ? ownParts[i++] ?? "" : part).filter(Boolean).join(", ");
+        }
+        selector = this.wrapImportant(selector);
+        const bang = important || this.options.important === true;
+        const decls = bang ? Object.fromEntries(
+          Object.entries(b.decls).map(([k, v]) => [
+            k,
+            v.endsWith("!important") ? v : `${v} !important`
+          ])
+        ) : b.decls;
+        rules.push({
+          selector,
+          decls,
+          atrules: this.mergeAtRules(b.atrules),
+          sort: {
+            variant: variantMatches.length ? 1 : 0,
+            layer: u.component || u.plugin === "container" ? 0 : 1,
+            // a bit mask: the same variant applied twice (`hover:hover:x`) sets one bit
+            variants: [.../* @__PURE__ */ new Set([...weights, ...b.weights ?? []])].sort(compareWeights),
+            // outermost variant first — the order Tailwind walks `options`
+            hooks: hooks.length ? [...hooks].reverse() : void 0,
+            parallel: Math.max(parallel, b.parallel ?? 0),
+            plugin: u.sort.plugin,
+            utility: u.sort.utility,
+            value: u.sort.value,
+            property: u.sort.property,
+            seq: this.seq++
+          },
+          candidate,
+          plugin: u.plugin,
+          defaults: u.defaults,
+          animations: u.animations,
+          component: u.component
+        });
       }
     }
-    return css;
+    return dedupeRules(rules);
   }
-  /** Design-paradigm component CSS */
-  getComponents() {
-    return this.components();
-  }
-  // ─────────────────────────────────────────── internals ───────────────────────────────────────────
-  hasContent() {
-    if (this.config.content !== void 0) {
-      const c = this.config.content;
-      return c !== "" && !(Array.isArray(c) && c.length === 0);
-    }
-    return false;
-  }
-  getContentFromConfig() {
-    const content = this.config.content ?? this.config.purge;
-    if (typeof content === "string") return [content];
-    return Array.isArray(content) ? content : [];
-  }
-  enabledVariants() {
-    return STATE_VARIANTS.filter((v) => this.variantCfg[v.configKey] !== false);
-  }
-  enabledBreakpoints() {
-    return this.variantCfg.responsive !== false ? this.breakpoints : [];
-  }
-  isGroupEnabled(group) {
-    return this.config.corePlugins?.[group] !== false;
-  }
-  /** Wrap a selector with the `important` scope when configured as a string */
-  wrapSelector(selector) {
-    const imp = this.config.important;
+  wrapImportant(selector) {
+    const imp = this.options.important;
     if (typeof imp === "string" && imp.trim()) {
-      return imp.trim().split(",").map((s) => s.trim()).map((scope) => `${scope} ${selector}`).join(", ");
+      const scopes = imp.trim().split(",").map((s) => s.trim()).filter(Boolean);
+      return splitAtTopLevelOnly(selector, ",").map((s) => s.trim()).flatMap((sel) => scopes.map((scope) => sel.includes(scope) ? sel : `${scope} ${sel}`)).join(", ");
     }
     return selector;
   }
-  emitRule(rule, prefix = "", media) {
-    const variant = prefix ? variantByPrefix.get(prefix) : void 0;
-    let selector;
-    if (variant) {
-      const full = variant.prefix === prefix ? `${variant.prefix}:${rule.class}` : rule.class;
-      const suffix = variant.suffix;
-      const ancestor = variant.ancestor;
-      selector = ancestor ? `${ancestor} .${escapeClass(full)}` : `.${escapeClass(full)}${suffix}`;
-    } else if (prefix) {
-      selector = `.${escapeClass(`${prefix}:${rule.class}`)}`;
-    } else {
-      selector = `.${escapeClass(rule.class)}`;
-    }
-    selector = this.wrapSelector(selector);
-    const decls = stringifyDecls(rule.decls, this.config.important === true);
-    const body = `${selector} { ${decls}; }`;
-    return media ? `  ${body}
-` : `${body}
-`;
-  }
-  // ─────────────────────────────── layers ───────────────────────────────
-  baseStyles() {
-    if (!this.isGroupEnabled("base")) return "";
-    const font = this.theme.fontFamily?.sans ?? '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    let css = `/* Nakshora v3 \u2014 Base */
-*, ::before, ::after {
-  box-sizing: border-box;
-  border-width: 0;
-  border-style: solid;
-  border-color: #e5e7eb;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: ${font};
-  line-height: 1.5;
-  color: #1f2937;
-  background-color: #ffffff;
-}
-
-img, picture, video, canvas, svg {
-  display: block;
-  max-width: 100%;
-}
-
-input, button, textarea, select {
-  font: inherit;
-  color: inherit;
-}
-
-p, h1, h2, h3, h4, h5, h6 {
-  overflow-wrap: break-word;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-size: inherit;
-  font-weight: inherit;
-}
-
-a {
-  color: inherit;
-  text-decoration: inherit;
-}
-
-button {
-  cursor: pointer;
-  background: none;
-}
-
-:where([tabindex="-1"]):focus:not(:focus-visible) {
-  outline: none;
-}
-
-:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-`;
-    for (const [selector, decls] of Object.entries(this.extraBase)) {
-      css += `${this.wrapSelector(selector)} { ${stringifyDecls(decls, this.config.important === true)}; }
-`;
-    }
-    return css;
-  }
-  variables() {
-    if (!this.isGroupEnabled("variables")) return "";
-    let css = "\n/* Nakshora v3 \u2014 CSS Variables */\n:root {\n";
-    for (const [name, scale] of Object.entries(this.theme.colors ?? {})) {
-      if (typeof scale === "string") {
-        css += `  --color-${name}: ${scale};
-`;
-      } else if (scale) {
-        for (const [shade, value] of Object.entries(scale)) {
-          if (typeof value === "string") css += `  --color-${name}-${shade}: ${value};
-`;
-        }
-      }
-    }
-    for (const [key, value] of Object.entries(this.theme.spacing ?? {})) {
-      css += `  --spacing-${key}: ${value};
-`;
-    }
-    const fontSize = this.theme.typography?.fontSize ?? {};
-    for (const [size, value] of Object.entries(fontSize)) {
-      css += `  --text-${size}: ${Array.isArray(value) ? value[0] : value};
-`;
-    }
-    for (const [name, value] of Object.entries(this.theme.fontFamily ?? {})) {
-      css += `  --font-${name}: ${value};
-`;
-    }
-    css += "}\n";
-    return css;
-  }
-  keyframes(names) {
-    if (!this.isGroupEnabled("animations")) return "";
-    const keyframes = this.theme.keyframes ?? {};
-    const animations = this.theme.animation ?? {};
-    const needed = names ?? new Set(Object.values(animations).map((v) => v.split(/\s+/)[0]));
-    let css = "";
-    for (const [name, body] of Object.entries(keyframes)) {
-      if (!needed.has(name)) continue;
-      css += `@keyframes ${name} {
-${body.split(";").map((s) => s.trim() ? `  ${s.trim()};` : "").join("\n")}
-}
-`;
-    }
-    return css ? `
-/* Nakshora v3 \u2014 Keyframes */
-${css}` : "";
-  }
-  components() {
-    if (!this.isGroupEnabled("components")) return "";
-    let css = "\n/* Nakshora v3 \u2014 Components */\n";
-    for (const block of Object.values(componentCss)) css += block;
-    for (const [selector, decls] of Object.entries(this.extraComponents)) {
-      css += `${this.wrapSelector(selector)} { ${stringifyDecls(decls, this.config.important === true)}; }
-`;
-    }
-    return css;
-  }
-  // ─────────────────────────────── full mode ───────────────────────────────
-  generateFull(_options) {
-    let css = `/*! Nakshora v3.0.0 \u2014 utility-first CSS framework (full build) */
-`;
-    css += this.baseStyles();
-    css += this.variables();
-    css += this.keyframes();
-    css += "\n/* \u2500\u2500\u2500 Utilities \u2500\u2500\u2500 */\n";
-    css += this.getUtilitiesFull(false);
-    css += this.components();
-    return css;
-  }
-  // ─────────────────────────────── JIT mode ───────────────────────────────
   /**
-   * Compile a JIT build from content.
-   * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
+   * Order at-rules outermost-first (the leftmost variant is the outermost
+   * wrapper, as in Tailwind) and — Nakshora policy — collapse every
+   * non-arbitrary `@media` condition into a single combined query
+   * (`print:md:` → `@media print and (min-width: 768px)`). Nested min-widths
+   * keep the largest, max-widths the smallest; the combined query sits where
+   * the outermost media query was. Arbitrary (`[@media(...)]:`) queries are
+   * never rewritten.
    */
-  generateJIT(content, _options, internal) {
-    const utilitiesOnly = internal?.utilitiesOnly ?? false;
-    const chunks = typeof content === "string" ? [content] : content ?? [];
-    const found = extractClasses(chunks, this.config.extractorPattern);
-    for (const safe of this.config.safelist ?? []) found.add(safe);
-    const bpNames = new Map(this.breakpoints.map((b) => [b.name, b]));
-    const usedAnimations = /* @__PURE__ */ new Set();
-    const emitted = /* @__PURE__ */ new Set();
-    const blocks = [];
-    for (const token of found) {
-      const { prefixes, base } = splitClass(token);
-      if (prefixes.length > 3) continue;
-      const rule = this.utilityByClass.get(base);
-      if (!rule) continue;
-      if (!this.isGroupEnabled(rule.group)) continue;
-      let media;
-      let ancestor = "";
-      let suffix = "";
-      let variantOrder = 0;
-      const prefixParts = [token];
-      let ok = true;
-      const responsiveEnabled = this.variantCfg.responsive !== false;
-      for (const prefix of prefixes) {
-        const bp = responsiveEnabled ? bpNames.get(prefix) : void 0;
-        if (bp) {
-          media = `@media (min-width: ${bp.px}px)`;
-          continue;
-        }
-        const variant = variantByPrefix.get(prefix);
-        if (!variant) {
-          ok = false;
-          break;
-        }
-        if (this.variantCfg[variant.configKey] === false) {
-          ok = false;
-          break;
-        }
-        if (variant.suffix) {
-          suffix += variant.suffix;
-          variantOrder++;
-        } else {
-          ancestor = `${ancestor} ${variant.ancestor}`.trim();
-          variantOrder++;
-        }
-      }
-      if (!ok) continue;
-      const className = prefixParts.join("");
-      if (emitted.has(className)) continue;
-      emitted.add(className);
-      if (rule.group === "animations") {
-        const first = String(rule.decls.animation ?? "").split(/\s+/)[0];
-        if (first) usedAnimations.add(first);
-      }
-      const selector = ancestor ? `${ancestor} .${escapeClass(className)}${suffix}` : `.${escapeClass(className)}${suffix}`;
-      const wrapped = this.wrapSelector(selector);
-      const body = `${wrapped} { ${stringifyDecls(rule.decls, this.config.important === true)}; }
-`;
-      blocks.push({ media, variantOrder, body: media ? `  ${body}` : body });
-    }
-    blocks.sort((a, b) => a.variantOrder - b.variantOrder);
-    let css = "";
-    if (!utilitiesOnly) {
-      css += `/*! Nakshora v3.0.0 \u2014 JIT build \xB7 ${emitted.size} classes */
-`;
-      css += this.baseStyles();
-      css += this.variables();
-      css += this.keyframes(usedAnimations);
-    }
-    const plain = [];
-    const byMedia = /* @__PURE__ */ new Map();
-    for (const block of blocks) {
-      if (block.media) {
-        const list = byMedia.get(block.media) ?? [];
-        list.push(block.body);
-        byMedia.set(block.media, list);
-      } else {
-        plain.push(block.body);
+  mergeAtRules(accumulated) {
+    if (accumulated.length <= 1) return accumulated;
+    const outerFirst = [...accumulated].reverse();
+    if (this.options.combineMedia === false) return outerFirst;
+    const mergeable = outerFirst.filter((a) => a.kind === "media" && !a.raw);
+    if (mergeable.length <= 1) return outerFirst;
+    const types = [];
+    const features = [];
+    let minCond;
+    let maxCond;
+    for (const m of mergeable) {
+      for (const part of m.params.split(/\s+and\s+/)) {
+        const p = part.trim();
+        if (/^(not\s+|only\s+)?(all|print|screen|speech)$/.test(p)) {
+          if (!types.includes(p)) types.push(p);
+        } else if (m.min !== void 0 && !Number.isNaN(m.min) && /^\(min-width: [^)]+\)$/.test(p)) {
+          if (!minCond || m.min > minCond.min) minCond = m;
+        } else if (m.max !== void 0 && !Number.isNaN(m.max) && /^\(max-width: [^)]+\)$/.test(p)) {
+          if (!maxCond || m.max < maxCond.max) maxCond = m;
+        } else if (!features.includes(p)) features.push(p);
       }
     }
-    css += "\n/* \u2500\u2500\u2500 Utilities (JIT) \u2500\u2500\u2500 */\n";
-    css += plain.join("");
-    const sortedMedia = [...byMedia.entries()].sort(
-      (a, b) => parseInt(a[0].match(/min-width: (\d+)/)?.[1] ?? "0", 10) - parseInt(b[0].match(/min-width: (\d+)/)?.[1] ?? "0", 10)
+    const parts = [
+      ...types,
+      ...minCond ? [minCond.params] : [],
+      ...maxCond ? [maxCond.params] : [],
+      ...features
+    ];
+    const combined = {
+      kind: "media",
+      params: parts.join(" and "),
+      sort: Math.max(...mergeable.map((m) => m.sort)),
+      min: minCond?.min,
+      max: maxCond?.max
+    };
+    const out = [];
+    let placed = false;
+    for (const a of outerFirst) {
+      if (a.kind === "media" && !a.raw) {
+        if (!placed) {
+          out.push(combined);
+          placed = true;
+        }
+        continue;
+      }
+      out.push(a);
+    }
+    return out;
+  }
+  // ───────────────────────── variants ─────────────────────────
+  variantCache = /* @__PURE__ */ new Map();
+  resolveVariant(name) {
+    const cached = this.variantCache.get(name);
+    if (cached !== void 0) return cached;
+    const result = this.resolveVariantUncached(name);
+    this.variantCache.set(name, result);
+    return result;
+  }
+  variantAllowed(def) {
+    if (!this.options.variantEnabled(def.key)) return false;
+    if (def.name !== def.key && !this.options.variantEnabled(def.name)) return false;
+    if ((def.name.startsWith("group-") || def.name === "group") && !this.options.variantEnabled("group"))
+      return false;
+    if ((def.name.startsWith("peer-") || def.name === "peer") && !this.options.variantEnabled("peer"))
+      return false;
+    return true;
+  }
+  resolveVariantUncached(name) {
+    if (!name) return null;
+    if (name.startsWith("[") && name.endsWith("]")) {
+      if (!this.options.variantEnabled("arbitraryVariants")) return null;
+      const inner = normalizeValue(name.slice(1, -1));
+      if (inner.startsWith("@")) {
+        const m = /^@([a-zA-Z-]+)\s*(.*)$/.exec(inner);
+        if (!m) return null;
+        const kindName = m[1];
+        const params = m[2].trim();
+        const kind = kindName === "media" ? "media" : kindName === "supports" ? "supports" : kindName === "container" ? "container" : "raw";
+        const cond = {
+          kind,
+          params: kind === "raw" ? `${kindName} ${params}` : params,
+          sort: MEDIA_SORT.arbitrary,
+          raw: true
+        };
+        const mm = /^\((min|max)-width:\s*([^)]+)\)$/.exec(params);
+        if (mm && kind === "media") {
+          const px = screenToPx(mm[2]);
+          if (mm[1] === "min") cond.min = px;
+          else cond.max = px;
+        }
+        return {
+          branches: [{ atrules: [cond] }],
+          sort: 0,
+          arbitrary: name,
+          key: "arbitraryVariants"
+        };
+      }
+      if (!inner.includes("&")) return null;
+      return {
+        branches: [{ format: inner }],
+        sort: 0,
+        arbitrary: name,
+        key: "arbitraryVariants"
+      };
+    }
+    const def = this.variants.get(name);
+    if (def && def.branches && !def.functional) {
+      if (!this.variantAllowed(def)) return null;
+      return { branches: def.branches, sort: def.sort, key: def.key, fn: def.fn };
+    }
+    for (const fv of this.functionalVariants) {
+      let rest = null;
+      if (fv.name === "@") {
+        if (name.startsWith("@")) rest = name.slice(1);
+      } else if (name === fv.name && !fv.functional) rest = "";
+      else if (name.startsWith(`${fv.name}-`)) rest = name.slice(fv.name.length + 1);
+      else if (name.startsWith(`${fv.name}/`)) rest = name.slice(fv.name.length);
+      if (rest === null) continue;
+      if (!this.variantAllowed(fv)) continue;
+      const slashSplit = splitModifier(rest);
+      const value = slashSplit.value;
+      let modifier = slashSplit.modifier;
+      if (modifier !== null && modifier.startsWith("[") && modifier.endsWith("]"))
+        modifier = normalizeValue(modifier.slice(1, -1));
+      const result = fv.match(value, modifier, { theme: this.theme });
+      if (!result) continue;
+      const r = Array.isArray(result) ? { branches: result } : result;
+      if (r.branches.length === 0) continue;
+      return {
+        branches: r.branches,
+        sort: fv.sort + Math.min(r.slot ?? fv.slots ?? 0, fv.slots ?? 0),
+        key: fv.key,
+        functional: true,
+        fn: r.fn
+      };
+    }
+    return null;
+  }
+  // ───────────────────────── utilities ─────────────────────────
+  resolveUtility(base, negative) {
+    const out = [];
+    if (base.startsWith("[") && base.endsWith("]") && !negative) {
+      if (this.options.arbitraryProperties === false) return [];
+      const inner = base.slice(1, -1);
+      const idx = inner.indexOf(":");
+      if (idx <= 0) return [];
+      const prop = inner.slice(0, idx).trim();
+      const value = normalizeValue(this.resolveThemeFn(inner.slice(idx + 1)), { property: prop });
+      if (!/^(--[\w-]+|[a-zA-Z][\w-]*)$/.test(prop) || !value || !isValidArbitraryValue(value))
+        return [];
+      return [
+        {
+          decls: { [prop]: value },
+          plugin: "arbitraryProperties",
+          sort: { plugin: 99999, utility: 0, value: 0, property: prop }
+        }
+      ];
+    }
+    if (!negative) {
+      for (const s of this.staticMap.get(base) ?? []) {
+        if (!this.options.pluginEnabled(s.p)) continue;
+        out.push({
+          decls: Object.fromEntries(s.d),
+          selector: s.s,
+          siblings: s.sl,
+          component: s.pc,
+          plugin: s.p,
+          defaults: s.df,
+          atrules: s.at?.map(parseAtRule),
+          sort: { plugin: this.pluginIndex.get(s.p) ?? 9999, utility: s.index, value: 0 }
+        });
+      }
+      if (base === "container" && this.options.pluginEnabled("container"))
+        out.push(...this.containerRules());
+    }
+    const tryPrefix = (prefix, modifier) => {
+      const list = this.functionalMap.get(prefix);
+      if (!list) return;
+      const matches = [];
+      for (const u of list) {
+        if (!this.options.pluginEnabled(u.plugin)) continue;
+        const r = this.resolveFunctional(u, modifier, negative);
+        if (r) matches.push({ u, r: r.rules, types: r.types, arbitrary: r.arbitrary });
+      }
+      if (matches.length === 0) return;
+      const arbitrary = matches.filter((m) => m.arbitrary);
+      if (arbitrary.length > 1) {
+        const withoutAny = arbitrary.filter((m) => !m.types.includes("any"));
+        const pick = (ms) => {
+          if (ms.length === 1) return ms[0];
+          return ms.find((m) => m.u.preferOnConflict);
+        };
+        const chosen = pick(withoutAny) ?? pick(arbitrary);
+        if (!chosen) return;
+        out.push(...chosen.r);
+        for (const m of matches) if (!m.arbitrary) out.push(...m.r);
+        return;
+      }
+      for (const m of matches) out.push(...m.r);
+    };
+    tryPrefix(base, "DEFAULT");
+    for (const [prefix, modifier] of candidatePermutations(base)) tryPrefix(prefix, modifier);
+    return out;
+  }
+  resolveFunctional(u, modifier, negative) {
+    const sortBase = { plugin: this.pluginIndex.get(u.plugin) ?? 9999, utility: u.index };
+    let lastArgs = null;
+    const build = (value2, ctx) => {
+      lastArgs = [value2, ctx.modifier];
+      return u.build(value2, ctx);
+    };
+    const make = (decls2, value2, types2, arbitrary, animations2) => {
+      if (!decls2) return null;
+      const common = {
+        plugin: u.plugin,
+        defaults: u.defaults,
+        sort: { ...sortBase, value: value2 },
+        animations: animations2
+      };
+      if (u.buildAll && lastArgs) {
+        const shapes = u.buildAll(lastArgs[0], lastArgs[1]);
+        if (!shapes || shapes.length === 0) return null;
+        return {
+          rules: shapes.map((sh) => ({
+            ...common,
+            decls: sh.decls,
+            selector: sh.selector,
+            atrules: sh.atrules?.map(parseAtRule)
+          })),
+          types: types2,
+          arbitrary
+        };
+      }
+      const selector = u.selectorFor && lastArgs ? u.selectorFor(lastArgs[0], lastArgs[1]) ?? u.selector : u.selector;
+      return { rules: [{ ...common, decls: decls2, selector }], types: types2, arbitrary };
+    };
+    const keys = Object.keys(u.values);
+    let valueKey = modifier;
+    let mod = null;
+    if (u.modifier) {
+      const split = splitModifier(modifier);
+      if (split.modifier !== null) {
+        valueKey = split.value;
+        mod = split.modifier;
+      }
+    }
+    if (valueKey === "" && mod !== null) valueKey = "DEFAULT";
+    const direct = (key) => Object.prototype.hasOwnProperty.call(u.values, key) ? u.values[key] : void 0;
+    let themeValue = direct(modifier);
+    let usedKey = modifier;
+    if (themeValue === void 0 && mod !== null) {
+      themeValue = direct(valueKey);
+      usedKey = valueKey;
+    } else if (themeValue !== void 0) {
+      mod = null;
+    }
+    if (themeValue !== void 0) {
+      const idx = keys.indexOf(usedKey) + 1;
+      if (negative) {
+        if (!u.negative) return null;
+        const neg = this.negate(themeValue);
+        if (neg === null) return null;
+        return make(build(neg, { modifier: null, key: usedKey }), idx + 0.5, [], false);
+      }
+      const modValue2 = mod === null ? null : this.resolveModifier(u, mod);
+      if (mod !== null && modValue2 === null) return null;
+      if (u.modifier === "color" && modValue2 !== null) {
+        const color = String(
+          typeof themeValue === "function" ? themeValue({}) : themeValue
+        );
+        const withAlpha = withAlphaValue(color, modValue2, "");
+        if (withAlpha === "") return null;
+        return make(
+          build(withAlpha, { modifier: modValue2, key: usedKey }),
+          idx,
+          [],
+          false,
+          void 0
+        );
+      }
+      const decls2 = build(themeValue, { modifier: modValue2, key: usedKey });
+      const animations2 = u.plugin === "animation" && decls2 ? animationNames(decls2.animation) : void 0;
+      return make(decls2, idx, [], false, animations2);
+    }
+    const arb = mod !== null ? valueKey : modifier;
+    if (!(arb.startsWith("[") && arb.endsWith("]"))) return null;
+    const raw = arb.slice(1, -1);
+    if (!raw) return null;
+    const { hint } = splitTypeHint(raw);
+    const types = u.types.length ? u.types : ["any"];
+    if (hint && !types.includes(hint)) return null;
+    const coerced = coerceValue(
+      this.resolveThemeFn(raw),
+      types.filter((t) => t !== "lookup"),
+      {}
     );
-    for (const [media, bodies] of sortedMedia) {
-      css += `
-${media} {
-${bodies.join("")}
-}
-`;
+    if (!coerced) return null;
+    const value = coerced.value;
+    if (!isValidArbitraryValue(value)) return null;
+    if (negative) {
+      if (!u.negative) return null;
+      const neg = negateValue(value);
+      if (neg === null) return null;
+      return make(build(neg, { modifier: null, key: arb }), 1e6, types, true);
     }
-    css += this.components();
-    return css;
+    const modValue = mod === null ? null : this.resolveModifier(u, mod);
+    if (mod !== null && modValue === null) return null;
+    if (u.modifier === "color" && modValue !== null) {
+      const withAlpha = withAlphaValue(value, modValue, "");
+      if (withAlpha === "") return null;
+      return make(build(withAlpha, { modifier: modValue, key: arb }), 1e6, types, true);
+    }
+    const decls = build(value, { modifier: modValue, key: arb });
+    const animations = u.plugin === "animation" && decls ? animationNames(decls.animation) : void 0;
+    return make(decls, 1e6, types, true, animations);
+  }
+  /** `/50` → `0.5` (opacity scale), `/[.3]` → `.3`; fontSize modifier → lineHeight */
+  resolveModifier(u, mod) {
+    if (mod.startsWith("[") && mod.endsWith("]")) return normalizeValue(mod.slice(1, -1)) || null;
+    if (u.modifier === "lineHeight") {
+      const lh = this.theme.lineHeight[mod];
+      return lh === void 0 ? null : String(lh);
+    }
+    if (u.modifier === "any") return mod;
+    if (u.modifier && typeof u.modifier === "object") {
+      const v = u.modifier[mod];
+      return v === void 0 ? null : String(v);
+    }
+    const op = this.theme.opacity[mod];
+    return op === void 0 ? null : String(op);
+  }
+  /** Replace `theme(path)` / `theme(path/alpha)` inside an arbitrary value. */
+  resolveThemeFn(value) {
+    if (!value.includes("theme(")) return value;
+    return value.replace(/theme\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g, (whole, inner) => {
+      const path = inner.trim().replace(/^['"]|['"]$/g, "");
+      const resolved = this.options.themeFn ? this.options.themeFn(path) : this.lookupTheme(path);
+      return resolved === void 0 ? whole : resolved;
+    });
+  }
+  /** Resolve `colors.red.500`, `spacing[2.5]`, `colors.red.500/50%` against the theme. */
+  lookupTheme(path) {
+    let alpha;
+    const slash = path.lastIndexOf("/");
+    if (slash !== -1 && !path.slice(slash).includes("]")) {
+      alpha = path.slice(slash + 1).trim();
+      path = path.slice(0, slash).trim();
+    }
+    const keys = splitPath(path);
+    let cur = this.theme;
+    for (const key of keys) {
+      if (cur === null || typeof cur !== "object") return void 0;
+      cur = cur[key];
+    }
+    if (cur === void 0) return void 0;
+    if (typeof cur === "function") cur = cur({});
+    if (Array.isArray(cur)) cur = keys[0] === "fontSize" ? cur[0] : cur.join(", ");
+    if (cur && typeof cur === "object") {
+      const d = cur.DEFAULT;
+      if (d === void 0) return void 0;
+      cur = d;
+    }
+    const str = String(cur);
+    return alpha !== void 0 ? withAlphaValue(str, alpha) : str;
+  }
+  /** `.container` rules (width + per-screen max-width up to `theme.container.maxScreen`). */
+  containerRules() {
+    const container = this.theme.container ?? {};
+    const plugin2 = this.pluginIndex.get("container") ?? 1;
+    const screens = container.screens ? Object.entries(container.screens).sort((a, b) => screenToPx(a[1]) - screenToPx(b[1])) : this.screens;
+    const minScreen = container.minScreen === void 0 ? DEFAULT_CONTAINER_MIN_SCREEN : container.minScreen;
+    const maxScreen = container.maxScreen === void 0 ? DEFAULT_CONTAINER_MAX_SCREEN : container.maxScreen;
+    const lower = minScreen === false || container.screens || this.theme.screens[minScreen] === void 0 ? 0 : screenToPx(this.theme.screens[minScreen]);
+    const limit = maxScreen === false || container.screens || this.theme.screens[maxScreen] === void 0 ? Infinity : screenToPx(this.theme.screens[maxScreen]);
+    const paddingFor = (screen) => {
+      const p = container.padding;
+      if (p === void 0) return {};
+      if (typeof p === "string")
+        return screen === "DEFAULT" ? { "padding-right": p, "padding-left": p } : {};
+      const v = p[screen];
+      return v === void 0 ? {} : { "padding-right": v, "padding-left": v };
+    };
+    const rules = [
+      {
+        decls: {
+          width: "100%",
+          ...container.center ? { "margin-right": "auto", "margin-left": "auto" } : {},
+          ...paddingFor("DEFAULT")
+        },
+        plugin: "container",
+        sort: { plugin: plugin2, utility: 0, value: 0 }
+      }
+    ];
+    let i = 1;
+    for (const [name, value] of screens) {
+      const px = screenToPx(value);
+      if (Number.isNaN(px) || px <= 0) continue;
+      if (px < lower || px > limit) continue;
+      rules.push({
+        decls: { "max-width": value, ...paddingFor(name) },
+        plugin: "container",
+        atrules: [minWidthCond(value)],
+        sort: { plugin: plugin2, utility: 0, value: i++ }
+      });
+    }
+    return rules;
   }
 };
-var GROUP_LABELS = {
+function compareWeights(a, b) {
+  if (typeof a === "number" && typeof b === "number") return b - a;
+  if (typeof a === "number") return 1;
+  if (typeof b === "number") return -1;
+  return b < a ? -1 : b > a ? 1 : 0;
+}
+function compareVariantMask(a, b) {
+  const n = Math.min(a.length, b.length);
+  for (let i = 0; i < n; i++) {
+    const c = compareWeights(a[i], b[i]);
+    if (c !== 0) return -c;
+  }
+  return a.length - b.length;
+}
+function compareRules(a, b) {
+  if (a.sort.variant !== b.sort.variant) return a.sort.variant - b.sort.variant;
+  if (a.sort.layer !== b.sort.layer) return a.sort.layer - b.sort.layer;
+  if (a.sort.hooks && b.sort.hooks) {
+    for (const ah of a.sort.hooks) {
+      for (const bh of b.sort.hooks) {
+        if (ah.id !== bh.id) continue;
+        if (a.sort.hooks.filter((h) => h.id === ah.id).length > 1 && b.sort.hooks.filter((h) => h.id === bh.id).length > 1 && (a.sort.hooks.find((h) => h.id === ah.id) !== ah || b.sort.hooks.find((h) => h.id === bh.id) !== bh))
+          continue;
+        const cut = Math.max(ah.bit, bh.bit);
+        const after = (r) => r.sort.variants.filter((w) => typeof w === "string" || w > cut);
+        if (compareVariantMask(after(a), after(b)) !== 0) continue;
+        const c = ah.compare(
+          { value: ah.value, modifier: ah.modifier },
+          { value: bh.value, modifier: bh.modifier }
+        );
+        if (c !== 0) return c;
+      }
+    }
+  }
+  const mask = compareVariantMask(a.sort.variants, b.sort.variants);
+  if (mask !== 0) return mask;
+  if (a.sort.parallel !== b.sort.parallel) return a.sort.parallel - b.sort.parallel;
+  const ap = a.sort.property !== void 0 ? 1 : 0;
+  const bp = b.sort.property !== void 0 ? 1 : 0;
+  if (ap !== bp) return ap - bp;
+  if (ap && a.sort.property !== b.sort.property)
+    return a.sort.property < b.sort.property ? -1 : 1;
+  if (a.sort.plugin !== b.sort.plugin) return a.sort.plugin - b.sort.plugin;
+  if (a.sort.utility !== b.sort.utility) return a.sort.utility - b.sort.utility;
+  if (a.candidate !== b.candidate) return a.candidate < b.candidate ? -1 : 1;
+  return a.sort.seq - b.sort.seq;
+}
+function compareContainers(a, b) {
+  const av = parseFloat(String(a.value));
+  const bv = parseFloat(String(b.value));
+  if (Number.isNaN(av) || Number.isNaN(bv)) return 0;
+  if (av - bv !== 0) return av - bv;
+  const al = a.modifier ?? "";
+  const bl = b.modifier ?? "";
+  if (al === "" && bl !== "") return 1;
+  if (al !== "" && bl === "") return -1;
+  return al.localeCompare(bl, "en", { numeric: true });
+}
+function dedupeRules(rules) {
+  if (rules.length < 2) return rules;
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  const atKey = (r) => r.atrules.map((a) => `${a.kind} ${a.params}`).join("|");
+  for (const r of rules) {
+    const key = `${r.selector}\0${atKey(r)}\0${JSON.stringify(r.decls)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const prev = out[out.length - 1];
+    if (prev && r.component && prev.component && prev.selector === r.selector && atKey(prev) === atKey(r) && prev.plugin === r.plugin && !Object.keys(r.decls).some((k) => k in prev.decls)) {
+      prev.decls = { ...prev.decls, ...r.decls };
+      continue;
+    }
+    out.push(r);
+  }
+  return out;
+}
+function removeAlphaVariables(decls, toRemove) {
+  const out = {};
+  for (const [prop, raw] of Object.entries(decls)) {
+    if (toRemove.includes(prop)) continue;
+    let value = raw;
+    for (const name of toRemove) {
+      if (value.includes(`/ var(${name})`)) value = value.replace(`/ var(${name})`, "");
+      else if (value.includes(`/ var(${name}, 1)`)) value = value.replace(`/ var(${name}, 1)`, "");
+    }
+    out[prop] = value;
+  }
+  return out;
+}
+function parseAtRule(text) {
+  const m = /^@([\w-]+)\s*(.*)$/.exec(text.trim());
+  const name = m ? m[1] : "media";
+  const params = m ? m[2].trim() : "";
+  const kind = name === "media" ? "media" : name === "supports" ? "supports" : name === "container" ? "container" : "raw";
+  return { kind, params: kind === "raw" ? `${name} ${params}` : params, sort: 9e3, raw: true };
+}
+function animationNames(value) {
+  if (!value) return [];
+  return splitAtTopLevelOnly(value, ",").map((part) => part.trim().split(/\s+/)[0]).filter(
+    (n) => n && !/^(none|inherit|initial|unset|revert)$/.test(n) && !/^\d/.test(n) && !/^(infinite|linear|ease|normal|reverse|alternate|forwards|backwards|both|running|paused)$/.test(
+      n
+    )
+  );
+}
+function* candidatePermutations(candidate) {
+  let lastIndex = Infinity;
+  while (lastIndex >= 0) {
+    let dashIdx;
+    let wasSlash = false;
+    if (lastIndex === Infinity && candidate.endsWith("]")) {
+      const bracketIdx = candidate.indexOf("[");
+      if (candidate[bracketIdx - 1] === "-") dashIdx = bracketIdx - 1;
+      else if (candidate[bracketIdx - 1] === "/") {
+        dashIdx = bracketIdx - 1;
+        wasSlash = true;
+      } else dashIdx = -1;
+    } else if (lastIndex === Infinity && candidate.includes("/")) {
+      dashIdx = candidate.lastIndexOf("/");
+      wasSlash = true;
+    } else {
+      dashIdx = candidate.lastIndexOf("-", lastIndex);
+    }
+    if (dashIdx < 0) break;
+    const prefix = candidate.slice(0, dashIdx);
+    const modifier = wasSlash ? candidate.slice(dashIdx) : candidate.slice(dashIdx + 1);
+    lastIndex = dashIdx - 1;
+    if (prefix === "" || modifier === "/") continue;
+    yield [prefix, modifier];
+  }
+}
+function splitModifier(input) {
+  const slashIdx = input.lastIndexOf("/");
+  if (slashIdx === -1) return { value: input, modifier: null };
+  const arbitraryStart = input.lastIndexOf("[", slashIdx);
+  const arbitraryEnd = input.indexOf("]", slashIdx);
+  const nextToArbitrary = input[slashIdx - 1] === "]" || input[slashIdx + 1] === "[";
+  if (!nextToArbitrary && arbitraryStart !== -1 && arbitraryEnd !== -1) {
+    const prev = input.lastIndexOf("/", arbitraryStart);
+    if (prev === -1) return { value: input, modifier: null };
+    return { value: input.slice(0, prev), modifier: input.slice(prev + 1) };
+  }
+  if (input.startsWith("[") && input.endsWith("]") && !input.includes("]/[") && !input.includes("]/")) {
+    return { value: input, modifier: null };
+  }
+  return { value: input.slice(0, slashIdx), modifier: input.slice(slashIdx + 1) };
+}
+function isValidArbitraryValue(value) {
+  let depthParen = 0;
+  let depthBracket = 0;
+  let quote = null;
+  for (let i = 0; i < value.length; i++) {
+    const ch = value[i];
+    if (quote) {
+      if (ch === "\\") i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") quote = ch;
+    else if (ch === "(") depthParen++;
+    else if (ch === ")") {
+      if (--depthParen < 0) return false;
+    } else if (ch === "[") depthBracket++;
+    else if (ch === "]") {
+      if (--depthBracket < 0) return false;
+    } else if (ch === ";" || ch === "{" || ch === "}") return false;
+  }
+  return depthParen === 0 && depthBracket === 0 && quote === null;
+}
+var MERGE_RE = /:merge\(((?:[^()]|\([^()]*\))*)\)/g;
+function applyFormat(current, format) {
+  const merges = [...current.matchAll(MERGE_RE)];
+  if (merges.length) {
+    let fmt = format;
+    for (const m of [...format.matchAll(MERGE_RE)]) {
+      const existing = merges.find((e) => e[1] === m[1]);
+      if (!existing) continue;
+      const after = format.slice((m.index ?? 0) + m[0].length);
+      const attMatch = /^((?:[^\s>+~&])*)(\s*[>+~]?\s*)?/.exec(after);
+      const attachments = attMatch?.[1] ?? "";
+      const combinator = attMatch?.[2] ?? "";
+      const insertAt = (existing.index ?? 0) + existing[0].length;
+      current = current.slice(0, insertAt) + attachments + current.slice(insertAt);
+      fmt = fmt.replace(m[0] + attachments + combinator, "");
+    }
+    format = fmt;
+  }
+  return format.replace(/&/g, current);
+}
+var PSEUDO_ELEMENT_PROPS = {
+  "::after": ["terminal", "jumpable"],
+  "::backdrop": ["terminal", "jumpable"],
+  "::before": ["terminal", "jumpable"],
+  "::cue": ["terminal"],
+  "::cue-region": ["terminal"],
+  "::first-letter": ["terminal", "jumpable"],
+  "::first-line": ["terminal", "jumpable"],
+  "::grammar-error": ["terminal"],
+  "::marker": ["terminal", "jumpable"],
+  "::part": ["terminal", "actionable"],
+  "::placeholder": ["terminal", "jumpable"],
+  "::selection": ["terminal", "jumpable"],
+  "::slotted": ["terminal"],
+  "::spelling-error": ["terminal"],
+  "::target-text": ["terminal"],
+  "::file-selector-button": ["terminal", "actionable"],
+  "::deep": ["actionable"],
+  "::v-deep": ["actionable"],
+  "::ng-deep": ["actionable"],
+  ":after": ["terminal", "jumpable"],
+  ":before": ["terminal", "jumpable"],
+  ":first-letter": ["terminal", "jumpable"],
+  ":first-line": ["terminal", "jumpable"]
+};
+var DEFAULT_PSEUDO_PROPS = ["terminal", "actionable"];
+function tokenizeSelector(sel) {
+  const tokens = [];
+  let i = 0;
+  const n = sel.length;
+  const readBalanced = (open, close) => {
+    let depth = 0;
+    let quote = null;
+    const start = i;
+    while (i < n) {
+      const ch = sel[i];
+      if (quote) {
+        if (ch === "\\") i++;
+        else if (ch === quote) quote = null;
+      } else if (ch === '"' || ch === "'") quote = ch;
+      else if (ch === open) depth++;
+      else if (ch === close) {
+        depth--;
+        if (depth === 0) {
+          i++;
+          break;
+        }
+      }
+      i++;
+    }
+    return sel.slice(start, i);
+  };
+  while (i < n) {
+    const ch = sel[i];
+    if (ch === " " || ch === ">" || ch === "~" || ch === "+") {
+      let j2 = i;
+      while (j2 < n && (sel[j2] === " " || sel[j2] === ">" || sel[j2] === "~" || sel[j2] === "+")) j2++;
+      tokens.push({ text: sel.slice(i, j2), kind: "combinator" });
+      i = j2;
+      continue;
+    }
+    if (ch === ":") {
+      let j2 = i + 1;
+      if (sel[j2] === ":") j2++;
+      while (j2 < n && /[\w-]/.test(sel[j2])) j2++;
+      const name = sel.slice(i, j2);
+      i = j2;
+      let args = "";
+      if (sel[i] === "(") args = readBalanced("(", ")");
+      tokens.push({ text: name + args, kind: "pseudo", name });
+      continue;
+    }
+    if (ch === "[") {
+      tokens.push({ text: readBalanced("[", "]"), kind: "other" });
+      continue;
+    }
+    let j = i;
+    while (j < n) {
+      const c = sel[j];
+      if (c === "\\") {
+        j += 2;
+        continue;
+      }
+      if (c === ":" || c === "[" || c === " " || c === ">" || c === "~" || c === "+") break;
+      if ((c === "." || c === "#") && j > i) break;
+      j++;
+    }
+    tokens.push({ text: sel.slice(i, j), kind: "other" });
+    i = j;
+  }
+  return tokens;
+}
+function pseudoProps(name) {
+  return PSEUDO_ELEMENT_PROPS[name] ?? DEFAULT_PSEUDO_PROPS;
+}
+function isPseudoElement(tok) {
+  return tok.kind === "pseudo" && (tok.name.startsWith("::") || PSEUDO_ELEMENT_PROPS[tok.name] !== void 0);
+}
+function finalizeSelector(selector) {
+  const out = selector.replace(/:merge\(((?:[^()]|\([^()]*\))*)\)/g, "$1");
+  if (!out.includes(":")) return out;
+  return splitAtTopLevelOnly(out, ",").map((sel) => {
+    const tokens = tokenizeSelector(sel.trim());
+    let buffer = [];
+    let lastSeen = null;
+    const keep = [];
+    for (const tok of tokens) {
+      if (tok.kind === "combinator") {
+        const stay = buffer.filter((b) => !pseudoProps(b.name).includes("jumpable"));
+        buffer = buffer.filter((b) => !stay.includes(b));
+        for (const s of stay) keep.push(s);
+        keep.push(tok);
+        lastSeen = null;
+        continue;
+      }
+      if (tok.kind === "pseudo") {
+        if (isPseudoElement(tok) && pseudoProps(tok.name).includes("terminal")) {
+          lastSeen = tok;
+          buffer.push(tok);
+          continue;
+        }
+        if (lastSeen && pseudoProps(lastSeen.name).includes("actionable")) {
+          buffer.push(tok);
+          continue;
+        }
+        lastSeen = null;
+      }
+      keep.push(tok);
+    }
+    return [...keep, ...buffer].map((t) => t.text).join("").trim();
+  }).join(", ");
+}
+var NAKSHORA_STATIC = [
+  { p: "animation", c: "animation-paused", d: [["animation-play-state", "paused"]] },
+  { p: "animation", c: "animation-running", d: [["animation-play-state", "running"]] },
+  { p: "whitespace", c: "break-spaces", d: [["white-space", "break-spaces"]] },
+  { p: "fontStretch", c: "font-stretch-normal", d: [["font-stretch", "normal"]] },
+  { p: "fontStretch", c: "font-stretch-ultra-condensed", d: [["font-stretch", "ultra-condensed"]] },
+  { p: "fontStretch", c: "font-stretch-extra-condensed", d: [["font-stretch", "extra-condensed"]] },
+  { p: "fontStretch", c: "font-stretch-condensed", d: [["font-stretch", "condensed"]] },
+  { p: "fontStretch", c: "font-stretch-semi-condensed", d: [["font-stretch", "semi-condensed"]] },
+  { p: "fontStretch", c: "font-stretch-semi-expanded", d: [["font-stretch", "semi-expanded"]] },
+  { p: "fontStretch", c: "font-stretch-expanded", d: [["font-stretch", "expanded"]] },
+  { p: "fontStretch", c: "font-stretch-extra-expanded", d: [["font-stretch", "extra-expanded"]] },
+  { p: "fontStretch", c: "font-stretch-ultra-expanded", d: [["font-stretch", "ultra-expanded"]] },
+  { p: "fieldSizing", c: "field-sizing-content", d: [["field-sizing", "content"]] },
+  { p: "fieldSizing", c: "field-sizing-fixed", d: [["field-sizing", "fixed"]] },
+  { p: "colorScheme", c: "scheme-normal", d: [["color-scheme", "normal"]] },
+  { p: "colorScheme", c: "scheme-dark", d: [["color-scheme", "dark"]] },
+  { p: "colorScheme", c: "scheme-light", d: [["color-scheme", "light"]] },
+  { p: "colorScheme", c: "scheme-light-dark", d: [["color-scheme", "light dark"]] },
+  { p: "colorScheme", c: "scheme-only-dark", d: [["color-scheme", "only dark"]] },
+  { p: "colorScheme", c: "scheme-only-light", d: [["color-scheme", "only light"]] }
+];
+var GROUP_CATEGORIES = {
+  layout: "Layout",
   display: "Display",
   position: "Position",
-  inset: "Inset",
-  zIndex: "Z-Index",
+  inset: "Inset (Offset)",
+  zIndex: "Stacking (Z-Index)",
   overflow: "Overflow",
   visibility: "Visibility",
   sizing: "Sizing",
@@ -2306,12 +6349,1354 @@ var GROUP_LABELS = {
   transitions: "Transitions",
   animations: "Animations",
   cursors: "Cursors",
+  interactivity: "Interactivity",
+  svg: "SVG",
+  tables: "Tables",
+  accessibility: "Accessibility",
+  effects: "Effects",
   whitespace: "Whitespace & Misc",
-  base: "Base",
-  variables: "Variables",
   components: "Components",
   plugin: "Plugins"
 };
+var PLUGIN_CATEGORY = {
+  container: "layout",
+  accessibility: "accessibility",
+  pointerEvents: "interactivity",
+  visibility: "visibility",
+  position: "position",
+  inset: "inset",
+  isolation: "layout",
+  zIndex: "zIndex",
+  order: "flex",
+  gridColumn: "grid",
+  gridColumnStart: "grid",
+  gridColumnEnd: "grid",
+  gridRow: "grid",
+  gridRowStart: "grid",
+  gridRowEnd: "grid",
+  float: "layout",
+  clear: "layout",
+  margin: "margin",
+  boxSizing: "layout",
+  lineClamp: "typography",
+  display: "display",
+  aspectRatio: "sizing",
+  size: "sizing",
+  height: "sizing",
+  maxHeight: "sizing",
+  minHeight: "sizing",
+  width: "sizing",
+  minWidth: "sizing",
+  maxWidth: "sizing",
+  flex: "flex",
+  flexShrink: "flex",
+  flexGrow: "flex",
+  flexBasis: "flex",
+  tableLayout: "tables",
+  captionSide: "tables",
+  borderCollapse: "tables",
+  borderSpacing: "tables",
+  transformOrigin: "transforms",
+  translate: "transforms",
+  rotate: "transforms",
+  skew: "transforms",
+  scale: "transforms",
+  transform: "transforms",
+  animation: "animations",
+  cursor: "cursors",
+  touchAction: "interactivity",
+  userSelect: "interactivity",
+  resize: "interactivity",
+  scrollSnapType: "interactivity",
+  scrollSnapAlign: "interactivity",
+  scrollSnapStop: "interactivity",
+  scrollMargin: "interactivity",
+  scrollPadding: "interactivity",
+  listStylePosition: "typography",
+  listStyleType: "typography",
+  listStyleImage: "typography",
+  appearance: "interactivity",
+  columns: "layout",
+  breakBefore: "layout",
+  breakInside: "layout",
+  breakAfter: "layout",
+  gridAutoColumns: "grid",
+  gridAutoFlow: "grid",
+  gridAutoRows: "grid",
+  gridTemplateColumns: "grid",
+  gridTemplateRows: "grid",
+  flexDirection: "flex",
+  flexWrap: "flex",
+  placeContent: "flex",
+  placeItems: "flex",
+  alignContent: "flex",
+  alignItems: "flex",
+  justifyContent: "flex",
+  justifyItems: "flex",
+  gap: "gap",
+  space: "margin",
+  divideWidth: "borders",
+  divideStyle: "borders",
+  divideColor: "borderColor",
+  divideOpacity: "borderColor",
+  placeSelf: "flex",
+  alignSelf: "flex",
+  justifySelf: "flex",
+  overflow: "overflow",
+  overscrollBehavior: "overflow",
+  scrollBehavior: "interactivity",
+  textOverflow: "typography",
+  hyphens: "typography",
+  whitespace: "whitespace",
+  textWrap: "typography",
+  wordBreak: "typography",
+  borderRadius: "borderRadius",
+  borderWidth: "borders",
+  borderStyle: "borders",
+  borderColor: "borderColor",
+  borderOpacity: "borderColor",
+  backgroundColor: "backgroundColor",
+  backgroundOpacity: "backgroundColor",
+  backgroundImage: "backgrounds",
+  gradientColorStops: "gradients",
+  boxDecorationBreak: "backgrounds",
+  backgroundSize: "backgrounds",
+  backgroundAttachment: "backgrounds",
+  backgroundClip: "backgrounds",
+  backgroundPosition: "backgrounds",
+  backgroundRepeat: "backgrounds",
+  backgroundOrigin: "backgrounds",
+  fill: "svg",
+  stroke: "svg",
+  strokeWidth: "svg",
+  objectFit: "sizing",
+  objectPosition: "sizing",
+  padding: "padding",
+  textAlign: "typography",
+  textIndent: "typography",
+  verticalAlign: "typography",
+  fontFamily: "typography",
+  fontSize: "typography",
+  fontWeight: "typography",
+  textTransform: "typography",
+  fontStyle: "typography",
+  fontVariantNumeric: "typography",
+  lineHeight: "typography",
+  letterSpacing: "typography",
+  textColor: "textColor",
+  textOpacity: "textColor",
+  textDecoration: "textDecoration",
+  textDecorationColor: "textDecoration",
+  textDecorationStyle: "textDecoration",
+  textDecorationThickness: "textDecoration",
+  textUnderlineOffset: "textDecoration",
+  fontSmoothing: "typography",
+  placeholderColor: "textColor",
+  placeholderOpacity: "textColor",
+  caretColor: "interactivity",
+  accentColor: "interactivity",
+  opacity: "opacity",
+  backgroundBlendMode: "effects",
+  mixBlendMode: "effects",
+  boxShadow: "shadows",
+  boxShadowColor: "shadows",
+  outlineStyle: "borders",
+  outlineWidth: "borders",
+  outlineOffset: "borders",
+  outlineColor: "borderColor",
+  ringWidth: "borders",
+  ringColor: "borderColor",
+  ringOpacity: "borderColor",
+  ringOffsetWidth: "borders",
+  ringOffsetColor: "borderColor",
+  blur: "filters",
+  brightness: "filters",
+  contrast: "filters",
+  dropShadow: "filters",
+  grayscale: "filters",
+  hueRotate: "filters",
+  invert: "filters",
+  saturate: "filters",
+  sepia: "filters",
+  filter: "filters",
+  backdropBlur: "filters",
+  backdropBrightness: "filters",
+  backdropContrast: "filters",
+  backdropGrayscale: "filters",
+  backdropHueRotate: "filters",
+  backdropInvert: "filters",
+  backdropOpacity: "filters",
+  backdropSaturate: "filters",
+  backdropSepia: "filters",
+  backdropFilter: "filters",
+  transitionProperty: "transitions",
+  transitionDelay: "transitions",
+  transitionDuration: "transitions",
+  transitionTimingFunction: "transitions",
+  willChange: "interactivity",
+  contain: "layout",
+  content: "typography",
+  containerQueries: "layout",
+  forcedColorAdjust: "accessibility",
+  fontStretch: "typography",
+  fieldSizing: "interactivity",
+  colorScheme: "interactivity",
+  arbitraryProperties: "plugin",
+  components: "components"
+};
+function categoryForPlugin(plugin2) {
+  return PLUGIN_CATEGORY[plugin2] ?? (GROUP_CATEGORIES[plugin2] ? plugin2 : "plugin");
+}
+function normalizePlugin(plugin2) {
+  if (typeof plugin2 === "function") {
+    if (plugin2.__isOptionsFunction) {
+      const resolved = plugin2();
+      return { handler: resolved.handler, config: resolved.config };
+    }
+    return { handler: plugin2 };
+  }
+  if (plugin2 && typeof plugin2 === "object") {
+    const p = plugin2;
+    return {
+      handler: p.handler,
+      config: typeof p.config === "object" && p.config !== null ? p.config : void 0,
+      legacyConfig: typeof p.config === "function" ? p.config : void 0
+    };
+  }
+  return {};
+}
+function plugin(handler, config) {
+  return { handler, config };
+}
+plugin.withOptions = function withOptions(pluginFunction, configFunction = () => ({})) {
+  const optionsFunction = (options) => ({
+    handler: pluginFunction(options),
+    config: configFunction(options)
+  });
+  optionsFunction.__isOptionsFunction = true;
+  return optionsFunction;
+};
+function cssInJsToRules(input) {
+  const nodes = flattenNodes(cssInJsToNodes(input));
+  const rules = [];
+  const looseDecls = {};
+  const walk = (list, atrules) => {
+    for (const node of list) {
+      if (node.type === "rule") {
+        const decls = {};
+        for (const d of node.nodes)
+          if (d.type === "decl") decls[d.prop] = d.important ? `${d.value} !important` : d.value;
+        rules.push({ selector: node.selector, decls, atrules });
+      } else if (node.type === "atrule" && node.nodes) {
+        walk(node.nodes, [...atrules, `@${node.name} ${node.params}`.trim()]);
+      } else if (node.type === "decl") {
+        looseDecls[node.prop] = node.important ? `${node.value} !important` : node.value;
+      }
+    }
+  };
+  walk(nodes, []);
+  return { rules, looseDecls };
+}
+function selectorSuffix(selector) {
+  const sel = selector.trim();
+  if (sel === "&") return void 0;
+  if (sel.startsWith("&") && sel.indexOf("&", 1) === -1 && !sel.includes(",")) return sel.slice(1);
+  return sel;
+}
+function rulesToStatics(pluginName, rules) {
+  const out = [];
+  for (const rule of rules) {
+    const parts = splitSelectorList(rule.selector);
+    const classes = [];
+    for (const part of parts) {
+      const m = /\.((?:\\.|[\w-])+)/.exec(part);
+      if (!m) continue;
+      const cls = m[1].replace(/\\(.)/g, "$1");
+      if (!classes.includes(cls)) classes.push(cls);
+    }
+    if (classes.length === 0) continue;
+    for (const cls of classes) {
+      const escaped = `.${escapeClassName(cls)}`;
+      const own = [];
+      const ordered = [];
+      for (const part of parts) {
+        if (part.includes(escaped) || part.includes(`.${cls}`)) {
+          own.push(part.split(escaped).join("&").split(`.${cls}`).join("&"));
+          ordered.push(null);
+        } else ordered.push(part);
+      }
+      const template = own.join(", ");
+      const hasSiblings = ordered.some((x) => x !== null);
+      out.push({
+        p: pluginName,
+        c: cls,
+        s: template === "&" ? void 0 : template,
+        sl: hasSiblings ? ordered.map((x) => x ?? "&") : void 0,
+        pc: true,
+        d: Object.entries(rule.decls),
+        at: rule.atrules.length ? rule.atrules : void 0
+      });
+    }
+  }
+  return out;
+}
+function normalizeTypes(type) {
+  if (!type) return { types: [], preferOnConflict: false };
+  const list = Array.isArray(type) ? type : [type];
+  let prefer = false;
+  const types = list.map((t) => {
+    if (Array.isArray(t)) {
+      if (t[1]?.preferOnConflict) prefer = true;
+      return t[0];
+    }
+    return t;
+  });
+  return { types, preferOnConflict: prefer };
+}
+function createPluginAPI(collector, ctx) {
+  const addStatic = (kind, input, options) => {
+    const normalised = (Array.isArray(input) ? input : [input]).map(
+      (obj) => Object.fromEntries(
+        Object.entries(obj).map(([k, v]) => [
+          /^[a-zA-Z][\w-]*$/.test(k) && v && typeof v === "object" ? `.${k}` : k,
+          v
+        ])
+      )
+    );
+    const group = typeof options === "string" ? options : kind === "components" ? "components" : ctx.pluginName;
+    const { rules } = cssInJsToRules(normalised);
+    collector.statics.push(...rulesToStatics(group, rules));
+  };
+  const addMatch = (kind, utilities, options = {}) => {
+    const { types, preferOnConflict } = normalizeTypes(options.type);
+    for (const [prefix, fn] of Object.entries(utilities)) {
+      const shapesFor = (value, modifier) => {
+        const out = fn(value, { modifier });
+        if (!out) return null;
+        const { rules } = cssInJsToRules({ "&": out });
+        if (rules.length === 0) return null;
+        return rules.map((r) => ({
+          selector: selectorSuffix(r.selector),
+          decls: r.decls,
+          atrules: r.atrules.length ? r.atrules : void 0
+        }));
+      };
+      collector.functional.push({
+        plugin: kind === "components" ? "components" : ctx.pluginName,
+        prefix,
+        values: options.values ?? {},
+        types,
+        preferOnConflict: preferOnConflict || void 0,
+        negative: options.supportsNegativeValues,
+        modifier: options.modifiers === "any" ? "any" : options.modifiers ? options.modifiers : void 0,
+        describe: `${prefix}-{value}`,
+        build: (value, { modifier }) => {
+          const shapes = shapesFor(value, modifier);
+          if (!shapes) return null;
+          return shapes.find((sh) => sh.selector === void 0)?.decls ?? {};
+        },
+        buildAll: shapesFor
+      });
+    }
+  };
+  return {
+    addUtilities: (u, o) => addStatic("utilities", u, o),
+    matchUtilities: (u, o) => addMatch("utilities", u, o),
+    addComponents: (c) => addStatic("components", c),
+    matchComponents: (c, o) => addMatch("components", c, o),
+    addBase: (base) => {
+      collector.base.push(...collapseAdjacentRules(flattenNodes(cssInJsToNodes(base))));
+    },
+    addVariant: (name, definition) => {
+      let formats;
+      if (typeof definition === "function") {
+        const result = definition({ separator: ":" });
+        formats = result === void 0 ? [] : Array.isArray(result) ? result : [result];
+      } else formats = Array.isArray(definition) ? definition : [definition];
+      const branches = formats.map(formatToBranch);
+      collector.variants.push({
+        name,
+        key: name,
+        sort: 0,
+        // assigned by the engine (registration order)
+        branches,
+        description: `plugin variant ${name}`
+      });
+    },
+    matchVariant: (name, fn, options = {}) => {
+      const values = options.values ?? {};
+      const keys = Object.keys(values).filter((k) => k !== "DEFAULT");
+      const sortFn = typeof options.sort === "function" ? options.sort : void 0;
+      const id = `plugin:${name}`;
+      collector.variants.push({
+        name,
+        key: name,
+        sort: 0,
+        // assigned by the engine (registration order)
+        functional: true,
+        slots: keys.length,
+        description: `plugin variant ${name}-*`,
+        match: (value, modifier) => {
+          let resolved;
+          if (value.startsWith("[") && value.endsWith("]"))
+            resolved = value.slice(1, -1).replace(/_/g, " ");
+          else if (values[value] !== void 0) resolved = values[value];
+          else if (value === "" && values.DEFAULT !== void 0) resolved = values.DEFAULT;
+          else return null;
+          const result = fn(resolved, { modifier });
+          const formats = Array.isArray(result) ? result : [result];
+          const slot = keys.indexOf(value);
+          return {
+            branches: formats.map(formatToBranch),
+            slot: slot === -1 ? keys.length : slot,
+            fn: sortFn ? {
+              id,
+              value: resolved,
+              modifier,
+              compare: (a, b) => sortFn(a, b)
+            } : void 0
+          };
+        }
+      });
+    },
+    theme: ctx.themeFn,
+    config: ctx.configFn,
+    corePlugins: ctx.corePluginEnabled,
+    e: escapeClassName,
+    prefix: (selector) => ctx.prefix ? selector.replace(/\.([\w-])/g, `.${ctx.prefix}$1`) : selector,
+    variants: () => [],
+    addCss: (css) => collector.rawCss.push(css)
+  };
+  function formatToBranch(format) {
+    const f = format.trim();
+    if (f.startsWith("@")) {
+      const m = /^@([\w-]+)\s*(.*)$/.exec(f);
+      const name = m ? m[1] : "media";
+      const params = m ? m[2].trim() : "";
+      const kind = name === "media" ? "media" : name === "supports" ? "supports" : name === "container" ? "container" : "raw";
+      return {
+        atrules: [
+          { kind, params: kind === "raw" ? `${name} ${params}` : params, sort: 9e3, raw: true }
+        ]
+      };
+    }
+    return { format: f.includes("&") ? f : `${f} &` };
+  }
+}
+var ApplyError = class extends Error {
+  constructor(message, candidate) {
+    super(message);
+    this.candidate = candidate;
+    this.name = "ApplyError";
+  }
+  candidate;
+};
+function replaceThemeFunctions(value, engine) {
+  if (!value.includes("theme(") && !value.includes("screen(")) return value;
+  let out = value.replace(/theme\(((?:[^()]|\([^()]*\))*)\)/g, (_whole, inner) => {
+    const path = inner.trim().replace(/^['"]|['"]$/g, "").replace(/\s*\/\s*/g, "/");
+    const resolved = engine.lookupTheme(path);
+    if (resolved === void 0)
+      throw new ApplyError(`'${path}' does not exist in your theme config.`);
+    return resolved;
+  });
+  out = out.replace(/screen\(([^)]+)\)/g, (_whole, name) => {
+    const key = name.trim().replace(/^['"]|['"]$/g, "");
+    const px = engine.theme.screens[key];
+    if (px === void 0) throw new ApplyError(`The '${key}' screen does not exist in your theme.`);
+    return `(min-width: ${px})`;
+  });
+  return out;
+}
+function processAuthorCss(css, engine, options = {}) {
+  const root = parseCss(css);
+  processNodes(root.nodes, engine, options);
+  return serializeCss(root);
+}
+function processNodes(nodes, engine, options, parent, insideAtRule, directChildren = false) {
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (node.type === "decl") {
+      node.value = replaceThemeFunctions(node.value, engine);
+      continue;
+    }
+    if (node.type === "atrule") {
+      if (node.name === "apply" && directChildren) continue;
+      if (node.name === "screen") {
+        const key = node.params.trim();
+        const px = engine.theme.screens[key];
+        if (px === void 0)
+          throw new ApplyError(`The '${key}' screen does not exist in your theme.`);
+        node.name = "media";
+        node.params = `(min-width: ${px})`;
+      } else if (node.name === "apply") {
+        if (!parent) throw new ApplyError("`@apply` must be used inside a rule.");
+        const list = node.params.replace(/\s!important$/, "").trim().split(/\s+/);
+        throw new ApplyError(
+          insideAtRule === "screen" ? `@apply is not supported within nested at-rules like @screen. We suggest you write this as @apply ${list.map((c) => `${node.params.trim()}:${c}`).join(" ")} instead.` : `@apply is not supported within nested at-rules like @${insideAtRule}. You can fix this by un-nesting @${insideAtRule}.`
+        );
+      }
+      if (node.params) node.params = replaceThemeFunctions(node.params, engine);
+      if (node.nodes) processNodes(node.nodes, engine, options, parent, node.name);
+      continue;
+    }
+    if (node.type === "rule") {
+      processNodes(node.nodes, engine, options, node, void 0, true);
+      if (!node.nodes.some((n) => n.type === "atrule" && n.name === "apply")) continue;
+      const out = expandRule(node, engine, options);
+      nodes.splice(i, 1, ...out);
+      i += out.length - 1;
+    }
+  }
+}
+function expandRule(rule, engine, options) {
+  const groups = [];
+  let current = [];
+  for (const child of rule.nodes) {
+    if (child.type === "atrule" && child.name === "apply") {
+      if (current.length) groups.push(current);
+      current = [];
+      groups.push([child]);
+    } else current.push(child);
+  }
+  if (current.length) groups.push(current);
+  const out = [];
+  for (const group of groups) {
+    const first = group[0];
+    if (group.length === 1 && first.type === "atrule" && first.name === "apply") {
+      const { decls, extraRules } = expandApply(first.params, engine, rule, options);
+      if (decls.length) out.push({ ...rule, nodes: decls });
+      extraRules.sort((a, b) => compareRules(a.rule, b.rule) || a.seq - b.seq);
+      for (const r of extraRules) out.push(r.node);
+    } else out.push({ ...rule, nodes: group });
+  }
+  return collapseAdjacentRules(out);
+}
+var siblingSeq = 0;
+function expandApply(params, engine, parent, options) {
+  let important = false;
+  let list = params.trim();
+  if (/\s!important$/.test(list)) {
+    important = true;
+    list = list.replace(/\s!important$/, "");
+  }
+  const candidates = list.split(/\s+/).filter(Boolean);
+  const decls = [];
+  const extraRules = [];
+  const compiled = [];
+  const parentClasses = [...parent.selector.matchAll(/\.((?:\\.|[\w-])+)/g)].map(
+    (m) => m[1].replace(/\\(.)/g, "$1")
+  );
+  for (const candidate of candidates) {
+    if (candidate === "group" || candidate === "peer")
+      throw new ApplyError(`@apply should not be used with the '${candidate}' utility`, candidate);
+    const rules = engine.compile(candidate);
+    if (rules.length === 0) {
+      if (options.strict === false) continue;
+      throw new ApplyError(
+        `The \`${candidate}\` class does not exist. If \`${candidate}\` is a custom class, make sure it is defined within a \`@layer\` directive or a plugin.`,
+        candidate
+      );
+    }
+    const base = candidate.slice(candidate.lastIndexOf(":") + 1).replace(/^!/, "");
+    if (parentClasses.includes(candidate) || parentClasses.includes(base))
+      throw new ApplyError(
+        `You cannot \`@apply\` the \`${candidate}\` utility here because it creates a circular dependency.`,
+        candidate
+      );
+    for (const rule of rules) compiled.push({ candidate, rule });
+  }
+  compiled.sort((a, b) => compareRules(a.rule, b.rule));
+  for (const { candidate, rule } of compiled) {
+    const bang = important || rule.candidate.startsWith("!");
+    const ruleDecls = Object.entries(rule.decls).map(([prop, value]) => {
+      const isImp = bang || / !important$/.test(value);
+      return {
+        type: "decl",
+        prop,
+        value: value.replace(/ !important$/, ""),
+        important: isImp || void 0
+      };
+    });
+    const escaped = `.${escapeClassName(candidate)}`;
+    const isPlain = rule.atrules.length === 0 && rule.selector === escaped;
+    if (isPlain) {
+      decls.push(...ruleDecls);
+      continue;
+    }
+    const selectors = splitAtTopLevelOnly(parent.selector, ",").map((s) => s.trim());
+    const newSelector = selectors.map((ps) => {
+      if (rule.selector === escaped) return ps;
+      return rule.selector.split(escaped).join(ps);
+    }).join(", ");
+    let node = { type: "rule", selector: newSelector, nodes: ruleDecls };
+    for (let a = rule.atrules.length - 1; a >= 0; a--) {
+      const at = rule.atrules[a];
+      node = {
+        type: "atrule",
+        name: atName(at.kind, at.params),
+        params: atParams(at.kind, at.params),
+        nodes: [node]
+      };
+    }
+    extraRules.push({ node, rule, seq: siblingSeq++ });
+  }
+  return { decls, extraRules };
+}
+function atName(kind, params) {
+  if (kind === "raw") return params.split(/\s+/)[0];
+  if (kind === "starting") return "starting-style";
+  return kind;
+}
+function atParams(kind, params) {
+  if (kind === "raw") return params.slice(params.indexOf(" ") + 1);
+  if (kind === "starting") return "";
+  return params;
+}
+var STATE_VARIANTS = [
+  {
+    prefix: "hover",
+    suffix: ":hover",
+    ancestor: "",
+    configKey: "hover",
+    description: "applies on hover"
+  },
+  {
+    prefix: "focus",
+    suffix: ":focus",
+    ancestor: "",
+    configKey: "focus",
+    description: "applies on focus"
+  },
+  {
+    prefix: "focus-visible",
+    suffix: ":focus-visible",
+    ancestor: "",
+    configKey: "focusVisible",
+    description: "keyboard focus"
+  },
+  {
+    prefix: "focus-within",
+    suffix: ":focus-within",
+    ancestor: "",
+    configKey: "focusWithin",
+    description: "a descendant has focus"
+  },
+  {
+    prefix: "active",
+    suffix: ":active",
+    ancestor: "",
+    configKey: "active",
+    description: "while pressed"
+  },
+  {
+    prefix: "visited",
+    suffix: ":visited",
+    ancestor: "",
+    configKey: "visited",
+    description: "visited links"
+  },
+  {
+    prefix: "disabled",
+    suffix: ":disabled",
+    ancestor: "",
+    configKey: "disabled",
+    description: "disabled controls"
+  },
+  {
+    prefix: "first",
+    suffix: ":first-child",
+    ancestor: "",
+    configKey: "firstChild",
+    description: "first child"
+  },
+  {
+    prefix: "last",
+    suffix: ":last-child",
+    ancestor: "",
+    configKey: "lastChild",
+    description: "last child"
+  },
+  {
+    prefix: "group-hover",
+    suffix: "",
+    ancestor: ".group:hover",
+    configKey: "groupHover",
+    description: "parent .group hovered"
+  },
+  {
+    prefix: "group-focus",
+    suffix: "",
+    ancestor: ".group:focus",
+    configKey: "groupFocus",
+    description: "parent .group focused"
+  },
+  {
+    prefix: "peer-hover",
+    suffix: "",
+    ancestor: ".peer:hover ~",
+    configKey: "peerHover",
+    description: "preceding .peer hovered"
+  },
+  {
+    prefix: "peer-focus",
+    suffix: "",
+    ancestor: ".peer:focus ~",
+    configKey: "peerFocus",
+    description: "preceding .peer focused"
+  },
+  {
+    prefix: "dark",
+    suffix: "",
+    ancestor: ":is(.dark *)",
+    configKey: "dark",
+    description: "dark mode"
+  }
+];
+var VERSION = "3.0.0";
+var CORE_SCREENS = ["sm", "md", "lg", "xl", "2xl"];
+var CSSGenerator = class {
+  config;
+  /** the fully resolved theme (Tailwind-shaped scales) */
+  theme;
+  engine;
+  variantCfg;
+  breakpoints;
+  catalog = null;
+  catalogByClass = null;
+  pluginBase;
+  pluginRawCss;
+  corePluginsEnabled;
+  constructor(config = {}) {
+    let draft = {};
+    for (const preset of config.presets ?? []) draft = mergePreset(draft, preset);
+    draft = mergePreset(draft, config);
+    const plugins = (draft.plugins ?? []).map((p) => normalizePlugin(p));
+    const pluginThemes = [];
+    for (const p of plugins) {
+      if (p.legacyConfig) p.legacyConfig(draft);
+      if (p.config) {
+        const { theme, ...rest } = p.config;
+        if (theme) pluginThemes.push(theme);
+        for (const [k, v] of Object.entries(rest))
+          if (draft[k] === void 0)
+            draft[k] = v;
+      }
+    }
+    const corePlugins = draft.corePlugins ?? {};
+    this.corePluginsEnabled = Array.isArray(corePlugins) ? (name) => corePlugins.includes(name) || ["base", "variables", "components", "animations"].includes(name) : (name) => corePlugins[name] !== false;
+    this.config = {
+      ...draft,
+      theme: draft.theme ?? {},
+      variants: { ...defaultVariants, ...draft.variants },
+      darkMode: draft.darkMode ?? "class",
+      content: draft.content,
+      purge: draft.purge ?? [],
+      safelist: draft.safelist ?? [],
+      blocklist: draft.blocklist ?? [],
+      plugins: draft.plugins ?? [],
+      important: draft.important ?? false,
+      corePlugins,
+      prefix: draft.prefix ?? "",
+      extractorPattern: draft.extractorPattern,
+      layers: draft.layers ?? false,
+      preflight: draft.preflight ?? true
+    };
+    this.variantCfg = this.config.variants;
+    this.theme = resolveTheme(this.config.theme, { pluginTheme: pluginThemes });
+    this.breakpoints = Object.entries(this.theme.screens).map(([name, value]) => ({ name, value, px: screenPx(value) })).filter((b) => !Number.isNaN(b.px) && b.px > 0).sort((a, b) => a.px - b.px);
+    const collector = {
+      statics: [],
+      functional: [],
+      variants: [],
+      base: [],
+      rawCss: []
+    };
+    const themeFn = (path, fallback) => {
+      if (path === void 0) return this.theme;
+      const v = lookup(this.theme, path);
+      return v === void 0 ? fallback : v;
+    };
+    for (const p of plugins) {
+      if (!p.handler) continue;
+      const api = createPluginAPI(collector, {
+        theme: this.theme,
+        themeFn,
+        configFn: (path, fallback) => {
+          if (path === void 0) return { ...this.config, theme: this.theme };
+          if (path === "prefix") return this.config.prefix;
+          if (path === "separator") return ":";
+          if (path === "darkMode") return this.config.darkMode;
+          const v = lookup({ ...this.config, theme: this.theme }, path);
+          return v === void 0 ? fallback : v;
+        },
+        corePluginEnabled: this.corePluginsEnabled,
+        prefix: this.config.prefix ?? "",
+        pluginName: "plugin"
+      });
+      p.handler(api);
+    }
+    this.pluginBase = collector.base;
+    this.pluginRawCss = collector.rawCss;
+    this.engine = new Engine({
+      theme: this.theme,
+      darkMode: this.variantCfg.dark === false ? false : this.config.darkMode ?? "class",
+      pluginEnabled: this.corePluginsEnabled,
+      variantEnabled: (key) => this.isVariantEnabled(key),
+      important: this.config.important ?? false,
+      extraStatic: collector.statics,
+      extraFunctional: collector.functional,
+      extraVariants: collector.variants,
+      combineMedia: true
+    });
+  }
+  // ───────────────────────────────────────────── API ─────────────────────────────────────────────
+  /**
+   * Generate the stylesheet.
+   *
+   * - `full` mode (default): base styles, CSS variables, keyframes, every
+   *   utility + its responsive variants, and the component set.
+   * - `jit` mode: only the utilities found in `options.content`
+   *   (state variants and variant combinations included).
+   */
+  generate(options = {}) {
+    const mode = options.mode ?? (this.hasContent() ? "jit" : "full");
+    const css = mode === "jit" ? this.generateJIT(options.content ?? this.getContentFromConfig(), options) : this.generateFull(options);
+    return options.minify ? minifyCss(css) : css;
+  }
+  /** Generate JIT CSS from explicit content */
+  generateFromContent(content, options = {}) {
+    const css = this.generateJIT(content, options);
+    return options.minify ? minifyCss(css) : css;
+  }
+  /** All utility rules in catalog order (value-bearing classes, no variants) */
+  getUtilities() {
+    return [...this.buildCatalog()];
+  }
+  /** Look up a single utility by (base) class name */
+  getUtility(className) {
+    this.buildCatalog();
+    const hit = this.catalogByClass.get(className);
+    if (hit) return hit;
+    const rules = this.engine.compile(className);
+    if (rules.length === 0) return void 0;
+    return {
+      class: className,
+      group: rules[0].plugin,
+      category: categoryForPlugin(rules[0].plugin),
+      decls: Object.assign({}, ...rules.map((r) => r.decls)),
+      description: `${className} (computed)`
+    };
+  }
+  /** Every variant name the engine knows (static + functional prefixes) */
+  getVariantNames() {
+    return this.engine.getVariants().map((v) => v.name);
+  }
+  /** Variant definitions (docs / IntelliSense) */
+  getVariantDefinitions() {
+    return this.engine.getVariants();
+  }
+  /** Resolved breakpoints, ascending */
+  getBreakpoints() {
+    return this.variantCfg.responsive !== false ? [...this.breakpoints] : [];
+  }
+  /** Compile a single candidate to CSS (empty string when unknown) */
+  compileClass(candidate) {
+    return this.serializeRules(this.engine.compile(candidate));
+  }
+  /** Statistics about a generated stylesheet */
+  getStats(css) {
+    const generated = css ?? this.generate();
+    const minified = minifyCss(generated);
+    const ruleCount = (generated.match(/\{[^{}]*\}/g) ?? []).length;
+    const responsiveRules = countRulesInside(generated, /@media \((?:min|max)-width/);
+    const variantRules = (generated.match(/\\:/g) ?? []).length;
+    return {
+      utilities: this.buildCatalog().length,
+      responsiveRules,
+      variantRules,
+      totalRules: ruleCount,
+      sizeBytes: byteLength(generated),
+      minifiedSizeBytes: byteLength(minified)
+    };
+  }
+  minify(css) {
+    return minifyCss(css);
+  }
+  /** Expand `@apply`, `theme()`, `screen()` and `@screen` in author CSS */
+  processCss(css, options = {}) {
+    return processAuthorCss(css, this.engine, options);
+  }
+  /** Resolve a theme path (`colors.blue.500`, `spacing[2.5]`) */
+  themeValue(path) {
+    return this.engine.lookupTheme(path);
+  }
+  // ───────────────────────────── layer accessors ─────────────────────────────
+  /** Base styles (reset, `--tw-*` defaults, plugin base) */
+  getBase() {
+    return this.baseStyles();
+  }
+  /** `:root` CSS variables */
+  getVariables() {
+    return this.variables();
+  }
+  /** `@keyframes` for the referenced animations (all when `names` is omitted) */
+  getKeyframes(names) {
+    return this.keyframes(names);
+  }
+  /**
+   * Full utility set.
+   * @param includeVariants when true (default) the classic state variants
+   *   (`STATE_VARIANTS`) are included — the standard full build omits them.
+   */
+  getUtilitiesFull(includeVariants = true, options = {}) {
+    const catalog = this.buildCatalog();
+    const prefix = this.config.prefix ?? "";
+    const base = [];
+    for (const r of catalog) {
+      const cls = r.class.slice(prefix.length);
+      for (const c of this.engine.compile(cls))
+        base.push(prefix ? this.reprefix(c, cls, r.class) : c);
+    }
+    let css = this.serializeRules(base);
+    for (const bp of this.fullBuildScreens(options.screens)) {
+      const wrapped = [];
+      const vm = this.engine.resolveVariant(bp.name);
+      const at = vm?.branches[0]?.atrules?.[0] ?? {
+        kind: "media",
+        params: `(min-width: ${bp.value})`,
+        sort: 1e3 + bp.px / 10,
+        min: bp.px
+      };
+      for (const rule of base) {
+        const from = `.${escapeClass(rule.candidate)}`;
+        const to = `.${escapeClass(`${bp.name}:${rule.candidate}`)}`;
+        wrapped.push({
+          ...rule,
+          selector: rule.selector.split(from).join(to),
+          atrules: [at, ...rule.atrules],
+          sort: {
+            ...rule.sort,
+            variant: 1,
+            variants: vm ? [vm.sort] : [],
+            hooks: vm?.fn ? [{ ...vm.fn, bit: vm.sort }] : void 0
+          }
+        });
+      }
+      css += this.serializeRules(wrapped);
+    }
+    if (includeVariants) {
+      const candidates = [];
+      for (const v of STATE_VARIANTS) {
+        if (!this.isVariantEnabled(v.configKey)) continue;
+        for (const r of catalog) candidates.push(`${v.prefix}:${r.class}`);
+      }
+      css += this.compileCandidates(candidates).css;
+    }
+    return css;
+  }
+  /**
+   * Screens that get responsive variants in the *full* build. Default
+   * (`'core'`): the classic `sm`–`2xl` set, so the extended 10-step scale
+   * does not multiply the CDN bundle (every screen is always available in
+   * JIT mode). `'all'` or an explicit list opt in.
+   */
+  fullBuildScreens(screens = "core") {
+    const all = this.getBreakpoints();
+    if (screens === "all") return all;
+    const wanted = new Set(screens === "core" ? CORE_SCREENS : screens);
+    const picked = all.filter((b) => wanted.has(b.name));
+    return screens === "core" && picked.length === 0 ? all : picked;
+  }
+  reprefix(rule, from, to) {
+    return {
+      ...rule,
+      selector: rule.selector.split(`.${escapeClass(from)}`).join(`.${escapeClass(to)}`)
+    };
+  }
+  /** Design-paradigm component CSS */
+  getComponents() {
+    return this.components();
+  }
+  // ─────────────────────────────────────────── internals ───────────────────────────────────────────
+  hasContent() {
+    if (this.config.content !== void 0) {
+      const c = this.config.content;
+      return c !== "" && !(Array.isArray(c) && c.length === 0);
+    }
+    return false;
+  }
+  getContentFromConfig() {
+    const content = this.config.content ?? this.config.purge;
+    if (typeof content === "string") return [content];
+    return Array.isArray(content) ? content : [];
+  }
+  isVariantEnabled(key) {
+    const cfg = this.variantCfg;
+    if (cfg[key] === false) return false;
+    for (const [legacy, name] of Object.entries(LEGACY_VARIANT_KEYS)) {
+      if (name === key && cfg[legacy] === false) return false;
+    }
+    const camel = key.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
+    if (camel !== key && cfg[camel] === false) return false;
+    return true;
+  }
+  buildCatalog() {
+    if (this.catalog) return this.catalog;
+    const prefix = this.config.prefix ?? "";
+    const entries = this.engine.buildCatalog();
+    this.catalog = entries.map((e) => ({
+      class: prefix + e.class,
+      group: e.plugin,
+      category: categoryForPlugin(e.plugin),
+      decls: e.decls,
+      description: e.description
+    }));
+    this.catalogByClass = new Map(this.catalog.map((r) => [r.class, r]));
+    return this.catalog;
+  }
+  /** Compile candidates → ordered CSS text plus bookkeeping */
+  compileCandidates(candidates) {
+    const prefix = this.config.prefix ?? "";
+    const block = new Set(this.config.blocklist ?? []);
+    const rules = [];
+    const emitted = /* @__PURE__ */ new Set();
+    const animations = /* @__PURE__ */ new Set();
+    const defaults = /* @__PURE__ */ new Set();
+    const ordered = [...new Set(candidates)].sort((x, y) => x < y ? -1 : x > y ? 1 : 0);
+    for (const raw of ordered) {
+      if (emitted.has(raw) || block.has(raw)) continue;
+      let candidate = raw;
+      if (prefix) {
+        const idx = raw.lastIndexOf(":");
+        const base = raw.slice(idx + 1);
+        const neg = base.startsWith("-") ? "-" : "";
+        const bang = base.startsWith("!") ? "!" : "";
+        const core = base.slice(neg.length + bang.length);
+        if (!core.startsWith(prefix)) continue;
+        candidate = raw.slice(0, idx + 1) + neg + bang + core.slice(prefix.length);
+      }
+      const compiled = this.engine.compile(candidate);
+      if (compiled.length === 0) continue;
+      emitted.add(raw);
+      for (const r of compiled) {
+        const rule = prefix ? {
+          ...r,
+          selector: r.selector.split(`.${escapeClass(candidate)}`).join(`.${escapeClass(raw)}`)
+        } : r;
+        rules.push(rule);
+        if (r.defaults) defaults.add(r.defaults);
+        for (const a of r.animations ?? []) animations.add(a);
+      }
+    }
+    return { css: this.serializeRules(rules), emitted, animations, defaults };
+  }
+  /** Sort rules (variant weight → plugin → utility → value) and serialise with grouped at-rules. */
+  serializeRules(rules) {
+    const sorted = [...rules].sort(compareRules);
+    let out = "";
+    let openKey = "";
+    let openDepth = 0;
+    const closeAll = () => {
+      while (openDepth > 0) {
+        openDepth--;
+        out += `${"  ".repeat(openDepth)}}
+`;
+      }
+      openKey = "";
+    };
+    for (const rule of sorted) {
+      const key = rule.atrules.map(atRuleText).join("\0");
+      if (key !== openKey) {
+        closeAll();
+        for (const at of rule.atrules) {
+          out += `${"  ".repeat(openDepth)}${atRuleText(at)} {
+`;
+          openDepth++;
+        }
+        openKey = key;
+      }
+      out += `${"  ".repeat(openDepth)}${rule.selector} { ${stringifyDecls(rule.decls)}; }
+`;
+    }
+    closeAll();
+    return out;
+  }
+  // ─────────────────────────────── layers ───────────────────────────────
+  baseStyles() {
+    if (!this.corePluginsEnabled("base")) return "";
+    let css = "";
+    if (this.config.preflight !== false && this.corePluginsEnabled("preflight"))
+      css += preflight(this.theme);
+    css += this.twDefaults();
+    if (this.pluginBase.length) css += serializeCss(this.pluginBase);
+    return css;
+  }
+  /** `*, ::before, ::after { --tw-… }` defaults required by composed utilities */
+  twDefaults(groups) {
+    const wanted = groups ?? new Set(Object.keys(DEFAULTS_GROUPS));
+    const decls = {};
+    for (const g of Object.keys(DEFAULTS_GROUPS)) {
+      if (!wanted.has(g)) continue;
+      Object.assign(decls, DEFAULTS_GROUPS[g]);
+    }
+    if (Object.keys(decls).length === 0) return "";
+    const body = Object.entries(decls).map(([k, v]) => `  ${k}: ${v};`).join("\n");
+    return `
+*, ::before, ::after {
+${body}
+}
+
+::backdrop {
+${body}
+}
+`;
+  }
+  variables() {
+    if (!this.corePluginsEnabled("variables")) return "";
+    let css = "\n/* Nakshora v3 \u2014 CSS Variables */\n:root {\n";
+    for (const [name, scale] of Object.entries(this.theme.colors ?? {})) {
+      if (typeof scale === "string") css += `  --color-${name}: ${scale};
+`;
+      else if (scale && typeof scale === "object") {
+        for (const [shade, value] of Object.entries(scale)) {
+          if (typeof value === "string")
+            css += `  --color-${name}${shade === "DEFAULT" ? "" : `-${shade}`}: ${value};
+`;
+        }
+      }
+    }
+    for (const [key, value] of Object.entries(this.theme.spacing ?? {}))
+      css += `  --spacing-${cssIdent(key)}: ${value};
+`;
+    for (const [size, value] of Object.entries(this.theme.fontSize ?? {}))
+      css += `  --text-${size}: ${Array.isArray(value) ? value[0] : String(value)};
+`;
+    for (const [name, value] of Object.entries(this.theme.fontFamily ?? {}))
+      css += `  --font-${name}: ${Array.isArray(value) ? value.join(", ") : String(value)};
+`;
+    for (const [name, value] of Object.entries(this.theme.screens ?? {}))
+      css += `  --breakpoint-${name}: ${value};
+`;
+    css += "}\n";
+    return css;
+  }
+  keyframes(names) {
+    if (!this.corePluginsEnabled("animations") && !this.corePluginsEnabled("animation")) return "";
+    const keyframes = this.theme.keyframes ?? {};
+    const animations = this.theme.animation ?? {};
+    const needed = names ?? new Set(Object.values(animations).map((v) => String(v).split(/\s+/)[0]));
+    let css = "";
+    for (const [name, body] of Object.entries(keyframes)) {
+      if (!needed.has(name)) continue;
+      css += `@keyframes ${name} {
+`;
+      for (const [step, decls] of Object.entries(body)) {
+        css += `  ${step} { ${Object.entries(decls).map(([k, v]) => `${kebabCase(k)}: ${v};`).join(" ")} }
+`;
+      }
+      css += "}\n";
+    }
+    return css ? `
+/* Nakshora v3 \u2014 Keyframes */
+${css}` : "";
+  }
+  components() {
+    if (!this.corePluginsEnabled("components")) return "";
+    let css = "\n/* Nakshora v3 \u2014 Components */\n";
+    for (const block of Object.values(componentCss)) css += block;
+    if (this.pluginRawCss.length) css += `${this.pluginRawCss.join("\n")}
+`;
+    return css;
+  }
+  wrapLayer(name, css) {
+    if (!css.trim()) return "";
+    if (!this.config.layers) return css;
+    return `@layer ${name} {
+${css}}
+`;
+  }
+  // ─────────────────────────────── full mode ───────────────────────────────
+  generateFull(options) {
+    let css = `/*! Nakshora v${VERSION} \u2014 utility-first CSS framework (full build) */
+`;
+    if (this.config.layers) css += "@layer base, components, utilities;\n";
+    css += this.wrapLayer("base", this.baseStyles() + this.variables() + this.keyframes());
+    css += this.wrapLayer("components", this.components());
+    css += "\n/* \u2500\u2500\u2500 Utilities \u2500\u2500\u2500 */\n";
+    css += this.wrapLayer("utilities", this.getUtilitiesFull(false, { screens: options.screens }));
+    return css;
+  }
+  // ─────────────────────────────── JIT mode ───────────────────────────────
+  /**
+   * Compile a JIT build from content.
+   * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
+   */
+  generateJIT(content, _options, internal) {
+    const utilitiesOnly = internal?.utilitiesOnly ?? false;
+    const chunks = typeof content === "string" ? [content] : content ?? [];
+    const found = extractClasses(chunks, this.config.extractorPattern);
+    for (const safe of this.config.safelist ?? []) found.add(safe);
+    const { css: utilities, emitted, animations, defaults } = this.compileCandidates(found);
+    let css = "";
+    if (!utilitiesOnly) {
+      css += `/*! Nakshora v${VERSION} \u2014 JIT build \xB7 ${emitted.size} classes */
+`;
+      if (this.config.layers) css += "@layer base, components, utilities;\n";
+      let base = "";
+      if (this.corePluginsEnabled("base")) {
+        if (this.config.preflight !== false && this.corePluginsEnabled("preflight"))
+          base += preflight(this.theme);
+        base += this.twDefaults(defaults);
+        if (this.pluginBase.length) base += serializeCss(this.pluginBase);
+      }
+      css += this.wrapLayer("base", base + this.variables() + this.keyframes(animations));
+      css += this.wrapLayer("components", this.componentsFor(found));
+    }
+    css += "\n/* \u2500\u2500\u2500 Utilities (JIT) \u2500\u2500\u2500 */\n";
+    css += this.wrapLayer("utilities", utilities);
+    return css;
+  }
+  /** Components layer — only the built-in blocks whose classes appear in `candidates`. */
+  componentsFor(candidates) {
+    if (!this.corePluginsEnabled("components")) return "";
+    const used = /* @__PURE__ */ new Set();
+    for (const c of candidates) {
+      const base = c.slice(c.lastIndexOf(":") + 1);
+      used.add(base);
+    }
+    let css = "";
+    for (const block of Object.values(componentCss)) {
+      const classes = [...block.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((m) => m[1]);
+      if (classes.some((c) => used.has(c))) css += block;
+    }
+    if (this.pluginRawCss.length) css += `${this.pluginRawCss.join("\n")}
+`;
+    return css ? `
+/* Nakshora v3 \u2014 Components */
+${css}` : "";
+  }
+};
+function mergePreset(base, preset) {
+  if ("colors" in preset && !("theme" in preset)) {
+    const p = preset;
+    const { name: _n, description: _d, ...themeBits } = p;
+    return { ...base, theme: deepMerge(base.theme ?? {}, themeBits) };
+  }
+  const cfg = preset;
+  return {
+    ...base,
+    ...cfg,
+    theme: deepMerge(base.theme ?? {}, cfg.theme ?? {}),
+    variants: { ...base.variants, ...cfg.variants },
+    corePlugins: Array.isArray(cfg.corePlugins) ? cfg.corePlugins : { ...Array.isArray(base.corePlugins) ? {} : base.corePlugins, ...cfg.corePlugins },
+    plugins: [...base.plugins ?? [], ...cfg.plugins ?? []],
+    safelist: [...base.safelist ?? [], ...cfg.safelist ?? []]
+  };
+}
+function lookup(obj, path) {
+  let cur = obj;
+  for (const key of splitPath(path)) {
+    if (cur === null || typeof cur !== "object") return void 0;
+    cur = cur[key];
+  }
+  return cur;
+}
+function screenPx(value) {
+  const m = /^(\d+(?:\.\d+)?)(px|rem|em)?$/.exec(String(value).trim());
+  if (!m) return NaN;
+  return m[2] === "rem" || m[2] === "em" ? parseFloat(m[1]) * 16 : parseFloat(m[1]);
+}
+function cssIdent(key) {
+  return key.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+function kebabCase(prop) {
+  return prop.startsWith("--") ? prop : prop.replace(/([a-z\d])([A-Z])/g, "$1-$2").toLowerCase();
+}
+function atRuleText(at) {
+  switch (at.kind) {
+    case "media":
+      return `@media ${at.params}`;
+    case "supports":
+      return `@supports ${at.params}`;
+    case "container":
+      return `@container ${at.params}`;
+    case "starting":
+      return "@starting-style";
+    default:
+      return `@${at.params}`;
+  }
+}
+function countRulesInside(css, header) {
+  let count = 0;
+  const lines = css.split("\n");
+  let depth = 0;
+  let inside = 0;
+  for (const line of lines) {
+    if (header.test(line) && line.trimEnd().endsWith("{")) {
+      inside = depth + 1;
+      depth++;
+      continue;
+    }
+    const opens = (line.match(/\{/g) ?? []).length;
+    const closes = (line.match(/\}/g) ?? []).length;
+    if (inside && depth >= inside && /\{[^}]*\}/.test(line)) count++;
+    depth += opens - closes;
+    if (depth < inside) inside = 0;
+  }
+  return count;
+}
+function preflight(theme) {
+  const sans = fontStack(theme.fontFamily?.sans) || 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
+  const mono = fontStack(theme.fontFamily?.mono) || 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
+  const border = theme.borderColor?.DEFAULT ?? "#e5e7eb";
+  const placeholder = (theme.colors.gray ?? {})[400] ?? "#9ca3af";
+  return `/* Nakshora v3 \u2014 Base (preflight) */
+*, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: ${String(border)}; }
+::before, ::after { --tw-content: ''; }
+html, :host { line-height: 1.5; -webkit-text-size-adjust: 100%; -moz-tab-size: 4; tab-size: 4; font-family: ${sans}; font-feature-settings: normal; font-variation-settings: normal; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; line-height: inherit; }
+hr { height: 0; color: inherit; border-top-width: 1px; }
+abbr:where([title]) { text-decoration: underline dotted; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+a { color: inherit; text-decoration: inherit; }
+b, strong { font-weight: bolder; }
+code, kbd, samp, pre { font-family: ${mono}; font-feature-settings: normal; font-variation-settings: normal; font-size: 1em; }
+small { font-size: 80%; }
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+sub { bottom: -0.25em; }
+sup { top: -0.5em; }
+table { text-indent: 0; border-color: inherit; border-collapse: collapse; }
+button, input, optgroup, select, textarea { font-family: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-size: 100%; font-weight: inherit; line-height: inherit; letter-spacing: inherit; color: inherit; margin: 0; padding: 0; }
+button, select { text-transform: none; }
+button, input:where([type='button']), input:where([type='reset']), input:where([type='submit']) { -webkit-appearance: button; background-color: transparent; background-image: none; }
+:-moz-focusring { outline: auto; }
+:-moz-ui-invalid { box-shadow: none; }
+progress { vertical-align: baseline; }
+::-webkit-inner-spin-button, ::-webkit-outer-spin-button { height: auto; }
+[type='search'] { -webkit-appearance: textfield; outline-offset: -2px; }
+::-webkit-search-decoration { -webkit-appearance: none; }
+::-webkit-file-upload-button { -webkit-appearance: button; font: inherit; }
+summary { display: list-item; }
+blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre { margin: 0; }
+fieldset { margin: 0; padding: 0; }
+legend { padding: 0; }
+ol, ul, menu { list-style: none; margin: 0; padding: 0; }
+dialog { padding: 0; }
+textarea { resize: vertical; }
+input::placeholder, textarea::placeholder { opacity: 1; color: ${placeholder}; }
+button, [role="button"] { cursor: pointer; }
+:disabled { cursor: default; }
+img, svg, video, canvas, audio, iframe, embed, object { display: block; vertical-align: middle; }
+img, video { max-width: 100%; height: auto; }
+[hidden]:where(:not([hidden="until-found"])) { display: none; }
+`;
+}
+function fontStack(value) {
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "string") return value;
+  return "";
+}
 
 // src/index.ts
 async function resolveContent(content, baseDir) {
@@ -2355,12 +7740,26 @@ function layerCss(layer, generator) {
       return generator.getKeyframes();
     case "utilities":
     case "utils":
-      return generator.getUtilitiesFull();
+      return generator.getUtilitiesFull(false);
     case "components":
       return generator.getComponents();
     default:
       return "";
   }
+}
+function spliceCss(atRule, css) {
+  const parent = atRule.parent;
+  if (!parent) return;
+  const parsed = postcss.parse(css, { from: void 0 });
+  const fresh = parsed.nodes;
+  parsed.nodes = [];
+  for (const n of fresh) n.parent = parent;
+  if (fresh[0] && !fresh[0].raws.before) fresh[0].raws.before = atRule.raws.before;
+  const nodes = parent.nodes ?? [];
+  const idx = parent.index(atRule);
+  atRule.parent = void 0;
+  parent.nodes = nodes.slice(0, idx).concat(fresh, nodes.slice(idx + 1));
+  parent.markDirty();
 }
 function nakshora(options = {}) {
   return {
@@ -2374,7 +7773,11 @@ function nakshora(options = {}) {
       if (!hasAtRule) return;
       const useJIT = config.content !== void 0 || config.purge !== void 0;
       const content = await resolveContent(config.content ?? config.purge, baseDir);
+      const atRules = [];
       root.walkAtRules("nakshora", (atRule) => {
+        atRules.push(atRule);
+      });
+      for (const atRule of atRules) {
         const param = atRule.params.trim().toLowerCase();
         let css;
         if (useJIT && content.length > 0 && (param === "source" || param === "utilities" || param === "utils" || param === "")) {
@@ -2384,16 +7787,17 @@ function nakshora(options = {}) {
           if (options.minify) css = generator.minify(css);
         }
         if (css) {
-          atRule.replaceWith(...postcss.parse(css, { from: void 0 }).nodes);
+          spliceCss(atRule, css);
         } else {
           atRule.remove();
         }
-      });
+      }
     }
   };
 }
 nakshora.postcss = true;
 export {
-  nakshora as default
+  nakshora as default,
+  spliceCss
 };
 //# sourceMappingURL=index.js.map
