@@ -8,7 +8,27 @@ import type { Plugin as VitePlugin } from 'vite';
 import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { globby } from 'globby';
-import { CSSGenerator, type NakshoraConfig } from '@nakshora/core';
+import {
+  CSSGenerator,
+  ContentCache,
+  scanSources,
+  type NakshoraConfig,
+  type ScanFs,
+} from '@nakshora/core';
+
+/** Process-wide incremental scan cache (dev server rebuilds only re-read changed files). */
+const contentCache = new ContentCache();
+const scanFs: ScanFs = {
+  stat: (p) => {
+    try {
+      const st = statSync(p);
+      return { mtimeMs: st.mtimeMs, size: st.size };
+    } catch {
+      return null;
+    }
+  },
+  read: (p) => readFileSync(p, 'utf-8'),
+};
 import nakshoraPostcss from '@nakshora/postcss';
 import { createWatcher, type WatcherHandle } from './watch';
 
@@ -27,39 +47,31 @@ export interface NakshoraViteOptions {
 }
 
 const VIRTUAL_ID = 'virtual:nakshora';
-const RESOLVED_VIRTUAL_ID = '\0' + VIRTUAL_ID;
+// The resolved id must end in `.css` so Vite's CSS pipeline (and Rollup in
+// `vite build`) treats the module as a stylesheet instead of parsing it as JS.
+const RESOLVED_VIRTUAL_ID = '\0' + VIRTUAL_ID + '.css';
 
-async function resolveContent(
+async function resolveCandidates(
   content: string | string[] | undefined,
   root: string,
-): Promise<string[]> {
-  if (!content) return [];
+): Promise<Set<string>> {
+  if (!content) return new Set();
   const entries = Array.isArray(content) ? content : [content];
   const globs: string[] = [];
-  const chunks: string[] = [];
+  const files: string[] = [];
+  const raw: string[] = [];
   for (const entry of entries) {
     if (!entry) continue;
     if (entry.includes('*') || entry.includes('{') || entry.includes('[')) {
       globs.push(resolve(root, entry));
     } else {
-      try {
-        chunks.push(readFileSync(resolve(root, entry), 'utf-8'));
-      } catch {
-        chunks.push(entry);
-      }
+      const abs = resolve(root, entry);
+      if (scanFs.stat(abs)) files.push(abs);
+      else raw.push(entry);
     }
   }
-  if (globs.length > 0) {
-    const files = await globby(globs, { cwd: root, absolute: true });
-    for (const file of files) {
-      try {
-        chunks.push(readFileSync(file, 'utf-8'));
-      } catch {
-        // skip unreadable
-      }
-    }
-  }
-  return chunks;
+  if (globs.length > 0) files.push(...(await globby(globs, { cwd: root, absolute: true })).sort());
+  return scanSources(contentCache, scanFs, files, raw);
 }
 
 /**
@@ -74,16 +86,23 @@ async function resolveContent(
 export function nakshora(options: NakshoraViteOptions = {}): VitePlugin {
   const postcssEnabled = options.postcss ?? true;
   let watcher: WatcherHandle | null = null;
+  // Vite project root (content globs are relative to it, not to process.cwd())
+  let root = process.cwd();
 
   return {
     name: 'nakshora',
     enforce: 'pre',
+    configResolved(resolved) {
+      root = resolved.root;
+    },
     config(config) {
       if (!postcssEnabled) return;
       const plugin = nakshoraPostcss({
         config: options.config,
         content: options.content,
         minify: options.minify,
+        // `config` runs before `configResolved`; resolve the root the same way Vite will
+        base: resolve(config.root ?? process.cwd()),
       });
       const css = config.css ?? {};
       const postcss = css.postcss;
@@ -99,19 +118,17 @@ export function nakshora(options: NakshoraViteOptions = {}): VitePlugin {
     },
     async load(id) {
       if (id !== RESOLVED_VIRTUAL_ID) return null;
-      const root = process.cwd();
       const config: Partial<NakshoraConfig> = { ...(options.config ?? {}) };
       if (options.content !== undefined) config.content = options.content;
       const generator = new CSSGenerator(config);
-      const content = await resolveContent(config.content ?? config.purge, root);
+      const candidates = await resolveCandidates(config.content ?? config.purge, root);
       const css =
-        content.length > 0
-          ? generator.generateJIT(content, { minify: options.minify })
+        candidates.size > 0
+          ? generator.generateJITFromCandidates(candidates, { minify: options.minify })
           : generator.generate({ mode: 'full', minify: options.minify });
       return css;
     },
     configureServer(server) {
-      const root = server.config.root;
       const content = options.content ?? options.config?.content ?? options.config?.purge;
       if (!content) return;
       const entries = Array.isArray(content) ? content : [content];

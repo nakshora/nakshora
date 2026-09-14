@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import postcss from 'postcss';
-import nakshora from '../src/index';
+import nakshora, { spliceCss } from '../src/index';
 
 async function run(css: string, options = {}) {
   const result = await postcss([nakshora(options)]).process(css, {
@@ -13,7 +13,9 @@ describe('@nakshora/postcss', () => {
   it('expands @nakshora source; (full build)', async () => {
     const css = await run('@nakshora source;');
     expect(css).toContain('.flex { display: flex; }');
-    expect(css).toContain('.bg-blue-500 { background-color: #3b82f6; }');
+    expect(css).toContain(
+      '.bg-blue-500 { --tw-bg-opacity: 1; background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1)); }',
+    );
     expect(css).toContain('@media (min-width: 640px) {');
     expect(css).toContain('.neon-card');
     expect(css).not.toContain('@nakshora');
@@ -24,7 +26,9 @@ describe('@nakshora/postcss', () => {
       content: '<div class="mt-4 hover:bg-rose-500">x</div>',
     });
     expect(css).toContain('.mt-4 { margin-top: 1rem; }');
-    expect(css).toContain('.hover\\:bg-rose-500:hover { background-color: #f43f5e; }');
+    expect(css).toContain(
+      '.hover\\:bg-rose-500:hover { --tw-bg-opacity: 1; background-color: rgb(244 63 94 / var(--tw-bg-opacity, 1)); }',
+    );
     expect(css).not.toContain('.flex { display: flex; }');
   });
 
@@ -58,7 +62,9 @@ describe('@nakshora/postcss', () => {
     const css = await run('@nakshora utilities;', {
       config: { theme: { colors: { blue: { 500: '#123456' } } } },
     });
-    expect(css).toContain('.bg-blue-500 { background-color: #123456; }');
+    expect(css).toContain(
+      '.bg-blue-500 { --tw-bg-opacity: 1; background-color: rgb(18 52 86 / var(--tw-bg-opacity, 1)); }',
+    );
   });
 
   it('minifies when requested', async () => {
@@ -67,8 +73,117 @@ describe('@nakshora/postcss', () => {
     expect(css).toContain('box-sizing:border-box');
   });
 
+  it('expands @apply / theme() / @screen in author CSS (with and without @nakshora)', async () => {
+    const css = await run(
+      '.btn { @apply px-4 hover:bg-red-500 md:flex !important; color: theme(colors.blue.500); }\n' +
+        '@screen lg { .wide { width: theme(spacing.4); } }\n@media screen(md) { .m { top: 0 } }\n',
+    );
+    expect(css).toContain(
+      '.btn { padding-left: 1rem !important; padding-right: 1rem !important; }',
+    );
+    expect(css).toContain('.btn:hover { --tw-bg-opacity: 1 !important;');
+    expect(css).toContain('@media (min-width: 768px) {\n  .btn { display: flex !important; }\n}');
+    expect(css).toContain('.btn { color: #3b82f6; }');
+    expect(css).toContain('@media (min-width: 1024px) {\n  .wide { width: 1rem; }\n}');
+    expect(css).toContain('@media (min-width: 768px) {\n  .m { top: 0; }\n}');
+    expect(css).not.toContain('@apply');
+    // combined with a JIT `@nakshora utilities;` — applied utilities are not re-scanned
+    const both = await run('@nakshora utilities;\n.card { @apply rounded-lg shadow; }', {
+      content: '<div class="p-1">x</div>',
+    });
+    expect(both).toContain('.p-1 { padding: 0.25rem; }');
+    expect(both).toContain('.card { border-radius: 0.5rem;');
+    expect(both).not.toContain('.rounded-lg {');
+    expect(both).not.toContain('@nakshora');
+  });
+
+  it('reports unknown @apply classes as PostCSS errors that name the class', async () => {
+    await expect(run('.a { @apply p-4 not-a-class; }')).rejects.toMatchObject({
+      name: 'CssSyntaxError',
+      plugin: 'nakshora',
+      reason: expect.stringContaining('not-a-class'),
+    });
+    // opt-out
+    const raw = await run('.a { @apply p-4; }', { apply: false });
+    expect(raw).toBe('.a { @apply p-4; }');
+  });
+
   it('leaves CSS without at-rules untouched', async () => {
     const css = await run('body { color: red; }');
     expect(css).toBe('body { color: red; }');
+  });
+});
+
+describe('spliceCss', () => {
+  it('replaces the at-rule in place and keeps document order', () => {
+    const root = postcss.parse('a{x:1}\n@nakshora utilities;\nb{y:2}');
+    const at = root.nodes[1] as postcss.AtRule;
+    spliceCss(at, '.p-1 { padding: 1px; }\n@media (min-width: 1px) { .q { r: s; } }');
+    expect(root.nodes.map((n) => n.type)).toEqual(['rule', 'rule', 'atrule', 'rule']);
+    expect(root.nodes.every((n) => n.parent === root)).toBe(true);
+    expect(root.toString()).toBe(
+      'a{x:1}\n.p-1 { padding: 1px; }\n@media (min-width: 1px) { .q { r: s; } }\nb{y:2}',
+    );
+  });
+
+  it('is linear for full-build sized output (regression: replaceWith(...spread) was quadratic)', () => {
+    // 200k rules ≈ the size of the responsive full build
+    const big = Array.from({ length: 200_000 }, (_, i) => `.c${i}{p:${i}}`).join('\n');
+    const root = postcss.parse('a{x:1}\n@nakshora utilities;\nb{y:2}');
+    const t = performance.now();
+    spliceCss(root.nodes[1] as postcss.AtRule, big);
+    const ms = performance.now() - t;
+    expect(root.nodes.length).toBe(200_002);
+    expect(root.first?.toString()).toBe('a{x:1}');
+    expect(root.last?.toString()).toBe('b{y:2}');
+    expect(ms).toBeLessThan(5_000); // measured ≈ 0.4 s; the old path took > 30 s / overflowed
+  });
+});
+
+describe('CSS-first configuration (@theme / @utility / @custom-variant)', () => {
+  const sheet = `@theme {
+  --color-brand-500: #123456;
+  --spacing-18: 4.5rem;
+}
+@utility content-auto { content-visibility: auto; }
+@custom-variant hocus (&:hover, &:focus);
+@nakshora utilities;
+.btn { @apply p-18 hocus:content-auto; }
+`;
+
+  it('extends the config, replaces the blocks with :root variables, works with JIT and @apply', async () => {
+    const result = await postcss([
+      nakshora({ content: ['<a class="bg-brand-500 hocus:content-auto p-18">'] }),
+    ]).process(sheet, { from: undefined });
+    const css = result.css;
+    expect(
+      css
+        .replace(/\s+/g, ' ')
+        .startsWith(':root { --color-brand-500: #123456; --spacing-18: 4.5rem; } '),
+    ).toBe(true);
+    expect(css).not.toMatch(/@theme|@utility|@custom-variant/);
+    expect(css).toContain(
+      '.bg-brand-500 { --tw-bg-opacity: 1; background-color: rgb(18 52 86 / var(--tw-bg-opacity, 1)); }',
+    );
+    expect(css).toContain('.p-18 { padding: 4.5rem; }');
+    expect(css).toContain('.hocus\\:content-auto:hover { content-visibility: auto; }');
+    expect(css).toContain('.btn { padding: 4.5rem; }');
+    expect(css).toContain('.btn:focus { content-visibility: auto; }');
+    expect(result.warnings()).toEqual([]);
+  });
+
+  it('warns about unmapped variables and still emits them', async () => {
+    const result = await postcss([nakshora()]).process(
+      '@theme { --my-token: 1px; }\n.a { x: var(--my-token) }',
+      {
+        from: undefined,
+      },
+    );
+    expect(result.css.replace(/\s+/g, ' ')).toBe(
+      ':root { --my-token: 1px; } .a { x: var(--my-token) }',
+    );
+    expect(result.warnings().map((w) => w.text)).toEqual([
+      '@theme: `--my-token` has no utility namespace — kept as a CSS variable only',
+    ]);
   });
 });

@@ -1,5 +1,5 @@
-import { Plugin } from 'postcss';
-import { NakshoraConfig } from '@nakshora/core';
+import { Plugin, Root, Result, AtRule } from 'postcss';
+import { NakshoraConfig, CSSGenerator } from '@nakshora/core';
 
 interface NakshoraPostCSSOptions {
     /** Nakshora configuration (theme, content, safelist, important…) */
@@ -11,7 +11,38 @@ interface NakshoraPostCSSOptions {
     content?: string | string[];
     /** Minify the generated CSS */
     minify?: boolean;
+    /**
+     * Expand `@apply`, `theme()` / `screen()` and `@screen` in author CSS
+     * (default: true). Errors are reported as PostCSS errors with the file name.
+     */
+    apply?: boolean;
+    /**
+     * Directory content globs resolve against. Defaults to the directory of the
+     * CSS file being processed (falling back to `process.cwd()`); the Vite
+     * plugin passes the project root so `content: ['index.html']` means the same
+     * thing in `vite.config` and in every stylesheet.
+     */
+    base?: string;
 }
+/**
+ * Replace `atRule` with the nodes parsed from `css` in O(n).
+ *
+ * `atRule.replaceWith(...nodes)` inserts one node at a time (each insert is an
+ * `indexOf` + array splice plus index bookkeeping) and spreads every node onto
+ * the call stack — with a full build (hundreds of thousands of rules) that is
+ * quadratic and overflows the stack. Rebuilding the parent's node list once
+ * keeps document order and is linear.
+ */
+declare function spliceCss(atRule: AtRule, css: string): void;
+/** Does the stylesheet use any author-CSS feature (`@apply`, `theme()`, `screen()`, `@screen`)? */
+declare function needsAuthorPass(root: Root): boolean;
+/**
+ * Expand `@apply` / `theme()` / `@screen` on the whole root. Nakshora's own
+ * CSS AST is used for the transform (identical to `nakshora build`); the
+ * result is parsed back so later PostCSS plugins see real nodes. Errors are
+ * rethrown as PostCSS `CssSyntaxError`s pointing at the stylesheet.
+ */
+declare function runAuthorPass(root: Root, generator: CSSGenerator, result: Result): void;
 /**
  * Nakshora PostCSS plugin.
  *
@@ -22,10 +53,11 @@ interface NakshoraPostCSSOptions {
  *   @nakshora keyframes;   → @keyframes only
  *   @nakshora utilities;   → ALL utilities (no base)
  *   @nakshora components;  → design-paradigm components only
+ *   @apply …; theme(…); screen(…); @screen md { … }  → expanded in place
  *
  * If `content` is configured (option or config), `@nakshora source;` and
  * `@nakshora utilities;` switch to JIT mode: only used classes are emitted.
  */
 declare function nakshora(options?: NakshoraPostCSSOptions): Plugin;
 
-export { type NakshoraPostCSSOptions, nakshora as default };
+export { type NakshoraPostCSSOptions, nakshora as default, needsAuthorPass, runAuthorPass, spliceCss };

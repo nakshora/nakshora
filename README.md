@@ -18,7 +18,7 @@
 
 <br/>
 
-`3,091 utilities` · `29 categories` · `22 color palettes` · `5 theme presets` · `zero runtime JS` · `~4 ms JIT build`
+`11,417 utilities` · `35 categories` · `22 color palettes` · `5 theme presets` · `zero runtime JS` · `18 ms JIT build (200 lines)` · `1.3 ms incremental rebuild`
 
 </div>
 
@@ -28,10 +28,10 @@
 
 |                                 |                                                                                                                                                                                                                          |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ⚡ **JIT compiler**             | Only the classes you use are compiled — KB-sized CSS from a 3,091-utility catalog                                                                                                                                        |
-| 🎨 **Utility-first**            | 3,091 utilities across 29 categories: layout, spacing, sizing, flexbox, grid, typography, colors, borders, effects, transforms, transitions, animations                                                                  |
+| ⚡ **JIT compiler**             | Only the classes you use are compiled — KB-sized CSS from an 11,417-utility catalog                                                                                                                                      |
+| 🎨 **Utility-first**            | 11,417 utilities across 35 categories: layout, spacing, sizing, flexbox, grid, typography, colors, borders, effects, transforms, transitions, animations                                                                 |
 | 🌈 **22 palettes × 11 shades**  | `slate gray zinc neutral stone red orange amber yellow lime emerald green teal cyan sky blue indigo violet purple fuchsia pink rose` — auto-generates `text-*` `bg-*` `border-*` `from-*` `via-*` `to-*` + CSS variables |
-| 📱 **Mobile-first responsive**  | `sm:` `md:` `lg:` `xl:` `2xl:` (640–1536px) — custom breakpoints supported                                                                                                                                               |
+| 📱 **Mobile-first responsive**  | 10 screens `xxs:` 200 → `5xl:` 5000px (`sm`–`2xl` identical to Tailwind), `max-*:`, `@container` / `@min-*` / `@max-*`, stacked media collapse into one query — see [Responsive](docs/RESPONSIVE.md)                     |
 | 🧩 **State variants**           | `hover:` `focus:` `active:` `disabled:` `first:` `last:` `dark:` `group-hover:` `group-focus:` `peer-hover:` `peer-focus:` `focus-visible:` `focus-within:` `visited:` — combinable: `md:hover:bg-blue-600`              |
 | 🧊 **Design components**        | Glassmorphism (`.glass*`), Neon Cyber (`.neon-*`), Brutalism (`.brutalist-*`), Minimalism (`.minimalist-*`), skeletons (`.skeleton-*`), helpers (`.hover-lift`, `.gradient-*`)                                           |
 | 🎭 **5 theme presets**          | Neon Cyber · Pastel Dream · Brutalist · Ultra Minimalist · Nature Inspired — plus a fully open theme system                                                                                                              |
@@ -156,13 +156,14 @@ Compiled (JIT) — only what you used:
 
 ## 📚 Documentation
 
-| Start here                                      | Reference                                                                                      |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| [Getting Started](docs/GETTING_STARTED.md)      | [Utilities (3,091, by category)](docs/UTILITIES.md)                                            |
-| [⭐ Full Setup Guide](docs/SETUP.md)            | [Variants](docs/VARIANTS.md) · [Responsive](docs/RESPONSIVE.md)                                |
-| [Installation](docs/INSTALLATION.md)            | [Configuration](docs/CONFIGURATION.md) · [JIT Compiler](docs/JIT.md)                           |
-| [Migration (v1/v2/Tailwind)](docs/MIGRATION.md) | [Themes & Presets](docs/THEMES.md) · [Design Components](docs/utilities/13-components.md)      |
-|                                                 | [CLI](docs/CLI.md) · [PostCSS](docs/POSTCSS.md) · [Vite](docs/VITE.md) · [JS API](docs/API.md) |
+| Start here                                                | Reference                                                                                                                   |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| [Getting Started](docs/GETTING_STARTED.md)                | [Utilities (11,417, by category)](docs/UTILITIES.md)                                                                        |
+| [⭐ Full Setup Guide](docs/SETUP.md)                      | [Variants](docs/VARIANTS.md) · [Responsive](docs/RESPONSIVE.md)                                                             |
+| [Installation](docs/INSTALLATION.md)                      | [Configuration](docs/CONFIGURATION.md) · [JIT Compiler](docs/JIT.md)                                                        |
+| [Migration (v1/v2/Tailwind)](docs/MIGRATION.md)           | [Themes & Presets](docs/THEMES.md) · [Design Components](docs/utilities/13-components.md)                                   |
+|                                                           | [CLI](docs/CLI.md) · [Editors](docs/EDITORS.md) · [PostCSS](docs/POSTCSS.md) · [Vite](docs/VITE.md) · [JS API](docs/API.md) |
+| [▶ Playground](https://nakshora.bsdc.info.bd/playground/) | Compile classes live in the browser — same engine, no build step ([how it works](docs/PLAYGROUND.md))                       |
 
 Operations: [Publishing](docs/PUBLISHING.md) · [Performance](docs/PERFORMANCE.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Development](docs/DEVELOPMENT.md) · [Examples](docs/EXAMPLES.md) · [Legacy v2 docs](docs/archive)
 
@@ -186,19 +187,24 @@ pnpm ai:export
 
 ## ⚡ Performance
 
+Medians from `pnpm benchmark` (Node 22; the numbers are pinned in
+`perf/baseline.json` and CI fails on a >10 % regression):
+
 ```
-operation                                ms
-────────────────────────────────────────────────
-full build (3,091 utilities)             ~18
-JIT build (200 lines of HTML)            ~4
-JIT build + minify                       < 1
+operation                                        ms
+──────────────────────────────────────────────────────
+JIT build (200 lines of HTML, warm)              18.2
+JIT build, 500 files, one file changed            1.3
+full build (11,417 utilities, sm–2xl)            371
+full build + minify                              302
 ```
 
-| Build                        | Size                          |
-| ---------------------------- | ----------------------------- |
-| full (all base + responsive) | ~860 KB → **~740 KB min**     |
-| typical project (JIT)        | **~15 KB min**                |
-| runtime JS                   | **0 bytes** (pure CSS output) |
+| Build                                          | Size                                               |
+| ---------------------------------------------- | -------------------------------------------------- |
+| full (base + all utilities, sm–2xl)            | 6,380 KB → **5,842 KB min** (578 KB gz, 130 KB br) |
+| the 200-line benchmark page (JIT)              | 18.4 KB → **16.1 KB min**                          |
+| this project's landing page (JIT, 179 classes) | **17.8 KB min · 3.9 KB gzip**                      |
+| runtime JS                                     | **0 bytes** (pure CSS output)                      |
 
 → [Performance details](docs/PERFORMANCE.md)
 
@@ -238,7 +244,7 @@ pnpm build && pnpm test && pnpm lint
 
 ## 👥 Community
 
-- **Website** — [nakshora.dev](https://nakshora.bsdc.info.bd)
+- **Website** — [nakshora.bsdc.info.bd](https://nakshora.bsdc.info.bd)
 - **GitHub** — [nakshora/nakshora](https://github.com/nakshora/nakshora)
 - **Issues** — [report bugs & request features](https://github.com/nakshora/nakshora/issues)
 - **Contributing** — [DEVELOPMENT.md](docs/DEVELOPMENT.md) · [CONTRIBUTING.md](CONTRIBUTING.md)

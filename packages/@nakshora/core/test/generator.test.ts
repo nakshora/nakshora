@@ -35,9 +35,16 @@ describe('CSSGenerator — full build', () => {
   });
 
   it('generates color utilities for the full palette', () => {
-    expect(full).toContain('.bg-blue-500 { background-color: #3b82f6; }');
-    expect(full).toContain('.text-rose-400 { color: #fb7185; }');
-    expect(full).toContain('.border-slate-900 { border-color: #0f172a; }');
+    // Colours are emitted in Tailwind's opacity-composable form (see docs/COMPATIBILITY.md §2)
+    expect(full).toContain(
+      '.bg-blue-500 { --tw-bg-opacity: 1; background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1)); }',
+    );
+    expect(full).toContain(
+      '.text-rose-400 { --tw-text-opacity: 1; color: rgb(251 113 133 / var(--tw-text-opacity, 1)); }',
+    );
+    expect(full).toContain(
+      '.border-slate-900 { --tw-border-opacity: 1; border-color: rgb(15 23 42 / var(--tw-border-opacity, 1)); }',
+    );
     expect(full).toContain('.from-indigo-400');
     expect(full).toContain('.via-purple-500');
     expect(full).toContain('.to-pink-500');
@@ -58,7 +65,8 @@ describe('CSSGenerator — full build', () => {
     expect(full).toContain('.md\\:flex { display: flex; }');
     expect(full).toContain('.lg\\:p-4 { padding: 1rem; }');
     expect(full).toContain('.xl\\:text-center { text-align: center; }');
-    expect(full).toContain('.2xl\\:max-w-4xl { max-width: 56rem; }');
+    // leading digits are escaped exactly like Tailwind/cssesc do
+    expect(full).toContain('.\\32xl\\:max-w-4xl { max-width: 56rem; }');
   });
 
   it('omits state variants in the full build (JIT-only by design)', () => {
@@ -68,7 +76,7 @@ describe('CSSGenerator — full build', () => {
 
   it('emits base styles, keyframes and components', () => {
     expect(full).toContain('box-sizing: border-box;');
-    expect(full).toContain('prefers-reduced-motion');
+    expect(full).toContain('--tw-ring-offset-width: 0px;'); // composed-utility defaults
     expect(full).toContain('@keyframes spin');
     expect(full).toContain('@keyframes shimmer');
     expect(full).toContain('.neon-card');
@@ -105,15 +113,19 @@ describe('CSSGenerator — JIT mode', () => {
   it('only emits classes found in content', () => {
     const jit = gen.generateFromContent(html);
     expect(jit).toContain('.flex { display: flex; }');
-    expect(jit).toContain('.bg-blue-500 { background-color: #3b82f6; }');
+    expect(jit).toContain(
+      '.bg-blue-500 { --tw-bg-opacity: 1; background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1)); }',
+    );
     expect(jit).not.toContain('.grid { display: grid; }'); // not used at base level
     expect(jit).not.toContain('.p-6 { padding: 1.5rem; }');
   });
 
   it('expands state variants', () => {
     const jit = gen.generateFromContent(html);
-    expect(jit).toContain('.hover\\:bg-blue-700:hover { background-color: #1d4ed8; }');
-    expect(jit).toContain('.dark .dark\\:opacity-70 { opacity: 0.7; }');
+    expect(jit).toContain(
+      '.hover\\:bg-blue-700:hover { --tw-bg-opacity: 1; background-color: rgb(29 78 216 / var(--tw-bg-opacity, 1)); }',
+    );
+    expect(jit).toContain('.dark\\:opacity-70:is(.dark *) { opacity: 0.7; }');
     expect(jit).toContain('.group:hover .group-hover\\:opacity-100 { opacity: 1; }');
   });
 
@@ -129,12 +141,16 @@ describe('CSSGenerator — JIT mode', () => {
   it('supports responsive + state combinations', () => {
     const jit = gen.generateFromContent('<a class="lg:hover:bg-rose-500 x">y</a>');
     expect(jit).toContain('@media (min-width: 1024px) {');
-    expect(jit).toContain('.lg\\:hover\\:bg-rose-500:hover { background-color: #f43f5e; }');
+    expect(jit).toContain(
+      '.lg\\:hover\\:bg-rose-500:hover { --tw-bg-opacity: 1; background-color: rgb(244 63 94 / var(--tw-bg-opacity, 1)); }',
+    );
   });
 
   it('handles escaped HTML class syntax', () => {
     const jit = gen.generateFromContent('<div class="hover\\:scale-105">x</div>');
-    expect(jit).toContain('.hover\\:scale-105:hover { transform: scale(1.05); }');
+    expect(jit).toContain(
+      '.hover\\:scale-105:hover { --tw-scale-x: 1.05; --tw-scale-y: 1.05; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }',
+    );
   });
 
   it('honours safelist', () => {
@@ -192,15 +208,24 @@ describe('CSSGenerator — options & config', () => {
     );
     const gen = new CSSGenerator(cfg);
     const css = gen.generate({ mode: 'full' });
-    expect(css).toContain('.bg-blue-500 { background-color: #123456; }');
+    expect(css).toContain(
+      '.bg-blue-500 { --tw-bg-opacity: 1; background-color: rgb(18 52 86 / var(--tw-bg-opacity, 1)); }',
+    );
     // other shades survive the deep merge
-    expect(css).toContain('.bg-blue-400 { background-color: #60a5fa; }');
+    expect(css).toContain(
+      '.bg-blue-400 { --tw-bg-opacity: 1; background-color: rgb(96 165 250 / var(--tw-bg-opacity, 1)); }',
+    );
     expect(css).toContain('.m-99 { margin: 99px; }');
   });
 
   it('supports custom breakpoints', () => {
     const gen = new CSSGenerator({ theme: { breakpoints: { sm: 640, md: 768, wide: 1800 } } });
-    const css = gen.generate({ mode: 'full' });
+    // JIT: every configured screen is available
+    const jit = gen.generateFromContent('<div class="wide:flex">');
+    expect(jit).toContain('@media (min-width: 1800px) {');
+    expect(jit).toContain('.wide\\:flex { display: flex; }');
+    // full build: extra screens are opt-in (`screens: 'all'`)
+    const css = gen.generate({ mode: 'full', screens: 'all' });
     expect(css).toContain('@media (min-width: 1800px) {');
     expect(css).toContain('.wide\\:flex { display: flex; }');
   });
@@ -222,11 +247,71 @@ describe('CSSGenerator — options & config', () => {
     expect(css).toContain('h1 { margin: 1rem 0; }');
   });
 
+  it('corePlugins.components:false disables built-in blocks but never user addComponents', () => {
+    const gen = new CSSGenerator({
+      corePlugins: { components: false },
+      plugins: [
+        {
+          handler: (api) => {
+            api.addComponents({ '.btn': { padding: '1rem' }, '.glass': { color: 'red' } });
+          },
+        },
+      ],
+    });
+    const css = gen.generateFromContent('<a class="btn glass neon-btn">');
+    expect(css).toContain('.btn { padding: 1rem; }');
+    // user `.glass` wins; the built-in showcase `.glass` block is gone
+    expect(css.split(/\n\.glass \{/).length - 1).toBe(1);
+    expect(css).toContain('.glass { color: red; }');
+    expect(css).not.toContain('.neon-btn');
+  });
+
+  it('a selector-list component used by several candidates is emitted once', () => {
+    const gen = new CSSGenerator({
+      plugins: [
+        {
+          handler: (api) => {
+            api.addComponents({ '.foo-link:hover, .bar-link:hover': { color: 'red' } });
+          },
+        },
+      ],
+    });
+    const rule = '.foo-link:hover, .bar-link:hover { color: red; }';
+    const css = gen.generateFromContent('<a class="foo-link bar-link">');
+    expect(css.split(rule).length - 1).toBe(1);
+    // a single candidate keeps the whole list (Tailwind emits the rule verbatim)…
+    expect(gen.generateFromContent('<a class="bar-link">')).toContain(rule);
+    // …but under a variant only its own part survives (Tailwind eliminateIrrelevantSelectors)
+    expect(gen.generateFromContent('<a class="md:bar-link">')).toContain(
+      '.md\\:bar-link:hover { color: red; }',
+    );
+  });
+
+  it('a plugin component that animates pulls its theme keyframes into the JIT build', () => {
+    const gen = new CSSGenerator({
+      plugins: [
+        {
+          handler: (api) => {
+            api.addComponents({ '.spinner': { animation: 'spin 1s linear infinite' } });
+          },
+        },
+      ],
+    });
+    const css = gen.generateFromContent('<a class="spinner">');
+    expect(css).toContain('@keyframes spin');
+    expect(css.split('@keyframes spin').length - 1).toBe(1);
+    expect(gen.generateFromContent('<a class="flex">')).not.toContain('@keyframes spin');
+  });
+
   it('applies presets', () => {
     const gen = new CSSGenerator({ theme: { colors: neonTheme.colors } });
     const css = gen.generate({ mode: 'full' });
-    expect(css).toContain('.text-primary-500 { color: #00d9ff; }');
-    expect(css).toContain('.bg-secondary-500 { background-color: #ff006e; }');
+    expect(css).toContain(
+      '.text-primary-500 { --tw-text-opacity: 1; color: rgb(0 217 255 / var(--tw-text-opacity, 1)); }',
+    );
+    expect(css).toContain(
+      '.bg-secondary-500 { --tw-bg-opacity: 1; background-color: rgb(255 0 110 / var(--tw-bg-opacity, 1)); }',
+    );
   });
 });
 

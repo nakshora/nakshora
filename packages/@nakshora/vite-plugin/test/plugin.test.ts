@@ -22,22 +22,24 @@ describe('@nakshora/vite-plugin', () => {
   });
 
   it('resolves the virtual module', () => {
-    expect(plugin.resolveId('nakshora')).toBe('\0virtual:nakshora');
-    expect(plugin.resolveId('virtual:nakshora')).toBe('\0virtual:nakshora');
+    expect(plugin.resolveId('nakshora')).toBe('\0virtual:nakshora.css');
+    expect(plugin.resolveId('virtual:nakshora')).toBe('\0virtual:nakshora.css');
     expect(plugin.resolveId('react')).toBeNull();
   });
 
   it('loads CSS for the virtual module (full build without content)', async () => {
-    const css = (await plugin.load('\0virtual:nakshora')) as string;
+    const css = (await plugin.load('\0virtual:nakshora.css')) as string;
     expect(css).toContain('.flex { display: flex; }');
     expect(css).toContain('@media (min-width: 640px) {');
   });
 
   it('loads JIT CSS when content is provided', async () => {
     const p = asTestPlugin(nakshora({ content: '<div class="p-4 bg-emerald-500">x</div>' }));
-    const css = (await p.load('\0virtual:nakshora')) as string;
+    const css = (await p.load('\0virtual:nakshora.css')) as string;
     expect(css).toContain('.p-4 { padding: 1rem; }');
-    expect(css).toContain('.bg-emerald-500 { background-color: #10b981; }');
+    expect(css).toContain(
+      '.bg-emerald-500 { --tw-bg-opacity: 1; background-color: rgb(16 185 129 / var(--tw-bg-opacity, 1)); }',
+    );
     expect(css).not.toContain('.flex { display: flex; }');
   });
 

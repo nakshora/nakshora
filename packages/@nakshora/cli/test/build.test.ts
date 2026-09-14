@@ -63,13 +63,30 @@ describe('runBuild', () => {
       minify: false,
     });
     const css = readFileSync(out, 'utf-8');
-    expect(css).toContain('.bg-blue-500 { background-color: #3b82f6; }');
+    expect(css).toContain(
+      '.bg-blue-500 { --tw-bg-opacity: 1; background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1)); }',
+    );
     expect(css).toContain('.hover\\:bg-blue-600:hover');
     expect(css).toContain('.md\\:grid-cols-2');
     expect(css).toContain('.lg\\:flex { display: flex; }');
-    expect(css).toContain('.neon-card'); // design components are always included
+    // JIT emits only the component blocks that the content actually uses
+    expect(css).not.toContain('.neon-card');
     expect(result.classes).toBeGreaterThan(5);
     expect(result.sizeBytes).toBeGreaterThan(0);
+  });
+
+  it('includes a design component block only when its class is used', async () => {
+    const out = join(tmp, 'dist', 'components.css');
+    await runBuild({
+      config: { content: ['<div class="neon-card p-2">x</div>'] },
+      output: out,
+      cwd: tmp,
+      minify: false,
+    });
+    const css = readFileSync(out, 'utf-8');
+    expect(css).toContain('.neon-card {');
+    expect(css).toContain('.p-2 { padding: 0.5rem; }');
+    expect(css).not.toContain('.brutalist-card');
   });
 
   it('splices generated CSS into @nakshora at-rules', async () => {
@@ -87,6 +104,30 @@ describe('runBuild', () => {
     expect(css).toContain('@nakshora'.length > 0 ? 'box-sizing: border-box' : 'x');
     expect(css).toContain('body { color: red; }');
     expect(css).not.toContain('@nakshora');
+  });
+
+  it('expands @apply / theme() in the input stylesheet and fails loudly on unknown classes', async () => {
+    const input = join(tmp, 'apply.css');
+    const out = join(tmp, 'dist', 'apply.css');
+    writeFileSync(
+      input,
+      '@nakshora utilities;\n.btn { @apply px-4 hover:bg-red-500; color: theme(colors.blue.500); }\n',
+    );
+    await runBuild({ config: { content: ['./src/**/*.html'] }, input, output: out, cwd: tmp });
+    const css = readFileSync(out, 'utf-8');
+    expect(css).toContain('.btn { padding-left: 1rem; padding-right: 1rem; }');
+    expect(css).toContain('.btn:hover { --tw-bg-opacity: 1;');
+    expect(css).toContain('.btn { color: #3b82f6; }');
+    expect(css).not.toContain('@apply');
+    expect(css).not.toContain('@nakshora');
+    // author-only stylesheet (no `@nakshora` at-rule) is processed too
+    writeFileSync(input, '.a { @apply p-2; }\n');
+    await runBuild({ config: { content: ['./src/**/*.html'] }, input, output: out, cwd: tmp });
+    expect(readFileSync(out, 'utf-8')).toBe('.a { padding: 0.5rem; }\n');
+    writeFileSync(input, '.a { @apply nope-42; }\n');
+    await expect(
+      runBuild({ config: { content: ['./src/**/*.html'] }, input, output: out, cwd: tmp }),
+    ).rejects.toThrow(/apply\.css: .*nope-42/);
   });
 
   it('prints a summary line', async () => {

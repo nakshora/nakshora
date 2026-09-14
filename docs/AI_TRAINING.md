@@ -39,7 +39,7 @@ store. The corpus is pre-structured for retrieval:
 ```json
 {
   "framework": "nakshora",
-  "utilityCount": 3091,
+  "utilityCount": 11417,
   "categories": [
     {
       "id": "margin",
@@ -119,7 +119,7 @@ JIT compiler. Rules:
    .gradient-brutalist
 7. Dark mode: class="dark" on <html>, use dark: variants.
 8. If unsure a class exists, say so rather than inventing one.
-Reference corpus: ai/corpus.json (3,091 utilities, 29 categories).
+Reference corpus: ai/corpus.json (11,417 utilities, 35 categories).
 ```
 
 ## 5. MCP / agent tooling

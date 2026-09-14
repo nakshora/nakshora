@@ -2,13 +2,17 @@
 // (the shebang is added by tsup via the `banner` option in tsup.config.ts)
 
 import { Command } from 'commander';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { buildAICorpus, corpusToSFT, metadata, version, type NakshoraConfig } from '@nakshora/core';
 import { runBuild, summarize, collectWatchPaths } from './build';
 import { resolveConfig } from './config-loader';
 import { createWatcher } from './watch';
+import { startDevServer, type DevServer } from './serve';
+import { diagnose, formatFindings } from './doctor';
+import { runMigrate } from './migrate';
 
 const program = new Command();
 
@@ -90,17 +94,29 @@ export default {
     );
   });
 
-program
-  .command('build [input]')
-  .description('compile Nakshora CSS (JIT by default when content is configured)')
-  .option('-c, --config <path>', 'path to nakshora config')
-  .option('-o, --output <file>', 'output file (default: stdout)')
-  .option('-m, --minify', 'minify the output')
-  .option('--mode <mode>', 'full | jit', undefined)
-  .option('--watch', 'rebuild on change')
-  .action(async (input: string | undefined, opts: BuildOpts) => {
-    await doBuild(input, opts);
-  });
+function buildOptions(cmd: Command): Command {
+  return cmd
+    .option('-c, --config <path>', 'path to nakshora config')
+    .option('-o, --output <file>', 'output file (default: stdout)')
+    .option('-m, --minify', 'minify the output')
+    .option('--mode <mode>', 'full | jit', undefined)
+    .option('--content <globs...>', 'JIT content globs / files (overrides config.content)')
+    .option('--safelist <classes...>', 'classes to always emit (added to config.safelist)')
+    .option('--source-map', 'write <output>.map next to the output')
+    .option('--stats', 'print build statistics (candidates, unknown classes, sizes) to stderr')
+    .option('--diff', 'do not write; show which selectors would change in the output file')
+    .option('--watch', 'rebuild on change');
+}
+
+buildOptions(
+  program
+    .command('build [input]')
+    .description(
+      'compile Nakshora CSS (JIT by default when content is configured); input may be a .css file or `-` for stdin',
+    ),
+).action(async (input: string | undefined, opts: BuildOpts) => {
+  await doBuild(input, opts);
+});
 
 interface BuildOpts {
   config?: string;
@@ -108,6 +124,82 @@ interface BuildOpts {
   minify?: boolean;
   mode?: string;
   watch?: boolean;
+  content?: string[];
+  safelist?: string[];
+  sourceMap?: boolean;
+  stats?: boolean;
+  diff?: boolean;
+  serve?: boolean;
+  port?: string;
+  host?: string;
+  root?: string;
+  open?: boolean;
+}
+
+async function readStdin(): Promise<string> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
+  return Buffer.concat(chunks).toString('utf-8');
+}
+
+/** Apply CLI overrides (`--content`, `--safelist`) on top of the loaded config. */
+export function applyCliOverrides(
+  config: Partial<NakshoraConfig>,
+  opts: Pick<BuildOpts, 'content' | 'safelist'>,
+): Partial<NakshoraConfig> {
+  const out = { ...config };
+  if (opts.content?.length) out.content = opts.content;
+  if (opts.safelist?.length) {
+    const safe = new Set([
+      ...((config.safelist ?? []) as string[]),
+      ...opts.safelist.flatMap((s) => s.split(/[\s,]+/)).filter(Boolean),
+    ]);
+    out.safelist = [...safe];
+  }
+  return out;
+}
+
+/** Selectors present in `a` but not `b`, and vice-versa (text-level, minified-insensitive). */
+export function diffSelectors(
+  before: string,
+  after: string,
+): { added: string[]; removed: string[] } {
+  const sel = (css: string): Set<string> =>
+    new Set(
+      (css.match(/(^|[}{;\n])\s*([^{}@;/][^{}]*?)\s*\{/g) ?? []).map((m) =>
+        m
+          .replace(/^[}{;\n]\s*/, '')
+          .replace(/\s*\{$/, '')
+          .replace(/\s+/g, ' '),
+      ),
+    );
+  const a = sel(before);
+  const b = sel(after);
+  return {
+    added: [...b].filter((x) => !a.has(x)).sort(),
+    removed: [...a].filter((x) => !b.has(x)).sort(),
+  };
+}
+
+function printStats(result: Awaited<ReturnType<typeof runBuild>>, output?: string): void {
+  const lines = [
+    `${chalk.bold('build')}       ${result.durationMs.toFixed(1)} ms`,
+    `${chalk.bold('classes')}     ${result.classes}`,
+    `${chalk.bold('candidates')}  ${result.candidates}`,
+    `${chalk.bold('size')}        ${result.sizeBytes} B (${result.minifiedSizeBytes} B minified)`,
+    ...(output ? [`${chalk.bold('output')}      ${output}`] : []),
+    ...(result.mapFile ? [`${chalk.bold('source map')}  ${result.mapFile}`] : []),
+  ];
+  if (result.unknown.length) {
+    const shown = result.unknown.slice(0, 25);
+    lines.push(
+      `${chalk.bold('unknown')}     ${result.unknown.length} candidate(s) produced no CSS` +
+        chalk.dim(
+          ` (plain words are expected): ${shown.join(' ')}${result.unknown.length > shown.length ? ' …' : ''}`,
+        ),
+    );
+  }
+  console.error(lines.join('\n'));
 }
 
 async function doBuild(
@@ -115,39 +207,110 @@ async function doBuild(
   opts: BuildOpts,
   forceWatch = false,
 ): Promise<void> {
-  const { config } = await withConfig({ opts: () => opts });
+  const loaded = await withConfig({ opts: () => opts });
+  const config = applyCliOverrides(loaded.config, opts);
   const mode = (opts.mode ?? undefined) as 'full' | 'jit' | undefined;
   if (mode && mode !== 'full' && mode !== 'jit') {
     console.error(chalk.red(`Invalid --mode "${mode}" (expected full or jit)`));
     process.exit(1);
   }
-  const started = Date.now();
-  const result = await runBuild({ input, output: opts.output, minify: opts.minify, mode, config });
-  const line = chalk.green(`✔ ${summarize(result, opts.output)} in ${Date.now() - started}ms`);
-  if (!opts.output) console.error(line);
+  const inputCss = input === '-' ? await readStdin() : undefined;
+  const base = {
+    input,
+    inputCss,
+    output: opts.output,
+    minify: opts.minify,
+    mode,
+    config,
+    sourceMap: opts.sourceMap,
+    // `--serve` without `--output` keeps the stylesheet in memory (served at /nakshora.css)
+    dryRun: Boolean(opts.serve && !opts.output),
+  };
 
-  if (opts.watch || forceWatch) {
+  if (opts.diff) {
+    const result = await runBuild({ ...base, dryRun: true });
+    const outPath = opts.output ? resolve(process.cwd(), opts.output) : undefined;
+    const before = outPath && existsSync(outPath) ? readFileSync(outPath, 'utf-8') : '';
+    const { added, removed } = diffSelectors(before, result.css);
+    for (const r of removed) console.log(chalk.red(`- ${r}`));
+    for (const a of added) console.log(chalk.green(`+ ${a}`));
+    console.error(
+      chalk.dim(
+        `${added.length} added, ${removed.length} removed${outPath ? ` vs ${opts.output}` : ' (no --output: compared against empty)'}`,
+      ),
+    );
+    if (opts.stats) printStats(result, opts.output);
+    return;
+  }
+
+  const started = Date.now();
+  const result = await runBuild(base);
+  const target = opts.serve && !opts.output ? 'memory' : opts.output;
+  const line = chalk.green(`✔ ${summarize(result, target)} in ${Date.now() - started}ms`);
+  if (!opts.output || opts.serve) console.error(line);
+  if (opts.stats) printStats(result, opts.output);
+
+  if (opts.watch || forceWatch || opts.serve) {
+    if (input === '-') {
+      console.error(chalk.red('--watch cannot be combined with stdin input'));
+      process.exit(1);
+    }
+    let server: DevServer | undefined;
+    if (opts.serve) {
+      const root = resolve(process.cwd(), opts.root ?? '.');
+      const cssPath = opts.output
+        ? '/' + relative(root, resolve(process.cwd(), opts.output))
+        : '/nakshora.css';
+      if (cssPath.startsWith('/..')) {
+        console.error(chalk.red(`--output must live inside the served root (${root})`));
+        process.exit(1);
+      }
+      server = await startDevServer({
+        root,
+        port: opts.port ? Number(opts.port) : 3000,
+        host: opts.host,
+        cssPath,
+        css: result.css,
+      });
+      console.error(
+        chalk.cyan(`➜ dev server ${server.url}`) +
+          chalk.dim(` (serving ${root}; stylesheet at ${cssPath}, hot-swapped on rebuild)`),
+      );
+      if (!opts.output)
+        console.error(chalk.dim(`  add <link rel="stylesheet" href="${cssPath}"> to your HTML`));
+    }
     const paths = await collectWatchPaths(config, { input, config });
-    console.log(chalk.dim(`Watching ${paths.length} path(s)… press Ctrl+C to stop`));
+    console.error(chalk.dim(`Watching ${paths.length} path(s)… press Ctrl+C to stop`));
+    let lastCss = result.css;
     const watcher = createWatcher(paths, () => {
-      runBuild({ input, output: opts.output, minify: opts.minify, mode, config })
-        .then((res) => console.error(chalk.green(`✔ rebuilt ${summarize(res, opts.output)}`)))
+      runBuild(base)
+        .then((res) => {
+          console.error(
+            chalk.green(`✔ rebuilt ${summarize(res, target)} in ${res.durationMs.toFixed(0)}ms`),
+          );
+          if (opts.stats) printStats(res, opts.output);
+          if (server) {
+            if (res.css !== lastCss) server.updateCss(res.css);
+            else server.reload();
+          }
+          lastCss = res.css;
+        })
         .catch((err: Error) => console.error(chalk.red(`Build error: ${err.message}`)));
     });
-    process.on('SIGINT', () => {
+    const stop = (): void => {
       watcher.close();
-      process.exit(0);
-    });
+      void (server ? server.close() : Promise.resolve()).then(() => process.exit(0));
+    };
+    process.on('SIGINT', stop);
+    process.on('SIGTERM', stop);
   }
 }
 
-program
-  .command('dev [input]')
-  .description('build with --watch (development mode)')
-  .option('-c, --config <path>', 'path to nakshora config')
-  .option('-o, --output <file>', 'output file (default: stdout)')
-  .option('-m, --minify', 'minify the output')
-  .option('--mode <mode>', 'full | jit', undefined)
+buildOptions(program.command('dev [input]').description('build with --watch (development mode)'))
+  .option('--serve', 'serve the project over HTTP with live CSS hot-swap / reload')
+  .option('--port <port>', 'dev server port (default 3000)')
+  .option('--host <host>', 'dev server host (default 0.0.0.0)')
+  .option('--root <dir>', 'directory to serve (default: current directory)')
   .action(async (input: string | undefined, opts: BuildOpts) => {
     await doBuild(input, opts, true);
   });
@@ -193,7 +356,72 @@ program
     );
   });
 
+program
+  .command('doctor')
+  .description(
+    'diagnose the project set-up: config, content globs, stylesheets, @apply, dependencies',
+  )
+  .option('-c, --config <path>', 'path to nakshora config')
+  .option('--json', 'machine-readable output')
+  .action(async (opts: { config?: string; json?: boolean }) => {
+    const { findings } = await diagnose(process.cwd(), opts.config);
+    if (opts.json) console.log(JSON.stringify(findings, null, 2));
+    else console.log(formatFindings(findings));
+    const errors = findings.filter((f) => f.level === 'error').length;
+    const warns = findings.filter((f) => f.level === 'warn').length;
+    if (!opts.json)
+      console.log(
+        `\n${errors ? chalk.red(`${errors} error(s)`) : chalk.green('no errors')}, ${warns ? chalk.yellow(`${warns} warning(s)`) : 'no warnings'}`,
+      );
+    if (errors) process.exit(1);
+  });
+
+program
+  .command('migrate [globs...]')
+  .description(
+    'codemod: rename Nakshora v1 classes (--from v1) or port a Tailwind project (--from tailwind)',
+  )
+  .option('--from <source>', 'v1 | tailwind', 'tailwind')
+  .option('--write', 'apply changes (default: dry run)')
+  .action(async (globs: string[], opts: { from: string; write?: boolean }) => {
+    if (opts.from !== 'v1' && opts.from !== 'tailwind') {
+      console.error(chalk.red(`--from must be v1 or tailwind`));
+      process.exit(1);
+    }
+    const patterns = globs.length
+      ? globs
+      : ['**/*.{html,js,jsx,ts,tsx,vue,svelte,astro,md,mdx,php}'];
+    const res = await runMigrate({
+      cwd: process.cwd(),
+      from: opts.from,
+      globs: patterns,
+      write: !!opts.write,
+    });
+    for (const f of res.files)
+      console.log(
+        `${opts.write ? chalk.green('✔') : chalk.yellow('~')} ${f.file.replace(process.cwd() + '/', '')}  ` +
+          chalk.dim(f.changes.map((c) => `${c.from}→${c.to}×${c.count}`).join(' ')),
+      );
+    if (res.config) {
+      console.log(
+        `${opts.write ? chalk.green('✔') : chalk.yellow('~')} ${res.config.from} → ${res.config.to}`,
+      );
+      for (const n of res.config.notes) console.log(chalk.dim(`   · ${n}`));
+    }
+    if (!res.files.length && !res.config) console.log(chalk.dim('nothing to migrate'));
+    else if (!opts.write) console.log(chalk.dim('\ndry run — re-run with --write to apply'));
+  });
+
 // `nakshora --version` handled by commander; bare `nakshora` shows help
+program
+  .command('lsp')
+  .description('start the Nakshora language server (LSP over stdio) for editor integrations')
+  .option('-c, --config <path>', 'config file (default: discovered from the workspace root)')
+  .action(async (opts: { config?: string }) => {
+    const { startLanguageServer } = await import('./language-server');
+    startLanguageServer({ config: opts.config });
+  });
+
 program.action(() => {
   program.outputHelp();
 });
@@ -202,8 +430,26 @@ program.action(() => {
 export { runBuild, resolveConfig, createWatcher, metadata };
 export default program;
 
+/**
+ * True when this module is the process entry point. `npx nakshora`, pnpm/yarn
+ * bins and global installs all run the binary through a symlink
+ * (`node_modules/.bin/nakshora`), so `process.argv[1]` and `import.meta.url`
+ * must be compared by real path — a plain string comparison silently did
+ * nothing (exit 0, no output) for every symlinked invocation.
+ */
+function isEntryPoint(): boolean {
+  if (process.env.NAKSHORA_CLI === '1') return true;
+  const argv1 = process.argv[1];
+  if (!argv1) return false;
+  try {
+    return realpathSync(argv1) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
 // Execute when run as a binary
-if (import.meta.url === `file://${process.argv[1]}` || process.env.NAKSHORA_CLI === '1') {
+if (isEntryPoint()) {
   program.parseAsync(process.argv).catch((err) => {
     console.error(chalk.red(`Error: ${(err as Error).message}`));
     process.exit(1);

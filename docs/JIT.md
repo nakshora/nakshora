@@ -7,12 +7,14 @@ Nakshora 3 compiles your CSS on demand. Two build modes:
 | **full** | base + variables + keyframes + **all** utilities + responsive variants + components                                               | default when no `content` is configured |
 | **jit**  | base + variables + used keyframes + **only the classes found in your content** (incl. state variants & combinations) + components | `content` configured, or `--mode jit`   |
 
-Measured on this machine (22 palettes, 3,091 utilities):
+Measured with `pnpm benchmark` (22 palettes, 11,417 utilities; see
+[PERFORMANCE.md](PERFORMANCE.md) for the full table):
 
-| Build                   | Raw     | Minified | Time   |
-| ----------------------- | ------- | -------- | ------ |
-| full                    | ~860 KB | ~740 KB  | ~18 ms |
-| JIT (200 lines of HTML) | ~17 KB  | ~15 KB   | ~4 ms  |
+| Build                                          | Raw         | Minified    | Time                    |
+| ---------------------------------------------- | ----------- | ----------- | ----------------------- |
+| full (sm–2xl)                                  | 6,533,388 B | 5,982,603 B | 371 ms                  |
+| JIT (200 lines of HTML)                        | 18,412 B    | 16,083 B    | 18 ms warm / 28 ms cold |
+| JIT incremental rebuild (500 files, 1 changed) | —           | —           | 1.3 ms                  |
 
 ## How JIT works
 
@@ -66,8 +68,11 @@ Tailwind-compatible `purge: [...]` works as an alias of `content`
 
 ## Sizes
 
-Full-build size is dominated by the color matrix (22 palettes × 11 shades ×
-6 utilities × 6 responsive slots). You can shrink it:
+Full-build size is dominated by the colour matrix: 22 palettes × 11 shades ×
+25 colour utilities (`bg-*`, `text-*`, `border-*` ×10 sides, `ring-*`,
+`from/via/to-*`, …) = 6,050 of the 11,417 catalog classes, each emitted in 6
+slots (base + `sm`…`2xl`) — measured 66.7 % of the pretty full build's bytes.
+You can shrink it:
 
 ```js
 corePlugins: { gradients: false, filters: false, whitespace: false },
@@ -81,6 +86,10 @@ with your actual markup (typically a few KB).
 
 - Every emitted rule is 1:1 with a real utility (no dead CSS)
 - State variants work with any base utility
-- Responsive + state combinations (`md:hover:x`) work
+- All 10 screens (`xxs:`…`5xl:`) plus `max-*`, `min-[…]`/`max-[…]` and
+  container queries (`@md:`, `@min-*`, `@max-*`) are available — the full
+  build only pre-generates `sm`–`2xl` (`screens: 'all'` opts in)
+- Responsive + state combinations (`md:hover:x`, `print:md:x`) work and
+  stacked media variants collapse into one `@media`
 - Keyframes are emitted only for animations you actually use
 - Deterministic output (same content → same bytes)

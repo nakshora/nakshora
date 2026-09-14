@@ -9,7 +9,7 @@ module, PostCSS `@nakshora` support and HMR.
 npm install -D @nakshora/vite-plugin
 ```
 
-(`vite ^5 || ^6` is a peer dependency.)
+(`vite ^5 || ^6 || ^7 || ^8` is a peer dependency; every major is exercised by a real `vite build` in the test suite. Vite 7+ needs Node ≥ 20.19.)
 
 ## Quick start
 
@@ -73,6 +73,10 @@ Instead of the virtual module, keep a classic entry file:
 // src/main.js
 import './nakshora.css';
 ```
+
+Every `.css` file in the project goes through the bundled PostCSS plugin, so
+`@nakshora …` at-rules, `@apply`, `theme()` and `@screen` work in any
+stylesheet (see [POSTCSS.md](POSTCSS.md#apply-theme-screen-and-screen)).
 
 ## Framework wrappers
 

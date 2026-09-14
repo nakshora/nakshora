@@ -1,18 +1,22 @@
-name: Performance Tracking
+name: Performance
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 jobs:
   benchmark:
-    name: Run Benchmarks
+    name: Benchmark + regression gate
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
@@ -30,35 +34,53 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🏗️ Build packages
-        run: pnpm build
+        run: pnpm build:core
 
-      - name: ⚡ Run benchmarks
-        run: pnpm benchmark
+      # The reference is measured on THIS runner so machine speed cancels out:
+      # for pull requests the merge-base with the target branch, for pushes to
+      # main the previous commit. Falls back to the committed perf/baseline.json.
+      - name: 📐 Measure reference commit
+        id: ref
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            REF=$(git merge-base origin/${{ github.base_ref }} HEAD)
+          else
+            REF=$(git rev-parse HEAD~1 2>/dev/null || echo "")
+          fi
+          if [ -z "$REF" ]; then
+            echo "no reference commit; using perf/baseline.json"
+            cp perf/baseline.json /tmp/reference.json
+            exit 0
+          fi
+          echo "reference = $REF"
+          git worktree add /tmp/ref "$REF"
+          (cd /tmp/ref && pnpm install --frozen-lockfile && pnpm build:core \
+            && node scripts/benchmark.mjs --update --baseline /tmp/reference.json) \
+            || { echo "reference build failed; using perf/baseline.json"; cp perf/baseline.json /tmp/reference.json; }
 
-      - name: 📊 Measure bundle sizes
+      - name: ⚡ Benchmark HEAD and check (>10 % slower / larger fails)
+        run: |
+          node scripts/benchmark.mjs --json perf/report.json --baseline /tmp/reference.json --check | tee perf/report.md
+
+      - name: 📊 Summary
+        if: always()
         run: |
           {
-            echo "# Performance Report — $(date)"
+            echo "## Performance — $(git rev-parse --short HEAD)"
             echo ""
-            echo "## Bundle Sizes (raw → gzip)"
-            echo ""
-            for package in packages/@nakshora/*; do
-              if [ -d "$package/dist" ]; then
-                echo "### $(basename $package)"
-                find "$package/dist" -maxdepth 1 -type f \( -name "*.js" -o -name "*.cjs" -o -name "*.css" -o -name "*.d.ts" \) | sort | while read file; do
-                  size=$(du -h "$file" | cut -f1)
-                  gzip_size=$(gzip -c "$file" | du -h | cut -f1)
-                  echo "- $(basename $file): $size (gzip: $gzip_size)"
-                done
-                echo ""
-              fi
-            done
-          } > performance.md
-          cat performance.md >> $GITHUB_STEP_SUMMARY
+            echo '```'
+            cat perf/report.md
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: 📤 Store performance report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: performance-report
-          path: performance.md
+          name: performance-report-${{ github.sha }}
+          path: |
+            perf/report.json
+            perf/report.md
+            /tmp/reference.json
           retention-days: 90

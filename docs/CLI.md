@@ -34,14 +34,29 @@ nakshora build --watch                  # rebuild on change
 nakshora build -c path/to/config.js     # explicit config
 ```
 
-| Flag                  | Description                                                               |
-| --------------------- | ------------------------------------------------------------------------- |
-| `input`               | Optional CSS file containing `@nakshora source;` / `@nakshora utilities;` |
-| `-o, --output <file>` | Write to file (default: stdout)                                           |
-| `-m, --minify`        | Minify output                                                             |
-| `--mode <full\|jit>`  | Force the build mode (default: JIT when content is configured)            |
-| `-c, --config <path>` | Explicit config file                                                      |
-| `--watch`             | Rebuild on change                                                         |
+| Flag                  | Description                                                                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| `input`               | Optional CSS file containing `@nakshora source;` / `@nakshora utilities;`, `@apply`, `theme()`, `@screen` |
+| `-o, --output <file>` | Write to file (default: stdout)                                                                           |
+| `-m, --minify`        | Minify output                                                                                             |
+| `--mode <full\|jit>`  | Force the build mode (default: JIT when content is configured)                                            |
+| `-c, --config <path>` | Explicit config file                                                                                      |
+| `--watch`             | Rebuild on change (incremental: only changed files are re-scanned)                                        |
+| `--content <globs…>`  | JIT content globs / files — overrides `config.content`                                                    |
+| `--safelist <cls…>`   | Classes always emitted (space or comma separated), added to the config                                    |
+| `--source-map`        | Write `<output>.map` (v3; marks the CSS as generated) + `sourceMappingURL`                                |
+| `--stats`             | Print build time, class/candidate counts, sizes and unknown candidates                                    |
+| `--diff`              | Dry run: list selectors that would be added/removed vs the existing output                                |
+
+`input` may be `-` to read the stylesheet from **stdin**:
+
+```bash
+echo '@nakshora utilities; .btn { @apply px-4 rounded; }' | nakshora build - --content 'src/**/*.html'
+```
+
+When `input` is given, `@apply` / `theme()` / `screen()` / `@screen` in it are
+expanded (see [POSTCSS.md](POSTCSS.md#apply-theme-screen-and-screen)); an
+unknown class fails the build with `input.css: The \`x\` class does not exist…`.
 
 **Build mode selection:**
 
@@ -52,8 +67,64 @@ nakshora build -c path/to/config.js     # explicit config
 
 ### `nakshora dev [input]`
 
-Alias for `build --watch` — development mode with the same flags (minus
-`--watch`).
+`build --watch` with the same flags, plus an optional **dev server** for
+bundler-less projects:
+
+| Flag           | Default   | Meaning                                                         |
+| -------------- | --------- | --------------------------------------------------------------- |
+| `--serve`      | off       | serve `--root` over HTTP; inject a live-reload client into HTML |
+| `--port <n>`   | `3000`    |                                                                 |
+| `--host <h>`   | `0.0.0.0` | bind address (works behind containers/proxies)                  |
+| `--root <dir>` | `.`       | directory to serve                                              |
+
+```bash
+nakshora dev --serve                       # http://localhost:3000/, stylesheet at /nakshora.css (in memory)
+nakshora dev --serve -o public/app.css     # stylesheet also written; served at /public/app.css
+```
+
+On every rebuild the server pushes a Server-Sent Event: a CSS change
+hot-swaps the `<link>` without reloading; a markup change that produces the
+same CSS reloads the page. The client is ~30 lines, injected before
+`</body>`, and only talks to `/__nakshora/events`. It is a development
+convenience, not a production server (no compression, no caching, no HTTPS).
+
+### `nakshora doctor`
+
+Diagnoses the project without building: Node version, config discovery and
+load errors, every `content` glob (files matched, globs into `node_modules`,
+raw strings), `safelist` entries that produce nothing, unknown `variants`
+keys, stylesheets missing `@nakshora source;`, `@apply`/`theme()` that would
+fail, and dependency mismatches (`@nakshora/postcss` without `postcss`,
+Tailwind installed alongside). Exit code 1 on errors. `--json` for tooling.
+
+```
+✔ node      Node v22.22.3
+✔ config    loaded /app/nakshora.config.js
+▲ content   glob matches no files: ./pages/**/*.vue
+            ↳ resolved relative to /app
+✖ apply     src/app.css: The `btn-primry` class does not exist…
+```
+
+### `nakshora migrate [globs…]`
+
+Codemods (dry run by default, `--write` applies):
+
+- `--from tailwind` (default): rewrites `tailwind.config.{js,cjs,mjs,ts}` into
+  `nakshora.config.*` (type comment, `tailwindcss/defaultTheme|colors|plugin`
+  imports → `@nakshora/core`) and prints review notes (`theme.screens` replaces
+  the 10-step scale, `darkMode` default differs, ignored keys, official
+  plugins that keep working). Source files get the handful of renamed
+  utilities (`flex-grow` → `grow`, `overflow-ellipsis` → `text-ellipsis`, …).
+- `--from v1`: Nakshora v1 class names inside `class`/`className` attributes
+  (`card-neon` → `neon-card`, `btn-neon` → `neon-btn`, `uhd:` → `4xl:`,
+  `k8:` → `5xl:`), variant prefixes preserved.
+
+### `nakshora lsp`
+
+Starts the language server (LSP over stdio): completion, hover, diagnostics
+and colour swatches for any editor. `-c <path>` pins the config; otherwise
+it is discovered from the workspace root. Setup per editor in
+[EDITORS.md](./EDITORS.md).
 
 ### `nakshora inspect`
 

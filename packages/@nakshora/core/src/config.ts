@@ -191,7 +191,7 @@ export const defaultTheme: ThemeConfig = {
 /**
  * Default variants configuration — every variant enabled.
  */
-export const defaultVariants: Required<VariantsConfig> = {
+export const defaultVariants: VariantsConfig = {
   hover: true,
   focus: true,
   focusVisible: true,
@@ -209,6 +209,9 @@ export const defaultVariants: Required<VariantsConfig> = {
   peerFocus: true,
   dark: true,
   responsive: true,
+  maxResponsive: true,
+  containerQueries: true,
+  arbitraryVariants: true,
 };
 
 /**

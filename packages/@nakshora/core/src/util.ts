@@ -1,13 +1,16 @@
 // Nakshora Core — internal helpers
 
 import type { CSSProperties } from './types';
+import { escapeClassName } from './values';
+import { extractCandidates } from './extractor';
+import { minifyCssSafe } from './css-ast';
 
 /**
  * Escape a class name for use in a CSS selector.
  * `hover:bg-blue-500` → `hover\:bg-blue-500`
  */
 export function escapeClass(className: string): string {
-  return className.replace(/([.:#[\]\\])/g, '\\$1');
+  return escapeClassName(className);
 }
 
 /**
@@ -34,29 +37,13 @@ export function classToSelector(className: string, suffix = '', ancestor = ''): 
   return ancestor ? `${ancestor} ${core}${suffix}` : `${core}${suffix}`;
 }
 
-const DEFAULT_EXTRACTOR = /[[\w\\:/.-]+/g;
-
 /**
  * Extract candidate class tokens from HTML/JSX/template content.
- * Handles escaped variant syntax (`hover\:bg-blue-500`) used in HTML.
+ * Uses the Tailwind-compatible extractor (arbitrary values, variants,
+ * modifiers) and unescapes HTML-escaped variant syntax (`hover\:bg-blue-500`).
  */
 export function extractClasses(content: string[], pattern?: string): Set<string> {
-  const regex = pattern ? new RegExp(pattern, 'g') : DEFAULT_EXTRACTOR;
-  const classes = new Set<string>();
-  for (const chunk of content) {
-    if (!chunk) continue;
-    for (const match of chunk.matchAll(regex)) {
-      const token = match[0];
-      // Skip obvious non-classes (URLs, long identifiers)
-      if (token.length > 64) continue;
-      // Unescape HTML class escaping: hover\:bg-x → hover:bg-x
-      const unescaped = token.replace(/\\:/g, ':').replace(/\\\\/g, '\\');
-      // Strip leading dot (e.g. `.hidden` in CSS files)
-      const cleaned = unescaped.replace(/^\.+/, '');
-      if (cleaned.length > 1) classes.add(cleaned);
-    }
-  }
-  return classes;
+  return extractCandidates(content, { pattern });
 }
 
 /**
@@ -73,25 +60,33 @@ export function splitClass(token: string): {
 }
 
 /**
- * Lightweight CSS minifier.
- * Removes comments, collapses whitespace, trims around punctuation.
- * Safe for Nakshora's generated output (no strings containing braces).
+ * CSS minifier. Parses the stylesheet and re-serialises it without
+ * whitespace or comments — strings, `url()` contents and custom-property
+ * values are never touched (a regex minifier broke `content: 'a b'`).
  */
 export function minifyCss(css: string): string {
-  return css
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/\s+/g, ' ')
-    .replace(/\s*([{}:;,>~])\s*/g, '$1')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\s+\}/g, '}')
-    .trim();
+  return minifyCssSafe(css);
 }
 
 /**
  * Byte length of a string (UTF-8).
  */
+const encoder = typeof TextEncoder !== 'undefined' ? new TextEncoder() : undefined;
+
+/** UTF-8 byte length — platform-neutral (browser playground + Node). */
 export function byteLength(str: string): number {
-  return Buffer.byteLength(str, 'utf-8');
+  if (encoder) return encoder.encode(str).length;
+  let bytes = 0;
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    if (c < 0x80) bytes += 1;
+    else if (c < 0x800) bytes += 2;
+    else if (c >= 0xd800 && c <= 0xdbff) {
+      bytes += 4;
+      i++;
+    } else bytes += 3;
+  }
+  return bytes;
 }
 
 /**

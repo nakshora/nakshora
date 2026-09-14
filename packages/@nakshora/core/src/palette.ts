@@ -1,9 +1,15 @@
 // Nakshora Core — default color palette
-// 20 palettes × 11 shades (50–950), W3C-validated hex values.
+// 22 palettes × 11 shades (50–950) + 5 special colors (inherit, current,
+// transparent, black, white). Values match Tailwind CSS 3.4 exactly.
 
 import type { ColorConfig } from './types';
 
 export const defaultColors: ColorConfig = {
+  inherit: 'inherit',
+  current: 'currentColor',
+  transparent: 'transparent',
+  black: '#000',
+  white: '#fff',
   slate: {
     50: '#f8fafc',
     100: '#f1f5f9',
@@ -286,9 +292,9 @@ export const defaultColors: ColorConfig = {
     500: '#f43f5e',
     600: '#e11d48',
     700: '#be123c',
-    800: '#881337',
-    900: '#4c0519',
-    950: '#1c020c',
+    800: '#9f1239',
+    900: '#881337',
+    950: '#4c0519',
   },
 };
 

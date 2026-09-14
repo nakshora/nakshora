@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nakshora Playground — compile utility classes in the browser</title>
+    <meta
+      name="description"
+      content="Type HTML, see the exact CSS Nakshora's JIT compiler emits — in your browser, no build step. Inspect any class, try @apply, @theme, variants and arbitrary values."
+    />
+    <link rel="canonical" href="https://nakshora.bsdc.info.bd/playground/" />
+    <link rel="icon" href="../img/favicon.ico" />
+    <link rel="stylesheet" href="playground.min.css" />
+  </head>
+  <body class="bg-slate-950 text-slate-100 min-h-screen antialiased">
+    <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-30">
+      <div class="max-w-screen-2xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <a href="../" class="flex items-center gap-2 no-underline text-slate-100">
+          <span
+            class="inline-block size-3 rounded-full bg-cyan-400 shadow-[0_0_12px_2px_rgba(34,211,238,0.7)]"
+            aria-hidden="true"
+          ></span>
+          <span class="font-bold tracking-tight">Nakshora</span>
+          <span class="text-slate-500">/</span>
+          <span class="text-slate-300">Playground</span>
+        </a>
+        <nav class="flex items-center gap-2 text-sm">
+          <span id="stats" class="hidden sm:inline text-slate-400 tabular-nums" aria-live="polite"
+            >loading engine…</span
+          >
+          <select
+            id="preset"
+            class="bg-slate-800 border border-slate-700 rounded-md px-2 py-1 text-slate-200 text-sm"
+            aria-label="Example"
+          >
+            <option value="card">Card</option>
+            <option value="form">Form + dark mode</option>
+            <option value="grid">Responsive grid</option>
+            <option value="variants">Variants &amp; arbitrary values</option>
+            <option value="cssconfig">@theme / @utility / @apply</option>
+            <option value="components">Design components</option>
+          </select>
+          <button
+            id="share"
+            class="px-3 py-1 rounded-md bg-cyan-500 text-slate-950 font-semibold hover:bg-cyan-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+            type="button"
+          >
+            Share
+          </button>
+          <a
+            href="https://github.com/nakshora/nakshora"
+            class="px-3 py-1 rounded-md border border-slate-700 text-slate-200 no-underline hover:border-slate-500"
+            >GitHub</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main
+      class="max-w-screen-2xl mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-2 gap-4"
+      style="min-height: calc(100vh - 3.5rem)"
+    >
+      <section class="flex flex-col gap-3 min-h-0" aria-labelledby="input-title">
+        <div class="flex items-center justify-between">
+          <h1
+            id="input-title"
+            class="text-sm font-semibold uppercase tracking-wider text-slate-400"
+          >
+            HTML
+          </h1>
+          <label class="text-xs text-slate-400 flex items-center gap-2">
+            <input id="minify" type="checkbox" class="accent-cyan-400" /> minify
+          </label>
+        </div>
+        <textarea
+          id="html"
+          class="flex-1 min-h-[16rem] lg:min-h-0 w-full resize-y font-mono text-sm leading-6 bg-slate-900 border border-slate-800 rounded-lg p-3 text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+          spellcheck="false"
+          aria-label="HTML input"
+        ></textarea>
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">
+            CSS (author stylesheet, optional)
+          </h2>
+          <span class="text-xs text-slate-500"
+            >@apply · theme() · @theme · @utility · @custom-variant</span
+          >
+        </div>
+        <textarea
+          id="css"
+          class="min-h-[8rem] w-full resize-y font-mono text-sm leading-6 bg-slate-900 border border-slate-800 rounded-lg p-3 text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+          spellcheck="false"
+          aria-label="Author CSS input"
+        ></textarea>
+        <div class="flex items-center gap-2">
+          <input
+            id="inspect"
+            class="flex-1 font-mono text-sm bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500"
+            placeholder="inspect a class: md:hover:bg-blue-500/50"
+            aria-label="Inspect a class"
+          />
+        </div>
+        <pre
+          id="inspect-out"
+          class="hidden font-mono text-xs leading-5 bg-slate-900 border border-slate-800 rounded-lg p-3 text-emerald-300 overflow-auto max-h-40 whitespace-pre-wrap"
+        ></pre>
+        <p
+          id="error"
+          class="hidden text-sm text-rose-300 bg-rose-950/60 border border-rose-900 rounded-lg px-3 py-2"
+          role="alert"
+        ></p>
+      </section>
+
+      <section class="flex flex-col gap-3 min-h-0" aria-labelledby="output-title">
+        <div class="flex items-center justify-between">
+          <h2
+            id="output-title"
+            class="text-sm font-semibold uppercase tracking-wider text-slate-400"
+          >
+            Preview
+          </h2>
+          <div class="flex gap-1 text-xs" role="tablist">
+            <button
+              class="tab px-2 py-1 rounded bg-slate-800 text-slate-100"
+              data-tab="preview"
+              role="tab"
+              aria-selected="true"
+              type="button"
+            >
+              Preview
+            </button>
+            <button
+              class="tab px-2 py-1 rounded text-slate-400 hover:text-slate-100"
+              data-tab="output"
+              role="tab"
+              aria-selected="false"
+              type="button"
+            >
+              Generated CSS
+            </button>
+          </div>
+        </div>
+        <iframe
+          id="preview"
+          class="flex-1 min-h-[20rem] w-full rounded-lg border border-slate-800 bg-white"
+          title="Preview"
+          sandbox="allow-same-origin"
+        ></iframe>
+        <div id="output-wrap" class="hidden flex-1 min-h-[20rem] relative">
+          <button
+            id="copy"
+            class="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-slate-800 text-slate-200 hover:bg-slate-700"
+            type="button"
+          >
+            Copy
+          </button>
+          <pre
+            id="output"
+            class="h-full font-mono text-xs leading-5 bg-slate-900 border border-slate-800 rounded-lg p-3 text-slate-200 overflow-auto whitespace-pre"
+          ></pre>
+        </div>
+        <p class="text-xs text-slate-500">
+          Runs <code class="text-slate-300">@nakshora/core</code> in your browser — the same engine
+          as the CLI, PostCSS and Vite plugins. Nothing is sent anywhere; the Share button puts the
+          source in the URL hash.
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="playground.js"></script>
+  </body>
+</html>

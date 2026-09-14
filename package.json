@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "private": true,
   "description": "The modern, ultra-fast, utility-first CSS framework — pnpm monorepo root",
-  "homepage": "https://nakshora.dev",
+  "homepage": "https://nakshora.bsdc.info.bd",
   "repository": {
     "type": "git",
     "url": "https://github.com/nakshora/nakshora"
@@ -43,7 +43,7 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "build": "pnpm -r build && node scripts/generate-css.mjs",
+    "build": "pnpm -r build && node scripts/generate-css.mjs && node scripts/build-site.mjs",
     "build:core": "pnpm -F @nakshora/core build",
     "build:cli": "pnpm -F @nakshora/cli build",
     "build:postcss": "pnpm -F @nakshora/postcss build",
@@ -58,6 +58,10 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}\"",
     "type-check": "pnpm build && pnpm -r type-check",
     "benchmark": "node scripts/benchmark.mjs",
+    "benchmark:check": "node scripts/benchmark.mjs --check",
+    "benchmark:update": "node scripts/benchmark.mjs --update",
+    "theme:sync": "node scripts/sync-tailwind-theme.mjs",
+    "theme:check": "node scripts/sync-tailwind-theme.mjs --check",
     "ai:export": "pnpm build:cli && node packages/@nakshora/cli/dist/cli.js export:ai --out ai/corpus.json",
     "clean": "pnpm -r exec rm -rf dist && rm -rf node_modules",
     "changeset": "changeset",
@@ -70,10 +74,18 @@
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^2.27.0",
     "@eslint/js": "^9.0.0",
+    "@tailwindcss/aspect-ratio": "0.4.2",
+    "@tailwindcss/container-queries": "0.1.1",
+    "@tailwindcss/forms": "0.5.10",
+    "@tailwindcss/typography": "0.5.16",
     "@vitest/coverage-v8": "^2.1.0",
+    "css-tree": "3.1.0",
     "eslint": "^9.0.0",
     "globals": "^15.0.0",
+    "postcss": "8.4.49",
+    "postcss-selector-parser": "6",
     "prettier": "^3.3.0",
+    "tailwindcss": "3.4.19",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.0.0",
     "vitest": "^2.1.0"

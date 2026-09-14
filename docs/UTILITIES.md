@@ -1,6 +1,6 @@
 # Nakshora Utilities Reference
 
-**3,091 utilities** organized into 13 categories. Every table below is
+**11,417 utilities** organized into 35 categories (12 reference pages). Every table below is
 **generated from the framework source** — if you see a class here, the
 compiler can emit it.
 
@@ -8,9 +8,9 @@ compiler can emit it.
 >
 > - Color: `<utility>-<palette>-<shade>` → `text-blue-500`, `bg-slate-900`, `from-rose-400`
 > - Spacing: `<utility>-<key>` → `p-4`, `mt-2`, `gap-x-6` (keys: `0 px 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 14 16 20 24 28 32 36 40 44 48 56 64 72 80 96`)
-> - Responsive: `sm:md:lg:xl:2xl:` prefix → `md:grid-cols-2`
+> - Responsive: `xxs: xs: sm: md: lg: xl: 2xl: 3xl: 4xl: 5xl:` (200–5000px) and `max-<screen>:` → `md:grid-cols-2`, `max-md:hidden`; container queries `@md:` `@min-md:` `@max-md:`
 > - Variants (JIT): `hover: focus: active: disabled: dark: group-hover: peer-focus:` → `hover:bg-blue-600`
-> - Combine (JIT): one responsive + one state → `md:hover:bg-blue-600`
+> - Combine (JIT): screens + any state, stacked freely → `md:hover:bg-blue-600`, `print:md:flex` (one merged `@media`)
 
 ## 📑 Categories
 

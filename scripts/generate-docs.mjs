@@ -16,12 +16,13 @@ mkdirSync(outDir, { recursive: true });
 const generator = new CSSGenerator();
 const rules = generator.getUtilities();
 
-// group → category
+// category → rules (every rule has exactly one category; the file specs
+// below list category ids, and a final check makes sure none is left out)
 const byGroup = new Map();
 for (const rule of rules) {
-  const list = byGroup.get(rule.group) ?? [];
+  const list = byGroup.get(rule.category) ?? [];
   list.push(rule);
-  byGroup.set(rule.group, list);
+  byGroup.set(rule.category, list);
 }
 
 const cssOf = (r) =>
@@ -34,7 +35,7 @@ const files = [
   {
     file: '01-layout.md',
     title: 'Layout Utilities',
-    groups: ['display', 'position', 'inset', 'zIndex', 'overflow', 'visibility'],
+    groups: ['layout', 'display', 'position', 'inset', 'zIndex', 'overflow', 'visibility'],
     intro: 'Control how elements are displayed, positioned and stacked in the document flow.',
   },
   {
@@ -67,7 +68,7 @@ const files = [
   {
     file: '06-colors.md',
     title: 'Color Utilities',
-    groups: ['textColor', 'backgroundColor', 'borderColor', 'gradients'],
+    groups: ['textColor', 'backgroundColor', 'borderColor', 'gradients', 'svg'],
     intro:
       '22 color palettes × 11 shades (50–950). Syntax: `<utility>-<palette>-<shade>` — e.g. `text-blue-500`, `bg-slate-900`, `border-rose-200`, `from-indigo-400`.\n\n**Palettes:** `slate` `gray` `zinc` `neutral` `stone` `red` `orange` `amber` `yellow` `lime` `emerald` `green` `teal` `cyan` `sky` `blue` `indigo` `violet` `purple` `fuchsia` `pink` `rose`\n\nThe full table is generated per palette below. Gradient direction utilities live in [Backgrounds](./07-backgrounds.md).',
   },
@@ -87,7 +88,7 @@ const files = [
   {
     file: '09-effects.md',
     title: 'Effect Utilities',
-    groups: ['shadows', 'opacity', 'filters'],
+    groups: ['shadows', 'opacity', 'effects', 'filters'],
     intro:
       'Shadows, opacity and CSS filters (blur, brightness, grayscale, invert, saturate, drop-shadow, backdrop-*).',
   },
@@ -108,10 +109,18 @@ const files = [
   {
     file: '12-misc.md',
     title: 'Cursor, Whitespace & Misc Utilities',
-    groups: ['cursors', 'whitespace'],
-    intro: 'Cursors, white-space, floats, clearing, lists, resize and user-select.',
+    groups: ['cursors', 'whitespace', 'interactivity', 'tables', 'accessibility'],
+    intro:
+      'Cursors, white-space, floats, clearing, lists, resize, user-select, scroll/touch behaviour, accent/caret colours, tables and accessibility helpers.',
   },
 ];
+
+const covered = new Set(files.flatMap((f) => f.groups));
+const uncovered = [...byGroup.keys()].filter((c) => !covered.has(c));
+if (uncovered.length) {
+  console.error(`✖ categories without a docs page: ${uncovered.join(', ')}`);
+  process.exit(1);
+}
 
 let total = 0;
 for (const spec of files) {
@@ -128,7 +137,7 @@ for (const spec of files) {
     );
     total += groupRules.length;
   }
-  const content = `---\ntitle: ${spec.title}\n---\n\n# ${spec.title}\n\n> Part of the [Nakshora Utilities Reference](../UTILITIES.md). These tables are **generated from the framework source** — what you see here is exactly what the compiler emits.\n\n${spec.intro}\n\n${sections.join('\n\n')}\n\n---\n\n## Responsive & state variants\n\nEvery utility above accepts a responsive prefix (\`sm:\`, \`md:\`, \`lg:\`, \`xl:\`, \`2xl:\`) and — in JIT mode — a state variant (\`hover:\`, \`focus:\`, \`active:\`, \`disabled:\`, \`dark:\`, \`group-hover:\`, \`peer-focus:\`, …). See [Variants](../VARIANTS.md) and [Responsive](../RESPONSIVE.md).\n`;
+  const content = `---\ntitle: ${spec.title}\n---\n\n# ${spec.title}\n\n> Part of the [Nakshora Utilities Reference](../UTILITIES.md). These tables are **generated from the framework source** — what you see here is exactly what the compiler emits.\n\n${spec.intro}\n\n${sections.join('\n\n')}\n\n---\n\n## Responsive & state variants\n\nEvery utility above accepts a responsive prefix (\`xxs:\` … \`5xl:\`, \`max-md:\`, container \`@md:\`) and — in JIT mode — a state variant (\`hover:\`, \`focus:\`, \`active:\`, \`disabled:\`, \`dark:\`, \`group-hover:\`, \`peer-focus:\`, …). See [Variants](../VARIANTS.md) and [Responsive](../RESPONSIVE.md).\n`;
   writeFileSync(join(outDir, spec.file), content);
   console.log(`✅ docs/utilities/${spec.file}`);
 }
