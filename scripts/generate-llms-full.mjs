@@ -39,6 +39,7 @@ const DOCS = [
   'docs/THEMES.md',
   'docs/CLI.md',
   'docs/EDITORS.md',
+  'docs/PLAYGROUND.md',
   'docs/POSTCSS.md',
   'docs/VITE.md',
   'docs/API.md',

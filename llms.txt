@@ -2,12 +2,12 @@
 
 > The modern, ultra-fast, utility-first CSS framework with a JIT compiler. Built by Rizwan Rahim Chowdhury (RRC Development). MIT licensed.
 
-Nakshora compiles only the CSS your project actually uses: 3,091 utilities across 29 categories (layout, spacing, sizing, flexbox, grid, typography, 22 color palettes × 11 shades, backgrounds, borders, effects, transforms, transitions, animations), plus built-in design-paradigm components (glassmorphism, neon cyber, brutalism, minimalism, skeletons) and five theme presets. Zero runtime JS — pure CSS output.
+Nakshora compiles only the CSS your project actually uses: 11,417 utilities across 35 categories (layout, spacing, sizing, flexbox, grid, typography, 22 color palettes × 11 shades, backgrounds, borders, effects, transforms, transitions, animations), plus built-in design-paradigm components (glassmorphism, neon cyber, brutalism, minimalism, skeletons) and five theme presets. Zero runtime JS — pure CSS output.
 
 ## Packages
 
 - `@nakshora/core` — JIT CSS compiler & engine (zero dependencies)
-- `@nakshora/cli` — CLI: `nakshora init / build / dev / inspect / export:ai`
+- `@nakshora/cli` — CLI: `nakshora init / build / dev / doctor / migrate / lsp / inspect / export:ai`
 - `@nakshora/postcss` — PostCSS plugin (`@nakshora source;` / `@nakshora utilities;`)
 - `@nakshora/vite-plugin` — Vite plugin (virtual module `import 'nakshora'`, HMR)
 
@@ -38,24 +38,29 @@ import 'nakshora';
 
 - Color: `<util>-<palette>-<shade>` — `text-blue-500`, `bg-slate-900`, `border-rose-200`, `from-indigo-400` (22 palettes: slate gray zinc neutral stone red orange amber yellow lime emerald green teal cyan sky blue indigo violet purple fuchsia pink rose; shades 50–950)
 - Spacing: key ∈ `0 px 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 14 16 20 24 28 32 36 40 44 48 56 64 72 80 96` (rem scale) — `p-4`, `mt-2`, `mx-6`, `gap-y-8`
-- Responsive (mobile-first): `sm:` 640 · `md:` 768 · `lg:` 1024 · `xl:` 1280 · `2xl:` 1536 — `md:grid-cols-2`
-- State variants (JIT mode): `hover:` `focus:` `focus-visible:` `focus-within:` `active:` `visited:` `disabled:` `first:` `last:` `group-hover:` `group-focus:` `peer-hover:` `peer-focus:` `dark:` — combine one responsive + one state: `md:hover:bg-blue-600`
+- Responsive (mobile-first, 10 breakpoints): `xxs:` 200 · `xs:` 400 · `sm:` 640 · `md:` 768 · `lg:` 1024 · `xl:` 1280 · `2xl:` 1536 · `3xl:` 1920 · `4xl:` 2560 · `5xl:` 5000 — `md:grid-cols-2`; `max-md:` (max-width), `@md:` (container queries), `min-[900px]:`
+- Variants (JIT mode, Tailwind v3.4 grammar, 155 total): `hover:` `focus:` `focus-visible:` `active:` `disabled:` `first:` `odd:` `group-hover:` `peer-checked:` `has-[…]:` `aria-*:` `data-*:` `supports-[…]:` `dark:` `print:` `motion-reduce:` `*:` `not-hover:` `starting:` — stack freely: `md:hover:bg-blue-600`, `dark:group-hover:text-white`
+- Arbitrary values / properties / variants: `w-[37px]`, `bg-[#1e293b]`, `[mask-type:luminance]`, `[&>*]:p-2`; opacity modifiers `bg-blue-500/50`; `!` important
 - Design components: `.glass` `.glass-light` `.glass-dark` `.neon-card` `.neon-btn` `.neon-glow` `.neon-text` `.brutalist-card` `.brutalist-btn` `.minimalist-card` `.minimalist-btn` `.skeleton-rect` `.skeleton-circle` `.skeleton-text` `.hover-lift` `.gradient-text` `.gradient-neon` `.gradient-pastel` `.gradient-nature` `.gradient-brutalist`
 - Dark mode: `class="dark"` on `<html>` + `dark:` variants
 
 ## Key behavior
 
-- JIT mode (default when `content` is configured) emits only used classes; full mode emits all base + responsive utilities (~740 KB min).
+- JIT mode (default when `content` is configured) emits only used classes (typically 5–20 KB); full mode emits all base + responsive utilities (5,983 KB min / 133 KB brotli).
+- `@apply`, `theme()`, `screen()` in author CSS; `@theme` / `@utility` / `@custom-variant` (Tailwind v4 syntax) extend the config from CSS.
+- Tailwind v3.4 parity: 11,343 static + 1,338 dynamic classes byte-identical; official Tailwind plugins (typography, forms, aspect-ratio, container-queries) run unchanged. `npx nakshora migrate` ports a Tailwind project.
+- Editor support: `npx nakshora lsp` (completion, hover, diagnostics, colours) for any LSP client.
 - `safelist: []` for dynamically-built class names.
 - Theme overrides deep-merge: `theme: { colors: { brand: { 500: '#6d28d9' } } }`.
 - Every token is exposed as a CSS variable on `:root` (`--color-blue-500`, `--spacing-4`, …).
 
 ## Resources
 
+- Playground (compile classes in the browser): https://nakshora.bsdc.info.bd/playground/
 - Full documentation: [docs/](https://github.com/nakshora/nakshora/tree/main/docs)
 - Full docs for LLMs: [llms-full.md](https://github.com/nakshora/nakshora/blob/main/llms-full.md)
 - Utility corpus (machine format): [ai/corpus.json](https://github.com/nakshora/nakshora/blob/main/ai/corpus.json)
 - SFT dataset: [ai/sft-train.jsonl](https://github.com/nakshora/nakshora/blob/main/ai/sft-train.jsonl)
 - npm: https://www.npmjs.com/package/@nakshora/core
 - Repo: https://github.com/nakshora/nakshora
-- Site: https://nakshora.dev
+- Site: https://nakshora.bsdc.info.bd

@@ -40,6 +40,11 @@ export default tseslint.config(
     },
   },
   {
+    // browser-only code: the playground runs the core ESM bundle in the page
+    files: ['playground/**/*.js'],
+    languageOptions: { globals: { ...globals.browser } },
+  },
+  {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
       'no-undef': 'off', // TS handles undefined symbols

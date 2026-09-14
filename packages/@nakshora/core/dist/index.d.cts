@@ -455,9 +455,7 @@ declare function splitClass(token: string): {
  * values are never touched (a regex minifier broke `content: 'a b'`).
  */
 declare function minifyCss(css: string): string;
-/**
- * Byte length of a string (UTF-8).
- */
+/** UTF-8 byte length — platform-neutral (browser playground + Node). */
 declare function byteLength(str: string): number;
 /**
  * Format a byte count for humans (12.3 KB)

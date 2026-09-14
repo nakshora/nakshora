@@ -38,6 +38,10 @@ describe('documentation claims match the code', () => {
       expect(text, `${file} stale count`).not.toMatch(/\b3,091\b|\b6,313\b/);
     }
     expect(read('README.md')).toContain(`${categories} categories`);
+    const llms = read('llms.txt');
+    expect(llms).toContain(`${fmt(catalog)} utilities across ${categories} categories`);
+    expect(llms).toContain(`${gen.getVariantDefinitions().length} total`);
+    expect(llms).not.toMatch(/\b3,091\b|\b29 categories\b|~740 KB/);
     const editors = read('docs/EDITORS.md');
     expect(editors).toContain(`${fmt(catalog)} by default`);
     expect(editors).toContain(`all ${gen.getVariantDefinitions().length} variants`);

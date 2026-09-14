@@ -82,7 +82,7 @@ and [docs/API.md](docs/API.md).
 
 ## Community
 
-- Website: [nakshora.dev](https://nakshora.dev)
+- Website: [nakshora.bsdc.info.bd](https://nakshora.bsdc.info.bd)
 - GitHub: [nakshora/nakshora](https://github.com/nakshora/nakshora)
 - Issues: [nakshora/nakshora/issues](https://github.com/nakshora/nakshora/issues)
 - Author: Rizwan Rahim Chowdhury ([rrc.bsdc.info.bd](https://rrc.bsdc.info.bd))

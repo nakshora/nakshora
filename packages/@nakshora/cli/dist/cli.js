@@ -797,7 +797,18 @@ function minifyCss(css) {
   return minifyCssSafe(css);
 }
 function byteLength(str) {
-  return Buffer.byteLength(str, "utf-8");
+  if (encoder) return encoder.encode(str).length;
+  let bytes = 0;
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    if (c < 128) bytes += 1;
+    else if (c < 2048) bytes += 2;
+    else if (c >= 55296 && c <= 56319) {
+      bytes += 4;
+      i++;
+    } else bytes += 3;
+  }
+  return bytes;
 }
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -3210,7 +3221,9 @@ function extractCssConfig(css) {
     }
     const themeKey = THEME_NAMESPACES[namespace];
     if (themeKey === null) {
-      notes.push(`@theme: \`--${name}\` (${namespace}) maps to a v4-only utility \u2014 kept as a CSS variable only`);
+      notes.push(
+        `@theme: \`--${name}\` (${namespace}) maps to a v4-only utility \u2014 kept as a CSS variable only`
+      );
       continue;
     }
     const meta = /^(.*?)--(line-height|letter-spacing|font-weight)$/.exec(key);
@@ -3288,7 +3301,8 @@ function setColor(extend, key, value) {
     colors[m[1]] = palette;
   } else {
     const existing = colors[key];
-    if (existing && typeof existing === "object") existing.DEFAULT = value;
+    if (existing && typeof existing === "object")
+      existing.DEFAULT = value;
     else colors[key] = value;
   }
 }
@@ -3321,8 +3335,10 @@ function blockVariantFormats(node) {
   const formats = [];
   const walk = (nodes, prefix) => {
     for (const n of nodes) {
-      if (n.type === "atrule" && n.name === "slot") formats.push(...prefix.length ? prefix : ["&"]);
-      else if (n.type === "atrule" && n.nodes) walk(n.nodes, [...prefix, `@${n.name} ${n.params}`.trim()]);
+      if (n.type === "atrule" && n.name === "slot")
+        formats.push(...prefix.length ? prefix : ["&"]);
+      else if (n.type === "atrule" && n.nodes)
+        walk(n.nodes, [...prefix, `@${n.name} ${n.params}`.trim()]);
       else if (n.type === "rule") walk(n.nodes, [...prefix, n.selector]);
     }
   };
@@ -3334,7 +3350,8 @@ function nodesToCssInJs(nodes) {
   for (const n of nodes) {
     if (n.type === "decl") out[n.prop] = n.important ? `${n.value} !important` : n.value;
     else if (n.type === "rule") out[n.selector] = nodesToCssInJs(n.nodes);
-    else if (n.type === "atrule" && n.nodes) out[`@${n.name} ${n.params}`.trim()] = nodesToCssInJs(n.nodes);
+    else if (n.type === "atrule" && n.nodes)
+      out[`@${n.name} ${n.params}`.trim()] = nodesToCssInJs(n.nodes);
   }
   return out;
 }
@@ -3375,10 +3392,11 @@ function matchType(kinds) {
     percentage: "percentage",
     ratio: "any"
   };
-  if (!kinds.arbitrary) return kinds.bare.length ? [...new Set(kinds.bare.map((k) => map[k] ?? "any"))] : void 0;
+  if (!kinds.arbitrary)
+    return kinds.bare.length ? [...new Set(kinds.bare.map((k) => map[k] ?? "any"))] : void 0;
   return void 0;
 }
-var defaultColors, defaultVariants, componentCss, componentNames, HEX, SHORT_HEX, VALUE, SEP, ALPHA_SEP, CUSTOM_PROPERTY, RGB, HSL, NAMED_COLORS, MATH_FUNCTIONS, AUTO_VAR_INJECTION_EXCEPTIONS, CSS_FUNCTIONS, LENGTH_UNITS, LENGTH_RE, typeCheckers, TYPE_HINTS, SPECIALS, ALLOWED_CLASS_CHARACTERS, cache, UNITLESS, tailwindDefaults, DEFAULT_SCREENS, SCREEN_GUIDE, DEFAULT_CONTAINER_MIN_SCREEN, DEFAULT_CONTAINER_MAX_SCREEN, FRACTIONS, FRACTIONS_SMALL, FRACTIONS_SIXTHS, NAKSHORA_EXTRAS, STATIC_UTILITIES, TRANSFORM_VALUE, FILTER_VALUE, BACKDROP_VALUE, CHILD_SELECTOR, SHADOW_KEYWORDS, SHADOW_LENGTH, CORE_PLUGIN_ORDER, DEFAULTS_GROUPS, BARE_VALUE, CATALOG_CACHE, CATALOG_CACHE_MAX, PSEUDO_ELEMENTS, VISITED_STRIP, PSEUDO_CLASSES, LEGACY_VARIANT_KEYS, MEDIA_SORT, Engine, MERGE_RE, PSEUDO_ELEMENT_PROPS, DEFAULT_PSEUDO_PROPS, NAKSHORA_STATIC, GROUP_CATEGORIES, PLUGIN_CATEGORY, PLUGIN_COMPONENTS_GROUP, ApplyError, siblingSeq, version, STATE_VARIANTS, VERSION, CORE_SCREENS, CSSGenerator, ContentCache, THEME_NAMESPACES, CONFIG_AT_RULES, VALUE_FN, metadata;
+var defaultColors, defaultVariants, componentCss, componentNames, HEX, SHORT_HEX, VALUE, SEP, ALPHA_SEP, CUSTOM_PROPERTY, RGB, HSL, NAMED_COLORS, MATH_FUNCTIONS, AUTO_VAR_INJECTION_EXCEPTIONS, CSS_FUNCTIONS, LENGTH_UNITS, LENGTH_RE, typeCheckers, TYPE_HINTS, SPECIALS, ALLOWED_CLASS_CHARACTERS, cache, UNITLESS, encoder, tailwindDefaults, DEFAULT_SCREENS, SCREEN_GUIDE, DEFAULT_CONTAINER_MIN_SCREEN, DEFAULT_CONTAINER_MAX_SCREEN, FRACTIONS, FRACTIONS_SMALL, FRACTIONS_SIXTHS, NAKSHORA_EXTRAS, STATIC_UTILITIES, TRANSFORM_VALUE, FILTER_VALUE, BACKDROP_VALUE, CHILD_SELECTOR, SHADOW_KEYWORDS, SHADOW_LENGTH, CORE_PLUGIN_ORDER, DEFAULTS_GROUPS, BARE_VALUE, CATALOG_CACHE, CATALOG_CACHE_MAX, PSEUDO_ELEMENTS, VISITED_STRIP, PSEUDO_CLASSES, LEGACY_VARIANT_KEYS, MEDIA_SORT, Engine, MERGE_RE, PSEUDO_ELEMENT_PROPS, DEFAULT_PSEUDO_PROPS, NAKSHORA_STATIC, GROUP_CATEGORIES, PLUGIN_CATEGORY, PLUGIN_COMPONENTS_GROUP, ApplyError, siblingSeq, version, STATE_VARIANTS, VERSION, CORE_SCREENS, CSSGenerator, ContentCache, THEME_NAMESPACES, CONFIG_AT_RULES, VALUE_FN, metadata;
 var init_dist = __esm({
   "../core/dist/index.js"() {
     "use strict";
@@ -4210,6 +4228,7 @@ var init_dist = __esm({
       "stroke-opacity",
       "stroke-width"
     ]);
+    encoder = typeof TextEncoder !== "undefined" ? new TextEncoder() : void 0;
     tailwindDefaults = {
       animation: {
         none: "none",
@@ -8301,7 +8320,7 @@ ${css}` : "";
       aspect: "aspectRatio",
       ease: "transitionTimingFunction",
       animate: "animation",
-      "default": null
+      default: null
     };
     CONFIG_AT_RULES = /* @__PURE__ */ new Set(["theme", "utility", "custom-variant"]);
     VALUE_FN = /--value\(([^)]*)\)/g;
@@ -8313,7 +8332,7 @@ ${css}` : "";
       maintainer: "RRC Development",
       license: "MIT",
       repository: "https://github.com/nakshora/nakshora",
-      homepage: "https://nakshora.dev",
+      homepage: "https://nakshora.bsdc.info.bd",
       documentation: "https://github.com/nakshora/nakshora/blob/main/docs"
     };
   }

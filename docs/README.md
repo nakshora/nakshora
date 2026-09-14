@@ -31,6 +31,7 @@ ultra-fast, utility-first CSS framework with a JIT compiler.
 | ------------------------------ | -------------------------------------------------------------------------------------- |
 | [CLI](./CLI.md)                | `nakshora init / build / dev / doctor / migrate / lsp / inspect / export:ai`           |
 | [Editors](./EDITORS.md)        | Language server: completion, hover, diagnostics, colours (VS Code, Neovim, Zed, Helix) |
+| [Playground](./PLAYGROUND.md)  | In-browser compiler at nakshora.bsdc.info.bd/playground — presets, inspect, share      |
 | [PostCSS Plugin](./POSTCSS.md) | `@nakshora source` / `@nakshora utilities` at-rules                                    |
 | [Vite Plugin](./VITE.md)       | Virtual CSS module, HMR, PostCSS pipeline                                              |
 | [JavaScript API](./API.md)     | `CSSGenerator`, config helpers, plugin API — the full programmatic surface             |

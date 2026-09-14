@@ -143,7 +143,7 @@ export const metadata = {
   maintainer: 'RRC Development',
   license: 'MIT',
   repository: 'https://github.com/nakshora/nakshora',
-  homepage: 'https://nakshora.dev',
+  homepage: 'https://nakshora.bsdc.info.bd',
   documentation: 'https://github.com/nakshora/nakshora/blob/main/docs',
 };
 

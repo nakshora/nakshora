@@ -1656,8 +1656,20 @@ function extractClasses(content, pattern2) {
 function minifyCss(css) {
   return minifyCssSafe(css);
 }
+var encoder = typeof TextEncoder !== "undefined" ? new TextEncoder() : void 0;
 function byteLength(str) {
-  return Buffer.byteLength(str, "utf-8");
+  if (encoder) return encoder.encode(str).length;
+  let bytes = 0;
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    if (c < 128) bytes += 1;
+    else if (c < 2048) bytes += 2;
+    else if (c >= 55296 && c <= 56319) {
+      bytes += 4;
+      i++;
+    } else bytes += 3;
+  }
+  return bytes;
 }
 var tailwindDefaults = {
   animation: {
@@ -7953,7 +7965,7 @@ var THEME_NAMESPACES = {
   aspect: "aspectRatio",
   ease: "transitionTimingFunction",
   animate: "animation",
-  "default": null
+  default: null
 };
 var CONFIG_AT_RULES = /* @__PURE__ */ new Set(["theme", "utility", "custom-variant"]);
 function hasCssConfig(css) {
@@ -8031,7 +8043,9 @@ function extractCssConfig(css) {
     }
     const themeKey = THEME_NAMESPACES[namespace];
     if (themeKey === null) {
-      notes.push(`@theme: \`--${name}\` (${namespace}) maps to a v4-only utility \u2014 kept as a CSS variable only`);
+      notes.push(
+        `@theme: \`--${name}\` (${namespace}) maps to a v4-only utility \u2014 kept as a CSS variable only`
+      );
       continue;
     }
     const meta = /^(.*?)--(line-height|letter-spacing|font-weight)$/.exec(key);
@@ -8109,7 +8123,8 @@ function setColor(extend, key, value) {
     colors[m[1]] = palette;
   } else {
     const existing = colors[key];
-    if (existing && typeof existing === "object") existing.DEFAULT = value;
+    if (existing && typeof existing === "object")
+      existing.DEFAULT = value;
     else colors[key] = value;
   }
 }
@@ -8142,8 +8157,10 @@ function blockVariantFormats(node) {
   const formats = [];
   const walk = (nodes, prefix) => {
     for (const n of nodes) {
-      if (n.type === "atrule" && n.name === "slot") formats.push(...prefix.length ? prefix : ["&"]);
-      else if (n.type === "atrule" && n.nodes) walk(n.nodes, [...prefix, `@${n.name} ${n.params}`.trim()]);
+      if (n.type === "atrule" && n.name === "slot")
+        formats.push(...prefix.length ? prefix : ["&"]);
+      else if (n.type === "atrule" && n.nodes)
+        walk(n.nodes, [...prefix, `@${n.name} ${n.params}`.trim()]);
       else if (n.type === "rule") walk(n.nodes, [...prefix, n.selector]);
     }
   };
@@ -8155,7 +8172,8 @@ function nodesToCssInJs(nodes) {
   for (const n of nodes) {
     if (n.type === "decl") out[n.prop] = n.important ? `${n.value} !important` : n.value;
     else if (n.type === "rule") out[n.selector] = nodesToCssInJs(n.nodes);
-    else if (n.type === "atrule" && n.nodes) out[`@${n.name} ${n.params}`.trim()] = nodesToCssInJs(n.nodes);
+    else if (n.type === "atrule" && n.nodes)
+      out[`@${n.name} ${n.params}`.trim()] = nodesToCssInJs(n.nodes);
   }
   return out;
 }
@@ -8197,7 +8215,8 @@ function matchType(kinds) {
     percentage: "percentage",
     ratio: "any"
   };
-  if (!kinds.arbitrary) return kinds.bare.length ? [...new Set(kinds.bare.map((k) => map[k] ?? "any"))] : void 0;
+  if (!kinds.arbitrary)
+    return kinds.bare.length ? [...new Set(kinds.bare.map((k) => map[k] ?? "any"))] : void 0;
   return void 0;
 }
 

@@ -71,8 +71,22 @@ export function minifyCss(css: string): string {
 /**
  * Byte length of a string (UTF-8).
  */
+const encoder = typeof TextEncoder !== 'undefined' ? new TextEncoder() : undefined;
+
+/** UTF-8 byte length — platform-neutral (browser playground + Node). */
 export function byteLength(str: string): number {
-  return Buffer.byteLength(str, 'utf-8');
+  if (encoder) return encoder.encode(str).length;
+  let bytes = 0;
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    if (c < 0x80) bytes += 1;
+    else if (c < 0x800) bytes += 2;
+    else if (c >= 0xd800 && c <= 0xdbff) {
+      bytes += 4;
+      i++;
+    } else bytes += 3;
+  }
+  return bytes;
 }
 
 /**
