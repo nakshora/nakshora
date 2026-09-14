@@ -8,6 +8,7 @@ import {
   finalizeSelector,
   candidatePermutations,
   maxWidthValue,
+  clearCatalogCache,
 } from './engine';
 import { resolveTheme, DEFAULT_SCREENS, SCREEN_GUIDE, splitPath, screenToPx } from './theme';
 import { plugin } from './plugin-api';
@@ -45,7 +46,14 @@ import { buildAICorpus, corpusToSFT } from './ai';
 
 export { CSSGenerator, createGenerator, STATE_VARIANTS, preflight };
 export type { VariantDef, ResolvedBreakpoint } from './generator';
-export { Engine, applyFormat, finalizeSelector, candidatePermutations, maxWidthValue };
+export {
+  Engine,
+  applyFormat,
+  finalizeSelector,
+  candidatePermutations,
+  maxWidthValue,
+  clearCatalogCache,
+};
 export type {
   CompiledRule,
   VariantDefinition,
@@ -59,6 +67,8 @@ export type { ResolvedTheme } from './theme';
 export { plugin };
 export type { PluginAPI, TailwindPluginObject } from './plugin-api';
 export { parseCss, serializeCss, minifyCssSafe };
+export { ContentCache, contentHash, scanSources } from './content-cache';
+export type { ContentCacheStats, ScanFs } from './content-cache';
 export type { CssNode, CssRoot, CssRule, CssDecl, CssAtRule } from './css-ast';
 export { processAuthorCss, ApplyError };
 export { escapeClassName, normalizeValue, coerceValue };

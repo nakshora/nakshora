@@ -746,6 +746,8 @@ interface VariantDefinition {
 interface VariantContext {
     theme: ResolvedTheme;
 }
+/** Test/benchmark hook: drop memoised catalogs. */
+declare function clearCatalogCache(): void;
 interface EngineOptions {
     theme: ResolvedTheme;
     darkMode: DarkModeConfig;
@@ -820,7 +822,19 @@ declare class Engine {
     getVariants(): VariantDefinition[];
     getScreens(): [string, string][];
     /** Every value-bearing utility class the theme defines (no variants, no arbitrary values). */
+    /**
+     * Full catalog (one entry per value-bearing class). Memoised per *resolved
+     * theme + enabled core plugins* across Engine instances: the Vite/PostCSS
+     * plugins create a fresh generator per build, and the catalog (11k entries,
+     * ~35 ms) only depends on those inputs. Engines with plugin-added utilities
+     * are not shared (their extras are per instance). Entries are shared by
+     * reference — callers must treat them as read-only.
+     */
     buildCatalog(): CatalogEntry[];
+    private catalogMemo;
+    /** Cache key: theme JSON + which core plugins are enabled. */
+    private catalogKey;
+    private buildCatalogUncached;
     private negate;
     /** Compile one candidate into rules (empty when unknown). Cached. */
     compile(candidate: string): CompiledRule[];
@@ -998,6 +1012,13 @@ declare class CSSGenerator {
      * @param internal.utilitiesOnly emit only the utilities section (no base/variables/keyframes/components)
      */
     generateJIT(content: string | string[] | undefined, options?: GenerationOptions, internal?: {
+        utilitiesOnly?: boolean;
+    }): string;
+    /**
+     * JIT build from an already-extracted candidate set (see `ContentCache`):
+     * skips the extractor entirely, otherwise identical to `generateJIT`.
+     */
+    generateJITFromCandidates(candidates: Iterable<string>, options?: GenerationOptions, internal?: {
         utilitiesOnly?: boolean;
     }): string;
     private generateJITPretty;
@@ -1240,6 +1261,50 @@ declare function buildAICorpus(config?: Partial<NakshoraConfig>, version?: strin
  */
 declare function corpusToSFT(corpus: AICorpus, limit?: number): string;
 
+interface ContentCacheStats {
+    hits: number;
+    misses: number;
+    entries: number;
+}
+/** FNV-1a 32-bit — cheap content stamp for raw strings. */
+declare function contentHash(text: string): string;
+declare class ContentCache {
+    private readonly pattern?;
+    private readonly entries;
+    private hits;
+    private misses;
+    constructor(pattern?: string | undefined);
+    /**
+     * Candidates for one source. `key` identifies the source (file path or
+     * `raw:<n>`), `stamp` its version (`${mtimeMs}:${size}` for files, a hash
+     * for strings). `read` is only called on a miss.
+     */
+    candidatesFor(key: string, stamp: string, read: () => string): Set<string>;
+    /** Raw content chunk (no path): stamped by hash. */
+    candidatesForText(text: string, key?: string): Set<string>;
+    /** Drop sources that no longer exist (call after a glob pass with the live key set). */
+    retain(keys: Iterable<string>): void;
+    /** Union of several candidate sets, in a deterministic (sorted) order. */
+    static union(sets: Iterable<Set<string>>): Set<string>;
+    stats(): ContentCacheStats;
+    clear(): void;
+}
+/** Minimal file-system surface `scanSources` needs (injected so core stays platform neutral). */
+interface ScanFs {
+    stat: (path: string) => {
+        mtimeMs: number;
+        size: number;
+    } | null;
+    read: (path: string) => string;
+}
+/**
+ * Resolve content sources to a candidate set using the cache: file paths are
+ * stamped by mtime+size, raw strings by hash. `files` are absolute paths
+ * (already globbed by the caller); `raw` are inline template strings.
+ * Returns a sorted candidate set so output never depends on scan order.
+ */
+declare function scanSources(cache: ContentCache, fs: ScanFs, files: readonly string[], raw?: readonly string[]): Set<string>;
+
 declare const version = "3.0.0";
 declare const metadata: {
     name: string;
@@ -1280,4 +1345,4 @@ declare const nakshora: {
     };
 };
 
-export { type AICategory, type AICorpus, type AIUtilityEntry, type AnimationConfig, ApplyError, type AtRuleCond, type BorderRadiusConfig, type Breakpoint, type BreakpointConfig, type BuildOptions, CSSGenerator, type CSSProperties, type CatalogEntry, type ColorConfig, type ColorName, type ColorScale, type ColorShade, type CompiledRule, type ContainerConfig, type CssAtRule, type CssDecl, type CssNode, type CssRoot, type CssRule, DEFAULT_SCREENS, type DarkMode, type DurationConfig, type EasingConfig, Engine, type EngineOptions, type FontFamilyConfig, type FunctionalUtility, GROUP_CATEGORIES, type GenerationOptions, type GenerationStats, type KeyframeConfig, type NakshoraConfig, type OpacityConfig, type Plugin, type PluginAPI, type PresetConfig, type PresetName, type ResolvedBreakpoint, type ResolvedTheme, SCREEN_GUIDE, STATE_VARIANTS, type ScreensConfig, type ShadowConfig, type SpacingConfig, type StaticUtilityDef, type TailwindPluginObject, type ThemeConfig, type ThemeScale, type TypographyConfig, type UtilityGenerator, type UtilityRule, type VariantBranch, type VariantDef, type VariantDefinition, type VariantsConfig, type ZIndexConfig, applyFormat, applyPreset, brutalistTheme, buildAICorpus, buildUtilityList, byteLength, candidatePermutations, categoryForPlugin, classToSelector, coerceValue, componentCss, componentNames, corpusToSFT, createGenerator, deepMerge, nakshora as default, defaultColors, defaultTheme, defaultVariants, escapeClass, escapeClassName, extractClasses, finalizeSelector, formatBytes, formatColor, maxWidthValue, mergeConfig, metadata, minifyCss, minifyCssSafe, minimalistTheme, natureTheme, neonTheme, normalizeValue, parseColor, parseCss, pastelTheme, plugin, preflight, processAuthorCss, resolveTheme, resolveThemeValue, screenToPx, serializeCss, splitClass, splitPath, stringifyDecls, version, withAlphaValue, withAlphaVariable };
+export { type AICategory, type AICorpus, type AIUtilityEntry, type AnimationConfig, ApplyError, type AtRuleCond, type BorderRadiusConfig, type Breakpoint, type BreakpointConfig, type BuildOptions, CSSGenerator, type CSSProperties, type CatalogEntry, type ColorConfig, type ColorName, type ColorScale, type ColorShade, type CompiledRule, type ContainerConfig, ContentCache, type ContentCacheStats, type CssAtRule, type CssDecl, type CssNode, type CssRoot, type CssRule, DEFAULT_SCREENS, type DarkMode, type DurationConfig, type EasingConfig, Engine, type EngineOptions, type FontFamilyConfig, type FunctionalUtility, GROUP_CATEGORIES, type GenerationOptions, type GenerationStats, type KeyframeConfig, type NakshoraConfig, type OpacityConfig, type Plugin, type PluginAPI, type PresetConfig, type PresetName, type ResolvedBreakpoint, type ResolvedTheme, SCREEN_GUIDE, STATE_VARIANTS, type ScanFs, type ScreensConfig, type ShadowConfig, type SpacingConfig, type StaticUtilityDef, type TailwindPluginObject, type ThemeConfig, type ThemeScale, type TypographyConfig, type UtilityGenerator, type UtilityRule, type VariantBranch, type VariantDef, type VariantDefinition, type VariantsConfig, type ZIndexConfig, applyFormat, applyPreset, brutalistTheme, buildAICorpus, buildUtilityList, byteLength, candidatePermutations, categoryForPlugin, classToSelector, clearCatalogCache, coerceValue, componentCss, componentNames, contentHash, corpusToSFT, createGenerator, deepMerge, nakshora as default, defaultColors, defaultTheme, defaultVariants, escapeClass, escapeClassName, extractClasses, finalizeSelector, formatBytes, formatColor, maxWidthValue, mergeConfig, metadata, minifyCss, minifyCssSafe, minimalistTheme, natureTheme, neonTheme, normalizeValue, parseColor, parseCss, pastelTheme, plugin, preflight, processAuthorCss, resolveTheme, resolveThemeValue, scanSources, screenToPx, serializeCss, splitClass, splitPath, stringifyDecls, version, withAlphaValue, withAlphaVariable };

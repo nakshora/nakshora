@@ -734,14 +734,28 @@ export class CSSGenerator {
     return options.minify ? minifyCss(css) : css;
   }
 
+  /**
+   * JIT build from an already-extracted candidate set (see `ContentCache`):
+   * skips the extractor entirely, otherwise identical to `generateJIT`.
+   */
+  generateJITFromCandidates(
+    candidates: Iterable<string>,
+    options: GenerationOptions = {},
+    internal?: { utilitiesOnly?: boolean },
+  ): string {
+    const css = this.generateJITPretty(undefined, options, internal, new Set(candidates));
+    return options.minify ? minifyCss(css) : css;
+  }
+
   private generateJITPretty(
     content: string | string[] | undefined,
     _options: GenerationOptions,
     internal?: { utilitiesOnly?: boolean },
+    candidates?: Set<string>,
   ): string {
     const utilitiesOnly = internal?.utilitiesOnly ?? false;
     const chunks = typeof content === 'string' ? [content] : (content ?? []);
-    const found = extractClasses(chunks, this.config.extractorPattern);
+    const found = candidates ?? extractClasses(chunks, this.config.extractorPattern);
     for (const safe of this.config.safelist ?? []) found.add(safe);
     const { css: utilities, emitted, animations, defaults } = this.compileCandidates(found);
 

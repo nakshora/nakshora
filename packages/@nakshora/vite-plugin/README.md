@@ -9,7 +9,7 @@ markup changes.
 ![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 
 Nakshora is a utility-first CSS framework with a JIT compiler and a
-Tailwind-compatible class grammar: 3,091 utilities, state + responsive variants,
+Tailwind-compatible class grammar: 11,417 utilities, state + responsive variants,
 design components and theme presets, compiled down to only the classes you use.
 
 ## Install

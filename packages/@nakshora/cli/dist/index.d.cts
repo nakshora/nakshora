@@ -50,6 +50,14 @@ declare function resolveConfig(explicitPath?: string, startDir?: string): Promis
 }>;
 
 declare function resolveContent(content: string | string[] | undefined, cwd?: string): Promise<string[]>;
+/**
+ * Like `resolveContent` but keeps files and raw strings apart so a
+ * `ContentCache` can stamp files by mtime (incremental rebuilds).
+ */
+declare function resolveSources(content: string | string[] | undefined, cwd?: string): Promise<{
+    files: string[];
+    raw: string[];
+}>;
 
 interface WatcherHandle {
     close(): void;
@@ -60,4 +68,4 @@ interface WatcherHandle {
  */
 declare function createWatcher(paths: string[], onChange: () => void): WatcherHandle;
 
-export { type BuildInput, type BuildResult, type WatcherHandle, collectWatchPaths, createWatcher, findConfigFile, loadConfigFile, resolveConfig, resolveContent, runBuild, summarize };
+export { type BuildInput, type BuildResult, type WatcherHandle, collectWatchPaths, createWatcher, findConfigFile, loadConfigFile, resolveConfig, resolveContent, resolveSources, runBuild, summarize };

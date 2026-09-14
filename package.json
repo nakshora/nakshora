@@ -58,6 +58,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}\"",
     "type-check": "pnpm build && pnpm -r type-check",
     "benchmark": "node scripts/benchmark.mjs",
+    "benchmark:check": "node scripts/benchmark.mjs --check",
+    "benchmark:update": "node scripts/benchmark.mjs --update",
     "ai:export": "pnpm build:cli && node packages/@nakshora/cli/dist/cli.js export:ai --out ai/corpus.json",
     "clean": "pnpm -r exec rm -rf dist && rm -rf node_modules",
     "changeset": "changeset",

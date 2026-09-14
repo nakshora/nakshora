@@ -1,0 +1,22 @@
+{
+  "node": "v22.22.3",
+  "metrics": {
+    "ctor cold (ms)": 7.65,
+    "catalog cold (ms)": 30.56,
+    "catalog memo hit: new generator + getUtilities (ms)": 10.82,
+    "JIT 200 lines cold (ms)": 28.07,
+    "JIT 200 lines warm (ms)": 18.18,
+    "JIT 200 lines minify (ms)": 0.85,
+    "500 files cold: scan + JIT (ms)": 190.1,
+    "500 files warm, 1 changed: scan + JIT (ms)": 1.32,
+    "full build pretty (ms)": 370.5,
+    "full build minify (ms)": 302.45,
+    "full build pretty (bytes)": 6533388,
+    "full build min (bytes)": 5982603,
+    "full build min gzip (bytes)": 592255,
+    "full build min brotli (bytes)": 132967,
+    "JIT 200 lines (bytes)": 18412,
+    "JIT 200 lines min (bytes)": 16083,
+    "catalog size (utilities)": 11417
+  }
+}

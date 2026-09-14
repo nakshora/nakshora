@@ -4876,6 +4876,8 @@ var DEFAULTS_GROUPS = {
   },
   "border-width": {}
 };
+var CATALOG_CACHE = /* @__PURE__ */ new Map();
+var CATALOG_CACHE_MAX = 4;
 var PSEUDO_ELEMENTS = [
   ["first-letter", "&::first-letter"],
   ["first-line", "&::first-line"],
@@ -5437,7 +5439,47 @@ var Engine = class {
   }
   // ───────────────────────── catalog ─────────────────────────
   /** Every value-bearing utility class the theme defines (no variants, no arbitrary values). */
+  /**
+   * Full catalog (one entry per value-bearing class). Memoised per *resolved
+   * theme + enabled core plugins* across Engine instances: the Vite/PostCSS
+   * plugins create a fresh generator per build, and the catalog (11k entries,
+   * ~35 ms) only depends on those inputs. Engines with plugin-added utilities
+   * are not shared (their extras are per instance). Entries are shared by
+   * reference — callers must treat them as read-only.
+   */
   buildCatalog() {
+    if (this.catalogMemo) return this.catalogMemo;
+    const hasExtras = (this.options.extraStatic?.length ?? 0) > 0 || (this.options.extraFunctional?.length ?? 0) > 0;
+    const key = hasExtras ? null : this.catalogKey();
+    if (key !== null) {
+      const hit = CATALOG_CACHE.get(key);
+      if (hit) {
+        CATALOG_CACHE.delete(key);
+        CATALOG_CACHE.set(key, hit);
+        this.catalogMemo = hit;
+        return hit;
+      }
+    }
+    const built = this.buildCatalogUncached();
+    if (key !== null) {
+      CATALOG_CACHE.set(key, built);
+      if (CATALOG_CACHE.size > CATALOG_CACHE_MAX)
+        CATALOG_CACHE.delete(CATALOG_CACHE.keys().next().value);
+    }
+    this.catalogMemo = built;
+    return built;
+  }
+  catalogMemo = null;
+  /** Cache key: theme JSON + which core plugins are enabled. */
+  catalogKey() {
+    const plugins = /* @__PURE__ */ new Set();
+    for (const s of this.statics) plugins.add(s.p);
+    for (const f of this.functional) plugins.add(f.plugin);
+    plugins.add("container");
+    const enabled = [...plugins].sort().filter((p) => this.options.pluginEnabled(p));
+    return `${enabled.join(",")}\0${JSON.stringify(this.theme)}`;
+  }
+  buildCatalogUncached() {
     const out = [];
     const seenStatic = /* @__PURE__ */ new Set();
     for (const s of this.statics) {
@@ -7626,10 +7668,18 @@ ${css}}
     const css = this.generateJITPretty(content, options, internal);
     return options.minify ? minifyCss(css) : css;
   }
-  generateJITPretty(content, _options, internal) {
+  /**
+   * JIT build from an already-extracted candidate set (see `ContentCache`):
+   * skips the extractor entirely, otherwise identical to `generateJIT`.
+   */
+  generateJITFromCandidates(candidates, options = {}, internal) {
+    const css = this.generateJITPretty(void 0, options, internal, new Set(candidates));
+    return options.minify ? minifyCss(css) : css;
+  }
+  generateJITPretty(content, _options, internal, candidates) {
     const utilitiesOnly = internal?.utilitiesOnly ?? false;
     const chunks = typeof content === "string" ? [content] : content ?? [];
-    const found = extractClasses(chunks, this.config.extractorPattern);
+    const found = candidates ?? extractClasses(chunks, this.config.extractorPattern);
     for (const safe of this.config.safelist ?? []) found.add(safe);
     const { css: utilities, emitted, animations, defaults } = this.compileCandidates(found);
     let css = "";
@@ -7790,6 +7840,77 @@ function fontStack(value) {
   if (Array.isArray(value)) return value.join(", ");
   if (typeof value === "string") return value;
   return "";
+}
+function contentHash(text) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return `${text.length}:${(h >>> 0).toString(36)}`;
+}
+var ContentCache = class {
+  constructor(pattern22) {
+    this.pattern = pattern22;
+  }
+  pattern;
+  entries = /* @__PURE__ */ new Map();
+  hits = 0;
+  misses = 0;
+  /**
+   * Candidates for one source. `key` identifies the source (file path or
+   * `raw:<n>`), `stamp` its version (`${mtimeMs}:${size}` for files, a hash
+   * for strings). `read` is only called on a miss.
+   */
+  candidatesFor(key, stamp, read) {
+    const hit = this.entries.get(key);
+    if (hit && hit.stamp === stamp) {
+      this.hits++;
+      return hit.candidates;
+    }
+    this.misses++;
+    const candidates = extractCandidates([read()], { pattern: this.pattern });
+    this.entries.set(key, { stamp, candidates });
+    return candidates;
+  }
+  /** Raw content chunk (no path): stamped by hash. */
+  candidatesForText(text, key) {
+    const stamp = contentHash(text);
+    return this.candidatesFor(key ?? `raw:${stamp}`, stamp, () => text);
+  }
+  /** Drop sources that no longer exist (call after a glob pass with the live key set). */
+  retain(keys) {
+    const keep = new Set(keys);
+    for (const k of this.entries.keys())
+      if (!keep.has(k) && !k.startsWith("raw:")) this.entries.delete(k);
+  }
+  /** Union of several candidate sets, in a deterministic (sorted) order. */
+  static union(sets) {
+    const all = /* @__PURE__ */ new Set();
+    for (const s of sets) for (const c of s) all.add(c);
+    return new Set([...all].sort());
+  }
+  stats() {
+    return { hits: this.hits, misses: this.misses, entries: this.entries.size };
+  }
+  clear() {
+    this.entries.clear();
+    this.hits = 0;
+    this.misses = 0;
+  }
+};
+function scanSources(cache22, fs, files, raw = []) {
+  const sets = [];
+  const live = [];
+  for (const file of files) {
+    const st = fs.stat(file);
+    if (!st) continue;
+    live.push(file);
+    sets.push(cache22.candidatesFor(file, `${st.mtimeMs}:${st.size}`, () => fs.read(file)));
+  }
+  for (const text of raw) sets.push(cache22.candidatesForText(text));
+  cache22.retain(live);
+  return ContentCache.union(sets);
 }
 
 // ../postcss/dist/index.js
@@ -12634,6 +12755,8 @@ var DEFAULTS_GROUPS2 = {
   },
   "border-width": {}
 };
+var CATALOG_CACHE2 = /* @__PURE__ */ new Map();
+var CATALOG_CACHE_MAX2 = 4;
 var PSEUDO_ELEMENTS2 = [
   ["first-letter", "&::first-letter"],
   ["first-line", "&::first-line"],
@@ -13195,7 +13318,47 @@ var Engine2 = class {
   }
   // ───────────────────────── catalog ─────────────────────────
   /** Every value-bearing utility class the theme defines (no variants, no arbitrary values). */
+  /**
+   * Full catalog (one entry per value-bearing class). Memoised per *resolved
+   * theme + enabled core plugins* across Engine instances: the Vite/PostCSS
+   * plugins create a fresh generator per build, and the catalog (11k entries,
+   * ~35 ms) only depends on those inputs. Engines with plugin-added utilities
+   * are not shared (their extras are per instance). Entries are shared by
+   * reference — callers must treat them as read-only.
+   */
   buildCatalog() {
+    if (this.catalogMemo) return this.catalogMemo;
+    const hasExtras = (this.options.extraStatic?.length ?? 0) > 0 || (this.options.extraFunctional?.length ?? 0) > 0;
+    const key = hasExtras ? null : this.catalogKey();
+    if (key !== null) {
+      const hit = CATALOG_CACHE2.get(key);
+      if (hit) {
+        CATALOG_CACHE2.delete(key);
+        CATALOG_CACHE2.set(key, hit);
+        this.catalogMemo = hit;
+        return hit;
+      }
+    }
+    const built = this.buildCatalogUncached();
+    if (key !== null) {
+      CATALOG_CACHE2.set(key, built);
+      if (CATALOG_CACHE2.size > CATALOG_CACHE_MAX2)
+        CATALOG_CACHE2.delete(CATALOG_CACHE2.keys().next().value);
+    }
+    this.catalogMemo = built;
+    return built;
+  }
+  catalogMemo = null;
+  /** Cache key: theme JSON + which core plugins are enabled. */
+  catalogKey() {
+    const plugins = /* @__PURE__ */ new Set();
+    for (const s of this.statics) plugins.add(s.p);
+    for (const f of this.functional) plugins.add(f.plugin);
+    plugins.add("container");
+    const enabled = [...plugins].sort().filter((p) => this.options.pluginEnabled(p));
+    return `${enabled.join(",")}\0${JSON.stringify(this.theme)}`;
+  }
+  buildCatalogUncached() {
     const out = [];
     const seenStatic = /* @__PURE__ */ new Set();
     for (const s of this.statics) {
@@ -15384,10 +15547,18 @@ ${css}}
     const css = this.generateJITPretty(content, options, internal);
     return options.minify ? minifyCss2(css) : css;
   }
-  generateJITPretty(content, _options, internal) {
+  /**
+   * JIT build from an already-extracted candidate set (see `ContentCache`):
+   * skips the extractor entirely, otherwise identical to `generateJIT`.
+   */
+  generateJITFromCandidates(candidates, options = {}, internal) {
+    const css = this.generateJITPretty(void 0, options, internal, new Set(candidates));
+    return options.minify ? minifyCss2(css) : css;
+  }
+  generateJITPretty(content, _options, internal, candidates) {
     const utilitiesOnly = internal?.utilitiesOnly ?? false;
     const chunks = typeof content === "string" ? [content] : content ?? [];
-    const found = extractClasses2(chunks, this.config.extractorPattern);
+    const found = candidates ?? extractClasses2(chunks, this.config.extractorPattern);
     for (const safe of this.config.safelist ?? []) found.add(safe);
     const { css: utilities, emitted, animations, defaults } = this.compileCandidates(found);
     let css = "";
@@ -15549,33 +15720,107 @@ function fontStack2(value) {
   if (typeof value === "string") return value;
   return "";
 }
-async function resolveContent(content, baseDir) {
-  if (!content) return [];
+function contentHash2(text) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return `${text.length}:${(h >>> 0).toString(36)}`;
+}
+var ContentCache2 = class {
+  constructor(pattern22) {
+    this.pattern = pattern22;
+  }
+  pattern;
+  entries = /* @__PURE__ */ new Map();
+  hits = 0;
+  misses = 0;
+  /**
+   * Candidates for one source. `key` identifies the source (file path or
+   * `raw:<n>`), `stamp` its version (`${mtimeMs}:${size}` for files, a hash
+   * for strings). `read` is only called on a miss.
+   */
+  candidatesFor(key, stamp, read) {
+    const hit = this.entries.get(key);
+    if (hit && hit.stamp === stamp) {
+      this.hits++;
+      return hit.candidates;
+    }
+    this.misses++;
+    const candidates = extractCandidates2([read()], { pattern: this.pattern });
+    this.entries.set(key, { stamp, candidates });
+    return candidates;
+  }
+  /** Raw content chunk (no path): stamped by hash. */
+  candidatesForText(text, key) {
+    const stamp = contentHash2(text);
+    return this.candidatesFor(key ?? `raw:${stamp}`, stamp, () => text);
+  }
+  /** Drop sources that no longer exist (call after a glob pass with the live key set). */
+  retain(keys) {
+    const keep = new Set(keys);
+    for (const k of this.entries.keys())
+      if (!keep.has(k) && !k.startsWith("raw:")) this.entries.delete(k);
+  }
+  /** Union of several candidate sets, in a deterministic (sorted) order. */
+  static union(sets) {
+    const all = /* @__PURE__ */ new Set();
+    for (const s of sets) for (const c of s) all.add(c);
+    return new Set([...all].sort());
+  }
+  stats() {
+    return { hits: this.hits, misses: this.misses, entries: this.entries.size };
+  }
+  clear() {
+    this.entries.clear();
+    this.hits = 0;
+    this.misses = 0;
+  }
+};
+function scanSources2(cache22, fs, files, raw = []) {
+  const sets = [];
+  const live = [];
+  for (const file of files) {
+    const st = fs.stat(file);
+    if (!st) continue;
+    live.push(file);
+    sets.push(cache22.candidatesFor(file, `${st.mtimeMs}:${st.size}`, () => fs.read(file)));
+  }
+  for (const text of raw) sets.push(cache22.candidatesForText(text));
+  cache22.retain(live);
+  return ContentCache2.union(sets);
+}
+var contentCache = new ContentCache2();
+var scanFs = {
+  stat: (p) => {
+    try {
+      const st = (0, import_fs.statSync)(p);
+      return { mtimeMs: st.mtimeMs, size: st.size };
+    } catch {
+      return null;
+    }
+  },
+  read: (p) => (0, import_fs.readFileSync)(p, "utf-8")
+};
+async function resolveCandidates(content, baseDir) {
+  if (!content) return /* @__PURE__ */ new Set();
   const entries = Array.isArray(content) ? content : [content];
   const globs = [];
-  const chunks = [];
+  const files = [];
+  const raw = [];
   for (const entry of entries) {
     if (!entry) continue;
     if (entry.includes("*") || entry.includes("{") || entry.includes("[")) {
       globs.push((0, import_path.resolve)(baseDir, entry));
     } else {
-      try {
-        chunks.push((0, import_fs.readFileSync)((0, import_path.resolve)(baseDir, entry), "utf-8"));
-      } catch {
-        chunks.push(entry);
-      }
+      const abs = (0, import_path.resolve)(baseDir, entry);
+      if (scanFs.stat(abs)) files.push(abs);
+      else raw.push(entry);
     }
   }
-  if (globs.length > 0) {
-    const files = await (0, import_globby.globby)(globs);
-    for (const file of files) {
-      try {
-        chunks.push((0, import_fs.readFileSync)((0, import_path.resolve)(baseDir, file), "utf-8"));
-      } catch {
-      }
-    }
-  }
-  return chunks;
+  if (globs.length > 0) files.push(...(await (0, import_globby.globby)(globs, { absolute: true })).sort());
+  return scanSources2(contentCache, scanFs, files, raw);
 }
 function layerCss(layer, generator) {
   switch (layer) {
@@ -15657,7 +15902,7 @@ function nakshora(options = {}) {
       if (authorPass) runAuthorPass(root, generator, result);
       if (!hasAtRule) return;
       const useJIT = config.content !== void 0 || config.purge !== void 0;
-      const content = await resolveContent(config.content ?? config.purge, baseDir);
+      const candidates = useJIT ? await resolveCandidates(config.content ?? config.purge, baseDir) : /* @__PURE__ */ new Set();
       const atRules = [];
       root.walkAtRules("nakshora", (atRule) => {
         atRules.push(atRule);
@@ -15665,8 +15910,8 @@ function nakshora(options = {}) {
       for (const atRule of atRules) {
         const param = atRule.params.trim().toLowerCase();
         let css;
-        if (useJIT && content.length > 0 && (param === "source" || param === "utilities" || param === "utils" || param === "")) {
-          css = generator.generateJIT(content, { minify: options.minify });
+        if (useJIT && candidates.size > 0 && (param === "source" || param === "utilities" || param === "utils" || param === "")) {
+          css = generator.generateJITFromCandidates(candidates, { minify: options.minify });
         } else {
           css = layerCss(param, generator);
           if (options.minify) css = generator.minify(css);
@@ -15766,35 +16011,38 @@ function createWatcher(paths, onChange) {
 }
 
 // src/index.ts
+var contentCache2 = new ContentCache();
+var scanFs2 = {
+  stat: (p) => {
+    try {
+      const st = (0, import_node_fs2.statSync)(p);
+      return { mtimeMs: st.mtimeMs, size: st.size };
+    } catch {
+      return null;
+    }
+  },
+  read: (p) => (0, import_node_fs2.readFileSync)(p, "utf-8")
+};
 var VIRTUAL_ID = "virtual:nakshora";
 var RESOLVED_VIRTUAL_ID = "\0" + VIRTUAL_ID + ".css";
-async function resolveContent2(content, root) {
-  if (!content) return [];
+async function resolveCandidates2(content, root) {
+  if (!content) return /* @__PURE__ */ new Set();
   const entries = Array.isArray(content) ? content : [content];
   const globs = [];
-  const chunks = [];
+  const files = [];
+  const raw = [];
   for (const entry of entries) {
     if (!entry) continue;
     if (entry.includes("*") || entry.includes("{") || entry.includes("[")) {
       globs.push((0, import_node_path2.resolve)(root, entry));
     } else {
-      try {
-        chunks.push((0, import_node_fs2.readFileSync)((0, import_node_path2.resolve)(root, entry), "utf-8"));
-      } catch {
-        chunks.push(entry);
-      }
+      const abs = (0, import_node_path2.resolve)(root, entry);
+      if (scanFs2.stat(abs)) files.push(abs);
+      else raw.push(entry);
     }
   }
-  if (globs.length > 0) {
-    const files = await (0, import_globby2.globby)(globs, { cwd: root, absolute: true });
-    for (const file of files) {
-      try {
-        chunks.push((0, import_node_fs2.readFileSync)(file, "utf-8"));
-      } catch {
-      }
-    }
-  }
-  return chunks;
+  if (globs.length > 0) files.push(...(await (0, import_globby2.globby)(globs, { cwd: root, absolute: true })).sort());
+  return scanSources(contentCache2, scanFs2, files, raw);
 }
 function nakshora2(options = {}) {
   const postcssEnabled = options.postcss ?? true;
@@ -15832,8 +16080,8 @@ function nakshora2(options = {}) {
       const config = { ...options.config ?? {} };
       if (options.content !== void 0) config.content = options.content;
       const generator = new CSSGenerator(config);
-      const content = await resolveContent2(config.content ?? config.purge, root);
-      const css = content.length > 0 ? generator.generateJIT(content, { minify: options.minify }) : generator.generate({ mode: "full", minify: options.minify });
+      const candidates = await resolveCandidates2(config.content ?? config.purge, root);
+      const css = candidates.size > 0 ? generator.generateJITFromCandidates(candidates, { minify: options.minify }) : generator.generate({ mode: "full", minify: options.minify });
       return css;
     },
     configureServer(server) {

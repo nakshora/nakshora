@@ -6,9 +6,30 @@
 import type { AtRule, Container, Plugin, Result, Root } from 'postcss';
 import postcss from 'postcss';
 import { globby } from 'globby';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { CSSGenerator, ApplyError, type NakshoraConfig } from '@nakshora/core';
+import {
+  CSSGenerator,
+  ApplyError,
+  ContentCache,
+  scanSources,
+  type NakshoraConfig,
+  type ScanFs,
+} from '@nakshora/core';
+
+/** Process-wide incremental scan cache shared by every plugin instance. */
+const contentCache = new ContentCache();
+const scanFs: ScanFs = {
+  stat: (p) => {
+    try {
+      const st = statSync(p);
+      return { mtimeMs: st.mtimeMs, size: st.size };
+    } catch {
+      return null;
+    }
+  },
+  read: (p) => readFileSync(p, 'utf-8'),
+};
 
 export interface NakshoraPostCSSOptions {
   /** Nakshora configuration (theme, content, safelist, important…) */
@@ -35,39 +56,30 @@ export interface NakshoraPostCSSOptions {
 }
 
 /**
- * Resolve content sources (globs + raw strings) to file contents.
+ * Resolve content sources (globs, file paths, raw strings) to a candidate set
+ * through the incremental cache: unchanged files are not re-read.
  */
-async function resolveContent(
+async function resolveCandidates(
   content: string | string[] | undefined,
   baseDir: string,
-): Promise<string[]> {
-  if (!content) return [];
+): Promise<Set<string>> {
+  if (!content) return new Set();
   const entries = Array.isArray(content) ? content : [content];
   const globs: string[] = [];
-  const chunks: string[] = [];
+  const files: string[] = [];
+  const raw: string[] = [];
   for (const entry of entries) {
     if (!entry) continue;
     if (entry.includes('*') || entry.includes('{') || entry.includes('[')) {
       globs.push(resolve(baseDir, entry));
     } else {
-      try {
-        chunks.push(readFileSync(resolve(baseDir, entry), 'utf-8'));
-      } catch {
-        chunks.push(entry); // raw template string
-      }
+      const abs = resolve(baseDir, entry);
+      if (scanFs.stat(abs)) files.push(abs);
+      else raw.push(entry); // raw template string
     }
   }
-  if (globs.length > 0) {
-    const files = await globby(globs);
-    for (const file of files) {
-      try {
-        chunks.push(readFileSync(resolve(baseDir, file), 'utf-8'));
-      } catch {
-        // skip unreadable
-      }
-    }
-  }
-  return chunks;
+  if (globs.length > 0) files.push(...(await globby(globs, { absolute: true })).sort());
+  return scanSources(contentCache, scanFs, files, raw);
 }
 
 function layerCss(layer: string, generator: CSSGenerator): string {
@@ -199,7 +211,9 @@ export default function nakshora(options: NakshoraPostCSSOptions = {}): Plugin {
       if (!hasAtRule) return;
 
       const useJIT = config.content !== undefined || config.purge !== undefined;
-      const content = await resolveContent(config.content ?? config.purge, baseDir);
+      const candidates = useJIT
+        ? await resolveCandidates(config.content ?? config.purge, baseDir)
+        : new Set<string>();
 
       // collect first: splicing large blocks while walking would re-walk them
       const atRules: AtRule[] = [];
@@ -211,10 +225,10 @@ export default function nakshora(options: NakshoraPostCSSOptions = {}): Plugin {
         let css: string;
         if (
           useJIT &&
-          content.length > 0 &&
+          candidates.size > 0 &&
           (param === 'source' || param === 'utilities' || param === 'utils' || param === '')
         ) {
-          css = generator.generateJIT(content, { minify: options.minify });
+          css = generator.generateJITFromCandidates(candidates, { minify: options.minify });
         } else {
           css = layerCss(param, generator);
           if (options.minify) css = generator.minify(css);

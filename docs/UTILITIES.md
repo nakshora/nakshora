@@ -1,6 +1,6 @@
 # Nakshora Utilities Reference
 
-**3,091 utilities** organized into 13 categories. Every table below is
+**11,417 utilities** organized into 35 categories (12 reference pages). Every table below is
 **generated from the framework source** — if you see a class here, the
 compiler can emit it.
 

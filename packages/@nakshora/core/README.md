@@ -1,6 +1,6 @@
 # @nakshora/core
 
-**The Nakshora JIT CSS compiler & engine** — 3,091 utilities across 29
+**The Nakshora JIT CSS compiler & engine** — 11,417 utilities across 35
 categories, state + responsive variants, themes, design components and a plugin
 API. Zero runtime JavaScript, zero dependencies.
 

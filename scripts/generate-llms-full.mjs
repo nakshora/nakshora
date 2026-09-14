@@ -32,6 +32,7 @@ const DOCS = [
   'docs/utilities/13-components.md',
   'docs/VARIANTS.md',
   'docs/RESPONSIVE.md',
+  'docs/COMPATIBILITY.md',
   'docs/CONFIGURATION.md',
   'docs/JIT.md',
   'docs/THEMES.md',

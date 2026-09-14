@@ -43,3 +43,27 @@ export async function resolveContent(
   chunks.push(...raw);
   return chunks;
 }
+
+/**
+ * Like `resolveContent` but keeps files and raw strings apart so a
+ * `ContentCache` can stamp files by mtime (incremental rebuilds).
+ */
+export async function resolveSources(
+  content: string | string[] | undefined,
+  cwd: string = process.cwd(),
+): Promise<{ files: string[]; raw: string[] }> {
+  if (!content) return { files: [], raw: [] };
+  const entries = Array.isArray(content) ? content : [content];
+  const globs: string[] = [];
+  const files: string[] = [];
+  const raw: string[] = [];
+  for (const entry of entries) {
+    if (!entry) continue;
+    if (entry.includes('*') || entry.includes('{') || entry.includes('[')) globs.push(entry);
+    else if (existsSync(resolve(cwd, entry)) && statSync(resolve(cwd, entry)).isFile())
+      files.push(resolve(cwd, entry));
+    else raw.push(entry);
+  }
+  if (globs.length > 0) files.push(...(await globby(globs, { cwd, absolute: true })).sort());
+  return { files, raw };
+}

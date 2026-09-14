@@ -203,6 +203,14 @@ export interface VariantContext {
   theme: ResolvedTheme;
 }
 
+/** Cross-instance catalog memo (see `Engine.buildCatalog`). */
+const CATALOG_CACHE = new Map<string, CatalogEntry[]>();
+const CATALOG_CACHE_MAX = 4;
+/** Test/benchmark hook: drop memoised catalogs. */
+export function clearCatalogCache(): void {
+  CATALOG_CACHE.clear();
+}
+
 export interface EngineOptions {
   theme: ResolvedTheme;
   darkMode: DarkModeConfig;
@@ -873,7 +881,53 @@ export class Engine {
   // ───────────────────────── catalog ─────────────────────────
 
   /** Every value-bearing utility class the theme defines (no variants, no arbitrary values). */
+  /**
+   * Full catalog (one entry per value-bearing class). Memoised per *resolved
+   * theme + enabled core plugins* across Engine instances: the Vite/PostCSS
+   * plugins create a fresh generator per build, and the catalog (11k entries,
+   * ~35 ms) only depends on those inputs. Engines with plugin-added utilities
+   * are not shared (their extras are per instance). Entries are shared by
+   * reference — callers must treat them as read-only.
+   */
   buildCatalog(): CatalogEntry[] {
+    if (this.catalogMemo) return this.catalogMemo;
+    const hasExtras =
+      (this.options.extraStatic?.length ?? 0) > 0 ||
+      (this.options.extraFunctional?.length ?? 0) > 0;
+    const key = hasExtras ? null : this.catalogKey();
+    if (key !== null) {
+      const hit = CATALOG_CACHE.get(key);
+      if (hit) {
+        // refresh LRU position
+        CATALOG_CACHE.delete(key);
+        CATALOG_CACHE.set(key, hit);
+        this.catalogMemo = hit;
+        return hit;
+      }
+    }
+    const built = this.buildCatalogUncached();
+    if (key !== null) {
+      CATALOG_CACHE.set(key, built);
+      if (CATALOG_CACHE.size > CATALOG_CACHE_MAX)
+        CATALOG_CACHE.delete(CATALOG_CACHE.keys().next().value as string);
+    }
+    this.catalogMemo = built;
+    return built;
+  }
+
+  private catalogMemo: CatalogEntry[] | null = null;
+
+  /** Cache key: theme JSON + which core plugins are enabled. */
+  private catalogKey(): string {
+    const plugins = new Set<string>();
+    for (const s of this.statics) plugins.add(s.p);
+    for (const f of this.functional) plugins.add(f.plugin);
+    plugins.add('container');
+    const enabled = [...plugins].sort().filter((p) => this.options.pluginEnabled(p));
+    return `${enabled.join(',')}\u0000${JSON.stringify(this.theme)}`;
+  }
+
+  private buildCatalogUncached(): CatalogEntry[] {
     const out: CatalogEntry[] = [];
     const seenStatic = new Set<string>();
     for (const s of this.statics) {

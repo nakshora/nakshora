@@ -4,13 +4,30 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import {
   ApplyError,
+  ContentCache,
   CSSGenerator,
   formatBytes,
+  scanSources,
+  type ScanFs,
   minifyCss,
   type GenerationOptions,
   type NakshoraConfig,
 } from '@nakshora/core';
-import { resolveContent } from './content';
+import { resolveSources } from './content';
+
+/** Process-wide incremental scan cache (mtime+size per file, hash per raw chunk). */
+const contentCache = new ContentCache();
+const scanFs: ScanFs = {
+  stat: (p) => {
+    try {
+      const st = statSync(p);
+      return { mtimeMs: st.mtimeMs, size: st.size };
+    } catch {
+      return null;
+    }
+  },
+  read: (p) => readFileSync(p, 'utf-8'),
+};
 
 export interface BuildInput {
   /** Explicit input CSS file (may contain `@nakshora source` / `@nakshora utilities`) */
@@ -42,14 +59,17 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   const cwd = input.cwd ?? process.cwd();
   const config = input.config;
   const generator = new CSSGenerator(config);
-  const content = await resolveContent(config.content ?? config.purge, cwd);
-  const mode: 'full' | 'jit' = input.mode ?? (content.length > 0 ? 'jit' : 'full');
-  const options: GenerationOptions = { minify: input.minify, mode, content };
+  const { files, raw } = await resolveSources(config.content ?? config.purge, cwd);
+  const hasContent = files.length + raw.length > 0;
+  const mode: 'full' | 'jit' = input.mode ?? (hasContent ? 'jit' : 'full');
+  const options: GenerationOptions = { minify: input.minify, mode };
+  // incremental: unchanged files are not re-read or re-extracted between builds
+  const candidates = hasContent ? scanSources(contentCache, scanFs, files, raw) : new Set<string>();
 
   let css: string;
   let classes: number;
   if (mode === 'jit') {
-    css = generator.generateJIT(content, options);
+    css = generator.generateJITFromCandidates(candidates, options);
     classes = countClasses(css);
   } else {
     css = generator.generate({ ...options, mode: 'full' });
@@ -72,7 +92,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
         }
       }
       if (authorPass || SOURCE_RE.test(source) || UTILITIES_RE.test(source)) {
-        const hasJitContent = content.length > 0;
+        const hasJitContent = hasContent;
         // `@nakshora source;` → the complete pipeline for the active mode:
         // JIT build (base + variables + keyframes + used utilities + components)
         // when content is configured, otherwise the full build.
@@ -80,7 +100,11 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
         // `@nakshora utilities;` → just the utilities layer for the active mode
         // (full mode: same layer as `@nakshora source;`, no state variants).
         const utilCss = hasJitContent
-          ? generator.generateJIT(content, { minify: false }, { utilitiesOnly: true })
+          ? generator.generateJITFromCandidates(
+              candidates,
+              { minify: false },
+              { utilitiesOnly: true },
+            )
           : generator.getUtilitiesFull(false);
         const out = source.replace(SOURCE_RE, () => sourceCss).replace(UTILITIES_RE, () => utilCss);
         css = input.minify ? minifyCss(out) : out;
