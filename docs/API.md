@@ -224,43 +224,27 @@ JSONL for supervised fine-tuning (one `{"messages":[user, assistant]}` per line)
 ## Plugins
 
 ```ts
-interface Plugin {
-  name: string;
-  config?(config: NakshoraConfig): void;
-  handler?(api: UtilityGenerator): void;
-}
+type PluginInput =
+  | ((api: UtilityGenerator) => void)
+  | { name: string; config?(config: NakshoraConfig): void; handler?(api: UtilityGenerator): void }
+  | TailwindPluginObject; // plugin(...) / plugin.withOptions(...) / official plugins
 
 interface UtilityGenerator {
-  addUtilities(utilities: Record<string, CSSProperties>, group?: string): void;
-  addComponents(components: Record<string, CSSProperties>): void;
-  addBase(base: Record<string, CSSProperties>): void;
+  addUtilities(utilities, options?): void;
+  matchUtilities({ [name]: (value, { modifier }) => decls }, options?): void;
+  addComponents(components, options?): void;
+  matchComponents({ [name]: (value, { modifier }) => decls }, options?): void;
+  addBase(base): void;
+  addVariant(name, definition: string | string[] | (api) => string | string[]): void;
+  matchVariant(name, (value, { modifier }) => string | string[], { values? }): void;
+  theme(path?, defaultValue?): unknown;
+  config(path?, defaultValue?): unknown;
+  corePlugins(name): boolean;
+  e(className): string;
+  prefix(selector): string;
 }
 ```
 
-```js
-const generator = new CSSGenerator({
-  plugins: [
-    {
-      name: 'badges',
-      handler(api) {
-        api.addComponents({
-          '.badge': {
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '0.125rem 0.5rem',
-            borderRadius: '9999px',
-            fontSize: '0.75rem',
-            fontWeight: '600',
-          },
-        });
-        api.addUtilities(
-          {
-            'badge-danger': { background: '#fee2e2', color: '#991b1b' },
-          },
-          'badges',
-        );
-      },
-    },
-  ],
-});
-```
+Full example with the exact CSS each method produces: [CONFIGURATION.md → Plugins](./CONFIGURATION.md#plugins).
+`plugin()` and `plugin.withOptions()` are exported from `@nakshora/core` for
+Tailwind-style authoring.

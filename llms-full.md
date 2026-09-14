@@ -878,6 +878,28 @@ Pinned version:
 > same bytes as `dist/css/nakshora.min.css`. The frozen v1.0.0 stylesheet is
 > `…@main/minified-version/v1.0.0.css` — see `minified-version/cdn.md`.
 
+### What the browser actually downloads
+
+`nakshora.min.css` is 5,982,603 B on disk but **132,967 B over brotli** and
+575,520 B over gzip (jsDelivr negotiates both automatically and caches at the
+edge; the pinned `@v3.0.0` URL is immutable, `@main` revalidates every 12 h).
+The repo ships the precompressed sidecars for self-hosting:
+
+| File                           | Bytes     | Produced by                           |
+| ------------------------------ | --------- | ------------------------------------- |
+| `dist/css/nakshora.min.css`    | 5,982,603 | `scripts/generate-css.mjs`            |
+| `dist/css/nakshora.min.css.br` | 132,967   | same script, brotli quality 11 (text) |
+| `dist/css/nakshora.min.css.gz` | 575,520   | same script, gzip level 9             |
+
+Serve them as-is with `nginx` (`brotli_static on; gzip_static on;`), Apache
+(`mod_brotli` + `MultiViews`), Netlify / Cloudflare Pages / Vercel (automatic
+for sidecars), or S3 + CloudFront (upload the `.br` with
+`Content-Encoding: br`). A test decompresses both sidecars and asserts they
+equal `nakshora.min.css` byte-for-byte.
+
+Even so: the full build is for zero-tooling pages. Any project with a build
+step should use JIT (typically 5–20 KB; the landing page is 3,936 B gzipped).
+
 ## Monorepo (framework development)
 
 ```bash
@@ -13742,24 +13764,96 @@ extractorPattern: '[[\\w\\\\:/.-]+';
 
 ## Plugins
 
-Plugins extend the framework programmatically.
+Plugins extend the framework programmatically. A plugin is a function
+`(api) => void`, an object `{ name, config?, handler }`, a Tailwind
+`plugin(...)` / `plugin.withOptions(...)` object, or an official Tailwind
+plugin (`@tailwindcss/typography`, `forms`, `aspect-ratio`,
+`container-queries` are verified byte-identical).
 
 ```js
-{
-  name: 'my-plugin',
-  config(cfg) { /* mutate/extend config before generation */ },
-  handler(api) {
-    api.addUtilities({ '.my-cool': { color: 'hotpink' } }, 'myGroup');
-    api.addComponents({ '.my-component': { padding: '1rem' } });
-    api.addBase({ 'h1': { margin: '1rem 0' } });
+// nakshora.config.js
+export default {
+  plugins: [
+    function (api) {
+      // static utilities — take every variant, listed in the catalog / IntelliSense
+      api.addUtilities({ '.content-auto': { 'content-visibility': 'auto' } });
+      // dynamic utilities: tab-4 (theme) and tab-[3] (arbitrary)
+      api.matchUtilities({ tab: (v) => ({ tabSize: v }) }, { values: api.theme('spacing') });
+      // components (postcss-nested `&`), emitted after the built-in ones
+      api.addComponents({
+        '.card': { padding: api.theme('spacing.4'), '&:hover': { opacity: '0.9' } },
+      });
+      api.matchComponents({ 'card-w': (v) => ({ width: v }) }, { values: { sm: '20rem' } });
+      // base layer
+      api.addBase({ h1: { fontSize: api.theme('fontSize.2xl')[0] } });
+      // variants: hocus:flex → :hover and :focus; nth-1:flex / nth-[3]:flex
+      api.addVariant('hocus', ['&:hover', '&:focus']);
+      api.matchVariant('nth', (v) => `&:nth-child(${v})`, { values: { 1: '1' } });
+    },
+  ],
+};
+```
+
+`<a class="content-auto tab-4 tab-[3] card card-w-sm hocus:flex nth-[3]:flex md:hocus:p-2">`
+compiles to:
+
+```css
+.content-auto {
+  content-visibility: auto;
+}
+.card {
+  padding: 1rem;
+}
+.card:hover {
+  opacity: 0.9;
+}
+.tab-4 {
+  tab-size: 1rem;
+}
+.tab-\[3\] {
+  tab-size: 3;
+}
+.card-w-sm {
+  width: 20rem;
+}
+.hocus\:flex:hover {
+  display: flex;
+}
+.hocus\:flex:focus {
+  display: flex;
+}
+.nth-\[3\]\:flex:nth-child(3) {
+  display: flex;
+}
+@media (min-width: 768px) {
+  .md\:hocus\:p-2:hover {
+    padding: 0.5rem;
+  }
+  .md\:hocus\:p-2:focus {
+    padding: 0.5rem;
   }
 }
 ```
 
-- `addUtilities(declarations, group)` — utilities participate in responsive
-  - variant expansion (JIT).
-- `addComponents(declarations)` — emitted after the built-in components.
-- `addBase(declarations)` — appended to the base layer.
+| Method                                          | Notes                                                                                     |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `addUtilities(rules, options?)`                 | object or array; keys are selectors (`.x`, `.x:hover`, `@media`), camelCase props allowed |
+| `matchUtilities({ name: fn }, options?)`        | `options.values` (theme object) + arbitrary `name-[…]`; `fn(value, { modifier })`         |
+| `addComponents(rules, options?)`                | same shape; nesting via `&`; adjacent identical selectors collapse                        |
+| `matchComponents({ name: fn }, options?)`       | dynamic components                                                                        |
+| `addBase(rules)`                                | appended to the base layer (after preflight and `--tw-*` defaults)                        |
+| `addVariant(name, selector \| selectors \| fn)` | `&` placeholders, `@media …` strings, arrays for parallel branches                        |
+| `matchVariant(name, fn, { values })`            | `name-key:` and `name-[…]:`                                                               |
+| `theme(path, default?)`                         | resolved theme (`spacing.4`, `colors.blue.500`, `fontSize.2xl`)                           |
+| `config(path, default?)`                        | resolved config (`darkMode`, `prefix`, …)                                                 |
+| `corePlugins(name)`                             | whether a core group is enabled                                                           |
+| `e(str)` / `prefix(selector)`                   | class escaping / prefix application                                                       |
+
+Numeric values get `px` unless the property is unitless (`lineHeight`,
+`zIndex`, `opacity`, …) — Tailwind semantics. The object form additionally
+gets a `config(cfg)` hook that runs before theme resolution (extend the
+theme, flip options). Every method above is exercised by
+`packages/@nakshora/core/test/plugin-api.test.ts`.
 
 ## Presets
 
@@ -14868,46 +14962,30 @@ JSONL for supervised fine-tuning (one `{"messages":[user, assistant]}` per line)
 ## Plugins
 
 ```ts
-interface Plugin {
-  name: string;
-  config?(config: NakshoraConfig): void;
-  handler?(api: UtilityGenerator): void;
-}
+type PluginInput =
+  | ((api: UtilityGenerator) => void)
+  | { name: string; config?(config: NakshoraConfig): void; handler?(api: UtilityGenerator): void }
+  | TailwindPluginObject; // plugin(...) / plugin.withOptions(...) / official plugins
 
 interface UtilityGenerator {
-  addUtilities(utilities: Record<string, CSSProperties>, group?: string): void;
-  addComponents(components: Record<string, CSSProperties>): void;
-  addBase(base: Record<string, CSSProperties>): void;
+  addUtilities(utilities, options?): void;
+  matchUtilities({ [name]: (value, { modifier }) => decls }, options?): void;
+  addComponents(components, options?): void;
+  matchComponents({ [name]: (value, { modifier }) => decls }, options?): void;
+  addBase(base): void;
+  addVariant(name, definition: string | string[] | (api) => string | string[]): void;
+  matchVariant(name, (value, { modifier }) => string | string[], { values? }): void;
+  theme(path?, defaultValue?): unknown;
+  config(path?, defaultValue?): unknown;
+  corePlugins(name): boolean;
+  e(className): string;
+  prefix(selector): string;
 }
 ```
 
-```js
-const generator = new CSSGenerator({
-  plugins: [
-    {
-      name: 'badges',
-      handler(api) {
-        api.addComponents({
-          '.badge': {
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '0.125rem 0.5rem',
-            borderRadius: '9999px',
-            fontSize: '0.75rem',
-            fontWeight: '600',
-          },
-        });
-        api.addUtilities(
-          {
-            'badge-danger': { background: '#fee2e2', color: '#991b1b' },
-          },
-          'badges',
-        );
-      },
-    },
-  ],
-});
-```
+Full example with the exact CSS each method produces: [CONFIGURATION.md → Plugins](./CONFIGURATION.md#plugins).
+`plugin()` and `plugin.withOptions()` are exported from `@nakshora/core` for
+Tailwind-style authoring.
 
 
 <!-- ===== docs/AI_TRAINING.md (#docs-ai-training-md) ===== -->

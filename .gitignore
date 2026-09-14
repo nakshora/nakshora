@@ -21,6 +21,8 @@ dist/*
 dist/css/*
 !dist/css/nakshora.css
 !dist/css/nakshora.min.css
+!dist/css/nakshora.min.css.br
+!dist/css/nakshora.min.css.gz
 *.tsbuildinfo
 
 # Test coverage

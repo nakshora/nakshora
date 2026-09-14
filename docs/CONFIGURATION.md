@@ -167,24 +167,96 @@ extractorPattern: '[[\\w\\\\:/.-]+';
 
 ## Plugins
 
-Plugins extend the framework programmatically.
+Plugins extend the framework programmatically. A plugin is a function
+`(api) => void`, an object `{ name, config?, handler }`, a Tailwind
+`plugin(...)` / `plugin.withOptions(...)` object, or an official Tailwind
+plugin (`@tailwindcss/typography`, `forms`, `aspect-ratio`,
+`container-queries` are verified byte-identical).
 
 ```js
-{
-  name: 'my-plugin',
-  config(cfg) { /* mutate/extend config before generation */ },
-  handler(api) {
-    api.addUtilities({ '.my-cool': { color: 'hotpink' } }, 'myGroup');
-    api.addComponents({ '.my-component': { padding: '1rem' } });
-    api.addBase({ 'h1': { margin: '1rem 0' } });
+// nakshora.config.js
+export default {
+  plugins: [
+    function (api) {
+      // static utilities — take every variant, listed in the catalog / IntelliSense
+      api.addUtilities({ '.content-auto': { 'content-visibility': 'auto' } });
+      // dynamic utilities: tab-4 (theme) and tab-[3] (arbitrary)
+      api.matchUtilities({ tab: (v) => ({ tabSize: v }) }, { values: api.theme('spacing') });
+      // components (postcss-nested `&`), emitted after the built-in ones
+      api.addComponents({
+        '.card': { padding: api.theme('spacing.4'), '&:hover': { opacity: '0.9' } },
+      });
+      api.matchComponents({ 'card-w': (v) => ({ width: v }) }, { values: { sm: '20rem' } });
+      // base layer
+      api.addBase({ h1: { fontSize: api.theme('fontSize.2xl')[0] } });
+      // variants: hocus:flex → :hover and :focus; nth-1:flex / nth-[3]:flex
+      api.addVariant('hocus', ['&:hover', '&:focus']);
+      api.matchVariant('nth', (v) => `&:nth-child(${v})`, { values: { 1: '1' } });
+    },
+  ],
+};
+```
+
+`<a class="content-auto tab-4 tab-[3] card card-w-sm hocus:flex nth-[3]:flex md:hocus:p-2">`
+compiles to:
+
+```css
+.content-auto {
+  content-visibility: auto;
+}
+.card {
+  padding: 1rem;
+}
+.card:hover {
+  opacity: 0.9;
+}
+.tab-4 {
+  tab-size: 1rem;
+}
+.tab-\[3\] {
+  tab-size: 3;
+}
+.card-w-sm {
+  width: 20rem;
+}
+.hocus\:flex:hover {
+  display: flex;
+}
+.hocus\:flex:focus {
+  display: flex;
+}
+.nth-\[3\]\:flex:nth-child(3) {
+  display: flex;
+}
+@media (min-width: 768px) {
+  .md\:hocus\:p-2:hover {
+    padding: 0.5rem;
+  }
+  .md\:hocus\:p-2:focus {
+    padding: 0.5rem;
   }
 }
 ```
 
-- `addUtilities(declarations, group)` — utilities participate in responsive
-  - variant expansion (JIT).
-- `addComponents(declarations)` — emitted after the built-in components.
-- `addBase(declarations)` — appended to the base layer.
+| Method                                          | Notes                                                                                     |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `addUtilities(rules, options?)`                 | object or array; keys are selectors (`.x`, `.x:hover`, `@media`), camelCase props allowed |
+| `matchUtilities({ name: fn }, options?)`        | `options.values` (theme object) + arbitrary `name-[…]`; `fn(value, { modifier })`         |
+| `addComponents(rules, options?)`                | same shape; nesting via `&`; adjacent identical selectors collapse                        |
+| `matchComponents({ name: fn }, options?)`       | dynamic components                                                                        |
+| `addBase(rules)`                                | appended to the base layer (after preflight and `--tw-*` defaults)                        |
+| `addVariant(name, selector \| selectors \| fn)` | `&` placeholders, `@media …` strings, arrays for parallel branches                        |
+| `matchVariant(name, fn, { values })`            | `name-key:` and `name-[…]:`                                                               |
+| `theme(path, default?)`                         | resolved theme (`spacing.4`, `colors.blue.500`, `fontSize.2xl`)                           |
+| `config(path, default?)`                        | resolved config (`darkMode`, `prefix`, …)                                                 |
+| `corePlugins(name)`                             | whether a core group is enabled                                                           |
+| `e(str)` / `prefix(selector)`                   | class escaping / prefix application                                                       |
+
+Numeric values get `px` unless the property is unitless (`lineHeight`,
+`zIndex`, `opacity`, …) — Tailwind semantics. The object form additionally
+gets a `config(cfg)` hook that runs before theme resolution (extend the
+theme, flip options). Every method above is exercised by
+`packages/@nakshora/core/test/plugin-api.test.ts`.
 
 ## Presets
 

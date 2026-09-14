@@ -51,6 +51,28 @@ Pinned version:
 > same bytes as `dist/css/nakshora.min.css`. The frozen v1.0.0 stylesheet is
 > `…@main/minified-version/v1.0.0.css` — see `minified-version/cdn.md`.
 
+### What the browser actually downloads
+
+`nakshora.min.css` is 5,982,603 B on disk but **132,967 B over brotli** and
+575,520 B over gzip (jsDelivr negotiates both automatically and caches at the
+edge; the pinned `@v3.0.0` URL is immutable, `@main` revalidates every 12 h).
+The repo ships the precompressed sidecars for self-hosting:
+
+| File                           | Bytes     | Produced by                           |
+| ------------------------------ | --------- | ------------------------------------- |
+| `dist/css/nakshora.min.css`    | 5,982,603 | `scripts/generate-css.mjs`            |
+| `dist/css/nakshora.min.css.br` | 132,967   | same script, brotli quality 11 (text) |
+| `dist/css/nakshora.min.css.gz` | 575,520   | same script, gzip level 9             |
+
+Serve them as-is with `nginx` (`brotli_static on; gzip_static on;`), Apache
+(`mod_brotli` + `MultiViews`), Netlify / Cloudflare Pages / Vercel (automatic
+for sidecars), or S3 + CloudFront (upload the `.br` with
+`Content-Encoding: br`). A test decompresses both sidecars and asserts they
+equal `nakshora.min.css` byte-for-byte.
+
+Even so: the full build is for zero-tooling pages. Any project with a build
+step should use JIT (typically 5–20 KB; the landing page is 3,936 B gzipped).
+
 ## Monorepo (framework development)
 
 ```bash

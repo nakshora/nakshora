@@ -10,7 +10,8 @@
 //  3. the committed `site/index.min.css` matches a fresh build (drift),
 //  4. the CDN bundles in `dist/css/` match the committed core dist (drift).
 
-import { readFileSync } from 'node:fs';
+import { brotliDecompressSync, gunzipSync } from 'node:zlib';
+import { readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -264,6 +265,17 @@ describe('static CDN bundles', () => {
         readFileSync(join(coreDist, file), 'utf-8'),
       );
     }
+  });
+
+  it('precompressed sidecars decompress to exactly dist/css/nakshora.min.css', () => {
+    const min = readFileSync(join(root, 'dist/css/nakshora.min.css'));
+    const br = brotliDecompressSync(readFileSync(join(root, 'dist/css/nakshora.min.css.br')));
+    const gz = gunzipSync(readFileSync(join(root, 'dist/css/nakshora.min.css.gz')));
+    expect(br.equals(min)).toBe(true);
+    expect(gz.equals(min)).toBe(true);
+    // the numbers quoted in docs/PERFORMANCE.md / INSTALLATION.md
+    expect(statSync(join(root, 'dist/css/nakshora.min.css.br')).size).toBeLessThan(140_000);
+    expect(statSync(join(root, 'dist/css/nakshora.min.css.gz')).size).toBeLessThan(600_000);
   });
 
   it('dist/css/nakshora.min.css is the minified full build of the current engine', () => {
