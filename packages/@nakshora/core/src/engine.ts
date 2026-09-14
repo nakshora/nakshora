@@ -38,6 +38,12 @@ import {
 
 // ───────────────────────────── types ─────────────────────────────
 
+const BARE_VALUE: Record<'integer' | 'number' | 'percentage', RegExp> = {
+  integer: /^\d+$/,
+  number: /^\d+(?:\.\d+)?$/,
+  percentage: /^\d+(?:\.\d+)?%$/,
+};
+
 export interface AtRuleCond {
   kind: 'media' | 'supports' | 'container' | 'starting' | 'raw';
   /** params without the `@name`, e.g. `(min-width: 768px)` */
@@ -1549,8 +1555,17 @@ export class Engine {
       return make(decls, idx, [], false, animations);
     }
 
-    // ── arbitrary value ──
+    // ── bare value (`tab-4` with `bare: 'integer'`) ──
     const arb = mod !== null ? valueKey : modifier;
+    if (u.bare && !arb.startsWith('[') && BARE_VALUE[u.bare].test(arb)) {
+      const modValue = mod === null ? null : this.resolveModifier(u, mod);
+      if (mod !== null && modValue === null) return null;
+      const value = negative ? `-${arb}` : arb;
+      if (negative && !u.negative) return null;
+      return make(build(value, { modifier: modValue, key: arb }), keys.length + 0.5, [], true);
+    }
+
+    // ── arbitrary value ──
     if (!(arb.startsWith('[') && arb.endsWith(']'))) return null;
     const raw = arb.slice(1, -1);
     if (!raw) return null;

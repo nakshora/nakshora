@@ -14,15 +14,16 @@ ultra-fast, utility-first CSS framework with a JIT compiler.
 
 ## 🧩 Reference
 
-| Document                                          | Contents                                                                     |
-| ------------------------------------------------- | ---------------------------------------------------------------------------- |
-| [Utilities Reference](./UTILITIES.md)             | Every utility, organized by category (3,000+ classes, generated from source) |
-| [Variants](./VARIANTS.md)                         | `hover:`, `focus:`, `active:`, `disabled:`, `group-*`, `peer-*`, `dark:` …   |
-| [Responsive](./RESPONSIVE.md)                     | Breakpoints, mobile-first workflow, custom breakpoints                       |
-| [Configuration](./CONFIGURATION.md)               | Every config option, theme sections, plugins, important, corePlugins         |
-| [JIT Compiler](./JIT.md)                          | Content scanning, safelist, purge, minification, sizes                       |
-| [Themes & Presets](./THEMES.md)                   | The 5 built-in presets + building your own theme                             |
-| [Design Components](./utilities/13-components.md) | Glass, neon, brutalist, minimalist, skeletons, helpers                       |
+| Document                                          | Contents                                                                                 |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [Utilities Reference](./UTILITIES.md)             | Every utility, organized by category (3,000+ classes, generated from source)             |
+| [Variants](./VARIANTS.md)                         | `hover:`, `focus:`, `active:`, `disabled:`, `group-*`, `peer-*`, `dark:` …               |
+| [Responsive](./RESPONSIVE.md)                     | Breakpoints, mobile-first workflow, custom breakpoints                                   |
+| [Configuration](./CONFIGURATION.md)               | Every config option, theme sections, plugins, important, corePlugins                     |
+| [CSS-first config](./CSS_CONFIG.md)               | `@theme` / `@utility` / `@custom-variant` (Tailwind v4 syntax) on top of the config file |
+| [JIT Compiler](./JIT.md)                          | Content scanning, safelist, purge, minification, sizes                                   |
+| [Themes & Presets](./THEMES.md)                   | The 5 built-in presets + building your own theme                                         |
+| [Design Components](./utilities/13-components.md) | Glass, neon, brutalist, minimalist, skeletons, helpers                                   |
 
 ## 🛠️ Integrations
 

@@ -569,6 +569,12 @@ interface FunctionalUtility {
     preferOnConflict?: boolean;
     /** `-prefix-value` allowed */
     negative?: boolean;
+    /**
+     * Bare (bracket-less) values accepted when no theme key matches — the v4
+     * `--value(integer)` form (`tab-4`). Nakshora extension; Tailwind v3 has
+     * no bare values outside the theme.
+     */
+    bare?: 'integer' | 'number' | 'percentage';
     /** `/modifier` semantics: colour alpha, fontSize line-height, any string, or a lookup map */
     modifier?: 'color' | 'lineHeight' | 'any' | Record<string, string>;
     /** selector suffix, e.g. ` > :not([hidden]) ~ :not([hidden])` */
@@ -1098,6 +1104,8 @@ interface MatchOptions {
         preferOnConflict?: boolean;
     }]>;
     supportsNegativeValues?: boolean;
+    /** Nakshora extension: accept bare `integer` / `number` / `percentage` values (`tab-4`) */
+    bare?: 'integer' | 'number' | 'percentage';
     modifiers?: 'any' | Record<string, string>;
     respectPrefix?: boolean;
     respectImportant?: boolean;
@@ -1320,6 +1328,25 @@ interface ScanFs {
  */
 declare function scanSources(cache: ContentCache, fs: ScanFs, files: readonly string[], raw?: readonly string[]): Set<string>;
 
+interface CssConfigResult {
+    /** CSS with the configuration at-rules removed */
+    css: string;
+    /** config fragment: `theme.extend` + one plugin for utilities / variants */
+    config: Partial<NakshoraConfig>;
+    /** `:root { --color-…: … }` block for the `@theme` variables (empty for `reference`) */
+    rootVars: string;
+    /** true when any configuration at-rule was present */
+    found: boolean;
+    /** human-readable notes (ignored namespaces, unsupported forms) */
+    notes: string[];
+}
+/** Tailwind v4 namespace → v3 theme key. `null` = keep as a CSS variable only. */
+declare const THEME_NAMESPACES: Record<string, string | null>;
+declare function hasCssConfig(css: string): boolean;
+declare function extractCssConfig(css: string): CssConfigResult;
+/** Merge a CSS-config fragment into a config (theme.extend deep-merged, plugins appended). */
+declare function mergeCssConfig(base: Partial<NakshoraConfig>, fragment: Partial<NakshoraConfig>): Partial<NakshoraConfig>;
+
 declare const version = "3.0.0";
 
 declare const metadata: {
@@ -1361,4 +1388,4 @@ declare const nakshora: {
     };
 };
 
-export { type AICategory, type AICorpus, type AIUtilityEntry, type AnimationConfig, ApplyError, type AtRuleCond, type BorderRadiusConfig, type Breakpoint, type BreakpointConfig, type BuildOptions, CSSGenerator, type CSSProperties, type CatalogEntry, type ColorConfig, type ColorName, type ColorScale, type ColorShade, type CompiledRule, type ContainerConfig, ContentCache, type ContentCacheStats, type CssAtRule, type CssDecl, type CssNode, type CssRoot, type CssRule, DEFAULT_SCREENS, type DarkMode, type DurationConfig, type EasingConfig, Engine, type EngineOptions, type FontFamilyConfig, type FunctionalUtility, GROUP_CATEGORIES, type GenerationOptions, type GenerationStats, type KeyframeConfig, type NakshoraConfig, type OpacityConfig, type Plugin, type PluginAPI, type PresetConfig, type PresetName, type ResolvedBreakpoint, type ResolvedTheme, SCREEN_GUIDE, STATE_VARIANTS, type ScanFs, type ScreensConfig, type ShadowConfig, type SpacingConfig, type StaticUtilityDef, type TailwindPluginObject, type ThemeConfig, type ThemeScale, type TypographyConfig, type UtilityGenerator, type UtilityRule, type VariantBranch, type VariantDef, type VariantDefinition, type VariantsConfig, type ZIndexConfig, applyFormat, applyPreset, brutalistTheme, buildAICorpus, buildUtilityList, byteLength, candidatePermutations, categoryForPlugin, classToSelector, classesInCss, clearCatalogCache, coerceValue, componentCss, componentNames, contentHash, corpusToSFT, createGenerator, deepMerge, nakshora as default, defaultColors, defaultTheme, defaultVariants, escapeClass, escapeClassName, extractClasses, finalizeSelector, formatBytes, formatColor, maxWidthValue, mergeConfig, metadata, minifyCss, minifyCssSafe, minimalistTheme, natureTheme, neonTheme, normalizeValue, parseColor, parseCss, pastelTheme, plugin, preflight, processAuthorCss, resolveTheme, resolveThemeValue, scanSources, screenToPx, serializeCss, splitClass, splitPath, stringifyDecls, version, walkRules, withAlphaValue, withAlphaVariable };
+export { type AICategory, type AICorpus, type AIUtilityEntry, type AnimationConfig, ApplyError, type AtRuleCond, type BorderRadiusConfig, type Breakpoint, type BreakpointConfig, type BuildOptions, CSSGenerator, type CSSProperties, type CatalogEntry, type ColorConfig, type ColorName, type ColorScale, type ColorShade, type CompiledRule, type ContainerConfig, ContentCache, type ContentCacheStats, type CssAtRule, type CssConfigResult, type CssDecl, type CssNode, type CssRoot, type CssRule, DEFAULT_SCREENS, type DarkMode, type DurationConfig, type EasingConfig, Engine, type EngineOptions, type FontFamilyConfig, type FunctionalUtility, GROUP_CATEGORIES, type GenerationOptions, type GenerationStats, type KeyframeConfig, type NakshoraConfig, type OpacityConfig, type Plugin, type PluginAPI, type PresetConfig, type PresetName, type ResolvedBreakpoint, type ResolvedTheme, SCREEN_GUIDE, STATE_VARIANTS, type ScanFs, type ScreensConfig, type ShadowConfig, type SpacingConfig, type StaticUtilityDef, THEME_NAMESPACES, type TailwindPluginObject, type ThemeConfig, type ThemeScale, type TypographyConfig, type UtilityGenerator, type UtilityRule, type VariantBranch, type VariantDef, type VariantDefinition, type VariantsConfig, type ZIndexConfig, applyFormat, applyPreset, brutalistTheme, buildAICorpus, buildUtilityList, byteLength, candidatePermutations, categoryForPlugin, classToSelector, classesInCss, clearCatalogCache, coerceValue, componentCss, componentNames, contentHash, corpusToSFT, createGenerator, deepMerge, nakshora as default, defaultColors, defaultTheme, defaultVariants, escapeClass, escapeClassName, extractClasses, extractCssConfig, finalizeSelector, formatBytes, formatColor, hasCssConfig, maxWidthValue, mergeConfig, mergeCssConfig, metadata, minifyCss, minifyCssSafe, minimalistTheme, natureTheme, neonTheme, normalizeValue, parseColor, parseCss, pastelTheme, plugin, preflight, processAuthorCss, resolveTheme, resolveThemeValue, scanSources, screenToPx, serializeCss, splitClass, splitPath, stringifyDecls, version, walkRules, withAlphaValue, withAlphaVariable };

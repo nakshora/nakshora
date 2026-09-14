@@ -48,6 +48,8 @@ export interface MatchOptions {
   values?: Record<string, unknown>;
   type?: DataType | Array<DataType | [DataType, { preferOnConflict?: boolean }]>;
   supportsNegativeValues?: boolean;
+  /** Nakshora extension: accept bare `integer` / `number` / `percentage` values (`tab-4`) */
+  bare?: 'integer' | 'number' | 'percentage';
   modifiers?: 'any' | Record<string, string>;
   respectPrefix?: boolean;
   respectImportant?: boolean;
@@ -328,6 +330,7 @@ export function createPluginAPI(
         types,
         preferOnConflict: preferOnConflict || undefined,
         negative: options.supportsNegativeValues,
+        bare: options.bare,
         modifier:
           options.modifiers === 'any' ? 'any' : options.modifiers ? options.modifiers : undefined,
         describe: `${prefix}-{value}`,

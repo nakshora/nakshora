@@ -13,9 +13,13 @@ import {
   ApplyError,
   ContentCache,
   scanSources,
+  extractCssConfig,
+  mergeCssConfig,
   type NakshoraConfig,
   type ScanFs,
 } from '@nakshora/core';
+
+const CSS_CONFIG_AT_RULES = new Set(['theme', 'utility', 'custom-variant']);
 
 /** Process-wide incremental scan cache shared by every plugin instance. */
 const contentCache = new ContentCache();
@@ -203,8 +207,24 @@ export default function nakshora(options: NakshoraPostCSSOptions = {}): Plugin {
         (root.source?.input?.file ? resolve(root.source.input.file, '..') : process.cwd());
       const hasAtRule = root.nodes?.some((n) => n.type === 'atrule' && n.name === 'nakshora');
       const authorPass = options.apply !== false && needsAuthorPass(root);
-      if (!hasAtRule && !authorPass) return;
-      const generator = new CSSGenerator(config);
+      // CSS-first configuration: `@theme` / `@utility` / `@custom-variant`
+      // blocks extend the config and are replaced by the `:root` variables.
+      const cssConfigNodes = (root.nodes ?? []).filter(
+        (n): n is AtRule => n.type === 'atrule' && CSS_CONFIG_AT_RULES.has(n.name),
+      );
+      if (!hasAtRule && !authorPass && cssConfigNodes.length === 0) return;
+      let resolved = config;
+      if (cssConfigNodes.length) {
+        const extracted = extractCssConfig(cssConfigNodes.map((n) => n.toString()).join('\n'));
+        resolved = mergeCssConfig(config, extracted.config);
+        for (const note of extracted.notes)
+          result.warn(note, { node: cssConfigNodes[0], plugin: 'nakshora' });
+        const first = cssConfigNodes[0];
+        for (const n of cssConfigNodes.slice(1)) n.remove();
+        if (extracted.rootVars) spliceCss(first, extracted.rootVars);
+        else first.remove();
+      }
+      const generator = new CSSGenerator(resolved);
       // `@apply` first so applied utilities never get spliced generated CSS
       // re-scanned, and so `@nakshora` output itself is left untouched.
       if (authorPass) runAuthorPass(root, generator, result);

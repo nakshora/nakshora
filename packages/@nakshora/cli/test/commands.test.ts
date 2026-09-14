@@ -134,6 +134,50 @@ describe('build flags', () => {
   });
 });
 
+describe('CSS-first configuration via the CLI', () => {
+  it('@theme/@utility/@custom-variant in the input stylesheet extend the config', async () => {
+    const css = [
+      '@theme { --color-brand-500: #123456; --breakpoint-3xl: 120rem; --my-token: 1px; }',
+      '@utility tab-* { tab-size: --value(--tab-size-*, integer, [integer]); }',
+      '@custom-variant hocus (&:hover, &:focus);',
+      '@nakshora utilities;',
+      '.btn { @apply tab-4 hocus:bg-brand-500; }',
+    ].join('\n');
+    writeFileSync(join(tmp, 'v4.html'), '<a class="3xl:tab-2 tab-[8] hocus:flex bg-brand-500">');
+    const res = await runBuild({
+      config: { content: ['v4.html'] },
+      inputCss: css,
+      cwd: tmp,
+      dryRun: true,
+    });
+    expect(
+      res.css.startsWith(
+        ':root {\n  --color-brand-500: #123456;\n  --breakpoint-3xl: 120rem;\n  --my-token: 1px;\n}\n',
+      ),
+    ).toBe(true);
+    expect(res.css).not.toMatch(/@theme|@utility|@custom-variant|@nakshora/);
+    expect(res.css).toContain('.tab-\\[8\\] { tab-size: 8; }');
+    expect(res.css).toContain('.hocus\\:flex:hover { display: flex; }');
+    expect(res.css).toContain(
+      '@media (min-width: 120rem) {\n  .\\33xl\\:tab-2 { tab-size: 2; }\n}',
+    );
+    expect(res.css).toContain('.btn { tab-size: 4; }');
+    expect(res.css).toContain('.btn:focus { --tw-bg-opacity: 1; background-color: rgb(18 52 86');
+    // only extractor noise is unknown — every real class compiled
+    expect(res.unknown.filter((c) => !/^class|^tab-$/.test(c))).toEqual([]);
+    // minified variant keeps the variables and drops the whitespace
+    const min = await runBuild({
+      config: { content: ['<a class="tab-4">'] },
+      inputCss: css,
+      cwd: tmp,
+      dryRun: true,
+      minify: true,
+    });
+    expect(min.css.startsWith(':root{--color-brand-500:#123456;')).toBe(true);
+    expect(min.css).toContain('.tab-4{tab-size:4;}');
+  });
+});
+
 describe('doctor', () => {
   it('reports config, content globs, apply errors and dependency issues', async () => {
     const proj = mkdtempSync(join(tmpdir(), 'nakshora-doc-'));
@@ -155,6 +199,10 @@ describe('doctor', () => {
       mkdirSync(join(proj, 'src'));
       writeFileSync(join(proj, 'src/i.html'), '<a class="flex">');
       writeFileSync(join(proj, 'app.css'), '@nakshora source;\n.a { @apply p-4 nope-2; }');
+      writeFileSync(
+        join(proj, 'theme.css'),
+        '@theme { --color-brand-500: #123456; --my-token: 1px; }\n@utility tab-* { tab-size: --value(integer); width: --spacing(4); }\n.b { @apply bg-brand-500 tab-4; }',
+      );
       const { findings } = await diagnose(proj);
       const by = (check: string) => findings.filter((f) => f.check === check);
       expect(by('config')[0].level).toBe('ok');
@@ -172,6 +220,17 @@ describe('doctor', () => {
       expect(by('deps').some((f) => f.message.includes('postcss peer'))).toBe(true);
       expect(by('deps').some((f) => f.message.includes('tailwindcss'))).toBe(true);
       expect(by('css')[0].level).toBe('ok');
+      // CSS-first config: recognised, notes surfaced, and @apply of its classes resolves
+      expect(by('css-config').map((f) => [f.level, f.message.split(':')[0]])).toEqual([
+        ['warn', 'theme.css'],
+        ['warn', 'theme.css'],
+        ['ok', '@theme / @utility / @custom-variant in theme.css'],
+      ]);
+      expect(by('css-config')[0].message).toContain('--my-token');
+      expect(by('css-config')[1].message).toContain('`--spacing()` is not implemented');
+      expect(by('apply').filter((f) => f.message.startsWith('theme.css'))).toEqual([
+        expect.objectContaining({ level: 'ok' }),
+      ]);
       const r = cli(['doctor'], proj);
       expect(r.code).toBe(1); // the @apply error
       expect(r.out).toContain('✖ apply');

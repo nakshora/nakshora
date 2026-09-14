@@ -109,21 +109,21 @@ CSS is emitted). Tailwind **v3.4** does not have these either — they are
 **v4-only** grammar and therefore out of the v3 parity target. Listed so that
 nobody mistakes silence for support.
 
-| Class / variant                                                              | Status  | Reason                                                                            |
-| ---------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------- |
-| `group/x:` (bare named group as variant)                                     | missing | v3 has no bare `group/name:` variant — use `group-hover/x:` (supported)           |
-| `in-*:` (`in-focus:`)                                                        | missing | v4 variant                                                                        |
-| `nth-*:`, `nth-last-of-type-*:`                                              | missing | v4 variants; `first:`/`last:`/`odd:`/`even:`/`only:` and `[&:nth-child(3)]:` work |
-| `**:` (descendant)                                                           | missing | v4 variant; `*:` (direct children) works                                          |
-| `inset-shadow-*`, `inset-ring*`                                              | missing | v4 utilities                                                                      |
-| `mask-*` (`mask-radial`, `mask-linear-*`)                                    | missing | v4 utilities; `[mask-type:…]` arbitrary properties work                           |
-| `bg-linear-*`, `bg-conic-*`, `bg-radial-*`                                   | missing | v4 gradient grammar; `bg-gradient-to-*` + `from/via/to` work                      |
-| `rotate-x-*`, `rotate-y-*`, `translate-z-*`, `perspective-*`, `transform-3d` | missing | v4 3D transforms                                                                  |
-| `text-shadow-*`                                                              | missing | v4 utility                                                                        |
-| `wrap-break-word`, `wrap-anywhere`                                           | missing | v4 names; `break-words`, `break-all` work                                         |
-| `container-normal` / `container-size`                                        | missing | v4 names; `@container` and `@container/name` work                                 |
-| v4 `@theme {}` / `@utility` / `@custom-variant` directives                   | missing | Tailwind v4 config-in-CSS — see Phase D P2 (not started)                          |
-| Tailwind v3 `safelist` `{ pattern: /…/, variants: […] }` object form         | partial | strings and RegExp are supported; per-pattern `variants` lists are not            |
+| Class / variant                                                                       | Status  | Reason                                                                                                                                                          |
+| ------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `group/x:` (bare named group as variant)                                              | missing | v3 has no bare `group/name:` variant — use `group-hover/x:` (supported)                                                                                         |
+| `in-*:` (`in-focus:`)                                                                 | missing | v4 variant                                                                                                                                                      |
+| `nth-*:`, `nth-last-of-type-*:`                                                       | missing | v4 variants; `first:`/`last:`/`odd:`/`even:`/`only:` and `[&:nth-child(3)]:` work                                                                               |
+| `**:` (descendant)                                                                    | missing | v4 variant; `*:` (direct children) works                                                                                                                        |
+| `inset-shadow-*`, `inset-ring*`                                                       | missing | v4 utilities                                                                                                                                                    |
+| `mask-*` (`mask-radial`, `mask-linear-*`)                                             | missing | v4 utilities; `[mask-type:…]` arbitrary properties work                                                                                                         |
+| `bg-linear-*`, `bg-conic-*`, `bg-radial-*`                                            | missing | v4 gradient grammar; `bg-gradient-to-*` + `from/via/to` work                                                                                                    |
+| `rotate-x-*`, `rotate-y-*`, `translate-z-*`, `perspective-*`, `transform-3d`          | missing | v4 3D transforms                                                                                                                                                |
+| `text-shadow-*`                                                                       | missing | v4 utility                                                                                                                                                      |
+| `wrap-break-word`, `wrap-anywhere`                                                    | missing | v4 names; `break-words`, `break-all` work                                                                                                                       |
+| `container-normal` / `container-size`                                                 | missing | v4 names; `@container` and `@container/name` work                                                                                                               |
+| v4 `@theme { --color-*: initial }` namespace resets, `@source`, `@variant`, `@plugin` | missing | `@theme` / `@utility` / `@custom-variant` **are** supported (see [CSS_CONFIG.md](./CSS_CONFIG.md)); resets → `theme.<key>` in the config, `@source` → `content` |
+| Tailwind v3 `safelist` `{ pattern: /…/, variants: […] }` object form                  | partial | strings and RegExp are supported; per-pattern `variants` lists are not                                                                                          |
 
 Tailwind v3 features that **are** supported and often assumed missing:
 `size-*`, `text-balance`/`text-pretty`, `has-[…]:`, `group-has-*`,
@@ -134,14 +134,14 @@ Tailwind v3 features that **are** supported and often assumed missing:
 
 ## 4. Nakshora extras (not in Tailwind v3.4)
 
-| Area       | Extra                                                                                                                                                    |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Screens    | `xxs` 200, `xs` 400, `3xl` 1920, `4xl` 2560, `5xl` 5000 (+ `max-*` for each); `theme.breakpoints` merge                                                  |
-| Variants   | `not-*` (`not-hover:`), `starting:` (`@starting-style`), `inert:`, `@min-*` / `@max-*` container variants, `min-[…]:` / `max-[…]:` arbitrary screens     |
-| Utilities  | `animation-paused` / `animation-running`, `break-spaces`, `font-stretch-*`, `field-sizing-*`, `scheme-*`                                                 |
-| Theme      | `animation` fade/slide/shimmer, `borderRadius.xs`, `boxShadow.glow`, `maxWidth.screen-*`, `rotate` 135–360, `scale` 175/200, `zIndex.hide`, `containers` |
-| Components | design-system component layer (`neon-btn`, `glass-card`, …) — `corePlugins.components: false` removes them; user `addComponents` are never affected      |
-| Config     | `theme.breakpoints`, `theme.container.minScreen/maxScreen`, `variants.maxResponsive`, `combineMedia`, `presets` in Nakshora preset form                  |
+| Area       | Extra                                                                                                                                                                                                                                                                      |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Screens    | `xxs` 200, `xs` 400, `3xl` 1920, `4xl` 2560, `5xl` 5000 (+ `max-*` for each); `theme.breakpoints` merge                                                                                                                                                                    |
+| Variants   | `not-*` (`not-hover:`), `starting:` (`@starting-style`), `inert:`, `@min-*` / `@max-*` container variants, `min-[…]:` / `max-[…]:` arbitrary screens                                                                                                                       |
+| Utilities  | `animation-paused` / `animation-running`, `break-spaces`, `font-stretch-*`, `field-sizing-*`, `scheme-*`                                                                                                                                                                   |
+| Theme      | `animation` fade/slide/shimmer, `borderRadius.xs`, `boxShadow.glow`, `maxWidth.screen-*`, `rotate` 135–360, `scale` 175/200, `zIndex.hide`, `containers`                                                                                                                   |
+| Components | design-system component layer (`neon-btn`, `glass-card`, …) — `corePlugins.components: false` removes them; user `addComponents` are never affected                                                                                                                        |
+| Config     | `theme.breakpoints`, `theme.container.minScreen/maxScreen`, `variants.maxResponsive`, `combineMedia`, `layers`, `presets` in Nakshora preset form; CSS-first `@theme` / `@utility` / `@custom-variant` (v4 syntax on the v3 engine); `matchUtilities({ bare: 'integer' })` |
 
 `theme.test.ts` fails if a default-theme key appears that is neither in
 Tailwind's default theme nor in this extras list.

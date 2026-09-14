@@ -33,6 +33,12 @@ export interface FunctionalUtility {
   preferOnConflict?: boolean;
   /** `-prefix-value` allowed */
   negative?: boolean;
+  /**
+   * Bare (bracket-less) values accepted when no theme key matches — the v4
+   * `--value(integer)` form (`tab-4`). Nakshora extension; Tailwind v3 has
+   * no bare values outside the theme.
+   */
+  bare?: 'integer' | 'number' | 'percentage';
   /** `/modifier` semantics: colour alpha, fontSize line-height, any string, or a lookup map */
   modifier?: 'color' | 'lineHeight' | 'any' | Record<string, string>;
   /** selector suffix, e.g. ` > :not([hidden]) ~ :not([hidden])` */

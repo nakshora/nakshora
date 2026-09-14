@@ -5,7 +5,15 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { globby } from 'globby';
-import { CSSGenerator, ApplyError, version, type NakshoraConfig } from '@nakshora/core';
+import {
+  CSSGenerator,
+  ApplyError,
+  version,
+  extractCssConfig,
+  hasCssConfig,
+  mergeCssConfig,
+  type NakshoraConfig,
+} from '@nakshora/core';
 import { findConfigFile, loadConfigFile } from './config-loader';
 
 export type Level = 'ok' | 'warn' | 'error';
@@ -16,8 +24,9 @@ export interface Finding {
   hint?: string;
 }
 
+// no `g` flag: `.test()` on a global regex keeps `lastIndex` between files
 const CSS_AT_RULES =
-  /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/g;
+  /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/;
 
 export async function diagnose(
   cwd: string = process.cwd(),
@@ -189,7 +198,6 @@ export async function diagnose(
     },
   );
   const withAtRule = cssFiles.filter((f) => CSS_AT_RULES.test(readFileSync(f, 'utf-8')));
-  CSS_AT_RULES.lastIndex = 0;
   if (cssFiles.length && withAtRule.length === 0 && config)
     push(
       'warn',
@@ -204,9 +212,36 @@ export async function diagnose(
       `@nakshora at-rules in ${withAtRule.map((f) => f.replace(cwd + '/', '')).join(', ')}`,
     );
   if (config) {
-    const gen = new CSSGenerator(config);
+    // CSS-first configuration (@theme / @utility / @custom-variant) extends the
+    // config exactly as the build does; its notes are surfaced as warnings.
+    let effective = config;
+    const cssConfigFiles: string[] = [];
     for (const f of cssFiles.slice(0, 200)) {
       const css = readFileSync(f, 'utf-8');
+      if (!hasCssConfig(css)) continue;
+      const extracted = extractCssConfig(css);
+      effective = mergeCssConfig(effective, extracted.config);
+      cssConfigFiles.push(f.replace(cwd + '/', ''));
+      for (const note of extracted.notes)
+        push('warn', 'css-config', `${f.replace(cwd + '/', '')}: ${note}`);
+      for (const m of css.matchAll(/--(modifier|alpha|spacing)\(/g))
+        push(
+          'warn',
+          'css-config',
+          `${f.replace(cwd + '/', '')}: \`--${m[1]}()\` is not implemented — the literal text stays in the output`,
+          'use theme values or a plugin `matchUtilities` callback instead',
+        );
+    }
+    if (cssConfigFiles.length)
+      push(
+        'ok',
+        'css-config',
+        `@theme / @utility / @custom-variant in ${cssConfigFiles.join(', ')}`,
+      );
+    const gen = new CSSGenerator(effective);
+    for (const f of cssFiles.slice(0, 200)) {
+      let css = readFileSync(f, 'utf-8');
+      if (hasCssConfig(css)) css = extractCssConfig(css).css;
       if (!/@apply\b|theme\(|@screen\b/.test(css)) continue;
       try {
         gen.processCss(css);

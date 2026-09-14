@@ -139,3 +139,51 @@ describe('spliceCss', () => {
     expect(ms).toBeLessThan(5_000); // measured ≈ 0.4 s; the old path took > 30 s / overflowed
   });
 });
+
+describe('CSS-first configuration (@theme / @utility / @custom-variant)', () => {
+  const sheet = `@theme {
+  --color-brand-500: #123456;
+  --spacing-18: 4.5rem;
+}
+@utility content-auto { content-visibility: auto; }
+@custom-variant hocus (&:hover, &:focus);
+@nakshora utilities;
+.btn { @apply p-18 hocus:content-auto; }
+`;
+
+  it('extends the config, replaces the blocks with :root variables, works with JIT and @apply', async () => {
+    const result = await postcss([
+      nakshora({ content: ['<a class="bg-brand-500 hocus:content-auto p-18">'] }),
+    ]).process(sheet, { from: undefined });
+    const css = result.css;
+    expect(
+      css
+        .replace(/\s+/g, ' ')
+        .startsWith(':root { --color-brand-500: #123456; --spacing-18: 4.5rem; } '),
+    ).toBe(true);
+    expect(css).not.toMatch(/@theme|@utility|@custom-variant/);
+    expect(css).toContain(
+      '.bg-brand-500 { --tw-bg-opacity: 1; background-color: rgb(18 52 86 / var(--tw-bg-opacity, 1)); }',
+    );
+    expect(css).toContain('.p-18 { padding: 4.5rem; }');
+    expect(css).toContain('.hocus\\:content-auto:hover { content-visibility: auto; }');
+    expect(css).toContain('.btn { padding: 4.5rem; }');
+    expect(css).toContain('.btn:focus { content-visibility: auto; }');
+    expect(result.warnings()).toEqual([]);
+  });
+
+  it('warns about unmapped variables and still emits them', async () => {
+    const result = await postcss([nakshora()]).process(
+      '@theme { --my-token: 1px; }\n.a { x: var(--my-token) }',
+      {
+        from: undefined,
+      },
+    );
+    expect(result.css.replace(/\s+/g, ' ')).toBe(
+      ':root { --my-token: 1px; } .a { x: var(--my-token) }',
+    );
+    expect(result.warnings().map((w) => w.text)).toEqual([
+      '@theme: `--my-token` has no utility namespace — kept as a CSS variable only',
+    ]);
+  });
+});

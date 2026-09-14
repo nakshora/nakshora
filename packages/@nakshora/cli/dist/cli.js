@@ -2640,6 +2640,7 @@ function createPluginAPI(collector, ctx) {
         types,
         preferOnConflict: preferOnConflict || void 0,
         negative: options.supportsNegativeValues,
+        bare: options.bare,
         modifier: options.modifiers === "any" ? "any" : options.modifiers ? options.modifiers : void 0,
         describe: `${prefix}-{value}`,
         build: (value, { modifier }) => {
@@ -3134,7 +3135,250 @@ function scanSources(cache2, fs, files, raw = []) {
   cache2.retain(live);
   return ContentCache.union(sets);
 }
-var defaultColors, defaultVariants, componentCss, componentNames, HEX, SHORT_HEX, VALUE, SEP, ALPHA_SEP, CUSTOM_PROPERTY, RGB, HSL, NAMED_COLORS, MATH_FUNCTIONS, AUTO_VAR_INJECTION_EXCEPTIONS, CSS_FUNCTIONS, LENGTH_UNITS, LENGTH_RE, typeCheckers, TYPE_HINTS, SPECIALS, ALLOWED_CLASS_CHARACTERS, cache, UNITLESS, tailwindDefaults, DEFAULT_SCREENS, SCREEN_GUIDE, DEFAULT_CONTAINER_MIN_SCREEN, DEFAULT_CONTAINER_MAX_SCREEN, FRACTIONS, FRACTIONS_SMALL, FRACTIONS_SIXTHS, NAKSHORA_EXTRAS, STATIC_UTILITIES, TRANSFORM_VALUE, FILTER_VALUE, BACKDROP_VALUE, CHILD_SELECTOR, SHADOW_KEYWORDS, SHADOW_LENGTH, CORE_PLUGIN_ORDER, DEFAULTS_GROUPS, CATALOG_CACHE, CATALOG_CACHE_MAX, PSEUDO_ELEMENTS, VISITED_STRIP, PSEUDO_CLASSES, LEGACY_VARIANT_KEYS, MEDIA_SORT, Engine, MERGE_RE, PSEUDO_ELEMENT_PROPS, DEFAULT_PSEUDO_PROPS, NAKSHORA_STATIC, GROUP_CATEGORIES, PLUGIN_CATEGORY, PLUGIN_COMPONENTS_GROUP, ApplyError, siblingSeq, version, STATE_VARIANTS, VERSION, CORE_SCREENS, CSSGenerator, ContentCache, metadata;
+function hasCssConfig(css) {
+  return /@(?:theme|utility|custom-variant)\b/.test(css);
+}
+function extractCssConfig(css) {
+  const notes = [];
+  if (!hasCssConfig(css)) return { css, config: {}, rootVars: "", found: false, notes };
+  const root = parseCss(css);
+  const themeVars = /* @__PURE__ */ new Map();
+  const rootVarList = [];
+  const keyframes = {};
+  const staticUtilities = {};
+  const functionalUtilities = [];
+  const variants = [];
+  let found = false;
+  const remaining = [];
+  for (const node of root.nodes) {
+    if (node.type !== "atrule" || !CONFIG_AT_RULES.has(node.name)) {
+      remaining.push(node);
+      continue;
+    }
+    found = true;
+    if (node.name === "theme") {
+      const flags = node.params.trim().split(/\s+/).filter(Boolean);
+      const reference = flags.includes("reference");
+      for (const child of node.nodes ?? []) {
+        if (child.type === "decl" && child.prop.startsWith("--")) {
+          const name = child.prop.slice(2);
+          if (name === "*" || child.value === "initial") {
+            const ns = splitNamespace(name.replace(/-\*$/, "")).namespace ?? name;
+            const key = THEME_NAMESPACES[ns] ?? ns;
+            notes.push(
+              `@theme: \`${child.prop}: initial\` (namespace reset) is not supported \u2014 set \`theme.${key}\` in the config to replace the scale`
+            );
+            continue;
+          }
+          themeVars.set(name, child.value);
+          if (!reference) rootVarList.push([child.prop, child.value]);
+        } else if (child.type === "atrule" && child.name === "keyframes") {
+          const frames = {};
+          for (const step of child.nodes ?? [])
+            if (step.type === "rule")
+              frames[step.selector] = Object.fromEntries(
+                step.nodes.filter((n) => n.type === "decl").map((d) => [d.prop, d.value])
+              );
+          keyframes[child.params.trim()] = frames;
+        }
+      }
+    } else if (node.name === "utility") {
+      const name = node.params.trim();
+      const decls = (node.nodes ?? []).filter((n) => n.type === "decl");
+      const nested = (node.nodes ?? []).filter((n) => n.type !== "decl");
+      if (name.endsWith("-*")) functionalUtilities.push({ name: name.slice(0, -2), decls, nested });
+      else staticUtilities[`.${name}`] = nodesToCssInJs(node.nodes ?? []);
+    } else {
+      const m = /^([\w@-]+)\s*(?:\((.*)\))?$/s.exec(node.params.trim());
+      if (!m) {
+        notes.push(`@custom-variant: cannot parse \`${node.params}\``);
+        continue;
+      }
+      const name = m[1];
+      if (m[2] !== void 0) variants.push({ name, formats: splitTopLevel(m[2]) });
+      else variants.push({ name, formats: blockVariantFormats(node) });
+    }
+  }
+  const extend = {};
+  const fontSizeMeta = {};
+  for (const [name, value] of themeVars) {
+    const { namespace, key } = splitNamespace(name);
+    if (!namespace || !(namespace in THEME_NAMESPACES)) {
+      if (namespace !== null && namespace !== void 0 && !(namespace in THEME_NAMESPACES))
+        notes.push(`@theme: \`--${name}\` has no utility namespace \u2014 kept as a CSS variable only`);
+      continue;
+    }
+    const themeKey = THEME_NAMESPACES[namespace];
+    if (themeKey === null) {
+      notes.push(`@theme: \`--${name}\` (${namespace}) maps to a v4-only utility \u2014 kept as a CSS variable only`);
+      continue;
+    }
+    const meta = /^(.*?)--(line-height|letter-spacing|font-weight)$/.exec(key);
+    if (themeKey === "fontSize" && meta) {
+      (fontSizeMeta[meta[1]] ??= {})[camel(meta[2])] = value;
+      continue;
+    }
+    if (themeKey === "colors") setColor(extend, key, resolveVarRefs(value, themeVars));
+    else (extend[themeKey] ??= {})[key] = resolveVarRefs(value, themeVars);
+  }
+  for (const [k, meta] of Object.entries(fontSizeMeta)) {
+    const size = (extend.fontSize ??= {})[k];
+    if (size !== void 0) extend.fontSize[k] = [size, meta];
+  }
+  if (Object.keys(keyframes).length) extend.keyframes = keyframes;
+  const plugin2 = Object.keys(staticUtilities).length || functionalUtilities.length || variants.length ? (api) => {
+    if (Object.keys(staticUtilities).length) api.addUtilities(staticUtilities);
+    for (const fu of functionalUtilities) {
+      const { values, kinds } = functionalValues(fu.decls, api, themeVars);
+      api.matchUtilities(
+        {
+          [fu.name]: (value) => {
+            const v = String(value);
+            const out = {};
+            for (const d of fu.decls) out[d.prop] = substituteValue(d.value, v);
+            for (const n of fu.nested) Object.assign(out, nodesToCssInJs([n]));
+            return out;
+          }
+        },
+        { values, type: matchType(kinds), bare: bareKind(kinds) }
+      );
+    }
+    for (const v of variants) api.addVariant(v.name, v.formats);
+  } : void 0;
+  const config = {};
+  if (Object.keys(extend).length) config.theme = { extend };
+  if (plugin2) config.plugins = [plugin2];
+  const rootVars = rootVarList.length ? `:root {
+${rootVarList.map(([p, v]) => `  ${p}: ${v};`).join("\n")}
+}
+` : "";
+  return { css: serializeCss({ type: "root", nodes: remaining }), config, rootVars, found, notes };
+}
+function mergeCssConfig(base, fragment) {
+  const out = { ...base };
+  if (fragment.theme?.extend) {
+    const baseExtend = base.theme?.extend ?? {};
+    const fragExtend = fragment.theme.extend;
+    const extend = { ...baseExtend };
+    for (const [k, v] of Object.entries(fragExtend)) {
+      const existing = baseExtend[k];
+      extend[k] = existing && typeof existing === "object" && !Array.isArray(existing) ? { ...existing, ...v } : v;
+    }
+    out.theme = { ...base.theme ?? {}, extend };
+  }
+  if (fragment.plugins?.length) out.plugins = [...base.plugins ?? [], ...fragment.plugins];
+  return out;
+}
+function splitNamespace(name) {
+  const candidates = Object.keys(THEME_NAMESPACES).sort((a, b) => b.length - a.length);
+  for (const ns of candidates) {
+    if (name === ns) return { namespace: ns, key: "DEFAULT" };
+    if (name.startsWith(`${ns}-`)) return { namespace: ns, key: name.slice(ns.length + 1) };
+  }
+  return { namespace: name.split("-")[0] ?? null, key: name };
+}
+function setColor(extend, key, value) {
+  const colors = extend.colors ??= {};
+  const m = /^(.*)-(\d{2,4}|DEFAULT)$/.exec(key);
+  if (m) {
+    const existing = colors[m[1]];
+    const palette = existing && typeof existing === "object" ? existing : {};
+    if (typeof existing === "string") palette.DEFAULT = existing;
+    palette[m[2]] = value;
+    colors[m[1]] = palette;
+  } else {
+    const existing = colors[key];
+    if (existing && typeof existing === "object") existing.DEFAULT = value;
+    else colors[key] = value;
+  }
+}
+function resolveVarRefs(value, vars, depth = 0) {
+  if (depth > 8) return value;
+  return value.replace(
+    /var\(--([\w-]+)\)/g,
+    (m, name) => vars.has(name) ? resolveVarRefs(vars.get(name), vars, depth + 1) : m
+  );
+}
+function camel(s) {
+  return s.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+}
+function splitTopLevel(list) {
+  const out = [];
+  let depth = 0;
+  let cur = "";
+  for (const ch of list) {
+    if (ch === "(" || ch === "[") depth++;
+    else if (ch === ")" || ch === "]") depth--;
+    if (ch === "," && depth === 0) {
+      out.push(cur.trim());
+      cur = "";
+    } else cur += ch;
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
+function blockVariantFormats(node) {
+  const formats = [];
+  const walk = (nodes, prefix) => {
+    for (const n of nodes) {
+      if (n.type === "atrule" && n.name === "slot") formats.push(...prefix.length ? prefix : ["&"]);
+      else if (n.type === "atrule" && n.nodes) walk(n.nodes, [...prefix, `@${n.name} ${n.params}`.trim()]);
+      else if (n.type === "rule") walk(n.nodes, [...prefix, n.selector]);
+    }
+  };
+  walk(node.nodes ?? [], []);
+  return formats;
+}
+function nodesToCssInJs(nodes) {
+  const out = {};
+  for (const n of nodes) {
+    if (n.type === "decl") out[n.prop] = n.important ? `${n.value} !important` : n.value;
+    else if (n.type === "rule") out[n.selector] = nodesToCssInJs(n.nodes);
+    else if (n.type === "atrule" && n.nodes) out[`@${n.name} ${n.params}`.trim()] = nodesToCssInJs(n.nodes);
+  }
+  return out;
+}
+function functionalValues(decls, api, themeVars) {
+  const kinds = { namespaces: [], bare: [], arbitrary: false };
+  for (const d of decls)
+    for (const m of d.value.matchAll(VALUE_FN))
+      for (const arg of splitTopLevel(m[1])) {
+        if (arg.startsWith("--") && arg.endsWith("-*")) kinds.namespaces.push(arg.slice(2, -2));
+        else if (arg.startsWith("[")) kinds.arbitrary = true;
+        else if (/^[a-z]+$/.test(arg)) kinds.bare.push(arg);
+      }
+  const values = {};
+  for (const ns of kinds.namespaces) {
+    for (const [name, value] of themeVars)
+      if (name.startsWith(`${ns}-`)) values[name.slice(ns.length + 1)] = value;
+    const themeKey = THEME_NAMESPACES[ns];
+    const scale = themeKey ? api.theme(themeKey) : void 0;
+    if (scale) {
+      for (const [k, v] of Object.entries(scale)) if (typeof v === "string") values[k] ??= v;
+    }
+  }
+  return { values, kinds };
+}
+function substituteValue(template, value) {
+  return template.replace(VALUE_FN, () => value);
+}
+function bareKind(kinds) {
+  if (kinds.bare.includes("percentage")) return "percentage";
+  if (kinds.bare.includes("number") || kinds.bare.includes("ratio")) return "number";
+  if (kinds.bare.includes("integer")) return "integer";
+  return void 0;
+}
+function matchType(kinds) {
+  const map = {
+    integer: "number",
+    number: "number",
+    percentage: "percentage",
+    ratio: "any"
+  };
+  if (!kinds.arbitrary) return kinds.bare.length ? [...new Set(kinds.bare.map((k) => map[k] ?? "any"))] : void 0;
+  return void 0;
+}
+var defaultColors, defaultVariants, componentCss, componentNames, HEX, SHORT_HEX, VALUE, SEP, ALPHA_SEP, CUSTOM_PROPERTY, RGB, HSL, NAMED_COLORS, MATH_FUNCTIONS, AUTO_VAR_INJECTION_EXCEPTIONS, CSS_FUNCTIONS, LENGTH_UNITS, LENGTH_RE, typeCheckers, TYPE_HINTS, SPECIALS, ALLOWED_CLASS_CHARACTERS, cache, UNITLESS, tailwindDefaults, DEFAULT_SCREENS, SCREEN_GUIDE, DEFAULT_CONTAINER_MIN_SCREEN, DEFAULT_CONTAINER_MAX_SCREEN, FRACTIONS, FRACTIONS_SMALL, FRACTIONS_SIXTHS, NAKSHORA_EXTRAS, STATIC_UTILITIES, TRANSFORM_VALUE, FILTER_VALUE, BACKDROP_VALUE, CHILD_SELECTOR, SHADOW_KEYWORDS, SHADOW_LENGTH, CORE_PLUGIN_ORDER, DEFAULTS_GROUPS, BARE_VALUE, CATALOG_CACHE, CATALOG_CACHE_MAX, PSEUDO_ELEMENTS, VISITED_STRIP, PSEUDO_CLASSES, LEGACY_VARIANT_KEYS, MEDIA_SORT, Engine, MERGE_RE, PSEUDO_ELEMENT_PROPS, DEFAULT_PSEUDO_PROPS, NAKSHORA_STATIC, GROUP_CATEGORIES, PLUGIN_CATEGORY, PLUGIN_COMPONENTS_GROUP, ApplyError, siblingSeq, version, STATE_VARIANTS, VERSION, CORE_SCREENS, CSSGenerator, ContentCache, THEME_NAMESPACES, CONFIG_AT_RULES, VALUE_FN, metadata;
 var init_dist = __esm({
   "../core/dist/index.js"() {
     "use strict";
@@ -5828,6 +6072,11 @@ var init_dist = __esm({
       },
       "border-width": {}
     };
+    BARE_VALUE = {
+      integer: /^\d+$/,
+      number: /^\d+(?:\.\d+)?$/,
+      percentage: /^\d+(?:\.\d+)?%$/
+    };
     CATALOG_CACHE = /* @__PURE__ */ new Map();
     CATALOG_CACHE_MAX = 4;
     PSEUDO_ELEMENTS = [
@@ -6906,6 +7155,13 @@ var init_dist = __esm({
           return make(decls2, idx, [], false, animations2);
         }
         const arb = mod !== null ? valueKey : modifier;
+        if (u.bare && !arb.startsWith("[") && BARE_VALUE[u.bare].test(arb)) {
+          const modValue2 = mod === null ? null : this.resolveModifier(u, mod);
+          if (mod !== null && modValue2 === null) return null;
+          const value2 = negative ? `-${arb}` : arb;
+          if (negative && !u.negative) return null;
+          return make(build(value2, { modifier: modValue2, key: arb }), keys.length + 0.5, [], true);
+        }
         if (!(arb.startsWith("[") && arb.endsWith("]"))) return null;
         const raw = arb.slice(1, -1);
         if (!raw) return null;
@@ -7720,8 +7976,8 @@ var init_dist = __esm({
         for (const [legacy, name] of Object.entries(LEGACY_VARIANT_KEYS)) {
           if (name === key && cfg[legacy] === false) return false;
         }
-        const camel = key.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
-        if (camel !== key && cfg[camel] === false) return false;
+        const camel2 = key.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
+        if (camel2 !== key && cfg[camel2] === false) return false;
         return true;
       }
       buildCatalog() {
@@ -8026,6 +8282,29 @@ ${css}` : "";
         this.misses = 0;
       }
     };
+    THEME_NAMESPACES = {
+      color: "colors",
+      font: "fontFamily",
+      text: "fontSize",
+      "font-weight": "fontWeight",
+      tracking: "letterSpacing",
+      leading: "lineHeight",
+      breakpoint: "screens",
+      container: "containers",
+      spacing: "spacing",
+      radius: "borderRadius",
+      shadow: "boxShadow",
+      "inset-shadow": null,
+      "drop-shadow": "dropShadow",
+      blur: "blur",
+      perspective: null,
+      aspect: "aspectRatio",
+      ease: "transitionTimingFunction",
+      animate: "animation",
+      "default": null
+    };
+    CONFIG_AT_RULES = /* @__PURE__ */ new Set(["theme", "utility", "custom-variant"]);
+    VALUE_FN = /--value\(([^)]*)\)/g;
     metadata = {
       name: "nakshora",
       version,
@@ -8602,7 +8881,16 @@ var AUTHOR_RE = /@apply\b|@screen\b|\b(?:theme|screen)\(/;
 async function runBuild(input) {
   const started = performance.now();
   const cwd = input.cwd ?? process.cwd();
-  const config = input.config;
+  const absInput = input.input && input.input !== "-" ? isAbsolute(input.input) ? input.input : resolve2(cwd, input.input) : void 0;
+  let source = input.inputCss ?? (absInput && existsSync2(absInput) ? readFileSync2(absInput, "utf-8") : void 0);
+  let config = input.config;
+  let rootVars = "";
+  if (source !== void 0 && hasCssConfig(source)) {
+    const extracted = extractCssConfig(source);
+    source = extracted.css;
+    rootVars = extracted.rootVars;
+    config = mergeCssConfig(config, extracted.config);
+  }
   const generator = new CSSGenerator(config);
   const { files, raw } = await resolveSources(config.content ?? config.purge, cwd);
   const hasContent = files.length + raw.length > 0;
@@ -8618,10 +8906,8 @@ async function runBuild(input) {
     css = generator.generate({ ...options, mode: "full" });
     classes = countClasses(css);
   }
-  const absInput = input.input && input.input !== "-" ? isAbsolute(input.input) ? input.input : resolve2(cwd, input.input) : void 0;
-  if (input.inputCss !== void 0 || absInput && existsSync2(absInput)) {
+  if (source !== void 0) {
     {
-      let source = input.inputCss ?? readFileSync2(absInput, "utf-8");
       const authorPass = AUTHOR_RE.test(source);
       if (authorPass) {
         try {
@@ -8644,7 +8930,10 @@ async function runBuild(input) {
         ) : generator.getUtilitiesFull(false);
         const out = source.replace(SOURCE_RE, () => sourceCss).replace(UTILITIES_RE, () => utilCss);
         css = input.minify ? minifyCss(out) : out;
+      } else if (rootVars) {
+        css = input.minify ? minifyCss(source) : source;
       }
+      if (rootVars) css = (input.minify ? minifyCss(rootVars) : rootVars) + css;
     }
   }
   let mapFile;
@@ -9008,7 +9297,7 @@ init_config_loader();
 import { existsSync as existsSync5, readFileSync as readFileSync4, statSync as statSync5 } from "fs";
 import { dirname as dirname4, isAbsolute as isAbsolute3, join as join5, resolve as resolve6 } from "path";
 import { globby as globby2 } from "globby";
-var CSS_AT_RULES = /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/g;
+var CSS_AT_RULES = /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/;
 async function diagnose(cwd = process.cwd(), explicitConfig) {
   const findings = [];
   const push = (level, check, message, hint) => {
@@ -9157,7 +9446,6 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
     }
   );
   const withAtRule = cssFiles.filter((f) => CSS_AT_RULES.test(readFileSync4(f, "utf-8")));
-  CSS_AT_RULES.lastIndex = 0;
   if (cssFiles.length && withAtRule.length === 0 && config)
     push(
       "warn",
@@ -9172,9 +9460,34 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
       `@nakshora at-rules in ${withAtRule.map((f) => f.replace(cwd + "/", "")).join(", ")}`
     );
   if (config) {
-    const gen = new CSSGenerator(config);
+    let effective = config;
+    const cssConfigFiles = [];
     for (const f of cssFiles.slice(0, 200)) {
       const css = readFileSync4(f, "utf-8");
+      if (!hasCssConfig(css)) continue;
+      const extracted = extractCssConfig(css);
+      effective = mergeCssConfig(effective, extracted.config);
+      cssConfigFiles.push(f.replace(cwd + "/", ""));
+      for (const note of extracted.notes)
+        push("warn", "css-config", `${f.replace(cwd + "/", "")}: ${note}`);
+      for (const m of css.matchAll(/--(modifier|alpha|spacing)\(/g))
+        push(
+          "warn",
+          "css-config",
+          `${f.replace(cwd + "/", "")}: \`--${m[1]}()\` is not implemented \u2014 the literal text stays in the output`,
+          "use theme values or a plugin `matchUtilities` callback instead"
+        );
+    }
+    if (cssConfigFiles.length)
+      push(
+        "ok",
+        "css-config",
+        `@theme / @utility / @custom-variant in ${cssConfigFiles.join(", ")}`
+      );
+    const gen = new CSSGenerator(effective);
+    for (const f of cssFiles.slice(0, 200)) {
+      let css = readFileSync4(f, "utf-8");
+      if (hasCssConfig(css)) css = extractCssConfig(css).css;
       if (!/@apply\b|theme\(|@screen\b/.test(css)) continue;
       try {
         gen.processCss(css);
@@ -9573,9 +9886,7 @@ async function doBuild(input, opts, forceWatch = false) {
     const watcher = createWatcher(paths, () => {
       runBuild(base).then((res) => {
         console.error(
-          chalk.green(
-            `\u2714 rebuilt ${summarize(res, target)} in ${res.durationMs.toFixed(0)}ms`
-          )
+          chalk.green(`\u2714 rebuilt ${summarize(res, target)} in ${res.durationMs.toFixed(0)}ms`)
         );
         if (opts.stats) printStats(res, opts.output);
         if (server) {
@@ -9593,9 +9904,7 @@ async function doBuild(input, opts, forceWatch = false) {
     process.on("SIGTERM", stop);
   }
 }
-buildOptions(
-  program.command("dev [input]").description("build with --watch (development mode)")
-).option("--serve", "serve the project over HTTP with live CSS hot-swap / reload").option("--port <port>", "dev server port (default 3000)").option("--host <host>", "dev server host (default 0.0.0.0)").option("--root <dir>", "directory to serve (default: current directory)").action(async (input, opts) => {
+buildOptions(program.command("dev [input]").description("build with --watch (development mode)")).option("--serve", "serve the project over HTTP with live CSS hot-swap / reload").option("--port <port>", "dev server port (default 3000)").option("--host <host>", "dev server host (default 0.0.0.0)").option("--root <dir>", "directory to serve (default: current directory)").action(async (input, opts) => {
   await doBuild(input, opts, true);
 });
 program.command("inspect").description("print the full generated CSS to stdout").option("-c, --config <path>", "path to nakshora config").action(async (opts) => {

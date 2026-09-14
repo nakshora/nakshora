@@ -29,6 +29,12 @@ export default {
 };
 ```
 
+### CSS-first configuration
+
+`@theme { --color-brand-500: #123456; }`, `@utility name { … }` and
+`@custom-variant name (…)` in your stylesheet extend this config — see
+[CSS_CONFIG.md](./CSS_CONFIG.md).
+
 ### `darkMode`
 
 `'class'` (default): `dark:` rules become `.dark\:flex:is(.dark *)`.

@@ -12,6 +12,9 @@ import {
   minifyCss,
   type GenerationOptions,
   type NakshoraConfig,
+  extractCssConfig,
+  hasCssConfig,
+  mergeCssConfig,
 } from '@nakshora/core';
 import { resolveSources } from './content';
 
@@ -72,7 +75,25 @@ const AUTHOR_RE = /@apply\b|@screen\b|\b(?:theme|screen)\(/;
 export async function runBuild(input: BuildInput): Promise<BuildResult> {
   const started = performance.now();
   const cwd = input.cwd ?? process.cwd();
-  const config = input.config;
+  // If an input file (or stdin) is given, read it first: `@theme` / `@utility` /
+  // `@custom-variant` blocks (CSS-first configuration) extend the config.
+  const absInput =
+    input.input && input.input !== '-'
+      ? isAbsolute(input.input)
+        ? input.input
+        : resolve(cwd, input.input)
+      : undefined;
+  let source: string | undefined =
+    input.inputCss ??
+    (absInput && existsSync(absInput) ? readFileSync(absInput, 'utf-8') : undefined);
+  let config = input.config;
+  let rootVars = '';
+  if (source !== undefined && hasCssConfig(source)) {
+    const extracted = extractCssConfig(source);
+    source = extracted.css;
+    rootVars = extracted.rootVars;
+    config = mergeCssConfig(config, extracted.config);
+  }
   const generator = new CSSGenerator(config);
   const { files, raw } = await resolveSources(config.content ?? config.purge, cwd);
   const hasContent = files.length + raw.length > 0;
@@ -91,16 +112,9 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     classes = countClasses(css);
   }
 
-  // If an input file (or stdin) is given, splice the generated CSS into at-rules
-  const absInput =
-    input.input && input.input !== '-'
-      ? isAbsolute(input.input)
-        ? input.input
-        : resolve(cwd, input.input)
-      : undefined;
-  if (input.inputCss !== undefined || (absInput && existsSync(absInput))) {
+  // Splice the generated CSS into the author stylesheet's at-rules
+  if (source !== undefined) {
     {
-      let source = input.inputCss ?? readFileSync(absInput as string, 'utf-8');
       // `@apply` / `theme()` / `screen()` / `@screen` in the author stylesheet
       const authorPass = AUTHOR_RE.test(source);
       if (authorPass) {
@@ -131,7 +145,11 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
           : generator.getUtilitiesFull(false);
         const out = source.replace(SOURCE_RE, () => sourceCss).replace(UTILITIES_RE, () => utilCss);
         css = input.minify ? minifyCss(out) : out;
+      } else if (rootVars) {
+        css = input.minify ? minifyCss(source) : source;
       }
+      // `@theme` variables become `:root` custom properties (Tailwind v4 semantics)
+      if (rootVars) css = (input.minify ? minifyCss(rootVars) : rootVars) + css;
     }
   }
 

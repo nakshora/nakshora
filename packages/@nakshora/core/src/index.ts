@@ -71,6 +71,8 @@ export { ContentCache, contentHash, scanSources } from './content-cache';
 export type { ContentCacheStats, ScanFs } from './content-cache';
 export type { CssNode, CssRoot, CssRule, CssDecl, CssAtRule } from './css-ast';
 export { processAuthorCss, ApplyError };
+export { extractCssConfig, mergeCssConfig, hasCssConfig, THEME_NAMESPACES } from './css-config';
+export type { CssConfigResult } from './css-config';
 export { escapeClassName, normalizeValue, coerceValue };
 export { parseColor, formatColor, withAlphaValue, withAlphaVariable };
 export type { FunctionalUtility } from './utilities';

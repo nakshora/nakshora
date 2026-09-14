@@ -34,6 +34,7 @@ const DOCS = [
   'docs/RESPONSIVE.md',
   'docs/COMPATIBILITY.md',
   'docs/CONFIGURATION.md',
+  'docs/CSS_CONFIG.md',
   'docs/JIT.md',
   'docs/THEMES.md',
   'docs/CLI.md',
