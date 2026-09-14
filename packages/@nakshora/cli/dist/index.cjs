@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,6 +17,14 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
@@ -8240,7 +8250,7 @@ function matchType(kinds) {
 // src/content.ts
 var import_node_fs = require("fs");
 var import_node_path = require("path");
-var import_globby = require("globby");
+var import_fast_glob = __toESM(require("fast-glob"), 1);
 async function resolveContent(content, cwd = process.cwd()) {
   if (!content) return [];
   const entries = Array.isArray(content) ? content : [content];
@@ -8258,7 +8268,7 @@ async function resolveContent(content, cwd = process.cwd()) {
     }
   }
   if (globs.length > 0) {
-    const files = await (0, import_globby.globby)(globs, { cwd, absolute: true });
+    const files = await (0, import_fast_glob.default)(globs, { cwd, absolute: true });
     for (const file of files) {
       try {
         raw.push((0, import_node_fs.readFileSync)(file, "utf-8"));
@@ -8282,7 +8292,7 @@ async function resolveSources(content, cwd = process.cwd()) {
       files.push((0, import_node_path.resolve)(cwd, entry));
     else raw.push(entry);
   }
-  if (globs.length > 0) files.push(...(await (0, import_globby.globby)(globs, { cwd, absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await (0, import_fast_glob.default)(globs, { cwd, absolute: true })).sort());
   return { files, raw };
 }
 
@@ -8456,7 +8466,7 @@ async function collectWatchPaths(config, input, cwd = process.cwd()) {
 // src/doctor.ts
 var import_node_fs4 = require("fs");
 var import_node_path4 = require("path");
-var import_globby2 = require("globby");
+var import_fast_glob2 = __toESM(require("fast-glob"), 1);
 
 // src/config-loader.ts
 var import_node_fs3 = require("fs");
@@ -8556,7 +8566,7 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
       let total = 0;
       for (const entry of entries) {
         if (/[*{[]/.test(entry)) {
-          const files = await (0, import_globby2.globby)(entry, { cwd: base, absolute: true });
+          const files = await (0, import_fast_glob2.default)(entry, { cwd: base, absolute: true });
           total += files.length;
           if (files.length === 0)
             push(
@@ -8653,7 +8663,7 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
       push("error", "config", `config rejected by the compiler: ${err.message}`);
     }
   }
-  const cssFiles = await (0, import_globby2.globby)(
+  const cssFiles = await (0, import_fast_glob2.default)(
     ["**/*.css", "!node_modules/**", "!dist/**", "!build/**", "!**/*.min.css"],
     {
       cwd,
@@ -8755,7 +8765,7 @@ function formatFindings(findings) {
 // src/migrate.ts
 var import_node_fs5 = require("fs");
 var import_node_path5 = require("path");
-var import_globby3 = require("globby");
+var import_fast_glob3 = __toESM(require("fast-glob"), 1);
 var V1_RENAMES = {
   "card-neon": "neon-card",
   "btn-neon": "neon-btn",
@@ -8869,7 +8879,7 @@ function migrateTailwindConfig(source) {
 }
 async function runMigrate(o) {
   const out = [];
-  const files = await (0, import_globby3.globby)(o.globs, {
+  const files = await (0, import_fast_glob3.default)(o.globs, {
     cwd: o.cwd,
     absolute: true,
     ignore: ["**/node_modules/**", "**/dist/**"]
@@ -9501,7 +9511,9 @@ data: ${data}
       });
       res.write("retry: 1000\n\n");
       clients.add(res);
-      req.on("close", () => clients.delete(res));
+      const drop = () => void clients.delete(res);
+      res.on("close", drop);
+      req.on("close", drop);
       return;
     }
     if (pathname === CLIENT_PATH) {
@@ -9573,6 +9585,7 @@ data: ${data}
           for (const c of clients) c.end();
           clients.clear();
           server.close(() => done());
+          server.closeAllConnections?.();
         })
       });
     });

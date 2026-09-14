@@ -9,7 +9,7 @@ export default defineConfig({
   target: 'es2022',
   platform: 'node',
   noExternal: [/@nakshora\/(core|postcss)/],
-  external: ['vite', 'postcss', 'globby'],
+  external: ['vite', 'postcss', 'fast-glob'],
   outExtension({ format }) {
     return { js: format === 'cjs' ? '.cjs' : '.js' };
   },

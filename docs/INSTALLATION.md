@@ -11,12 +11,12 @@ npm install -D @nakshora/vite-plugin # Vite plugin
 
 `pnpm add -D …` and `yarn add -D …` work identically.
 
-| Package                 | Size (gzip, dist) | Needs             |
-| ----------------------- | ----------------- | ----------------- |
-| `@nakshora/core`        | ~25 KB            | nothing           |
-| `@nakshora/cli`         | ~40 KB            | Node ≥ 18         |
-| `@nakshora/postcss`     | ~30 KB            | `postcss ^8.4`    |
-| `@nakshora/vite-plugin` | ~25 KB            | `vite ^5 \|\| ^6` |
+| Package                 | Size (gzip, ESM dist) | Needs                                                                 |
+| ----------------------- | --------------------- | --------------------------------------------------------------------- |
+| `@nakshora/core`        | ~71 KB                | nothing — runs in Node ≥ 18 _and_ the browser (no Node APIs)          |
+| `@nakshora/cli`         | ~78 KB                | Node ≥ 18                                                             |
+| `@nakshora/postcss`     | ~65 KB                | `postcss ^8.4`, Node ≥ 18                                             |
+| `@nakshora/vite-plugin` | ~128 KB               | `vite ^5 \|\| ^6 \|\| ^7 \|\| ^8` (Vite 7+ itself needs Node ≥ 20.19) |
 
 ## GitHub Packages
 

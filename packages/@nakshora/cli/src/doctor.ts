@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { globby } from 'globby';
+import fg from 'fast-glob';
 import {
   CSSGenerator,
   ApplyError,
@@ -88,7 +88,7 @@ export async function diagnose(
       let total = 0;
       for (const entry of entries) {
         if (/[*{[]/.test(entry)) {
-          const files = await globby(entry, { cwd: base, absolute: true });
+          const files = await fg(entry, { cwd: base, absolute: true });
           total += files.length;
           if (files.length === 0)
             push(
@@ -190,7 +190,7 @@ export async function diagnose(
   }
 
   // ── stylesheets: @nakshora at-rules and @apply that would fail ──
-  const cssFiles = await globby(
+  const cssFiles = await fg(
     ['**/*.css', '!node_modules/**', '!dist/**', '!build/**', '!**/*.min.css'],
     {
       cwd,

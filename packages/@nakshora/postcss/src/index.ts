@@ -5,7 +5,7 @@
 
 import type { AtRule, Container, Plugin, Result, Root } from 'postcss';
 import postcss from 'postcss';
-import { globby } from 'globby';
+import fg from 'fast-glob';
 import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
@@ -82,7 +82,7 @@ async function resolveCandidates(
       else raw.push(entry); // raw template string
     }
   }
-  if (globs.length > 0) files.push(...(await globby(globs, { absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await fg(globs, { absolute: true })).sort());
   return scanSources(contentCache, scanFs, files, raw);
 }
 
