@@ -92,7 +92,7 @@ function escapeClassName(className) {
 function isCSSFunction(value) {
   return CSS_FUNCTIONS.some((fn) => new RegExp(`^${fn}\\(.*\\)`).test(value));
 }
-function splitAtTopLevelOnly(input, sep) {
+function splitAtTopLevelOnly(input, sep2) {
   const parts = [];
   let depth = 0;
   let quote = null;
@@ -107,9 +107,9 @@ function splitAtTopLevelOnly(input, sep) {
     if (ch === '"' || ch === "'") quote = ch;
     else if (ch === "(" || ch === "[" || ch === "{") depth++;
     else if (ch === ")" || ch === "]" || ch === "}") depth--;
-    else if (depth === 0 && input.startsWith(sep, i)) {
+    else if (depth === 0 && input.startsWith(sep2, i)) {
       parts.push(input.slice(last, i));
-      i += sep.length - 1;
+      i += sep2.length - 1;
       last = i + 1;
     }
   }
@@ -8188,7 +8188,9 @@ var init_language_service = __esm({
         this.catalog = this.generator.getUtilities();
         this.catalogIndex = new Map(this.catalog.map((u) => [u.class, u]));
         const componentCss2 = this.generator.getComponents();
-        this.components = [...new Set([...componentCss2.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1]))].filter((c) => !this.catalogIndex.has(c)).sort();
+        this.components = [
+          ...new Set([...componentCss2.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1]))
+        ].filter((c) => !this.catalogIndex.has(c)).sort();
         this.variants = this.generator.getVariantDefinitions().map((v) => ({
           name: v.name,
           functional: v.functional === true,
@@ -8223,7 +8225,11 @@ var init_language_service = __esm({
             if (close === -1) continue;
             const body = text.slice(open + 1, close);
             for (const s of body.matchAll(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g))
-              out.push({ start: open + 1 + s.index + 1, end: open + 1 + s.index + 1 + s[2].length, kind: "call" });
+              out.push({
+                start: open + 1 + s.index + 1,
+                end: open + 1 + s.index + 1 + s[2].length,
+                kind: "call"
+              });
           }
         }
         for (const m of text.matchAll(/@apply\s+([^;{}]*)/g)) {
@@ -8240,7 +8246,12 @@ var init_language_service = __esm({
           for (const m of slice.matchAll(/\S+/g)) {
             const raw = m[0];
             if (raw.includes("${")) continue;
-            out.push({ text: raw, start: region.start + m.index, end: region.start + m.index + raw.length, region });
+            out.push({
+              text: raw,
+              start: region.start + m.index,
+              end: region.start + m.index + raw.length,
+              region
+            });
           }
         }
         return out;
@@ -8269,7 +8280,8 @@ var init_language_service = __esm({
         const range = { start: segStart + (important ? 1 : 0), end: token.end };
         if (token.region.kind !== "apply") {
           for (const v of this.variants) {
-            if (!v.name.startsWith(needle) || v.name.startsWith("@") && !needle.startsWith("@")) continue;
+            if (!v.name.startsWith(needle) || v.name.startsWith("@") && !needle.startsWith("@"))
+              continue;
             items.push({
               label: v.functional ? `${v.name}-` : `${v.name}:`,
               kind: "variant",
@@ -8302,7 +8314,8 @@ var init_language_service = __esm({
       compile(candidate) {
         const css = this.generator.compileClass(candidate);
         if (css.trim()) return css.trimEnd();
-        if (this.isComponent(candidate)) return componentRule(this.generator.getComponents(), candidate);
+        if (this.isComponent(candidate))
+          return componentRule(this.generator.getComponents(), candidate);
         return "";
       }
       diagnostics(text, languageId = "html") {
@@ -8460,11 +8473,17 @@ function startLanguageServer(options = {}) {
     if (path === configFile || !configFile && dirname5(path) === rootDir && /nakshora\.config\./.test(path))
       void loadConfig();
   });
-  documents.onDidClose((e) => void connection.sendDiagnostics({ uri: e.document.uri, diagnostics: [] }));
+  documents.onDidClose(
+    (e) => void connection.sendDiagnostics({ uri: e.document.uri, diagnostics: [] })
+  );
   connection.onCompletion((params) => {
     const doc = documents.get(params.textDocument.uri);
     if (!doc) return null;
-    const { items, incomplete } = service.complete(doc.getText(), doc.offsetAt(params.position), doc.languageId);
+    const { items, incomplete } = service.complete(
+      doc.getText(),
+      doc.offsetAt(params.position),
+      doc.languageId
+    );
     return {
       isIncomplete: incomplete,
       items: items.map((item, i) => ({
@@ -8483,7 +8502,8 @@ function startLanguageServer(options = {}) {
   connection.onCompletionResolve((item) => {
     if (item.kind === KIND.class || item.kind === KIND.component) {
       const css = service.compile(item.label);
-      if (css) item.documentation = { kind: MarkupKind.Markdown, value: "```css\n" + css + "\n```" };
+      if (css)
+        item.documentation = { kind: MarkupKind.Markdown, value: "```css\n" + css + "\n```" };
     }
     return item;
   });
@@ -8532,8 +8552,8 @@ var init_language_server = __esm({
 // src/cli.ts
 init_dist();
 import { Command } from "commander";
-import { existsSync as existsSync6, mkdirSync as mkdirSync2, readFileSync as readFileSync6, realpathSync, writeFileSync as writeFileSync3 } from "fs";
-import { dirname as dirname6, isAbsolute as isAbsolute4, join as join6, resolve as resolve6 } from "path";
+import { existsSync as existsSync7, mkdirSync as mkdirSync2, readFileSync as readFileSync6, realpathSync, writeFileSync as writeFileSync3 } from "fs";
+import { dirname as dirname6, isAbsolute as isAbsolute4, join as join7, relative as relative2, resolve as resolve7 } from "path";
 import { fileURLToPath as fileURLToPath2 } from "url";
 import chalk from "chalk";
 
@@ -8684,7 +8704,7 @@ function countClasses(css) {
   return (css.match(/\.([a-zA-Z0-9\\\-_]+)/g) ?? []).length;
 }
 function summarize(result, output) {
-  const size = output ? formatBytes(result.sizeBytes) : "stdout";
+  const size = output === "memory" ? `${formatBytes(result.sizeBytes)} in memory` : output ? formatBytes(result.sizeBytes) : "stdout";
   return `${result.classes} classes \xB7 ${size} (${formatBytes(result.minifiedSizeBytes)} min)`;
 }
 async function collectWatchPaths(config, input, cwd = process.cwd()) {
@@ -8811,11 +8831,182 @@ function createWatcher(paths, onChange) {
   };
 }
 
+// src/serve.ts
+import { createServer } from "http";
+import { createReadStream, existsSync as existsSync4, statSync as statSync4 } from "fs";
+import { extname, join as join4, normalize, relative, resolve as resolve5, sep } from "path";
+var TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".htm": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".ico": "image/x-icon",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".txt": "text/plain; charset=utf-8",
+  ".map": "application/json; charset=utf-8",
+  ".wasm": "application/wasm"
+};
+var CLIENT_PATH = "/__nakshora/client.js";
+var EVENTS_PATH = "/__nakshora/events";
+function clientScript(cssPath) {
+  return `// nakshora dev client
+(function () {
+  var css = ${JSON.stringify(cssPath)};
+  var es = new EventSource(${JSON.stringify(EVENTS_PATH)});
+  es.addEventListener('css', function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    var swapped = false;
+    for (var i = 0; i < links.length; i++) {
+      var l = links[i];
+      var href = l.getAttribute('href') || '';
+      if (href.split('?')[0] === css || href.split('?')[0].endsWith(css)) {
+        var next = l.cloneNode();
+        next.href = css + '?t=' + Date.now();
+        next.onload = function () { l.remove(); };
+        l.parentNode.insertBefore(next, l.nextSibling);
+        swapped = true;
+      }
+    }
+    if (!swapped) location.reload();
+  });
+  es.addEventListener('reload', function () { location.reload(); });
+  es.onerror = function () { setTimeout(function () { location.reload(); }, 1000); es.close(); };
+})();
+`;
+}
+function injectClient(html) {
+  const tag = `<script src="${CLIENT_PATH}"></script>`;
+  if (html.includes(CLIENT_PATH)) return html;
+  const i = html.search(/<\/body\s*>/i);
+  if (i !== -1) return `${html.slice(0, i)}${tag}
+${html.slice(i)}`;
+  const j = html.search(/<\/html\s*>/i);
+  if (j !== -1) return `${html.slice(0, j)}${tag}
+${html.slice(j)}`;
+  return `${html}
+${tag}
+`;
+}
+function startDevServer(options = {}) {
+  const root = resolve5(options.root ?? process.cwd());
+  const host = options.host ?? "0.0.0.0";
+  const cssPath = normalizeCssPath(options.cssPath ?? "/nakshora.css");
+  let css = options.css ?? "";
+  const clients = /* @__PURE__ */ new Set();
+  const broadcast = (event, data = "{}") => {
+    for (const res of clients) res.write(`event: ${event}
+data: ${data}
+
+`);
+  };
+  const server = createServer((req, res) => {
+    const url = new URL(req.url ?? "/", "http://localhost");
+    const pathname = decodeURIComponent(url.pathname);
+    if (pathname === EVENTS_PATH) {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*"
+      });
+      res.write("retry: 1000\n\n");
+      clients.add(res);
+      req.on("close", () => clients.delete(res));
+      return;
+    }
+    if (pathname === CLIENT_PATH) {
+      res.writeHead(200, { "Content-Type": TYPES[".js"], "Cache-Control": "no-cache" });
+      res.end(clientScript(cssPath));
+      return;
+    }
+    if (pathname === cssPath) {
+      res.writeHead(200, {
+        "Content-Type": TYPES[".css"],
+        "Cache-Control": "no-cache",
+        "Content-Length": Buffer.byteLength(css)
+      });
+      res.end(css);
+      return;
+    }
+    let file = normalize(join4(root, pathname));
+    const rel = relative(root, file);
+    if (rel.startsWith("..") || rel.startsWith(sep + "..")) {
+      res.writeHead(403).end("Forbidden");
+      return;
+    }
+    try {
+      if (statSync4(file).isDirectory()) file = join4(file, "index.html");
+    } catch {
+    }
+    if (!existsSync4(file) || !statSync4(file).isFile()) {
+      res.writeHead(404, { "Content-Type": TYPES[".txt"] }).end(`Not found: ${pathname}`);
+      return;
+    }
+    const type = TYPES[extname(file).toLowerCase()] ?? "application/octet-stream";
+    if (type.startsWith("text/html")) {
+      let html = "";
+      createReadStream(file, "utf-8").on("data", (chunk) => html += chunk).on("end", () => {
+        const body = injectClient(html);
+        res.writeHead(200, {
+          "Content-Type": type,
+          "Cache-Control": "no-cache",
+          "Content-Length": Buffer.byteLength(body)
+        });
+        res.end(body);
+      }).on("error", () => res.writeHead(500).end());
+      return;
+    }
+    res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-cache" });
+    createReadStream(file).pipe(res);
+  });
+  return new Promise((resolvePromise, reject) => {
+    server.once("error", reject);
+    server.listen(options.port ?? 0, host, () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : options.port ?? 0;
+      const shownHost = host === "0.0.0.0" || host === "::" ? "localhost" : host;
+      resolvePromise({
+        server,
+        port,
+        host,
+        url: `http://${shownHost}:${port}/`,
+        updateCss(next) {
+          if (next === css) return;
+          css = next;
+          broadcast("css", JSON.stringify({ bytes: Buffer.byteLength(css) }));
+        },
+        reload() {
+          broadcast("reload");
+        },
+        clients: () => clients.size,
+        close: () => new Promise((done) => {
+          for (const c of clients) c.end();
+          clients.clear();
+          server.close(() => done());
+        })
+      });
+    });
+  });
+}
+function normalizeCssPath(p) {
+  const clean = p.replace(/\\/g, "/").replace(/^\.\//, "");
+  return clean.startsWith("/") ? clean : `/${clean}`;
+}
+
 // src/doctor.ts
 init_dist();
 init_config_loader();
-import { existsSync as existsSync4, readFileSync as readFileSync4, statSync as statSync4 } from "fs";
-import { dirname as dirname4, isAbsolute as isAbsolute3, join as join4, resolve as resolve5 } from "path";
+import { existsSync as existsSync5, readFileSync as readFileSync4, statSync as statSync5 } from "fs";
+import { dirname as dirname4, isAbsolute as isAbsolute3, join as join5, resolve as resolve6 } from "path";
 import { globby as globby2 } from "globby";
 var CSS_AT_RULES = /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/g;
 async function diagnose(cwd = process.cwd(), explicitConfig) {
@@ -8827,7 +9018,7 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
   if (major >= 18) push("ok", "node", `Node ${process.version}`);
   else push("error", "node", `Node ${process.version} is too old`, "Nakshora needs Node >= 18");
   push("ok", "version", `@nakshora/core ${version}`);
-  const file = explicitConfig ? isAbsolute3(explicitConfig) ? explicitConfig : resolve5(cwd, explicitConfig) : findConfigFile(cwd);
+  const file = explicitConfig ? isAbsolute3(explicitConfig) ? explicitConfig : resolve6(cwd, explicitConfig) : findConfigFile(cwd);
   let config = null;
   if (!file) {
     push(
@@ -8836,7 +9027,7 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
       "no nakshora.config.{js,mjs,cjs,ts,json} found (walking up from the current directory)",
       "run `nakshora init`, or pass --content to build in JIT mode without a config"
     );
-  } else if (!existsSync4(file)) {
+  } else if (!existsSync5(file)) {
     push("error", "config", `config file not found: ${file}`);
   } else {
     try {
@@ -8878,7 +9069,7 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
               "this scans thousands of files on every build; narrow it"
             );
           else push("ok", "content", `${entry} \u2192 ${files.length} file(s)`);
-        } else if (existsSync4(resolve5(base, entry)) && statSync4(resolve5(base, entry)).isFile()) {
+        } else if (existsSync5(resolve6(base, entry)) && statSync5(resolve6(base, entry)).isFile()) {
           total++;
           push("ok", "content", `${entry} (file)`);
         } else {
@@ -8994,8 +9185,8 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
       }
     }
   }
-  const pkgPath = join4(cwd, "package.json");
-  if (existsSync4(pkgPath)) {
+  const pkgPath = join5(cwd, "package.json");
+  if (existsSync5(pkgPath)) {
     const pkg = JSON.parse(readFileSync4(pkgPath, "utf-8"));
     const deps = { ...pkg.dependencies, ...pkg.devDependencies };
     const has = (n) => n in deps;
@@ -9034,8 +9225,8 @@ function formatFindings(findings) {
 }
 
 // src/migrate.ts
-import { readFileSync as readFileSync5, writeFileSync as writeFileSync2, existsSync as existsSync5 } from "fs";
-import { join as join5 } from "path";
+import { readFileSync as readFileSync5, writeFileSync as writeFileSync2, existsSync as existsSync6 } from "fs";
+import { join as join6 } from "path";
 import { globby as globby3 } from "globby";
 var V1_RENAMES = {
   "card-neon": "neon-card",
@@ -9170,12 +9361,12 @@ async function runMigrate(o) {
       "tailwind.config.mjs",
       "tailwind.config.ts"
     ];
-    const found = candidates.find((c) => existsSync5(join5(o.cwd, c)));
+    const found = candidates.find((c) => existsSync6(join6(o.cwd, c)));
     if (found) {
       const ext = found.endsWith(".ts") ? ".ts" : found.endsWith(".cjs") ? ".cjs" : found.endsWith(".mjs") ? ".mjs" : ".js";
-      const to = join5(o.cwd, `nakshora.config${ext}`);
-      const res = migrateTailwindConfig(readFileSync5(join5(o.cwd, found), "utf-8"));
-      if (o.write && !existsSync5(to)) writeFileSync2(to, res.text);
+      const to = join6(o.cwd, `nakshora.config${ext}`);
+      const res = migrateTailwindConfig(readFileSync5(join6(o.cwd, found), "utf-8"));
+      if (o.write && !existsSync6(to)) writeFileSync2(to, res.text);
       config = { from: found, to: `nakshora.config${ext}`, notes: res.notes };
     }
   }
@@ -9196,7 +9387,7 @@ program.command("init").description("scaffold a nakshora.config.js and starter s
   const dir = process.cwd();
   const cfgFile = opts.json ? "nakshora.config.json" : "nakshora.config.js";
   const cssFile = "nakshora.css";
-  if ((existsSync6(join6(dir, cfgFile)) || existsSync6(join6(dir, cssFile))) && !opts.force) {
+  if ((existsSync7(join7(dir, cfgFile)) || existsSync7(join7(dir, cssFile))) && !opts.force) {
     console.error(
       chalk.red(`A Nakshora config already exists. Use ${chalk.bold("--force")} to overwrite.`)
     );
@@ -9232,9 +9423,9 @@ export default {
   plugins: [],
 };
 `;
-  writeFileSync3(join6(dir, cfgFile), configContent);
+  writeFileSync3(join7(dir, cfgFile), configContent);
   writeFileSync3(
-    join6(dir, cssFile),
+    join7(dir, cssFile),
     `/* Nakshora entry point
    Consume this file in your bundler \u2014 or run: nakshora build nakshora.css -o dist/nakshora.css --minify
    Layers: @nakshora source | base | variables | keyframes | utilities | components
@@ -9325,12 +9516,14 @@ async function doBuild(input, opts, forceWatch = false) {
     minify: opts.minify,
     mode,
     config,
-    sourceMap: opts.sourceMap
+    sourceMap: opts.sourceMap,
+    // `--serve` without `--output` keeps the stylesheet in memory (served at /nakshora.css)
+    dryRun: Boolean(opts.serve && !opts.output)
   };
   if (opts.diff) {
     const result2 = await runBuild({ ...base, dryRun: true });
-    const outPath = opts.output ? resolve6(process.cwd(), opts.output) : void 0;
-    const before = outPath && existsSync6(outPath) ? readFileSync6(outPath, "utf-8") : "";
+    const outPath = opts.output ? resolve7(process.cwd(), opts.output) : void 0;
+    const before = outPath && existsSync7(outPath) ? readFileSync6(outPath, "utf-8") : "";
     const { added, removed } = diffSelectors(before, result2.css);
     for (const r of removed) console.log(chalk.red(`- ${r}`));
     for (const a of added) console.log(chalk.green(`+ ${a}`));
@@ -9344,35 +9537,65 @@ async function doBuild(input, opts, forceWatch = false) {
   }
   const started = Date.now();
   const result = await runBuild(base);
-  const line = chalk.green(`\u2714 ${summarize(result, opts.output)} in ${Date.now() - started}ms`);
-  if (!opts.output) console.error(line);
+  const target = opts.serve && !opts.output ? "memory" : opts.output;
+  const line = chalk.green(`\u2714 ${summarize(result, target)} in ${Date.now() - started}ms`);
+  if (!opts.output || opts.serve) console.error(line);
   if (opts.stats) printStats(result, opts.output);
-  if (opts.watch || forceWatch) {
+  if (opts.watch || forceWatch || opts.serve) {
     if (input === "-") {
       console.error(chalk.red("--watch cannot be combined with stdin input"));
       process.exit(1);
     }
+    let server;
+    if (opts.serve) {
+      const root = resolve7(process.cwd(), opts.root ?? ".");
+      const cssPath = opts.output ? "/" + relative2(root, resolve7(process.cwd(), opts.output)) : "/nakshora.css";
+      if (cssPath.startsWith("/..")) {
+        console.error(chalk.red(`--output must live inside the served root (${root})`));
+        process.exit(1);
+      }
+      server = await startDevServer({
+        root,
+        port: opts.port ? Number(opts.port) : 3e3,
+        host: opts.host,
+        cssPath,
+        css: result.css
+      });
+      console.error(
+        chalk.cyan(`\u279C dev server ${server.url}`) + chalk.dim(` (serving ${root}; stylesheet at ${cssPath}, hot-swapped on rebuild)`)
+      );
+      if (!opts.output)
+        console.error(chalk.dim(`  add <link rel="stylesheet" href="${cssPath}"> to your HTML`));
+    }
     const paths = await collectWatchPaths(config, { input, config });
-    console.log(chalk.dim(`Watching ${paths.length} path(s)\u2026 press Ctrl+C to stop`));
+    console.error(chalk.dim(`Watching ${paths.length} path(s)\u2026 press Ctrl+C to stop`));
+    let lastCss = result.css;
     const watcher = createWatcher(paths, () => {
       runBuild(base).then((res) => {
         console.error(
           chalk.green(
-            `\u2714 rebuilt ${summarize(res, opts.output)} in ${res.durationMs.toFixed(0)}ms`
+            `\u2714 rebuilt ${summarize(res, target)} in ${res.durationMs.toFixed(0)}ms`
           )
         );
         if (opts.stats) printStats(res, opts.output);
+        if (server) {
+          if (res.css !== lastCss) server.updateCss(res.css);
+          else server.reload();
+        }
+        lastCss = res.css;
       }).catch((err) => console.error(chalk.red(`Build error: ${err.message}`)));
     });
-    process.on("SIGINT", () => {
+    const stop = () => {
       watcher.close();
-      process.exit(0);
-    });
+      void (server ? server.close() : Promise.resolve()).then(() => process.exit(0));
+    };
+    process.on("SIGINT", stop);
+    process.on("SIGTERM", stop);
   }
 }
 buildOptions(
   program.command("dev [input]").description("build with --watch (development mode)")
-).action(async (input, opts) => {
+).option("--serve", "serve the project over HTTP with live CSS hot-swap / reload").option("--port <port>", "dev server port (default 3000)").option("--host <host>", "dev server host (default 0.0.0.0)").option("--root <dir>", "directory to serve (default: current directory)").action(async (input, opts) => {
   await doBuild(input, opts, true);
 });
 program.command("inspect").description("print the full generated CSS to stdout").option("-c, --config <path>", "path to nakshora config").action(async (opts) => {
@@ -9392,7 +9615,7 @@ program.command("export:ai").description("export the utility corpus for AI/LLM t
     out = JSON.stringify(corpus, null, 2);
     fileName = opts.out;
   }
-  const abs = isAbsolute4(fileName) ? fileName : resolve6(process.cwd(), fileName);
+  const abs = isAbsolute4(fileName) ? fileName : resolve7(process.cwd(), fileName);
   mkdirSync2(dirname6(abs), { recursive: true });
   writeFileSync3(abs, out);
   console.log(

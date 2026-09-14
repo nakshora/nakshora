@@ -67,8 +67,26 @@ unknown class fails the build with `input.css: The \`x\` class does not exist…
 
 ### `nakshora dev [input]`
 
-Alias for `build --watch` — development mode with the same flags (minus
-`--watch`).
+`build --watch` with the same flags, plus an optional **dev server** for
+bundler-less projects:
+
+| Flag           | Default   | Meaning                                                         |
+| -------------- | --------- | --------------------------------------------------------------- |
+| `--serve`      | off       | serve `--root` over HTTP; inject a live-reload client into HTML |
+| `--port <n>`   | `3000`    |                                                                 |
+| `--host <h>`   | `0.0.0.0` | bind address (works behind containers/proxies)                  |
+| `--root <dir>` | `.`       | directory to serve                                              |
+
+```bash
+nakshora dev --serve                       # http://localhost:3000/, stylesheet at /nakshora.css (in memory)
+nakshora dev --serve -o public/app.css     # stylesheet also written; served at /public/app.css
+```
+
+On every rebuild the server pushes a Server-Sent Event: a CSS change
+hot-swaps the `<link>` without reloading; a markup change that produces the
+same CSS reloads the page. The client is ~30 lines, injected before
+`</body>`, and only talks to `/__nakshora/events`. It is a development
+convenience, not a production server (no compression, no caching, no HTTPS).
 
 ### `nakshora doctor`
 

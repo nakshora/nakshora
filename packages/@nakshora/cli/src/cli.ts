@@ -3,13 +3,14 @@
 
 import { Command } from 'commander';
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { buildAICorpus, corpusToSFT, metadata, version, type NakshoraConfig } from '@nakshora/core';
 import { runBuild, summarize, collectWatchPaths } from './build';
 import { resolveConfig } from './config-loader';
 import { createWatcher } from './watch';
+import { startDevServer, type DevServer } from './serve';
 import { diagnose, formatFindings } from './doctor';
 import { runMigrate } from './migrate';
 
@@ -128,6 +129,11 @@ interface BuildOpts {
   sourceMap?: boolean;
   stats?: boolean;
   diff?: boolean;
+  serve?: boolean;
+  port?: string;
+  host?: string;
+  root?: string;
+  open?: boolean;
 }
 
 async function readStdin(): Promise<string> {
@@ -217,6 +223,8 @@ async function doBuild(
     mode,
     config,
     sourceMap: opts.sourceMap,
+    // `--serve` without `--output` keeps the stylesheet in memory (served at /nakshora.css)
+    dryRun: Boolean(opts.serve && !opts.output),
   };
 
   if (opts.diff) {
@@ -237,41 +245,75 @@ async function doBuild(
 
   const started = Date.now();
   const result = await runBuild(base);
-  const line = chalk.green(`✔ ${summarize(result, opts.output)} in ${Date.now() - started}ms`);
-  if (!opts.output) console.error(line);
+  const target = opts.serve && !opts.output ? 'memory' : opts.output;
+  const line = chalk.green(`✔ ${summarize(result, target)} in ${Date.now() - started}ms`);
+  if (!opts.output || opts.serve) console.error(line);
   if (opts.stats) printStats(result, opts.output);
 
-  if (opts.watch || forceWatch) {
+  if (opts.watch || forceWatch || opts.serve) {
     if (input === '-') {
       console.error(chalk.red('--watch cannot be combined with stdin input'));
       process.exit(1);
     }
+    let server: DevServer | undefined;
+    if (opts.serve) {
+      const root = resolve(process.cwd(), opts.root ?? '.');
+      const cssPath = opts.output
+        ? '/' + relative(root, resolve(process.cwd(), opts.output))
+        : '/nakshora.css';
+      if (cssPath.startsWith('/..')) {
+        console.error(chalk.red(`--output must live inside the served root (${root})`));
+        process.exit(1);
+      }
+      server = await startDevServer({
+        root,
+        port: opts.port ? Number(opts.port) : 3000,
+        host: opts.host,
+        cssPath,
+        css: result.css,
+      });
+      console.error(
+        chalk.cyan(`➜ dev server ${server.url}`) +
+          chalk.dim(` (serving ${root}; stylesheet at ${cssPath}, hot-swapped on rebuild)`),
+      );
+      if (!opts.output)
+        console.error(chalk.dim(`  add <link rel="stylesheet" href="${cssPath}"> to your HTML`));
+    }
     const paths = await collectWatchPaths(config, { input, config });
-    console.log(chalk.dim(`Watching ${paths.length} path(s)… press Ctrl+C to stop`));
+    console.error(chalk.dim(`Watching ${paths.length} path(s)… press Ctrl+C to stop`));
+    let lastCss = result.css;
     const watcher = createWatcher(paths, () => {
       runBuild(base)
         .then((res) => {
           console.error(
-            chalk.green(
-              `✔ rebuilt ${summarize(res, opts.output)} in ${res.durationMs.toFixed(0)}ms`,
-            ),
+            chalk.green(`✔ rebuilt ${summarize(res, target)} in ${res.durationMs.toFixed(0)}ms`),
           );
           if (opts.stats) printStats(res, opts.output);
+          if (server) {
+            if (res.css !== lastCss) server.updateCss(res.css);
+            else server.reload();
+          }
+          lastCss = res.css;
         })
         .catch((err: Error) => console.error(chalk.red(`Build error: ${err.message}`)));
     });
-    process.on('SIGINT', () => {
+    const stop = (): void => {
       watcher.close();
-      process.exit(0);
-    });
+      void (server ? server.close() : Promise.resolve()).then(() => process.exit(0));
+    };
+    process.on('SIGINT', stop);
+    process.on('SIGTERM', stop);
   }
 }
 
-buildOptions(
-  program.command('dev [input]').description('build with --watch (development mode)'),
-).action(async (input: string | undefined, opts: BuildOpts) => {
-  await doBuild(input, opts, true);
-});
+buildOptions(program.command('dev [input]').description('build with --watch (development mode)'))
+  .option('--serve', 'serve the project over HTTP with live CSS hot-swap / reload')
+  .option('--port <port>', 'dev server port (default 3000)')
+  .option('--host <host>', 'dev server host (default 0.0.0.0)')
+  .option('--root <dir>', 'directory to serve (default: current directory)')
+  .action(async (input: string | undefined, opts: BuildOpts) => {
+    await doBuild(input, opts, true);
+  });
 
 program
   .command('inspect')

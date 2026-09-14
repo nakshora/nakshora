@@ -27,5 +27,7 @@ export type {
   LanguageServiceOptions,
 } from './language-service';
 export { startLanguageServer } from './language-server';
+export { startDevServer, injectClient, clientScript, CLIENT_PATH, EVENTS_PATH } from './serve';
+export type { DevServer, DevServerOptions } from './serve';
 export type { LspOptions } from './language-server';
 export { version } from '@nakshora/core';

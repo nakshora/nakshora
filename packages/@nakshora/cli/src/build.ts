@@ -213,8 +213,13 @@ function countClasses(css: string): number {
 /**
  * Human-readable build summary line.
  */
-export function summarize(result: BuildResult, output: string | undefined): string {
-  const size = output ? formatBytes(result.sizeBytes) : 'stdout';
+export function summarize(result: BuildResult, output: string | undefined | 'memory'): string {
+  const size =
+    output === 'memory'
+      ? `${formatBytes(result.sizeBytes)} in memory`
+      : output
+        ? formatBytes(result.sizeBytes)
+        : 'stdout';
   return `${result.classes} classes · ${size} (${formatBytes(result.minifiedSizeBytes)} min)`;
 }
 

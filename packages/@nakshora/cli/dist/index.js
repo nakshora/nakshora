@@ -711,7 +711,7 @@ var CSS_FUNCTIONS = ["min", "max", "clamp", "calc"];
 function isCSSFunction(value) {
   return CSS_FUNCTIONS.some((fn) => new RegExp(`^${fn}\\(.*\\)`).test(value));
 }
-function splitAtTopLevelOnly(input, sep) {
+function splitAtTopLevelOnly(input, sep2) {
   const parts = [];
   let depth = 0;
   let quote = null;
@@ -726,9 +726,9 @@ function splitAtTopLevelOnly(input, sep) {
     if (ch === '"' || ch === "'") quote = ch;
     else if (ch === "(" || ch === "[" || ch === "{") depth++;
     else if (ch === ")" || ch === "]" || ch === "}") depth--;
-    else if (depth === 0 && input.startsWith(sep, i)) {
+    else if (depth === 0 && input.startsWith(sep2, i)) {
       parts.push(input.slice(last, i));
-      i += sep.length - 1;
+      i += sep2.length - 1;
       last = i + 1;
     }
   }
@@ -8058,7 +8058,7 @@ function countClasses(css) {
   return (css.match(/\.([a-zA-Z0-9\\\-_]+)/g) ?? []).length;
 }
 function summarize(result, output) {
-  const size = output ? formatBytes(result.sizeBytes) : "stdout";
+  const size = output === "memory" ? `${formatBytes(result.sizeBytes)} in memory` : output ? formatBytes(result.sizeBytes) : "stdout";
   return `${result.classes} classes \xB7 ${size} (${formatBytes(result.minifiedSizeBytes)} min)`;
 }
 async function collectWatchPaths(config, input, cwd = process.cwd()) {
@@ -8644,7 +8644,9 @@ var LanguageService = class {
     this.catalog = this.generator.getUtilities();
     this.catalogIndex = new Map(this.catalog.map((u) => [u.class, u]));
     const componentCss2 = this.generator.getComponents();
-    this.components = [...new Set([...componentCss2.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1]))].filter((c) => !this.catalogIndex.has(c)).sort();
+    this.components = [
+      ...new Set([...componentCss2.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1]))
+    ].filter((c) => !this.catalogIndex.has(c)).sort();
     this.variants = this.generator.getVariantDefinitions().map((v) => ({
       name: v.name,
       functional: v.functional === true,
@@ -8679,7 +8681,11 @@ var LanguageService = class {
         if (close === -1) continue;
         const body = text.slice(open + 1, close);
         for (const s of body.matchAll(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g))
-          out.push({ start: open + 1 + s.index + 1, end: open + 1 + s.index + 1 + s[2].length, kind: "call" });
+          out.push({
+            start: open + 1 + s.index + 1,
+            end: open + 1 + s.index + 1 + s[2].length,
+            kind: "call"
+          });
       }
     }
     for (const m of text.matchAll(/@apply\s+([^;{}]*)/g)) {
@@ -8696,7 +8702,12 @@ var LanguageService = class {
       for (const m of slice.matchAll(/\S+/g)) {
         const raw = m[0];
         if (raw.includes("${")) continue;
-        out.push({ text: raw, start: region.start + m.index, end: region.start + m.index + raw.length, region });
+        out.push({
+          text: raw,
+          start: region.start + m.index,
+          end: region.start + m.index + raw.length,
+          region
+        });
       }
     }
     return out;
@@ -8725,7 +8736,8 @@ var LanguageService = class {
     const range = { start: segStart + (important ? 1 : 0), end: token.end };
     if (token.region.kind !== "apply") {
       for (const v of this.variants) {
-        if (!v.name.startsWith(needle) || v.name.startsWith("@") && !needle.startsWith("@")) continue;
+        if (!v.name.startsWith(needle) || v.name.startsWith("@") && !needle.startsWith("@"))
+          continue;
         items.push({
           label: v.functional ? `${v.name}-` : `${v.name}:`,
           kind: "variant",
@@ -8758,7 +8770,8 @@ var LanguageService = class {
   compile(candidate) {
     const css = this.generator.compileClass(candidate);
     if (css.trim()) return css.trimEnd();
-    if (this.isComponent(candidate)) return componentRule(this.generator.getComponents(), candidate);
+    if (this.isComponent(candidate))
+      return componentRule(this.generator.getComponents(), candidate);
     return "";
   }
   diagnostics(text, languageId = "html") {
@@ -8966,11 +8979,17 @@ function startLanguageServer(options = {}) {
     if (path === configFile || !configFile && dirname5(path) === rootDir && /nakshora\.config\./.test(path))
       void loadConfig();
   });
-  documents.onDidClose((e) => void connection.sendDiagnostics({ uri: e.document.uri, diagnostics: [] }));
+  documents.onDidClose(
+    (e) => void connection.sendDiagnostics({ uri: e.document.uri, diagnostics: [] })
+  );
   connection.onCompletion((params) => {
     const doc = documents.get(params.textDocument.uri);
     if (!doc) return null;
-    const { items, incomplete } = service.complete(doc.getText(), doc.offsetAt(params.position), doc.languageId);
+    const { items, incomplete } = service.complete(
+      doc.getText(),
+      doc.offsetAt(params.position),
+      doc.languageId
+    );
     return {
       isIncomplete: incomplete,
       items: items.map((item, i) => ({
@@ -8989,7 +9008,8 @@ function startLanguageServer(options = {}) {
   connection.onCompletionResolve((item) => {
     if (item.kind === KIND.class || item.kind === KIND.component) {
       const css = service.compile(item.label);
-      if (css) item.documentation = { kind: MarkupKind.Markdown, value: "```css\n" + css + "\n```" };
+      if (css)
+        item.documentation = { kind: MarkupKind.Markdown, value: "```css\n" + css + "\n```" };
     }
     return item;
   });
@@ -9016,10 +9036,184 @@ function startLanguageServer(options = {}) {
   connection.listen();
   return connection;
 }
+
+// src/serve.ts
+import { createServer } from "http";
+import { createReadStream, existsSync as existsSync6, statSync as statSync5 } from "fs";
+import { extname, join as join6, normalize, relative, resolve as resolve6, sep } from "path";
+var TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".htm": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".ico": "image/x-icon",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".txt": "text/plain; charset=utf-8",
+  ".map": "application/json; charset=utf-8",
+  ".wasm": "application/wasm"
+};
+var CLIENT_PATH = "/__nakshora/client.js";
+var EVENTS_PATH = "/__nakshora/events";
+function clientScript(cssPath) {
+  return `// nakshora dev client
+(function () {
+  var css = ${JSON.stringify(cssPath)};
+  var es = new EventSource(${JSON.stringify(EVENTS_PATH)});
+  es.addEventListener('css', function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    var swapped = false;
+    for (var i = 0; i < links.length; i++) {
+      var l = links[i];
+      var href = l.getAttribute('href') || '';
+      if (href.split('?')[0] === css || href.split('?')[0].endsWith(css)) {
+        var next = l.cloneNode();
+        next.href = css + '?t=' + Date.now();
+        next.onload = function () { l.remove(); };
+        l.parentNode.insertBefore(next, l.nextSibling);
+        swapped = true;
+      }
+    }
+    if (!swapped) location.reload();
+  });
+  es.addEventListener('reload', function () { location.reload(); });
+  es.onerror = function () { setTimeout(function () { location.reload(); }, 1000); es.close(); };
+})();
+`;
+}
+function injectClient(html) {
+  const tag = `<script src="${CLIENT_PATH}"></script>`;
+  if (html.includes(CLIENT_PATH)) return html;
+  const i = html.search(/<\/body\s*>/i);
+  if (i !== -1) return `${html.slice(0, i)}${tag}
+${html.slice(i)}`;
+  const j = html.search(/<\/html\s*>/i);
+  if (j !== -1) return `${html.slice(0, j)}${tag}
+${html.slice(j)}`;
+  return `${html}
+${tag}
+`;
+}
+function startDevServer(options = {}) {
+  const root = resolve6(options.root ?? process.cwd());
+  const host = options.host ?? "0.0.0.0";
+  const cssPath = normalizeCssPath(options.cssPath ?? "/nakshora.css");
+  let css = options.css ?? "";
+  const clients = /* @__PURE__ */ new Set();
+  const broadcast = (event, data = "{}") => {
+    for (const res of clients) res.write(`event: ${event}
+data: ${data}
+
+`);
+  };
+  const server = createServer((req, res) => {
+    const url = new URL(req.url ?? "/", "http://localhost");
+    const pathname = decodeURIComponent(url.pathname);
+    if (pathname === EVENTS_PATH) {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*"
+      });
+      res.write("retry: 1000\n\n");
+      clients.add(res);
+      req.on("close", () => clients.delete(res));
+      return;
+    }
+    if (pathname === CLIENT_PATH) {
+      res.writeHead(200, { "Content-Type": TYPES[".js"], "Cache-Control": "no-cache" });
+      res.end(clientScript(cssPath));
+      return;
+    }
+    if (pathname === cssPath) {
+      res.writeHead(200, {
+        "Content-Type": TYPES[".css"],
+        "Cache-Control": "no-cache",
+        "Content-Length": Buffer.byteLength(css)
+      });
+      res.end(css);
+      return;
+    }
+    let file = normalize(join6(root, pathname));
+    const rel = relative(root, file);
+    if (rel.startsWith("..") || rel.startsWith(sep + "..")) {
+      res.writeHead(403).end("Forbidden");
+      return;
+    }
+    try {
+      if (statSync5(file).isDirectory()) file = join6(file, "index.html");
+    } catch {
+    }
+    if (!existsSync6(file) || !statSync5(file).isFile()) {
+      res.writeHead(404, { "Content-Type": TYPES[".txt"] }).end(`Not found: ${pathname}`);
+      return;
+    }
+    const type = TYPES[extname(file).toLowerCase()] ?? "application/octet-stream";
+    if (type.startsWith("text/html")) {
+      let html = "";
+      createReadStream(file, "utf-8").on("data", (chunk) => html += chunk).on("end", () => {
+        const body = injectClient(html);
+        res.writeHead(200, {
+          "Content-Type": type,
+          "Cache-Control": "no-cache",
+          "Content-Length": Buffer.byteLength(body)
+        });
+        res.end(body);
+      }).on("error", () => res.writeHead(500).end());
+      return;
+    }
+    res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-cache" });
+    createReadStream(file).pipe(res);
+  });
+  return new Promise((resolvePromise, reject) => {
+    server.once("error", reject);
+    server.listen(options.port ?? 0, host, () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : options.port ?? 0;
+      const shownHost = host === "0.0.0.0" || host === "::" ? "localhost" : host;
+      resolvePromise({
+        server,
+        port,
+        host,
+        url: `http://${shownHost}:${port}/`,
+        updateCss(next) {
+          if (next === css) return;
+          css = next;
+          broadcast("css", JSON.stringify({ bytes: Buffer.byteLength(css) }));
+        },
+        reload() {
+          broadcast("reload");
+        },
+        clients: () => clients.size,
+        close: () => new Promise((done) => {
+          for (const c of clients) c.end();
+          clients.clear();
+          server.close(() => done());
+        })
+      });
+    });
+  });
+}
+function normalizeCssPath(p) {
+  const clean = p.replace(/\\/g, "/").replace(/^\.\//, "");
+  return clean.startsWith("/") ? clean : `/${clean}`;
+}
 export {
+  CLIENT_PATH,
+  EVENTS_PATH,
   LanguageService,
   TAILWIND_RENAMES,
   V1_RENAMES,
+  clientScript,
   collectWatchPaths,
   createWatcher,
   diagnose,
@@ -9027,6 +9221,7 @@ export {
   findConfigFile,
   formatFindings,
   generatedSourceMap,
+  injectClient,
   loadConfigFile,
   migrateSource,
   migrateTailwindConfig,
@@ -9035,6 +9230,7 @@ export {
   resolveSources,
   runBuild,
   runMigrate,
+  startDevServer,
   startLanguageServer,
   summarize,
   version

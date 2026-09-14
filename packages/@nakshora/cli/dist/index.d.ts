@@ -1,6 +1,7 @@
 import { NakshoraConfig } from '@nakshora/core';
 export { version } from '@nakshora/core';
 import { Connection } from 'vscode-languageserver/node';
+import { Server } from 'node:http';
 
 interface BuildInput {
     /** Explicit input CSS file (may contain `@nakshora source` / `@nakshora utilities`); `-` = stdin */
@@ -53,7 +54,7 @@ declare function generatedSourceMap(css: string, file: string, inputFile?: strin
 /**
  * Human-readable build summary line.
  */
-declare function summarize(result: BuildResult, output: string | undefined): string;
+declare function summarize(result: BuildResult, output: string | undefined | 'memory'): string;
 /**
  * Collect all file paths a build depends on (for watching).
  */
@@ -252,4 +253,34 @@ interface LspOptions {
 }
 declare function startLanguageServer(options?: LspOptions): Connection;
 
-export { type BuildInput, type BuildResult, type ColorInformation, type CompletionItem, type Diagnostic, type Finding, type Hover, LanguageService, type LanguageServiceOptions, type Level, type LspOptions, type MigrateResult, type MigrateRunOptions, type Region, TAILWIND_RENAMES, type Token, V1_RENAMES, type WatcherHandle, collectWatchPaths, createWatcher, diagnose, extractColor, findConfigFile, formatFindings, generatedSourceMap, loadConfigFile, migrateSource, migrateTailwindConfig, resolveConfig, resolveContent, resolveSources, runBuild, runMigrate, startLanguageServer, summarize };
+interface DevServerOptions {
+    /** directory to serve (default: process.cwd()) */
+    root?: string;
+    port?: number;
+    host?: string;
+    /** URL path of the stylesheet (default `/nakshora.css`) */
+    cssPath?: string;
+    /** initial stylesheet */
+    css?: string;
+}
+interface DevServer {
+    server: Server;
+    port: number;
+    host: string;
+    url: string;
+    /** publish a new stylesheet — connected clients hot-swap it */
+    updateCss(css: string): void;
+    /** ask connected clients to reload the page */
+    reload(): void;
+    /** number of connected clients */
+    clients(): number;
+    close(): Promise<void>;
+}
+declare const CLIENT_PATH = "/__nakshora/client.js";
+declare const EVENTS_PATH = "/__nakshora/events";
+/** Browser client (kept dependency-free and tiny). */
+declare function clientScript(cssPath: string): string;
+declare function injectClient(html: string): string;
+declare function startDevServer(options?: DevServerOptions): Promise<DevServer>;
+
+export { type BuildInput, type BuildResult, CLIENT_PATH, type ColorInformation, type CompletionItem, type DevServer, type DevServerOptions, type Diagnostic, EVENTS_PATH, type Finding, type Hover, LanguageService, type LanguageServiceOptions, type Level, type LspOptions, type MigrateResult, type MigrateRunOptions, type Region, TAILWIND_RENAMES, type Token, V1_RENAMES, type WatcherHandle, clientScript, collectWatchPaths, createWatcher, diagnose, extractColor, findConfigFile, formatFindings, generatedSourceMap, injectClient, loadConfigFile, migrateSource, migrateTailwindConfig, resolveConfig, resolveContent, resolveSources, runBuild, runMigrate, startDevServer, startLanguageServer, summarize };
