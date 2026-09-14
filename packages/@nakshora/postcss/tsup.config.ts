@@ -6,7 +6,7 @@ const shared = {
   target: 'es2022',
   platform: 'node',
   noExternal: [/@nakshora\/core/],
-  external: ['postcss', 'globby'],
+  external: ['postcss', 'fast-glob'],
 } as const;
 
 export default defineConfig([

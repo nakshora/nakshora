@@ -2,7 +2,7 @@
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { globby } from 'globby';
+import fg from 'fast-glob';
 
 // Resolve JIT content sources.
 // Each entry is either:
@@ -31,7 +31,7 @@ export async function resolveContent(
   }
 
   if (globs.length > 0) {
-    const files = await globby(globs, { cwd, absolute: true });
+    const files = await fg(globs, { cwd, absolute: true });
     for (const file of files) {
       try {
         raw.push(readFileSync(file, 'utf-8'));
@@ -64,6 +64,6 @@ export async function resolveSources(
       files.push(resolve(cwd, entry));
     else raw.push(entry);
   }
-  if (globs.length > 0) files.push(...(await globby(globs, { cwd, absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await fg(globs, { cwd, absolute: true })).sort());
   return { files, raw };
 }

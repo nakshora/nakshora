@@ -125,7 +125,11 @@ export function startDevServer(options: DevServerOptions = {}): Promise<DevServe
       });
       res.write('retry: 1000\n\n');
       clients.add(res);
-      req.on('close', () => clients.delete(res));
+      // `res` 'close' fires when the connection drops while the stream is still
+      // open (Node 18 does not emit 'close' on `req` for an aborted SSE GET).
+      const drop = (): void => void clients.delete(res);
+      res.on('close', drop);
+      req.on('close', drop);
       return;
     }
     if (pathname === CLIENT_PATH) {
@@ -205,6 +209,10 @@ export function startDevServer(options: DevServerOptions = {}): Promise<DevServe
             for (const c of clients) c.end();
             clients.clear();
             server.close(() => done());
+            // `server.close()` only stops accepting; keep-alive sockets from
+            // browsers / fetch would otherwise hold the process open (Node 18
+            // waits for them indefinitely — observed in CI).
+            server.closeAllConnections?.();
           }),
       });
     });

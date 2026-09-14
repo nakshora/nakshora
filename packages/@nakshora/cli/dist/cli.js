@@ -8863,7 +8863,7 @@ import { basename, dirname, isAbsolute, join, resolve as resolve2 } from "path";
 // src/content.ts
 import { existsSync, readFileSync, statSync } from "fs";
 import { resolve } from "path";
-import { globby } from "globby";
+import fg from "fast-glob";
 async function resolveSources(content, cwd = process.cwd()) {
   if (!content) return { files: [], raw: [] };
   const entries = Array.isArray(content) ? content : [content];
@@ -8877,7 +8877,7 @@ async function resolveSources(content, cwd = process.cwd()) {
       files.push(resolve(cwd, entry));
     else raw.push(entry);
   }
-  if (globs.length > 0) files.push(...(await globby(globs, { cwd, absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await fg(globs, { cwd, absolute: true })).sort());
   return { files, raw };
 }
 
@@ -9228,7 +9228,9 @@ data: ${data}
       });
       res.write("retry: 1000\n\n");
       clients.add(res);
-      req.on("close", () => clients.delete(res));
+      const drop = () => void clients.delete(res);
+      res.on("close", drop);
+      req.on("close", drop);
       return;
     }
     if (pathname === CLIENT_PATH) {
@@ -9300,6 +9302,7 @@ data: ${data}
           for (const c of clients) c.end();
           clients.clear();
           server.close(() => done());
+          server.closeAllConnections?.();
         })
       });
     });
@@ -9315,7 +9318,7 @@ init_dist();
 init_config_loader();
 import { existsSync as existsSync5, readFileSync as readFileSync4, statSync as statSync5 } from "fs";
 import { dirname as dirname4, isAbsolute as isAbsolute3, join as join5, resolve as resolve6 } from "path";
-import { globby as globby2 } from "globby";
+import fg2 from "fast-glob";
 var CSS_AT_RULES = /@nakshora\s+(source|utilities|utils|base|variables|vars|keyframes|components)\s*;?/;
 async function diagnose(cwd = process.cwd(), explicitConfig) {
   const findings = [];
@@ -9360,7 +9363,7 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
       let total = 0;
       for (const entry of entries) {
         if (/[*{[]/.test(entry)) {
-          const files = await globby2(entry, { cwd: base, absolute: true });
+          const files = await fg2(entry, { cwd: base, absolute: true });
           total += files.length;
           if (files.length === 0)
             push(
@@ -9457,7 +9460,7 @@ async function diagnose(cwd = process.cwd(), explicitConfig) {
       push("error", "config", `config rejected by the compiler: ${err.message}`);
     }
   }
-  const cssFiles = await globby2(
+  const cssFiles = await fg2(
     ["**/*.css", "!node_modules/**", "!dist/**", "!build/**", "!**/*.min.css"],
     {
       cwd,
@@ -9559,7 +9562,7 @@ function formatFindings(findings) {
 // src/migrate.ts
 import { readFileSync as readFileSync5, writeFileSync as writeFileSync2, existsSync as existsSync6 } from "fs";
 import { join as join6 } from "path";
-import { globby as globby3 } from "globby";
+import fg3 from "fast-glob";
 var V1_RENAMES = {
   "card-neon": "neon-card",
   "btn-neon": "neon-btn",
@@ -9673,7 +9676,7 @@ function migrateTailwindConfig(source) {
 }
 async function runMigrate(o) {
   const out = [];
-  const files = await globby3(o.globs, {
+  const files = await fg3(o.globs, {
     cwd: o.cwd,
     absolute: true,
     ignore: ["**/node_modules/**", "**/dist/**"]

@@ -20,11 +20,20 @@ type ViteModule = {
 };
 type PluginFactory = (o: Record<string, unknown>) => unknown;
 
+// Vite 7+ requires Node ^20.19 || >=22.12 (its own `engines`); on older
+// runtimes those majors are skipped — the plugin itself supports Node >=18.
+const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
+const modernNode =
+  nodeMajor > 22 || (nodeMajor === 22 && nodeMinor >= 12) || (nodeMajor === 20 && nodeMinor >= 19);
 const VITES: Array<[string, string]> = [
   ['vite', '5'],
   ['vite6', '6'],
-  ['vite7', '7'],
-  ['vite8', '8'],
+  ...(modernNode
+    ? ([
+        ['vite7', '7'],
+        ['vite8', '8'],
+      ] as Array<[string, string]>)
+    : []),
 ];
 
 function scaffold(): string {

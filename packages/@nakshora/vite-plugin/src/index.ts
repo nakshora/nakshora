@@ -7,7 +7,7 @@
 import type { Plugin as VitePlugin } from 'vite';
 import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { globby } from 'globby';
+import fg from 'fast-glob';
 import {
   CSSGenerator,
   ContentCache,
@@ -70,7 +70,7 @@ async function resolveCandidates(
       else raw.push(entry);
     }
   }
-  if (globs.length > 0) files.push(...(await globby(globs, { cwd: root, absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await fg(globs, { cwd: root, absolute: true })).sort());
   return scanSources(contentCache, scanFs, files, raw);
 }
 

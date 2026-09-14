@@ -1,7 +1,7 @@
 // src/index.ts
 import { readFileSync as readFileSync2, statSync as statSync3 } from "fs";
 import { resolve as resolve3 } from "path";
-import { globby as globby2 } from "globby";
+import fg2 from "fast-glob";
 
 // ../core/dist/index.js
 var defaultColors = {
@@ -7911,7 +7911,7 @@ function scanSources(cache22, fs, files, raw = []) {
 
 // ../postcss/dist/index.js
 import postcss from "postcss";
-import { globby } from "globby";
+import fg from "fast-glob";
 import { readFileSync, statSync } from "fs";
 import { resolve } from "path";
 var defaultColors2 = {
@@ -16120,7 +16120,7 @@ async function resolveCandidates(content, baseDir) {
       else raw.push(entry);
     }
   }
-  if (globs.length > 0) files.push(...(await globby(globs, { absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await fg(globs, { absolute: true })).sort());
   return scanSources2(contentCache, scanFs, files, raw);
 }
 function layerCss(layer, generator) {
@@ -16356,7 +16356,7 @@ async function resolveCandidates2(content, root) {
       else raw.push(entry);
     }
   }
-  if (globs.length > 0) files.push(...(await globby2(globs, { cwd: root, absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await fg2(globs, { cwd: root, absolute: true })).sort());
   return scanSources(contentCache2, scanFs2, files, raw);
 }
 function nakshora2(options = {}) {

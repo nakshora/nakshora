@@ -1,6 +1,6 @@
 // src/index.ts
 import postcss from "postcss";
-import { globby } from "globby";
+import fg from "fast-glob";
 import { readFileSync, statSync } from "fs";
 import { resolve } from "path";
 
@@ -8213,7 +8213,7 @@ async function resolveCandidates(content, baseDir) {
       else raw.push(entry);
     }
   }
-  if (globs.length > 0) files.push(...(await globby(globs, { absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await fg(globs, { absolute: true })).sort());
   return scanSources(contentCache, scanFs, files, raw);
 }
 function layerCss(layer, generator) {

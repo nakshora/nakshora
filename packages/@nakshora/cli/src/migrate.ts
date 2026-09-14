@@ -7,7 +7,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { globby } from 'globby';
+import fg from 'fast-glob';
 
 /** Nakshora v1 (static CSS) → v3 class renames. */
 export const V1_RENAMES: Record<string, string> = {
@@ -165,7 +165,7 @@ export async function runMigrate(o: MigrateRunOptions): Promise<{
   config?: { from: string; to: string; notes: string[] };
 }> {
   const out: { file: string; changes: MigrateResult['changes'] }[] = [];
-  const files = await globby(o.globs, {
+  const files = await fg(o.globs, {
     cwd: o.cwd,
     absolute: true,
     ignore: ['**/node_modules/**', '**/dist/**'],

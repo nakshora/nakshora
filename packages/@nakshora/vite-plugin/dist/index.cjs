@@ -36,7 +36,7 @@ __export(src_exports, {
 module.exports = __toCommonJS(src_exports);
 var import_node_fs2 = require("fs");
 var import_node_path2 = require("path");
-var import_globby2 = require("globby");
+var import_fast_glob2 = __toESM(require("fast-glob"), 1);
 
 // ../core/dist/index.js
 var defaultColors = {
@@ -7946,7 +7946,7 @@ function scanSources(cache22, fs, files, raw = []) {
 
 // ../postcss/dist/index.js
 var import_postcss = __toESM(require("postcss"), 1);
-var import_globby = require("globby");
+var import_fast_glob = __toESM(require("fast-glob"), 1);
 var import_fs = require("fs");
 var import_path = require("path");
 var defaultColors2 = {
@@ -16155,7 +16155,7 @@ async function resolveCandidates(content, baseDir) {
       else raw.push(entry);
     }
   }
-  if (globs.length > 0) files.push(...(await (0, import_globby.globby)(globs, { absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await (0, import_fast_glob.default)(globs, { absolute: true })).sort());
   return scanSources2(contentCache, scanFs, files, raw);
 }
 function layerCss(layer, generator) {
@@ -16391,7 +16391,7 @@ async function resolveCandidates2(content, root) {
       else raw.push(entry);
     }
   }
-  if (globs.length > 0) files.push(...(await (0, import_globby2.globby)(globs, { cwd: root, absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await (0, import_fast_glob2.default)(globs, { cwd: root, absolute: true })).sort());
   return scanSources(contentCache2, scanFs2, files, raw);
 }
 function nakshora2(options = {}) {

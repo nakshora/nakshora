@@ -37,7 +37,7 @@ __export(src_exports, {
 });
 module.exports = __toCommonJS(src_exports);
 var import_postcss = __toESM(require("postcss"), 1);
-var import_globby = require("globby");
+var import_fast_glob = __toESM(require("fast-glob"), 1);
 var import_node_fs = require("fs");
 var import_node_path = require("path");
 
@@ -8250,7 +8250,7 @@ async function resolveCandidates(content, baseDir) {
       else raw.push(entry);
     }
   }
-  if (globs.length > 0) files.push(...(await (0, import_globby.globby)(globs, { absolute: true })).sort());
+  if (globs.length > 0) files.push(...(await (0, import_fast_glob.default)(globs, { absolute: true })).sort());
   return scanSources(contentCache, scanFs, files, raw);
 }
 function layerCss(layer, generator) {
