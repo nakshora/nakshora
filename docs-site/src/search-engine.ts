@@ -140,9 +140,17 @@ export function queryIndex(index: SearchIndex, version: string, rawQuery: string
   for (const [docIdx, score] of scores) {
     const doc = index.docs[docIdx];
     let sc = score;
+    const SECTION_PRIOR: Record<string, number> = {
+      utilities: 4, colors: 2.5, components: 2, variants: 1.5, responsive: 1.5,
+      glossary: 1, faq: 0.5, spotlight: -0.5, tags: -2.5
+    };
+    sc += SECTION_PRIOR[doc.sec] ?? 0;
     const titleLower = doc.t.toLowerCase();
     if (raw.length > 3 && titleLower.includes(raw)) sc += 14;
-    for (const token of tokens) if (titleLower.includes(token)) sc += 2.2;
+    for (const token of tokens) {
+      if (titleLower.startsWith(token)) sc += 3.2;
+      else if (titleLower.includes(token)) sc += 2.2;
+    }
     sc *= 0.75 + 0.5 * (doc.p / 100);
     hits.push({
       slug: doc.s,
