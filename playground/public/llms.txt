@@ -1,0 +1,16 @@
+# Nakshora CSS Playground
+
+> play.nakshora.bsdc.info.bd — the most advanced playground for the Nakshora CSS framework v3.1. The real JIT compiler runs 100% in the browser: type utility classes, get exact CSS in milliseconds. 100+ templates, device lab (200–5000 px), sharing via compressed URLs. Free on Cloudflare Pages. By Rizwan Rahim Chowdhury, RRC Development. MIT.
+
+## Routes
+- / — Overview, engine counts, feature registry
+- /playground/ — Live editor + preview (SPA)
+- /templates/ — 100+ ready-made v3.1 templates
+- /features/ — 500+ counted real-time features
+- /about/ — Framework, author, contacts
+
+## Facts
+- Nakshora v3.1.0: 11,417 utilities · 155 variants · 10 breakpoints (200–5000 px) · 22 palettes × 11 shades · zero-runtime, Tailwind 3.4 byte-parity
+- Playground compiles client-side; state is shared deflate-compressed in the URL hash (#s=)
+- Docs: https://docs.nakshora.bsdc.info.bd/ (9,400 pages, v1.0–v3.1)
+- Source: https://github.com/nakshora/nakshora

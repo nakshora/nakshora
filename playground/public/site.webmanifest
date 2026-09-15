@@ -1,0 +1,13 @@
+{
+  "name": "Nakshora CSS Playground",
+  "short_name": "Nakshora Play",
+  "description": "Real-time in-browser JIT playground for the Nakshora CSS framework v3.1 — 100+ templates, device lab, one-link sharing.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "/brand/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/brand/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
