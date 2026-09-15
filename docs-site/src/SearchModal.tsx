@@ -5,10 +5,11 @@ interface Props {
   versions: string[];
   current: string;
   open: boolean;
+  initialQuery?: string;
   onClose: () => void;
 }
 
-export default function SearchModal({ versions, current, open, onClose }: Props) {
+export default function SearchModal({ versions, current, open, initialQuery, onClose }: Props) {
   const [query, setQuery] = useState('');
   const [scope, setScope] = useState<string>('all');
   const [hits, setHits] = useState<SearchHit[]>([]);
@@ -39,15 +40,21 @@ export default function SearchModal({ versions, current, open, onClose }: Props)
     [versions, current]
   );
 
+  const seeded = useRef(false);
   useEffect(() => {
     if (open) {
-      setQuery('');
+      if (!seeded.current && initialQuery) {
+        setQuery(initialQuery);
+        seeded.current = true;
+      } else {
+        setQuery('');
+      }
       setHits([]);
       setSuggestions([]);
       setScope('all');
       window.setTimeout(() => inputRef.current?.focus(), 30);
     }
-  }, [open]);
+  }, [open, initialQuery]);
 
   useEffect(() => {
     const t = window.setTimeout(() => runSearch(query, scope), 120);

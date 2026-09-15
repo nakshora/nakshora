@@ -115,7 +115,7 @@ function setSearchOpen(open: boolean) {
   searchStateListeners.forEach((fn) => fn(open));
 }
 
-function SearchIsland({ versions, current }: { versions: string[]; current: string }) {
+function SearchIsland({ versions, current, initialQuery }: { versions: string[]; current: string; initialQuery: string }) {
   const [open, setOpen] = useState(searchOpen);
   useEffect(() => {
     const fn = (o: boolean) => setOpen(o);
@@ -124,19 +124,24 @@ function SearchIsland({ versions, current }: { versions: string[]; current: stri
       searchStateListeners.delete(fn);
     };
   }, []);
-  return <SearchModal versions={versions} current={current} open={open} onClose={() => setSearchOpen(false)} />;
+  return (
+    <SearchModal versions={versions} current={current} open={open} initialQuery={initialQuery} onClose={() => setSearchOpen(false)} />
+  );
 }
 
 function initSearch() {
+  // WebSite SearchAction deep link: /?q=… opens the modal pre-filled.
+  const q = new URLSearchParams(window.location.search).get('q') || '';
   document.querySelectorAll<HTMLElement>('[data-island="search"]').forEach((el) => {
     const versions = (el.dataset.versions || '').split(',').filter(Boolean);
     const current = el.dataset.current || versions[versions.length - 1] || 'v3.1';
     createRoot(el).render(
       <StrictMode>
-        <SearchIsland versions={versions} current={current} />
+        <SearchIsland versions={versions} current={current} initialQuery={q} />
       </StrictMode>
     );
   });
+  if (q) setSearchOpen(true);
 
   document.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;

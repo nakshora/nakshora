@@ -565,7 +565,7 @@ const V1_EXTRA = [
   ['v1-accessibility', 'Accessibility in the frozen era', 'What v1 got right and what modern releases improved.', 'v1 shipped sr-only, focus-visible-friendly components and semantic HTML patterns in its examples; v3 formalized a11y guidance across the docs.', '<a class="btn-neon" href="#main">Skip patterns were documented early</a>'],
   ['v1-performance', 'Serving the frozen file fast', 'Caching, compression and delivery for a 1MB immutable stylesheet.', 'The v1 file is immutable by definition — cache it with max-age=31536000. jsDelivr serves brotli; self-hosters can precompress.', '<link rel="preload" as="style" href="v1.0.0.css" />\n<!-- Cache-Control: public, max-age=31536000, immutable -->'],
   ['v1-to-tokens', 'Reading v1 as tokens', 'The frozen sheet is a token library in disguise.', 'Every v1 palette/shade is a CSS variable; every spacing step a --space-* var. Treating v1 as tokens makes customization systematic.', ':root { --neon-cyan-500: hsl(190 100% 60%); }'],
-  ['v1-design-ethos', 'The v1 design ethos', 'Stars, glow and Bangladeshi identity in a 2024 stylesheet.', 'Nakshora (নক্ষত্র, "star") began as a love letter to glowing night skies: dark canvases, neon accents, generous glass. The name is the design brief.']
+  ['v1-design-ethos', 'The v1 design ethos', 'Stars, glow and Bangladeshi identity in a 2024 stylesheet.', 'Nakshora (নক্ষত্র, "star") began as a love letter to glowing night skies: dark canvases, neon accents, generous glass. The name is the design brief.', '<body class="bg-mono-900 text-mono-100">\n  <h1 class="gradient-neon text-4 font-black">নক্ষত্র</h1>\n  <div class="card-glass p-8">A star, rendered in CSS.</div>\n</body>']
 ];
 
 const V2_EXTRA = [
