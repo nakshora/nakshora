@@ -23,11 +23,12 @@
   "scripts": {
     "generate": "node scripts/generate-content.mjs",
     "brand": "node scripts/brand.mjs",
+    "images": "node scripts/build-images.mjs",
     "prebuild:vite": "node scripts/ensure-deps.mjs",
     "build:vite": "vite build",
     "prerender": "node scripts/prerender.mjs",
     "postbuild": "node scripts/postbuild.mjs",
-    "build": "npm run generate && npm run brand && npm run build:vite && npm run prerender && npm run postbuild",
+    "build": "npm run generate && npm run brand && npm run images && npm run build:vite && npm run prerender && npm run postbuild",
     "dev": "npm run generate && vite",
     "preview": "vite preview --host 0.0.0.0 --port 4173"
   },

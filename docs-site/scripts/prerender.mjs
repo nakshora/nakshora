@@ -21,6 +21,8 @@ const site = JSON.parse(fs.readFileSync(path.join(DATA, 'site.json'), 'utf8'));
 const VERSIONS = site.versions;
 const versionIds = VERSIONS.map((v) => v.id);
 const core = JSON.parse(fs.readFileSync(path.join(DATA, 'content/core.json'), 'utf8')).articles;
+let IMG = {};
+try { IMG = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/img/manifest.json'), 'utf8')); } catch { IMG = {}; }
 const content = {};
 for (const v of VERSIONS) {
   const raw = JSON.parse(fs.readFileSync(path.join(DATA, 'content', `${v.id}.json`), 'utf8'));
@@ -63,8 +65,8 @@ function orgLd() {
     name: SITE.company,
     url: SITE.companyUrl,
     email: SITE.companyEmail,
-    founder: { '@type': 'Person', name: SITE.owner, email: SITE.ownerEmail },
-    logo: `${HOST}/android-chrome-512.png`
+    founder: { '@type': 'Person', name: SITE.owner, email: SITE.ownerEmail, sameAs: [SITE.portfolio], knowsAbout: ['CSS frameworks', 'SEO architecture', 'full-stack engineering'] },
+    logo: `${HOST}/brand/android-chrome-512x512.png`
   };
 }
 function articleLd(a, vid, canonical) {
@@ -79,6 +81,7 @@ function articleLd(a, vid, canonical) {
     inLanguage: 'en',
     articleSection: a.section,
     keywords: (a.keywords || []).join(', '),
+    image: a.image ? HOST + a.image : `${HOST}/og.png`,
     dateModified: a.updated,
     author: { '@type': 'Person', name: SITE.owner, email: SITE.ownerEmail },
     publisher: orgLd(),
@@ -117,7 +120,7 @@ function websiteLd() {
 }
 
 // ------------------------------------------------------------------ chrome
-function headHtml({ title, description, canonicalPath, ogImage, noindex, extraLd }) {
+function headHtml({ title, description, canonicalPath, ogImage, ogW, ogH, noindex, extraLd }) {
   const canonical = HOST + canonicalPath;
   const og = ogImage || '/og.png';
   return `<!doctype html>
@@ -130,9 +133,10 @@ function headHtml({ title, description, canonicalPath, ogImage, noindex, extraLd
 <link rel="canonical" href="${canonical}">
 ${noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}<meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#0d1026">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/brand/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/brand/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:site_name" content="${esc(SITE.name)}">
 <meta property="og:type" content="article">
@@ -140,12 +144,12 @@ ${noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}<meta name="
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${HOST}${og}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="${ogW || 1200}">
+<meta property="og:image:height" content="${ogH || 630}">
+<meta name="twitter:image" content="${HOST}${og}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
-<meta name="twitter:image" content="${HOST}${og}">
 ${CSS.map((c) => `<link rel="stylesheet" href="${c}">`).join('\n')}
 <script type="module" src="${JS}" defer></script>
 ${(extraLd || []).join('\n')}
@@ -173,6 +177,13 @@ function sidebarHtml(vid, currentSlug) {
           <li><a href="/">Home</a></li>
           <li><a href="/features/">Platform features</a></li>
           <li><a href="/about/">About & brand</a></li>
+        </ul></details></section>
+      <section><details open><summary class="side-head">The Story <span class="cnt">${Object.keys(core).filter((k) => k.startsWith('story/')).length}</span></summary>
+        <ul>
+          ${Object.keys(core)
+            .filter((k) => k.startsWith('story/') && k !== 'story/index')
+            .map((k) => `<li><a href="/${k}/">${esc(core[k].title.replace(/ — .*$/, ''))}</a></li>`)
+            .join('')}
         </ul></details></section>
       ${VERSIONS.slice()
         .reverse()
@@ -260,7 +271,7 @@ function footerHtml() {
 function headerHtml(vid, slug) {
   return `<header class="site-header">
   <label for="nav-toggle" class="icon-btn nav-toggle-label" aria-label="Toggle navigation">☰</label>
-  <a class="brand" href="/"><img src="/favicon.svg" alt="Nakshora star logo" width="30" height="30"><span class="brand-name">Nakshora</span><span class="brand-docs">Docs</span></a>
+  <a class="brand" href="/"><img src="/brand/android-chrome-192x192.png" alt="Nakshora logo" width="30" height="30"><span class="brand-name">Nakshora</span><span class="brand-docs">Docs</span></a>
   ${switcherHtml(vid, slug)}
   <div class="header-spacer"></div>
   <div class="header-actions">
@@ -323,7 +334,9 @@ function renderArticlePage({ a, vid }) {
     : '';
 
   const canonical = p;
-  const og = vid ? `/og-${vid}.png` : '/og.png';
+  const imgKey = a.image ? (a.image.match(/\/img\/([\w-]+)\.jpg/) || [])[1] : null;
+  const imgDims = imgKey && IMG[imgKey] ? IMG[imgKey] : { width: 1200, height: 630 };
+  const og = a.image || (vid ? `/og-${vid}.png` : '/og.png');
   const ldCrumbs = [{ label: 'Docs', path: '/' }, ...(v ? [{ label: v.label, path: `/${v.id}/` }] : []), { label: a.title, path: p }];
   const lds = [jsonLd(articleLd(a, vid, HOST + canonical)), jsonLd(breadcrumbLd(ldCrumbs, canonical))];
   if (a.slug === 'index' && vid === null) lds.unshift(jsonLd(websiteLd()));
@@ -332,7 +345,7 @@ function renderArticlePage({ a, vid }) {
 
   const hero =
     a.slug === 'index' && vid === null
-      ? `<div class="hero"><img class="hero-star" src="/android-chrome-192.png" alt="" width="74" height="74">
+      ? `<div class="hero"><img class="hero-star" src="/brand/android-chrome-512x512.png" alt="Nakshora logo" width="74" height="74">
       <h1>Nakshora Docs</h1>
       <p class="hero-sub">The complete documentation platform for the <strong>Nakshora CSS framework</strong> — every release from 1.0 to 3.1, every utility, every recipe. Created by ${esc(SITE.owner)} · ${esc(SITE.company)}.</p>
       <div class="hero-cta"><a class="btn-primary" href="/v3.1/">Start with v3.1 (latest)</a><button class="btn-ghost" data-open-search>⌕ Search everything</button></div>
@@ -349,9 +362,15 @@ function renderArticlePage({ a, vid }) {
     description: a.summary,
     canonicalPath: canonical,
     ogImage: og,
+    ogW: a.image ? imgDims.width : 1200,
+    ogH: a.image ? imgDims.height : 630,
     noindex: a.noindex,
     extraLd: lds
   });
+
+  const figureHtml = a.image
+    ? `<figure class="article-figure"><img src="${a.image}" alt="${esc(a.title)} — Nakshora Docs" width="${imgDims.width}" height="${imgDims.height}" loading="${a.slug === 'index' ? 'eager' : 'lazy'}"><figcaption>${esc(a.category)} · Nakshora Docs editorial library</figcaption></figure>`
+    : '';
 
   return `${head}
 <body>
@@ -365,6 +384,7 @@ ${hero}
 <nav class="crumbs" aria-label="Breadcrumb">${crumbsHtml}</nav>
 <header class="article-head"><h1>${esc(a.title)}</h1>${meta}</header>
 <p class="lede">${esc(a.summary)}</p>
+${figureHtml}
 <article class="article-body">
 ${html}
 </article>
@@ -375,7 +395,7 @@ ${relHtml}
 ${tocHtml}
 </div>
 ${footerHtml()}
-<div data-island="search" data-current="${vid || 'v3.1'}" data-versions="${versionIds.join(',')}"></div>
+<div data-island="search" data-current="${vid || 'v3.1'}" data-versions="core,${versionIds.join(',')}"></div>
 </body>
 </html>`;
 }
@@ -443,7 +463,7 @@ ${sidebarHtml(null, null)}
 </div></main>
 </div>
 ${footerHtml()}
-<div data-island="search" data-current="v3.1" data-versions="${versionIds.join(',')}"></div>
+<div data-island="search" data-current="v3.1" data-versions="core,${versionIds.join(',')}"></div>
 </body>
 </html>`;
   writePage('404.html', notFound);

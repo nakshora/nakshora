@@ -157,10 +157,9 @@ fs.writeFileSync(
       theme_color: '#0d1026',
       lang: 'en',
       icons: [
-        { src: '/android-chrome-192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/android-chrome-512.png', sizes: '512x512', type: 'image/png' },
-        { src: '/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-        { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' }
+        { src: '/brand/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/brand/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+        { src: '/brand/android-chrome-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
       ]
     },
     null,

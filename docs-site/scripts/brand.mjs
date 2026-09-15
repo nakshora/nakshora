@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
+import { decodePNG, scaleRGBA, overRGBA } from './lib/pngio.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = path.join(ROOT, 'public');
@@ -213,10 +214,15 @@ const FONT = {
   '—': [0, 0, 0, 0b11111, 0, 0, 0]
 };
 
+let LOGO = null;
+function logo() {
+  if (!LOGO) LOGO = decodePNG(fs.readFileSync(path.join(PUB, 'brand/android-chrome-512x512.png')));
+  return LOGO;
+}
+
 function renderOG({ title, subtitle, accent, file }) {
   const W = 1200, H = 630;
   const rgba = Buffer.alloc(W * H * 4);
-  const star = starPolygon(1000, 165, 150, 58, 8);
   const miniStars = [
     [140, 90, 26, 10], [420, 120, 18, 7], [180, 520, 20, 8], [1040, 540, 26, 10], [620, 70, 16, 6]
   ].map(([x, y, R, r]) => starPolygon(x, y, R, r, 4));
@@ -250,18 +256,18 @@ function renderOG({ title, subtitle, accent, file }) {
       const t = y / H;
       let [r, g, b] = lerpC([13, 16, 46], [40, 24, 92], t);
       // subtle diagonal nebula glow
-      const glow = Math.max(0, 1 - Math.hypot(x - 1000, y - 165) / 520);
+      const glow = Math.max(0, 1 - Math.hypot(x - 1000, y - 180) / 520);
       [r, g, b] = lerpC([r, g, b], [86, 46, 128], glow * 0.5);
-      if (pointInPoly(x, y, star)) {
-        const st = Math.min(1, Math.max(0, (y - 15) / 300));
-        [r, g, b] = accent ? lerpC(accent[0], accent[1], st) : lerpC(STAR_A, STAR_B, st);
-      }
       for (const ms of miniStars) if (pointInPoly(x, y, ms)) [r, g, b] = [214, 205, 255];
       for (const [dx, dy, dr] of dots) if (Math.hypot(x - dx, y - dy) <= dr) [r, g, b] = [255, 236, 170];
       const i = (y * W + x) * 4;
       rgba[i] = Math.round(r); rgba[i + 1] = Math.round(g); rgba[i + 2] = Math.round(b); rgba[i + 3] = 255;
     }
   }
+  const lg = logo();
+  const lsz = 250;
+  const lscaled = scaleRGBA(lg.rgba, lg.width, lg.height, lsz, lsz);
+  overRGBA(rgba, W, H, lscaled, lsz, lsz, 905, 60);
   const subScale = Math.max(3, Math.min(6, Math.floor(1040 / (subtitle.length * 6))));
   drawText(title, 80, 300, 12, [255, 255, 255]);
   drawText(subtitle, 84, 430, subScale, [196, 190, 240]);

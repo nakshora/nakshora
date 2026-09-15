@@ -272,6 +272,14 @@ body {
 .article-body li { margin: 5px 0; }
 .article-body strong { color: var(--ink); }
 
+/* article figure */
+.article-figure { margin: 4px 0 28px; }
+.article-figure img {
+  width: 100%; height: auto; display: block;
+  border-radius: 14px; border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.article-figure figcaption { color: var(--ink-faint); font-size: 12px; margin-top: 8px; }
+
 /* tables */
 .table-wrap { overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--line); border-radius: var(--radius); }
 .article-body table { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 0; }

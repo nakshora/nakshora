@@ -19,6 +19,8 @@ import { componentArticles } from './content/components.mjs';
 import { variantArticles, responsiveArticles } from './content/variants-responsive.mjs';
 import { learningArticles } from './content/learning.mjs';
 import { deepdiveArticles } from './content/deepdives.mjs';
+import { imagePathFor } from './content/images.mjs';
+import { storyArticles } from './content/story.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = path.resolve(ROOT, '..');
@@ -65,7 +67,8 @@ export const SECTIONS = [
   ['v1-originals', 'v1 Originals', 36],
   ['v2-engine', 'v2 Engine', 37],
   ['v3-monorail', 'v3.0 Deep Dives', 38],
-  ['parity', '3.1 Deep Dives', 39]
+  ['parity', '3.1 Deep Dives', 39],
+  ['story', 'The Story', 40]
 ];
 export const sectionLabel = (id) => SECTIONS.find(([s]) => s === id)?.[1] || cap(id);
 export const sectionOrder = (id) => SECTIONS.find(([s]) => s === id)?.[2] ?? 90;
@@ -497,7 +500,7 @@ function coreArticles() {
       blocks: [
         p('**Nakshora** (নক্ষত্র — *star*) is a utility-first CSS framework: a fixed, documented vocabulary of single-purpose classes plus a JIT compiler that emits only the CSS you use.'),
         h2('Author'),
-        p('**Rizwan Rahim Chowdhury** — owner and author of Nakshora. Contact: rizwan@bsdc.info.bd.'),
+        p('**Rizwan Rahim Chowdhury** — software developer, SEO architect and full-stack engineer from Sylhet, Bangladesh; owner and author of Nakshora. Born 2013, a Class 7 student at Border Guard Public School and College (BGPSC) Sylhet, he ships production platforms — DebateSylhetBD, BSDC, BSDC Cloud, Gyankosh Wiki, BanglaVerseWiki — from a self-built Linux workstation on an Android tablet via Termux and code-server. His story: [[story/rizwan-rahim-chowdhury|The author of Nakshora]]. Contact: rizwan@bsdc.info.bd · portfolio: rrc.cloud.bsdc.info.bd.'),
         h2('Company'),
         p('**RRC Development** — the development company behind Nakshora, its documentation and its release engineering. rrc@bsdc.info.bd · https://rrc.bsdc.info.bd'),
         h2('Principles'),
@@ -541,6 +544,7 @@ function main() {
     const dedup = new Map();
     for (const a of all) if (!dedup.has(a.slug)) dedup.set(a.slug, a);
     const finalArts = [...dedup.values()];
+    for (const a of finalArts) if (!a.image) a.image = imagePathFor(a);
     V._count = finalArts.length;
     grand += finalArts.length;
 
@@ -584,8 +588,10 @@ function main() {
     console.log(`  ${V.id}: ${finalArts.length} articles`);
   }
 
-  const core = coreArticles();
+  const core = [...coreArticles(), ...storyArticles()];
+  for (const a of core) if (!a.image) a.image = imagePathFor(a);
   fs.writeFileSync(path.join(OUT, 'content', 'core.json'), JSON.stringify({ count: core.length, articles: Object.fromEntries(core.map((a) => [a.slug, a])) }));
+  fs.writeFileSync(path.join(OUT, 'search', 'core.json'), JSON.stringify(buildSearchIndex(core)));
   fs.writeFileSync(path.join(OUT, 'site.json'), JSON.stringify({ site: SITE, generatedAt: new Date().toISOString(), versions: versionsOut, totalArticles: grand + core.length }, null, 1));
 
   console.log(`✔ generated ${grand + core.length} total articles across ${VERSIONS.length} versions + core pages`);

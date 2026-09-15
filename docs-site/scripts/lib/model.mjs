@@ -89,6 +89,7 @@ export function article(fields) {
     popularity: fields.popularity ?? seeded(fields.slug),
     order: fields.order ?? 500,
     noindex: !!fields.noindex,
+    image: fields.image || null,
     updated: fields.updated || '2026-09-15',
     toc: []
   };

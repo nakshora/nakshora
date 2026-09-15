@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { highlight, searchAll, type SearchHit } from './search-engine';
 
+function hitHref(hit: SearchHit): string {
+  if (hit.version === 'core') return hit.slug === 'index' ? '/' : `/${hit.slug}/`;
+  return `/${hit.version}/${hit.slug}/`;
+}
+
 interface Props {
   versions: string[];
   current: string;
@@ -67,7 +72,7 @@ export default function SearchModal({ versions, current, open, initialQuery, onC
 
   const go = useCallback(
     (hit: SearchHit) => {
-      window.location.href = `/${hit.version}/${hit.slug}/`;
+      window.location.href = hitHref(hit);
     },
     []
   );
@@ -97,7 +102,13 @@ export default function SearchModal({ versions, current, open, initialQuery, onC
     return () => window.removeEventListener('keydown', kbd);
   }, [kbd]);
 
-  const scopeChips = useMemo(() => [{ id: 'all', label: 'All versions' }, ...versions.map((v) => ({ id: v, label: v }))], [versions]);
+  const scopeChips = useMemo(
+    () => [
+      { id: 'all', label: 'Everything' },
+      ...versions.map((v) => ({ id: v, label: v === 'core' ? 'Story & platform' : v }))
+    ],
+    [versions]
+  );
 
   if (!open) return null;
   return (
@@ -150,7 +161,7 @@ export default function SearchModal({ versions, current, open, initialQuery, onC
             hits.map((h, i) => (
               <a
                 key={`${h.version}/${h.slug}`}
-                href={`/${h.version}/${h.slug}/`}
+                href={hitHref(h)}
                 className={`search-hit${i === selected ? '' : ''}`}
                 data-active={i === selected ? 'true' : 'false'}
                 onMouseEnter={() => setSelected(i)}
