@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   CSSGenerator,
@@ -338,8 +340,16 @@ describe('helpers', () => {
   });
 
   it('exposes version & metadata', () => {
-    expect(version).toBe('3.0.0');
+    // Derived from the package manifest, not pinned: `pnpm release:version`
+    // bumps both together (scripts/sync-version.mjs), and version.test.ts
+    // cross-checks every package.json against src/version.ts.
+    const pkg = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8')) as {
+      version: string;
+    };
+    expect(version).toBe(pkg.version);
+    expect(version).toMatch(/^\d+\.\d+\.\d+/);
     expect(metadata.name).toBe('nakshora');
+    expect(metadata.version).toBe(version);
     expect(createGenerator()).toBeInstanceOf(CSSGenerator);
   });
 });

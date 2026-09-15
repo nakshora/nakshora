@@ -18,6 +18,20 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const repo = join(__dirname, '../../../..');
 const packages = ['core', 'postcss', 'cli', 'vite-plugin'];
+
+/** A workspace package's version, read from its manifest instead of pinned. */
+const pkgVersion = (p: string): string =>
+  (
+    JSON.parse(readFileSync(join(repo, 'packages/@nakshora', p, 'package.json'), 'utf-8')) as {
+      version: string;
+    }
+  ).version;
+
+// `pnpm release:version` bumps the four packages in lockstep, so this is the
+// version the packed tarballs, the CLI's `--version` and the runtime
+// `version` export must all report.
+const version = pkgVersion('core');
+
 let consumer: string;
 let packDir: string;
 
@@ -74,14 +88,9 @@ afterAll(() => {
 });
 
 describe('packed tarballs', () => {
-  it('produce one tarball per package at version 3.0.0', () => {
+  it('produce one tarball per package at the workspace version', () => {
     const files = readdirSync(packDir).sort();
-    expect(files).toEqual([
-      'nakshora-cli-3.0.0.tgz',
-      'nakshora-core-3.0.0.tgz',
-      'nakshora-postcss-3.0.0.tgz',
-      'nakshora-vite-plugin-3.0.0.tgz',
-    ]);
+    expect(files).toEqual(packages.map((p) => `nakshora-${p}-${pkgVersion(p)}.tgz`).sort());
   });
 
   it('install with dist/ present and a working bin symlink', () => {
@@ -93,10 +102,10 @@ describe('packed tarballs', () => {
 });
 
 describe('nakshora binary', () => {
-  it('node_modules/.bin/nakshora --version prints 3.0.0', () => {
+  it('node_modules/.bin/nakshora --version prints the workspace version', () => {
     const r = run(join(consumer, 'node_modules/.bin/nakshora'), ['--version'], consumer);
     expect(r.status).toBe(0);
-    expect(r.stdout.trim()).toBe('3.0.0');
+    expect(r.stdout.trim()).toBe(version);
   });
 
   it('node_modules/.bin/nakshora build -o out.css writes a JIT build', () => {
@@ -169,7 +178,7 @@ describe('library entry points from a consumer project', () => {
     const r = run('node', ['esm.mjs'], consumer);
     expect(r.status, r.stderr).toBe(0);
     expect(JSON.parse(r.stdout.trim())).toEqual({
-      version: '3.0.0',
+      version,
       p2: true,
       pc: true,
       rb: 'function',
@@ -196,7 +205,7 @@ describe('library entry points from a consumer project', () => {
     const r = run('node', ['cjs.cjs'], consumer);
     expect(r.status, r.stderr).toBe(0);
     expect(JSON.parse(r.stdout.trim())).toEqual({
-      version: '3.0.0',
+      version,
       p2: true,
       pc: true,
       base: true,
