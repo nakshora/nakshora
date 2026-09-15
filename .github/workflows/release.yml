@@ -203,7 +203,18 @@ jobs:
           # pnpm intercepts the bare `version` command and prints its own
           # version manifest instead of running the root `version` script, so
           # nothing was ever bumped and the release PR was never opened.
-          version: pnpm changeset version
+          #
+          # `release:version` = `changeset version` + `scripts/sync-version.mjs`
+          # + `pnpm build` + `pnpm ai:export`. The bare changeset step only
+          # rewrites the *published* packages' package.json files; it leaves the
+          # root package.json, `core/src/version.ts` and every generated artifact
+          # that inlines the version (the four `dist/` bundles + their eight
+          # source maps, `dist/css/*`, `min.main.css`, `site/index.min.css`,
+          # `playground/playground.min.css`, `ai/corpus.json`) stale. Those are
+          # committed and compared byte-for-byte, so the release PR would fail
+          # `Test & Lint` and could never be merged. Everything this regenerates
+          # is picked up by the action's `git add .` below.
+          version: pnpm release:version
           publish: pnpm publish:packages
           commit: 'chore(release): bump versions'
           title: 'chore(release): bump versions'

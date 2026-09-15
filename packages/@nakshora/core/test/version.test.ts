@@ -21,6 +21,6 @@ it('CSS banners and the AI corpus carry that version', () => {
   expect(
     gen.generateJIT('<a class="flex">').startsWith(`/*! Nakshora v${version} — JIT build`),
   ).toBe(true);
-  expect(gen.getBase()).not.toContain('v3.0.0-');
+  expect(gen.getBase()).not.toContain(`v${version}-`);
   expect(buildAICorpus().version).toBe(version);
 });
