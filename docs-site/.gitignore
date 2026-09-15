@@ -1,0 +1,4 @@
+# Generated content payload (regenerate with `npm run generate`)
+.data/
+# Build output (regenerate with `npm run build`)
+dist/

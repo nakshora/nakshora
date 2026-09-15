@@ -1,0 +1,42 @@
+{
+ "night-sky": {
+  "height": 768,
+  "width": 1408
+ },
+ "code-screen": {
+  "height": 768,
+  "width": 1408
+ },
+ "pattern-textile": {
+  "height": 768,
+  "width": 1408
+ },
+ "glass-ui": {
+  "height": 768,
+  "width": 1408
+ },
+ "neon-city": {
+  "height": 768,
+  "width": 1408
+ },
+ "blueprint": {
+  "height": 768,
+  "width": 1408
+ },
+ "workspace-tablet": {
+  "height": 768,
+  "width": 1408
+ },
+ "color-paint": {
+  "height": 768,
+  "width": 1408
+ },
+ "library-books": {
+  "height": 768,
+  "width": 1408
+ },
+ "cloud-servers": {
+  "height": 768,
+  "width": 1408
+ }
+}
