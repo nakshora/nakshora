@@ -7391,7 +7391,7 @@ function atParams(kind, params) {
 }
 
 // src/version.ts
-var version = "3.0.0";
+var version = "3.1.0";
 
 // src/generator.ts
 var STATE_VARIANTS = [

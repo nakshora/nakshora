@@ -7083,7 +7083,7 @@ function atParams(kind, params) {
   if (kind === "starting") return "";
   return params;
 }
-var version = "3.0.0";
+var version = "3.1.0";
 var STATE_VARIANTS = [
   {
     prefix: "hover",
@@ -14993,7 +14993,7 @@ function atParams2(kind, params) {
   if (kind === "starting") return "";
   return params;
 }
-var version2 = "3.0.0";
+var version2 = "3.1.0";
 var STATE_VARIANTS2 = [
   {
     prefix: "hover",
