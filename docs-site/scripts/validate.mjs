@@ -37,6 +37,7 @@ function resolves(href) {
 
 let pages = 0;
 let bad = 0;
+let headBad = 0;
 const badSamples = [];
 const sample = parseInt(process.argv[2] || '0', 10); // 0 = all
 let seen = 0;
@@ -45,6 +46,10 @@ for (const file of walk(DIST)) {
   if (sample && seen > sample) break;
   pages++;
   const html = fs.readFileSync(file, 'utf8');
+  if (!html.includes('rel="stylesheet"') || !html.includes('type="module"')) {
+    headBad++;
+    if (badSamples.length < 40) badSamples.push(`${path.relative(DIST, file)}: missing stylesheet/module script in head`);
+  }
   const re = /href="([^"]+)"/g;
   let m;
   while ((m = re.exec(html))) {
@@ -56,6 +61,6 @@ for (const file of walk(DIST)) {
     }
   }
 }
-console.log(`checked ${pages} pages; bad internal hrefs: ${bad}`);
+console.log(`checked ${pages} pages; bad internal hrefs: ${bad}; pages missing css/js head: ${headBad}`);
 if (badSamples.length) console.log(badSamples.join('\n'));
-process.exit(bad ? 1 : 0);
+process.exit(bad || headBad ? 1 : 0);

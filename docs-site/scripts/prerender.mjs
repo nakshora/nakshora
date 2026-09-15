@@ -27,11 +27,17 @@ for (const v of VERSIONS) {
   content[v.id] = raw.articles;
 }
 
-// vite manifest → hashed assets
+// vite manifest → hashed assets. With cssCodeSplit:false the stylesheet is its
+// own manifest chunk (not listed under entry.css), so gather every .css chunk.
 const manifest = JSON.parse(fs.readFileSync(path.join(DIST, '.vite/manifest.json'), 'utf8'));
 const entry = manifest['index.html'] || Object.values(manifest).find((m) => m.isEntry);
 const JS = '/' + entry.file;
-const CSS = (entry.css || []).map((c) => '/' + c);
+const cssFiles = [...(entry.css || [])];
+for (const m of Object.values(manifest)) {
+  if (m.file && m.file.endsWith('.css') && !cssFiles.includes(m.file)) cssFiles.push(m.file);
+}
+const CSS = cssFiles.map((c) => '/' + c);
+if (!CSS.length) throw new Error('prerender: no CSS chunks found in the vite manifest');
 
 const urls = [];
 
