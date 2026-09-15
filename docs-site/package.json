@@ -23,6 +23,7 @@
   "scripts": {
     "generate": "node scripts/generate-content.mjs",
     "brand": "node scripts/brand.mjs",
+    "prebuild:vite": "node scripts/ensure-deps.mjs",
     "build:vite": "vite build",
     "prerender": "node scripts/prerender.mjs",
     "postbuild": "node scripts/postbuild.mjs",
