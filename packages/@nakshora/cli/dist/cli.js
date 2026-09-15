@@ -7598,7 +7598,7 @@ var init_dist = __esm({
       candidate;
     };
     siblingSeq = 0;
-    version = "3.0.0";
+    version = "3.1.0";
     STATE_VARIANTS = [
       {
         prefix: "hover",

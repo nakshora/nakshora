@@ -1345,7 +1345,7 @@ declare function extractCssConfig(css: string): CssConfigResult;
 /** Merge a CSS-config fragment into a config (theme.extend deep-merged, plugins appended). */
 declare function mergeCssConfig(base: Partial<NakshoraConfig>, fragment: Partial<NakshoraConfig>): Partial<NakshoraConfig>;
 
-declare const version = "3.0.0";
+declare const version = "3.1.0";
 
 declare const metadata: {
     name: string;

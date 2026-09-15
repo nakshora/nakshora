@@ -3,4 +3,4 @@
 // published packages' package.json by `scripts/sync-version.mjs` (run by
 // `pnpm release:version`), and `core/test/version.test.ts` asserts it equals
 // every package.json in the workspace.
-export const version = '3.0.0';
+export const version = '3.1.0';

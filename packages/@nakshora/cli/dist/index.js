@@ -7087,7 +7087,7 @@ function atParams(kind, params) {
   if (kind === "starting") return "";
   return params;
 }
-var version = "3.0.0";
+var version = "3.1.0";
 var STATE_VARIANTS = [
   {
     prefix: "hover",
