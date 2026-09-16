@@ -1,0 +1,30 @@
+{
+  "name": "@nakshora/playground",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nakshora Playground — the next-generation live playground for the Nakshora CSS framework v3.1 (play.nakshora.bsdc.info.bd). Real-time JIT compilation in the browser, 100+ templates, 500+ counted features, sharing, zero backend.",
+  "type": "module",
+  "homepage": "https://play.nakshora.bsdc.info.bd",
+  "author": { "name": "Rizwan Rahim Chowdhury", "email": "rizwan@bsdc.info.bd" },
+  "maintainers": [{ "name": "RRC Development", "email": "rrc@bsdc.info.bd", "url": "https://rrc.bsdc.info.bd" }],
+  "license": "MIT",
+  "engines": { "node": ">=18.17.0" },
+  "scripts": {
+    "prebuild:vite": "node scripts/ensure-deps.mjs",
+    "build:vite": "vite build",
+    "prerender": "node scripts/prerender.mjs",
+    "build": "npm run build:vite && npm run prerender",
+    "dev": "vite",
+    "preview": "vite preview --host 0.0.0.0 --port 4174"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

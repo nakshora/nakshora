@@ -1,0 +1,10 @@
+/* SITE */
+Name:         Nakshora CSS Playground
+Domain:       play.nakshora.bsdc.info.bd
+Author:       Rizwan Rahim Chowdhury — RRC Development
+Contact:      rizwan@bsdc.info.bd · rrc@bsdc.info.bd
+From:         Sylhet, Bangladesh
+Built with:   React 18, Vite, TypeScript, the real Nakshora 3.1 JIT engine
+Hosted on:    Cloudflare Pages (free)
+Framework:    Nakshora CSS v3.1 — MIT — https://github.com/nakshora/nakshora
+Note:         Built entirely on an Android tablet via Termux + code-server.

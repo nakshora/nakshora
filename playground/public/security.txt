@@ -1,0 +1,4 @@
+Contact: mailto:rizwan@bsdc.info.bd
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en, bn
+Canonical: https://play.nakshora.bsdc.info.bd/security.txt

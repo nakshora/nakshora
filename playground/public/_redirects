@@ -1,0 +1,6 @@
+# Nakshora Playground — SPA fallback (static assets are matched first)
+/playground /playground/ 301
+/templates /templates/ 301
+/features /features/ 301
+/about /about/ 301
+/* /index.html 200
