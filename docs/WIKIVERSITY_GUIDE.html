@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nakshora CSS Framework Guide (Version 3.1)</title>
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#1f2937;--muted:#6b7280;
+--accent:#2563eb;--code-bg:#0f172a;--code-fg:#e2e8f0;--tbl-head:#f1f5f9;
+--border:#e5e7eb;--inline:#f1f5f9}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--fg:#e5e7eb;
+--muted:#9ca3af;--accent:#60a5fa;--tbl-head:#111c33;--border:#263349;
+--inline:#16213a}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,
+-apple-system,"Segoe UI",Roboto,Arial,sans-serif;margin:0;padding:2rem 1rem 4rem}
+main{max-width:880px;margin:0 auto}
+h1,h2,h3{line-height:1.25;scroll-margin-top:1rem}
+h1{font-size:2rem;border-bottom:2px solid var(--border);padding-bottom:.5rem}
+h2{font-size:1.5rem;margin-top:2.5rem;border-bottom:1px solid var(--border);
+padding-bottom:.4rem}
+h3{font-size:1.2rem;margin-top:2rem}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85em;
+background:var(--inline);padding:.1em .35em;border-radius:.3em}
+pre{background:var(--code-bg);color:var(--code-fg);padding:1rem 1.2rem;
+border-radius:.6rem;overflow-x:auto;font-size:.85rem;line-height:1.55}
+pre code{background:none;padding:0;color:inherit}
+.tbl{overflow-x:auto;margin:1rem 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid var(--border);padding:.5rem .7rem;text-align:left;
+vertical-align:top}
+th{background:var(--tbl-head)}
+blockquote{border-left:4px solid var(--accent);margin:1rem 0;
+padding:.6rem 1rem;background:var(--inline);border-radius:0 .5rem .5rem 0}
+blockquote p{margin:.3rem 0}
+hr{border:none;border-top:1px solid var(--border);margin:2rem 0}
+li{margin:.25rem 0}
+footer{margin-top:3rem;color:var(--muted);font-size:.85rem;
+border-top:1px solid var(--border);padding-top:1rem}
+</style>
+</head>
+<body>
+<main>
+<h1 id="nakshora-css-framework-guide-version-31">Nakshora CSS Framework Guide (Version 3.1)</h1>
+<blockquote>
+<p><strong>Course module:</strong> Open-source textbook chapter for students and developers learning utility-first web design.</p>
+<p><strong>Scope:</strong> Nakshora v3.1 — 11,417 utilities, 35 categories, 22 color palettes, 10 breakpoints, 155 stackable variants, zero runtime JavaScript.</p>
+<p><strong>Sources:</strong> This guide derives every class name, value, and behavior from the framework source code (<code>packages/@nakshora/core/src/</code>), the repository documentation (<code>docs/</code>), and the official documentation platform at <a href="https://docs.nakshora.bsdc.info.bd/" rel="noopener">docs.nakshora.bsdc.info.bd</a>. Release facts cite the project's public announcements (see References).</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-introduction-to-nakshora-css-v31">Introduction to Nakshora CSS (v3.1)</a></li>
+<li><a href="#2-installation-and-integration">Installation and Integration</a></li>
+<li><a href="#3-core-architecture-and-configuration">Core Architecture and Configuration</a></li>
+<li><a href="#4-detailed-layout-and-utility-system-guide">Detailed Layout and Utility System Guide</a></li>
+<li><a href="#5-component-library-breakdown">Component Library Breakdown</a></li>
+<li><a href="#6-interactive-practical-learning-lab-exercises">Interactive Practical Learning Lab (Exercises)</a></li>
+<li><a href="#7-conclusion-and-review-questions">Conclusion and Review Questions</a></li>
+<li><a href="#8-references">References</a></li>
+</ol>
+<hr>
+<h2 id="1-introduction-to-nakshora-css-v31">1. Introduction to Nakshora CSS (v3.1)</h2>
+<h3 id="11-what-nakshora-is">1.1 What Nakshora Is</h3>
+<p>Nakshora (নক্ষত্র — "star" in Bangla) is an <strong>open-source, utility-first CSS framework</strong> with a <strong>Just-In-Time (JIT) compiler</strong>, created by <strong>Rizwan Rahim Chowdhury</strong> and developed by <strong>RRC Development</strong>. The project lives at <a href="https://github.com/nakshora/nakshora" rel="noopener">github.com/nakshora/nakshora</a>, ships under the <strong>MIT license</strong>, and publishes its documentation at <a href="https://docs.nakshora.bsdc.info.bd/" rel="noopener">docs.nakshora.bsdc.info.bd</a> (2,050 articles for v3.1 alone, released 2026-09-14).</p>
+<p>Nakshora follows a <strong>hybrid architecture</strong>:</p>
+<ul>
+<li><strong>Utility-first at its core.</strong> You style elements by composing small, single-purpose classes in HTML. Each class maps to one CSS declaration or a tight group of declarations. Example: <code>px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg</code>.</li>
+<li><strong>Component layer on top.</strong> A small set of ready-made design-paradigm classes (<code>.glass</code>, <code>.neon-card</code>, <code>.brutalist-btn</code>, and others) provides complete visual treatments. You combine them freely with utilities.</li>
+<li><strong>Compiler-driven output.</strong> A JIT engine scans your source files, finds the class names you actually use, and emits only that CSS. A typical project ships roughly 5–20 KB of CSS instead of hundreds of kilobytes. No JavaScript runs in the browser at all.</li>
+</ul>
+<h3 id="12-core-design-philosophy">1.2 Core Design Philosophy</h3>
+<p>Study these five principles. They explain every design decision in the codebase:</p>
+<ol>
+<li><strong>Markup, not ceremony.</strong> You describe the design directly in the <code>class</code> attribute. You rarely open a stylesheet.</li>
+<li><strong>Mobile-first responsiveness.</strong> Base classes apply to all viewports. Prefixed classes (<code>sm:</code>, <code>md:</code>, <code>lg:</code>) override them from a minimum width upward.</li>
+<li><strong>Pay only for what you use.</strong> The catalog holds 11,417 utilities, but the JIT compiler emits only the classes found in your files (plus an explicit <code>safelist</code>).</li>
+<li><strong>Design tokens drive everything.</strong> Colors, spacing, type sizes, shadows, radii, and breakpoints live in one resolved theme. Change a token once; every utility that references it updates.</li>
+<li><strong>Compatibility without lock-in.</strong> Version 3.1 verifies byte-identical output against Tailwind CSS v3.4 for shared classes, accepts Tailwind-style configuration (<code>theme.screens</code>, <code>plugin()</code>), and supports official Tailwind plugins (<code>typography</code>, <code>forms</code>, <code>aspect-ratio</code>, <code>container-queries</code>). You can migrate existing Tailwind knowledge directly.</li>
+</ol>
+<h3 id="13-how-v31-differs-from-earlier-releases">1.3 How v3.1 Differs from Earlier Releases</h3>
+<div class="tbl"><table><thead><tr>
+<th>Release</th>
+<th>Architecture</th>
+<th>Key facts</th>
+</tr></thead><tbody>
+<tr><td><strong>1.0</strong> (legacy)</td><td>Single static stylesheet</td><td>One batteries-included CSS file; frozen copy kept at <code>minified-version/v1.0.0.css</code></td></tr>
+<tr><td><strong>2.0</strong> (legacy)</td><td>TypeScript rewrite</td><td>Programmatic CSS generation, five themes, npm-ready</td></tr>
+<tr><td><strong>3.0</strong></td><td>pnpm monorepo + JIT</td><td>Four packages (<code>core</code>, <code>cli</code>, <code>postcss</code>, <code>vite-plugin</code>); AI-ready docs</td></tr>
+<tr><td><strong>3.1</strong> (current)</td><td>3.0 + parity + tooling</td><td>Tailwind 3.4 parity oracle, 10 breakpoints, 155 variants, language server (<code>nakshora lsp</code>), CSS-first config (<code>@theme</code> / <code>@utility</code> / <code>@custom-variant</code>), dependency-free dev server</td></tr>
+</tbody></table></div>
+<h3 id="14-prerequisites-for-learners">1.4 Prerequisites for Learners</h3>
+<p>Before you start, you need:</p>
+<ul>
+<li><strong>HTML basics.</strong> Elements, attributes, nesting, and the <code>class</code> attribute.</li>
+<li><strong>The CSS box model.</strong> Content, padding, border, margin — and how <code>box-sizing: border-box</code> changes width math. (Nakshora's preflight reset applies <code>border-box</code> globally, so trust it.)</li>
+<li><strong>Basic command-line skills.</strong> Run <code>node -v</code> and <code>npm -v</code>. Install packages. (Only required for the compiler-based paths; the CDN path needs no tooling.)</li>
+<li><strong>Helpful but optional:</strong> CSS flexbox and grid concepts, media-query syntax, and basic JavaScript module imports.</li>
+</ul>
+<h3 id="15-what-you-will-be-able-to-do">1.5 What You Will Be Able to Do</h3>
+<p>After completing this module, you will install Nakshora through any of its five integration paths, read and write its utility grammar fluently, configure the theme, build responsive layouts with the 10-screen system, apply state variants, use the built-in components, and verify your setup with the CLI's doctor and inspect tools.</p>
+<hr>
+<h2 id="2-installation-and-integration">2. Installation and Integration</h2>
+<p>Nakshora v3.1 ships <strong>four packages</strong> and supports <strong>five integration paths</strong>. Pick exactly one path per project.</p>
+<h3 id="21-the-four-packages">2.1 The Four Packages</h3>
+<div class="tbl"><table><thead><tr>
+<th>Package</th>
+<th>Purpose</th>
+<th>Runtime needs</th>
+<th>Install</th>
+</tr></thead><tbody>
+<tr><td><code>@nakshora/core</code></td><td>JIT compiler and engine</td><td>None — runs in Node ≥ 18 and in the browser (~71 KB gzip ESM)</td><td><code>npm i @nakshora/core</code></td></tr>
+<tr><td><code>@nakshora/cli</code></td><td><code>nakshora init / build / dev / inspect / export:ai</code> commands</td><td>Node ≥ 18</td><td><code>npm i -D @nakshora/cli</code></td></tr>
+<tr><td><code>@nakshora/postcss</code></td><td>PostCSS plugin (<code>@nakshora source;</code> at-rules)</td><td><code>postcss ^8.4</code>, Node ≥ 18</td><td><code>npm i -D @nakshora/postcss</code></td></tr>
+<tr><td><code>@nakshora/vite-plugin</code></td><td>Vite plugin (virtual module + HMR)</td><td>`vite ^5 \</td><td>\</td><td>^6 \</td><td>\</td><td>^7 \</td><td>\</td><td>^8`</td><td><code>npm i -D @nakshora/vite-plugin</code></td></tr>
+</tbody></table></div>
+<p><strong>Requirements:</strong> Node.js ≥ 18 (22 LTS recommended). TypeScript config files (<code>nakshora.config.ts</code>) need Node ≥ 22.18; on older Node runtimes use <code>.js</code>, <code>.mjs</code>, or <code>.json</code> configs.</p>
+<h3 id="22-package-managers-and-registries">2.2 Package Managers and Registries</h3>
+<p>Nakshora publishes to <strong>two registries</strong>:</p>
+<p><strong>npm (primary):</strong></p>
+<pre><code class="language-bash"># npm
+npm install @nakshora/core
+npm install -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin
+
+# pnpm (also the monorepo's own manager; pnpm &gt;= 9)
+pnpm add @nakshora/core
+pnpm add -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin
+
+# yarn
+yarn add @nakshora/core
+yarn add -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin
+
+# bun (npm-compatible registry API)
+bun add @nakshora/core
+bun add -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin</code></pre>
+<p><strong>GitHub Packages (mirror):</strong></p>
+<pre><code class="language-bash"># ~/.npmrc
+@nakshora:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=&lt;your GitHub token&gt;</code></pre>
+<pre><code class="language-bash">npm install @nakshora/core</code></pre>
+<p>Releases follow an automated pipeline: a version bump merges, then GitHub Actions publishes to npm with provenance, mirrors to GitHub Packages, and cuts a GitHub Release with tarballs.</p>
+<h3 id="23-path-a-vite-recommended">2.3 Path A — Vite (Recommended)</h3>
+<p>The Vite plugin gives you a virtual CSS module, PostCSS <code>@nakshora</code> support, and hot-module replacement (HMR) when your class usage changes.</p>
+<p><strong>Step 1 — Create a Vite project:</strong></p>
+<pre><code class="language-bash">npm create vite@latest my-app -- --template vanilla
+cd my-app</code></pre>
+<p><strong>Step 2 — Install Nakshora:</strong></p>
+<pre><code class="language-bash">npm install -D @nakshora/vite-plugin</code></pre>
+<p><strong>Step 3 — Register the plugin:</strong></p>
+<pre><code class="language-js">// vite.config.js
+import { defineConfig } from 'vite';
+import { nakshora } from '@nakshora/vite-plugin';
+
+export default defineConfig({
+  plugins: [
+    nakshora({
+      // JIT: scan these files for class names — only used classes compile
+      content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,vue}'],
+      config: {
+        theme: {},
+        safelist: [],
+      },
+    }),
+  ],
+});</code></pre>
+<p><strong>Step 4 — Import the stylesheet:</strong></p>
+<pre><code class="language-js">// src/main.js
+import 'nakshora'; // injects the compiled Nakshora CSS</code></pre>
+<p>Alternatively, create <code>src/nakshora.css</code> containing <code>@nakshora source;</code> and import that file instead.</p>
+<p><strong>Step 5 — Run and build:</strong></p>
+<pre><code class="language-bash">npm run dev     # dev server with HMR
+npm run build   # production bundle
+npm run preview # preview the production build</code></pre>
+<p>Edit any class in your source files. The browser refreshes automatically.</p>
+<h3 id="24-path-b-postcss-webpack-nextjs-laravel-gulp">2.4 Path B — PostCSS (Webpack, Next.js, Laravel, Gulp)</h3>
+<p>Use this path with any tool that runs PostCSS.</p>
+<p><strong>Step 1 — Install:</strong></p>
+<pre><code class="language-bash">npm install -D @nakshora/postcss postcss</code></pre>
+<p><strong>Step 2 — Configure:</strong></p>
+<pre><code class="language-js">// postcss.config.js
+module.exports = {
+  plugins: [
+    require('@nakshora/postcss')({
+      config: {
+        content: ['./src/**/*.{html,js,ts,jsx,tsx}'], // JIT mode
+        safelist: ['lg:flex'],
+      },
+      minify: false, // let your bundler minify
+    }),
+  ],
+};</code></pre>
+<p><strong>Step 3 — Write the entry CSS:</strong></p>
+<pre><code class="language-css">/* src/nakshora.css */
+@nakshora source; /* base + variables + keyframes + utilities + components */
+
+/* Or control each layer yourself: */
+@nakshora base;
+@nakshora variables;
+@nakshora keyframes;
+@nakshora utilities; /* JIT when content is configured */
+@nakshora components;</code></pre>
+<p><strong>Step 4 — Import the entry CSS in your application.</strong> Your bundler handles the rest.</p>
+<p><strong>Next.js (App Router) variant:</strong></p>
+<pre><code class="language-bash">npm install -D @nakshora/postcss postcss</code></pre>
+<pre><code class="language-js">// postcss.config.mjs
+import nakshora from '@nakshora/postcss';
+
+export default {
+  plugins: {
+    nakshora: nakshora({
+      config: {
+        content: ['./app/**/*.{js,jsx,ts,tsx,mdx}'],
+      },
+    }),
+  },
+};</code></pre>
+<pre><code class="language-css">/* app/globals.css */
+@nakshora source;</code></pre>
+<pre><code class="language-js">// app/layout.js
+import './globals.css';
+
+export default function RootLayout({ children }) {
+  return (
+    &lt;html lang="en"&gt;
+      &lt;body&gt;{children}&lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</code></pre>
+<h3 id="25-path-c-cli-only-plain-html-no-bundler">2.5 Path C — CLI Only (Plain HTML, No Bundler)</h3>
+<p>Use this path for static sites or any environment without a bundler.</p>
+<p><strong>Step 1 — Install:</strong></p>
+<pre><code class="language-bash">npm install -g @nakshora/cli
+# or locally: npm install -D @nakshora/cli</code></pre>
+<p><strong>Step 2 — Scaffold:</strong></p>
+<pre><code class="language-bash">mkdir my-site &amp;&amp; cd my-site
+nakshora init</code></pre>
+<p>This creates two files:</p>
+<pre><code class="language-text">my-site/
+├── nakshora.config.js   # content globs, theme, plugins
+└── nakshora.css         # @nakshora source; @nakshora utilities;</code></pre>
+<p>Useful flags: <code>nakshora init --json</code> writes a JSON config; <code>nakshora init --force</code> overwrites existing files.</p>
+<p><strong>Step 3 — Write markup:</strong></p>
+<pre><code class="language-html">&lt;!-- index.html --&gt;
+&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;title&gt;Nakshora site&lt;/title&gt;
+    &lt;link rel="stylesheet" href="dist/nakshora.css" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div class="min-h-screen flex items-center justify-center bg-slate-900"&gt;
+      &lt;div class="glass p-8 text-center"&gt;
+        &lt;h1 class="text-3xl font-bold text-white"&gt;Hello, Nakshora&lt;/h1&gt;
+        &lt;button class="neon-btn mt-6"&gt;Wow&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p><strong>Step 4 — Build:</strong></p>
+<pre><code class="language-bash">nakshora build nakshora.css -o dist/nakshora.css --minify</code></pre>
+<p>The compiler replaces the at-rules with only the classes it found in your content globs (JIT). For watch mode, run:</p>
+<pre><code class="language-bash">nakshora dev nakshora.css -o dist/nakshora.css</code></pre>
+<p><strong>Full CLI command reference:</strong></p>
+<div class="tbl"><table><thead><tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr></thead><tbody>
+<tr><td><code>nakshora init</code></td><td>Scaffold config + entry CSS</td></tr>
+<tr><td><code>nakshora build [input]</code></td><td>Compile CSS (full build to stdout by default; `--mode full\</td><td>jit<code>, </code>--watch<code>, </code>--minify<code>, </code>--content<code>, </code>--safelist<code>, </code>--source-map<code>, </code>--stats<code>, </code>--diff`)</td></tr>
+<tr><td><code>nakshora dev [input]</code></td><td><code>build --watch</code> plus an optional dependency-free dev server</td></tr>
+<tr><td><code>nakshora inspect &lt;class&gt;</code></td><td>Show the CSS a class (or variant stack) compiles to</td></tr>
+<tr><td><code>nakshora doctor</code></td><td>Diagnose config, content globs, safelist, and dependency problems</td></tr>
+<tr><td><code>nakshora lsp</code></td><td>Start the language server (completion, hover, diagnostics, color previews)</td></tr>
+<tr><td><code>nakshora export:ai</code></td><td>Regenerate <code>ai/corpus.json</code> from source so LLM assets never drift</td></tr>
+<tr><td><code>nakshora migrate</code></td><td>Migrate configs from v1/v2 or Tailwind</td></tr>
+</tbody></table></div>
+<p><strong>Build-mode selection logic</strong> (memorize this order):</p>
+<ol>
+<li><code>--mode</code> wins when provided.</li>
+<li><code>content</code> (or legacy <code>purge</code>) configured → <strong>JIT mode</strong> (only used classes, including all state variants).</li>
+<li>Otherwise → <strong>full mode</strong> (all base + responsive utilities + components).</li>
+</ol>
+<h3 id="26-path-d-plain-html-cdn-no-build-at-all">2.6 Path D — Plain HTML + CDN (No Build at All)</h3>
+<p>Add one <code>&lt;link&gt;</code> tag. No Node.js, no terminal, no build step.</p>
+<pre><code class="language-html">&lt;!-- Full build, latest main branch --&gt;
+&lt;link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/dist/css/nakshora.min.css"
+/&gt;</code></pre>
+<p>Pin an exact version for production stability:</p>
+<pre><code class="language-html">&lt;!-- Pinned, immutable release --&gt;
+&lt;link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@v3.0.0/dist/css/nakshora.min.css"
+/&gt;</code></pre>
+<p>Know the limits of the CDN file:</p>
+<ul>
+<li>It contains <strong>base + responsive utilities</strong> only. <strong>State variants</strong> (<code>hover:</code>, <code>dark:</code>, <code>group-hover:</code>, …) require the JIT compiler.</li>
+<li>The full build uses the classic five screens (<code>sm</code>–<code>2xl</code>) by default. JIT mode supports all ten.</li>
+<li>jsDelivr negotiates compression automatically: the file is ~5.98 MB on disk but transfers at ~133 KB over Brotli and ~576 KB over gzip.</li>
+</ul>
+<h3 id="27-path-e-self-hosting-local-file-hosting">2.7 Path E — Self-Hosting (Local File Hosting)</h3>
+<p>Download the prebuilt files and serve them yourself:</p>
+<div class="tbl"><table><thead><tr>
+<th>File</th>
+<th>Bytes</th>
+<th>Purpose</th>
+</tr></thead><tbody>
+<tr><td><code>dist/css/nakshora.min.css</code></td><td>5,982,603</td><td>Full minified stylesheet</td></tr>
+<tr><td><code>dist/css/nakshora.min.css.br</code></td><td>132,967</td><td>Brotli sidecar (quality 11)</td></tr>
+<tr><td><code>dist/css/nakshora.min.css.gz</code></td><td>575,520</td><td>Gzip sidecar (level 9)</td></tr>
+</tbody></table></div>
+<p>A test in the repository decompresses both sidecars and asserts byte-for-byte equality with the main file. Serve them with static-compression support:</p>
+<ul>
+<li><strong>nginx:</strong> <code>brotli_static on; gzip_static on;</code></li>
+<li><strong>Apache:</strong> <code>mod_brotli</code> + <code>MultiViews</code></li>
+<li><strong>Netlify / Cloudflare Pages / Vercel:</strong> automatic sidecar handling</li>
+<li><strong>S3 + CloudFront:</strong> upload the <code>.br</code> file with <code>Content-Encoding: br</code></li>
+</ul>
+<p>Rule of thumb: use the full build only for zero-tooling pages. Any project with a build step should use JIT (typically 5–20 KB; the framework's own landing page ships 3,936 B gzipped).</p>
+<h3 id="28-verifying-your-setup">2.8 Verifying Your Setup</h3>
+<p>Run these checks after any installation:</p>
+<pre><code class="language-bash"># 1. Diagnose the whole project (content globs, safelist, missing at-rules, deps)
+nakshora doctor
+
+# 2. Inspect what one class compiles to
+nakshora inspect "md:hover:bg-blue-600"
+
+# 3. Build with statistics (time, class counts, sizes, unknown candidates)
+nakshora build nakshora.css -o dist/nakshora.css --stats</code></pre>
+<p>Then render this smoke-test page. If the button turns blue on hover and the grid gains columns as you widen the window, your setup works:</p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;title&gt;Nakshora smoke test&lt;/title&gt;
+    &lt;link rel="stylesheet" href="dist/nakshora.css" /&gt;
+  &lt;/head&gt;
+  &lt;body class="p-6"&gt;
+    &lt;button
+      class="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+    &gt;
+      Hover me
+    &lt;/button&gt;
+    &lt;div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"&gt;
+      &lt;div class="bg-slate-100 p-4 rounded-lg"&gt;One&lt;/div&gt;
+      &lt;div class="bg-slate-100 p-4 rounded-lg"&gt;Two&lt;/div&gt;
+      &lt;div class="bg-slate-100 p-4 rounded-lg"&gt;Three&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<hr>
+<h2 id="3-core-architecture-and-configuration">3. Core Architecture and Configuration</h2>
+<h3 id="31-the-engine-how-the-jit-compiler-works">3.1 The Engine: How the JIT Compiler Works</h3>
+<p>The heart of Nakshora is <code>@nakshora/core</code>, a dependency-free engine written in strict TypeScript. Learn its pipeline in four stages:</p>
+<ol>
+<li><strong>Extract.</strong> The extractor scans every file matched by <code>content</code> globs (or raw strings you pass directly) with a class-candidate regex. You can override the pattern with <code>extractorPattern</code>.</li>
+<li><strong>Resolve.</strong> Each candidate parses into <em>variants + base utility + modifier</em> (for example, <code>md:hover:bg-blue-600/80</code> → screens <code>md</code>, state <code>hover</code>, color <code>blue-600</code>, opacity modifier <code>80</code>). The engine validates the base against its registry of 11,417 utilities across 35 categories.</li>
+<li><strong>Generate.</strong> Matched utilities compile to CSS rules. Screen variants wrap rules in <code>@media</code> queries; state variants append pseudo-classes or ancestor selectors. Stacked media variants collapse into <strong>one</strong> <code>@media</code> query (configurable with <code>combineMedia</code>).</li>
+<li><strong>Emit.</strong> Output assembles in three sections — <strong>base</strong> (preflight reset, CSS variables, keyframes), <strong>components</strong>, <strong>utilities</strong> — optionally wrapped in real cascade layers (<code>@layer base, components, utilities</code>) when you set <code>layers: true</code>.</li>
+</ol>
+<p>Two build modes exist:</p>
+<div class="tbl"><table><thead><tr>
+<th>Mode</th>
+<th>Trigger</th>
+<th>Output</th>
+</tr></thead><tbody>
+<tr><td><strong>JIT</strong></td><td><code>content</code> configured (or <code>--mode jit</code>)</td><td>Only used classes + <code>safelist</code>, <strong>including all state variants</strong></td></tr>
+<tr><td><strong>Full</strong></td><td>No <code>content</code> (or <code>--mode full</code>)</td><td>All base + responsive utilities + components; state variants excluded</td></tr>
+</tbody></table></div>
+<p>Measured performance (pinned in <code>perf/baseline.json</code>; CI fails on regressions over 10%):</p>
+<div class="tbl"><table><thead><tr>
+<th>Operation</th>
+<th>Median time</th>
+</tr></thead><tbody>
+<tr><td>JIT build (200 lines of HTML, warm)</td><td>18.2 ms</td></tr>
+<tr><td>JIT rebuild after one file changes (500 files)</td><td>1.3 ms</td></tr>
+<tr><td>Full build (11,417 utilities, sm–2xl)</td><td>371 ms</td></tr>
+<tr><td>Full build + minify</td><td>302 ms</td></tr>
+</tbody></table></div>
+<h3 id="32-global-reset-preflight">3.2 Global Reset (Preflight)</h3>
+<p>Every build starts with a preflight reset (Tailwind-compatible): margins collapse to zero, <code>box-sizing</code> becomes <code>border-box</code>, headings inherit font sizes, images become block-level responsive elements, and button backgrounds turn transparent. Disable it per project with top-level <code>preflight: false</code> or <code>corePlugins: { base: false }</code>.</p>
+<h3 id="33-the-configuration-file">3.3 The Configuration File</h3>
+<p>Nakshora auto-discovers <code>nakshora.config.{ts,js,mjs,cjs,json}</code> by walking up from the working directory. Here is the complete option surface with defaults:</p>
+<pre><code class="language-js">// nakshora.config.js
+export default {
+  content: './**/*.{html,js,ts,jsx,tsx,vue,astro,svelte,md}', // JIT mode trigger
+  purge: [], // legacy alias of content
+  safelist: [], // classes always included (variants allowed: 'lg:flex')
+  blocklist: [], // classes never emitted in JIT
+  theme: {}, // deep-merged overrides (see §3.4)
+  presets: [], // configs merged before theme
+  variants: {}, // variant toggles (see §3.7)
+  corePlugins: {}, // utility-group toggles (see §3.8)
+  darkMode: 'class', // 'class' | 'media' | 'selector' | ['selector', sel] | ['variant', sel] | false
+  prefix: '', // e.g. 'nk-' turns .flex into .nk-flex
+  important: false, // true adds !important; '#app' scopes every rule under #app
+  preflight: true, // include the reset in base
+  layers: false, // wrap output in real @layer blocks
+  combineMedia: true, // print:md:flex → one '@media print and (min-width: 768px)'
+  plugins: [], // plugin functions / objects / Tailwind plugins
+  extractorPattern: undefined, // custom class-extractor regex
+};</code></pre>
+<p><strong>CSS-first configuration (v3.1).</strong> You can extend the theme without touching JavaScript:</p>
+<pre><code class="language-css">@theme {
+  --color-brand-500: #6d28d9;
+}
+
+@utility tab-4 {
+  tab-size: 1rem;
+}
+
+@custom-variant hocus (&amp;:hover, &amp;:focus);</code></pre>
+<h3 id="34-design-tokens-the-theme-system">3.4 Design Tokens: The Theme System</h3>
+<p>The resolved theme is Tailwind-3.4-shaped (<code>theme.colors</code>, <code>theme.spacing</code>, <code>theme.fontSize</code>, <code>theme.screens</code>, …) so Tailwind configs and plugins work unchanged. Nakshora's historical aliases (<code>typography.fontSize</code>, <code>breakpoints</code>, <code>shadows</code>, <code>duration</code>, <code>easing</code>) map onto the same keys automatically.</p>
+<p><strong>Token sections and defaults:</strong></p>
+<div class="tbl"><table><thead><tr>
+<th>Section</th>
+<th>Default keys</th>
+<th>Notes</th>
+</tr></thead><tbody>
+<tr><td><code>colors</code></td><td>22 palettes × shades 50–950</td><td>Override one shade (<code>blue: {500: '#hex'}</code>) or add a palette (<code>brand: {...}</code>)</td></tr>
+<tr><td><code>spacing</code></td><td><code>0 px 0.5 1 … 96</code></td><td>Key → CSS length; shared by margin, padding, gap, sizing, inset</td></tr>
+<tr><td><code>typography.fontSize</code></td><td><code>xs sm base lg xl 2xl … 9xl</code></td><td>Value or <code>[size, lineHeight]</code> tuple</td></tr>
+<tr><td><code>typography.fontWeight</code></td><td><code>thin … black</code></td><td>100–900</td></tr>
+<tr><td><code>typography.lineHeight</code></td><td><code>none tight snug base relaxed loose</code></td><td><code>base</code> (1.5) is a Nakshora addition</td></tr>
+<tr><td><code>typography.letterSpacing</code></td><td><code>tighter tight normal wide wider widest</code></td><td></td></tr>
+<tr><td><code>fontFamily</code></td><td><code>sans</code>, <code>mono</code></td><td>System stacks by default</td></tr>
+<tr><td><code>breakpoints</code></td><td><code>xxs:200 xs:400 sm:640 md:768 lg:1024 xl:1280 2xl:1536 3xl:1920 4xl:2560 5xl:5000</code></td><td>px; merged + re-sorted; <code>null</code> removes</td></tr>
+<tr><td><code>shadows</code></td><td><code>none sm base md lg xl 2xl inner glow</code></td><td><code>glow</code> (blue) is a Nakshora addition</td></tr>
+<tr><td><code>borderRadius</code></td><td><code>none xs sm md lg xl 2xl 3xl full</code></td><td><code>xs</code> is a Nakshora addition</td></tr>
+<tr><td><code>zIndex</code></td><td><code>auto hide 0 10 20 30 40 50</code></td><td><code>hide</code> (−1) is a Nakshora addition</td></tr>
+<tr><td><code>opacity</code></td><td><code>0 5 10 20 … 100</code></td><td></td></tr>
+<tr><td><code>duration</code></td><td><code>0 75 100 150 200 300 500 700 1000</code></td><td>milliseconds</td></tr>
+<tr><td><code>easing</code></td><td><code>linear in out in-out back</code></td><td><code>back</code> (spring overshoot) is a Nakshora addition</td></tr>
+<tr><td><code>animation</code></td><td><code>spin ping pulse bounce fade slide shimmer</code></td><td>name → shorthand</td></tr>
+<tr><td><code>keyframes</code></td><td>matches the animation names</td><td>name → keyframe body</td></tr>
+</tbody></table></div>
+<p><strong>Example — extend the theme:</strong></p>
+<pre><code class="language-js">// nakshora.config.js
+export default {
+  theme: {
+    colors: {
+      brand: {
+        50: '#f5f3ff',
+        500: '#8b5cf6',
+        900: '#4c1d95',
+      },
+    },
+    breakpoints: { tablet: 900, xxs: null }, // add tablet:, drop xxs:
+    animation: { wiggle: 'wiggle 1s ease-in-out infinite' },
+    keyframes: {
+      wiggle: '0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); }',
+    },
+  },
+};</code></pre>
+<p>Every new color automatically generates <code>text-*</code>, <code>bg-*</code>, <code>border-*</code>, <code>from-*</code>, <code>via-*</code>, <code>to-*</code> utilities plus <code>--color-*</code> CSS variables. Every new breakpoint gains a matching <code>max-*</code> twin.</p>
+<p><strong>All tokens surface as CSS variables on <code>:root</code>:</strong></p>
+<pre><code class="language-css">:root {
+  --color-brand-500: #8b5cf6;
+  --spacing-4: 1rem;
+  --text-base: 1rem;
+}</code></pre>
+<p>Disable the variable block with <code>corePlugins: { variables: false }</code>.</p>
+<h3 id="35-color-palettes">3.5 Color Palettes</h3>
+<p>Nakshora ships <strong>22 palettes × 11 shades (50–950)</strong>:</p>
+<pre><code class="language-text">slate gray zinc neutral stone red orange amber yellow lime
+emerald green teal cyan sky blue indigo violet purple fuchsia pink rose</code></pre>
+<p>Each <code>palette-shade</code> pair generates six utility families automatically:</p>
+<pre><code class="language-html">&lt;p class="text-blue-500"&gt;Colored text&lt;/p&gt;
+&lt;div class="bg-slate-900"&gt;Colored background&lt;/div&gt;
+&lt;div class="border border-rose-400"&gt;Colored border&lt;/div&gt;
+&lt;div class="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600"&gt;
+  Gradient with three stops
+&lt;/div&gt;</code></pre>
+<p>Five <strong>theme presets</strong> (<code>neonTheme</code>, <code>pastelTheme</code>, <code>brutalistTheme</code>, <code>minimalistTheme</code>, <code>natureTheme</code>, imported from <code>@nakshora/core</code>) replace the palette and typography for a complete visual direction. Apply one preset like this:</p>
+<pre><code class="language-js">// nakshora.config.js
+import { neonTheme } from '@nakshora/core';
+
+export default {
+  theme: {
+    colors: neonTheme.colors,
+    typography: neonTheme.typography,
+    shadows: neonTheme.shadows,
+  },
+};</code></pre>
+<h3 id="36-responsive-modifiers-the-10-breakpoint-system">3.6 Responsive Modifiers: The 10-Breakpoint System</h3>
+<p>Nakshora is <strong>mobile-first</strong>: unprefixed classes apply everywhere; a screen prefix overrides from that width upward. Version 3.1 defines <strong>10 screens</strong> from wearables to video walls:</p>
+<div class="tbl"><table><thead><tr>
+<th>Prefix</th>
+<th>Min-width</th>
+<th><code>max-*</code> twin (max-width)</th>
+<th>Typical devices</th>
+</tr></thead><tbody>
+<tr><td><em>(none)</em></td><td>0</td><td>—</td><td>everything</td></tr>
+<tr><td><code>xxs:</code></td><td>200px</td><td><code>max-xxs:</code> → 199.98px</td><td>tiny / folded screens, wearables</td></tr>
+<tr><td><code>xs:</code></td><td>400px</td><td><code>max-xs:</code> → 399.98px</td><td>small phones</td></tr>
+<tr><td><code>sm:</code></td><td>640px</td><td><code>max-sm:</code> → 639.98px</td><td>large phones</td></tr>
+<tr><td><code>md:</code></td><td>768px</td><td><code>max-md:</code> → 767.98px</td><td>tablets</td></tr>
+<tr><td><code>lg:</code></td><td>1024px</td><td><code>max-lg:</code> → 1023.98px</td><td>laptops</td></tr>
+<tr><td><code>xl:</code></td><td>1280px</td><td><code>max-xl:</code> → 1279.98px</td><td>desktops</td></tr>
+<tr><td><code>2xl:</code></td><td>1536px</td><td><code>max-2xl:</code> → 1535.98px</td><td>large desktops</td></tr>
+<tr><td><code>3xl:</code></td><td>1920px</td><td><code>max-3xl:</code> → 1919.98px</td><td>Full HD monitors, TVs</td></tr>
+<tr><td><code>4xl:</code></td><td>2560px</td><td><code>max-4xl:</code> → 2559.98px</td><td>QHD / 2K monitors</td></tr>
+<tr><td><code>5xl:</code></td><td>5000px</td><td><code>max-5xl:</code> → 4999.98px</td><td>4K+, video walls, ultra-wide</td></tr>
+</tbody></table></div>
+<p>Screens <code>sm</code>–<code>2xl</code> match Tailwind CSS v3 exactly. The other five are purely additive — no existing class changes meaning.</p>
+<pre><code class="language-html">&lt;div class="text-base sm:text-lg md:text-xl 3xl:text-2xl"&gt;Grows with the viewport&lt;/div&gt;
+&lt;nav class="max-md:hidden"&gt;Hidden on tablets and below&lt;/nav&gt;
+&lt;div class="min-[900px]:flex max-[900px]:hidden"&gt;Arbitrary breakpoint widths&lt;/div&gt;</code></pre>
+<p>Learn the combination rules (all pinned by <code>responsive.test.ts</code>):</p>
+<ul>
+<li>Screens emit <strong>ascending</strong> (200 → 5000) so the widest matching screen wins the cascade. <code>max-*</code> blocks emit <strong>descending</strong> so the narrowest wins.</li>
+<li>A screen plus any other <strong>media</strong> variant collapses into <strong>one</strong> query: <code>print:md:flex</code> → <code>@media print and (min-width: 768px)</code>. Set <code>combineMedia: false</code> for nested queries instead.</li>
+<li>Stacking two screens keeps the <strong>tighter</strong> bound: <code>lg:xl:flex</code> → <code>(min-width: 1280px)</code>; <code>md:max-xl:flex</code> → <code>(min-width: 768px) and (max-width: 1279.98px)</code> (a range).</li>
+<li><strong>Container queries</strong> (element-relative breakpoints) use Tailwind v4 grammar: <code>@container</code>, <code>@md:flex</code>, <code>@min-md:flex</code>, <code>@max-md:flex</code>, <code>@lg/card:flex</code>, <code>@[30rem]:flex</code>.</li>
+</ul>
+<p>The <code>.container</code> class sets <code>width: 100%</code> plus one <code>max-width</code> per screen — but only for <code>sm</code>…<code>2xl</code> by default, since a 200px or 5000px container is never useful. Widen the range with <code>theme.container.minScreen</code> / <code>maxScreen</code>.</p>
+<h3 id="37-state-variants">3.7 State Variants</h3>
+<p>Variants apply utilities in specific states or contexts. <strong>State variants emit in JIT mode only</strong> — configure <code>content</code> so the compiler can see your class names. Version 3.1 supports 155 stackable variants; these are the core set:</p>
+<p><strong>State variants:</strong></p>
+<div class="tbl"><table><thead><tr>
+<th>Prefix</th>
+<th>Generated CSS</th>
+<th>When it applies</th>
+</tr></thead><tbody>
+<tr><td><code>hover:</code></td><td><code>.hover\:x:hover</code></td><td>pointer is over the element</td></tr>
+<tr><td><code>focus:</code></td><td><code>.focus\:x:focus</code></td><td>element has focus</td></tr>
+<tr><td><code>focus-visible:</code></td><td><code>.focus-visible\:x:focus-visible</code></td><td>keyboard focus</td></tr>
+<tr><td><code>focus-within:</code></td><td><code>.focus-within\:x:focus-within</code></td><td>element or a descendant has focus</td></tr>
+<tr><td><code>active:</code></td><td><code>.active\:x:active</code></td><td>element is pressed</td></tr>
+<tr><td><code>visited:</code></td><td><code>.visited\:x:visited</code></td><td>link was visited</td></tr>
+<tr><td><code>disabled:</code></td><td><code>.disabled\:x:disabled</code></td><td>element is disabled</td></tr>
+<tr><td><code>first:</code></td><td><code>.first\:x:first-child</code></td><td>first child</td></tr>
+<tr><td><code>last:</code></td><td><code>.last\:x:last-child</code></td><td>last child</td></tr>
+</tbody></table></div>
+<p><strong>Group variants (parent → child):</strong> add <code>group</code> to the parent, then target children with <code>group-hover:</code> / <code>group-focus:</code>.</p>
+<pre><code class="language-html">&lt;a class="group flex items-center gap-2"&gt;
+  &lt;span class="text-slate-700"&gt;Docs&lt;/span&gt;
+  &lt;span class="opacity-0 group-hover:opacity-100 transition"&gt;→&lt;/span&gt;
+&lt;/a&gt;</code></pre>
+<p><strong>Peer variants (sibling → sibling):</strong> add <code>peer</code> to the earlier sibling, then target later siblings with <code>peer-hover:</code> / <code>peer-focus:</code>.</p>
+<pre><code class="language-html">&lt;input type="text" class="peer border rounded px-3 py-2" placeholder="Type here" /&gt;
+&lt;p class="hidden peer-focus:block text-sm text-slate-500"&gt;You are typing…&lt;/p&gt;</code></pre>
+<p><strong>Dark mode:</strong> class-based by default. Add <code>dark</code> to any ancestor (convention: <code>&lt;html class="dark"&gt;</code>), then use <code>dark:</code> variants:</p>
+<pre><code class="language-html">&lt;div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"&gt;
+  Adapts automatically.
+&lt;/div&gt;</code></pre>
+<p>This compiles to <code>.dark .dark\:bg-slate-900 { background-color: #0f172a; }</code>. Switch strategies with <code>darkMode: 'media'</code> (<code>prefers-color-scheme</code>), <code>'selector'</code>, <code>['selector', '[data-theme="dark]']</code>, or disable it with <code>false</code>.</p>
+<p><strong>Stacking:</strong> combine screens and states freely in any order:</p>
+<pre><code class="language-html">&lt;button class="bg-blue-500 hover:bg-blue-600 md:hover:bg-indigo-600"&gt;…&lt;/button&gt;</code></pre>
+<pre><code class="language-css">@media (min-width: 768px) {
+  .md\:hover\:bg-indigo-600:hover {
+    background-color: #4f46e5;
+  }
+}</code></pre>
+<p><strong>Disable any variant</strong> to shrink builds:</p>
+<pre><code class="language-js">export default {
+  variants: {
+    visited: false,
+    dark: false,
+    responsive: false, // no screen prefixes at all
+    maxResponsive: false, // keep md: but drop max-md:
+    containerQueries: false,
+  },
+};</code></pre>
+<h3 id="38-core-plugin-toggles">3.8 Core Plugin Toggles</h3>
+<p>Disable whole utility groups to shrink builds:</p>
+<pre><code class="language-js">export default {
+  corePlugins: {
+    transforms: false,
+    whitespace: false,
+    components: false, // drops .glass, .neon-btn, .brutalist-card, … (built-ins only)
+  },
+};</code></pre>
+<p>Available groups: <code>base, variables, animations, components, backgrounds, borderColor, borderRadius, borders, cursors, display, effects, filters, flex, gap, grid, inset, margin, opacity, padding, position, sizing, shadows, textColor, textDecoration, transforms, transitions, typography, whitespace, zIndex, overflow, visibility, gradients, plugin</code>. Note that <code>components: false</code> never removes components you register yourself with <code>addComponents</code> / <code>matchComponents</code>.</p>
+<h3 id="39-typography-handling">3.9 Typography Handling</h3>
+<p>Typography utilities read directly from the <code>typography</code> tokens:</p>
+<pre><code class="language-html">&lt;h1 class="text-4xl font-black tracking-tight leading-none"&gt;Headline&lt;/h1&gt;
+&lt;p class="text-base font-normal leading-relaxed tracking-normal text-slate-600"&gt;
+  Body copy. Each text-* size sets a matching line-height automatically:
+  text-base → 1rem / 1.5rem.
+&lt;/p&gt;
+&lt;code class="font-mono text-sm"&gt;Monospace for code&lt;/code&gt;
+&lt;p class="truncate"&gt;Long single-line text clips with an ellipsis…&lt;/p&gt;</code></pre>
+<p>Font-size scale (size / line-height): <code>xs</code> 0.75/1rem · <code>sm</code> 0.875/1.25rem · <code>base</code> 1/1.5rem · <code>lg</code> 1.125/1.75rem · <code>xl</code> 1.25/1.75rem · <code>2xl</code> 1.5/2rem · <code>3xl</code> 1.875/2.25rem · <code>4xl</code> 2.25/2.5rem · <code>5xl</code> 3rem/1 · <code>6xl</code> 3.75rem/1 · <code>7xl</code> 4.5rem/1 · <code>8xl</code> 6rem/1 · <code>9xl</code> 8rem/1.</p>
+<p>Weights map <code>thin</code>→100 through <code>black</code>→900. Line heights: <code>leading-none tight snug base relaxed loose</code>. Letter spacing: <code>tracking-tighter tight normal wide wider widest</code>.</p>
+<h3 id="310-the-plugin-api">3.10 The Plugin API</h3>
+<p>Plugins extend the framework programmatically. A plugin is a function <code>(api) =&gt; void</code>, an object <code>{ name, config?, handler }</code>, or a Tailwind <code>plugin()</code> object:</p>
+<pre><code class="language-js">// nakshora.config.js
+export default {
+  plugins: [
+    function (api) {
+      // Static utility — takes every variant automatically
+      api.addUtilities({ '.content-auto': { 'content-visibility': 'auto' } });
+      // Dynamic utility: tab-4 (theme) and tab-[3] (arbitrary)
+      api.matchUtilities({ tab: (v) =&gt; ({ tabSize: v }) }, { values: api.theme('spacing') });
+      // Component with nesting
+      api.addComponents({
+        '.card': { padding: api.theme('spacing.4'), '&amp;:hover': { opacity: '0.9' } },
+      });
+      // Base-layer rule
+      api.addBase({ h1: { fontSize: api.theme('fontSize.2xl')[0] } });
+      // Custom variants: hocus:flex, nth-[3]:flex
+      api.addVariant('hocus', ['&amp;:hover', '&amp;:focus']);
+      api.matchVariant('nth', (v) =&gt; `&amp;:nth-child(${v})`, { values: { 1: '1' } });
+    },
+  ],
+};</code></pre>
+<p>Numeric values gain <code>px</code> automatically unless the property is unitless (<code>lineHeight</code>, <code>zIndex</code>, <code>opacity</code>, …) — Tailwind semantics.</p>
+<hr>
+<h2 id="4-detailed-layout-and-utility-system-guide">4. Detailed Layout and Utility System Guide</h2>
+<h3 id="41-reading-the-utility-grammar">4.1 Reading the Utility Grammar</h3>
+<p>Every Nakshora class follows predictable patterns. Memorize these five rules and you can guess hundreds of classes correctly:</p>
+<ol>
+<li><strong>Color:</strong> <code>&lt;utility&gt;-&lt;palette&gt;-&lt;shade&gt;</code> → <code>text-blue-500</code>, <code>bg-slate-900</code>, <code>border-rose-400</code>, <code>from-cyan-500</code>.</li>
+<li><strong>Spacing:</strong> <code>&lt;utility&gt;-&lt;key&gt;</code> → <code>p-4</code>, <code>mt-2</code>, <code>gap-x-6</code>. Keys: <code>0 px 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 14 16 20 24 28 32 36 40 44 48 56 64 72 80 96</code>.</li>
+<li><strong>Responsive:</strong> <code>&lt;screen&gt;:&lt;utility&gt;</code> → <code>md:grid-cols-2</code>, <code>max-md:hidden</code>, <code>@md:flex</code> (container query).</li>
+<li><strong>State (JIT):</strong> <code>&lt;variant&gt;:&lt;utility&gt;</code> → <code>hover:bg-blue-600</code>, <code>dark:text-white</code>, <code>group-hover:opacity-100</code>.</li>
+<li><strong>Stacking (JIT):</strong> chain freely → <code>md:hover:bg-blue-600</code>, <code>print:md:flex</code>, <code>portrait:max-md:dark:flex</code>.</li>
+</ol>
+<h3 id="42-display-position-inset-and-stacking">4.2 Display, Position, Inset, and Stacking</h3>
+<pre><code class="language-html">&lt;!-- Display --&gt;
+&lt;div class="block"&gt;Block&lt;/div&gt;
+&lt;div class="inline-block"&gt;Inline block&lt;/div&gt;
+&lt;div class="flex"&gt;Flex container&lt;/div&gt;
+&lt;div class="grid"&gt;Grid container&lt;/div&gt;
+&lt;div class="hidden md:block"&gt;Hidden on mobile, block on tablets and up&lt;/div&gt;
+
+&lt;!-- Position + inset --&gt;
+&lt;header class="sticky top-0 z-50"&gt;Sticky header, always on top&lt;/header&gt;
+&lt;div class="relative"&gt;
+  &lt;span class="absolute top-2 right-2"&gt;Badge&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="fixed inset-0"&gt;Full-viewport overlay&lt;/div&gt;
+
+&lt;!-- z-index scale: auto hide(-1) 0 10 20 30 40 50 --&gt;
+&lt;div class="z-10"&gt;Above default content&lt;/div&gt;
+
+&lt;!-- Overflow and visibility --&gt;
+&lt;div class="overflow-hidden"&gt;Clips children&lt;/div&gt;
+&lt;div class="overflow-x-auto"&gt;Horizontal scroll when needed&lt;/div&gt;
+&lt;div class="invisible"&gt;Occupies space but hides&lt;/div&gt;</code></pre>
+<p>Inset utilities (<code>top-* right-* bottom-* left-* inset-* inset-x-* inset-y-*</code>) accept the full spacing scale plus fractions and <code>auto</code>. Logical-property twins (<code>start-* end-*</code>) support right-to-left layouts.</p>
+<h3 id="43-spacing-margin-padding-gap-and-space">4.3 Spacing: Margin, Padding, Gap, and Space</h3>
+<p>All spacing utilities share the spacing scale, where one step equals <code>0.25rem</code> (4px at default root size). Key <code>4</code> → <code>1rem</code>; key <code>px</code> → <code>1px</code>.</p>
+<pre><code class="language-html">&lt;!-- Margin: m t r b l x y s e + scale key; negatives with a dash prefix --&gt;
+&lt;div class="m-4"&gt;Margin 1rem on all sides&lt;/div&gt;
+&lt;div class="mt-2 mb-6 mx-auto max-w-md"&gt;Top, bottom, centered&lt;/div&gt;
+&lt;div class="-mt-4"&gt;Negative top margin pulls upward&lt;/div&gt;
+
+&lt;!-- Padding: p t r b l x y s e + scale key --&gt;
+&lt;div class="p-6 px-8 py-2"&gt;Padding variants&lt;/div&gt;
+
+&lt;!-- Gap (flex/grid): gap x y + scale key --&gt;
+&lt;div class="grid grid-cols-3 gap-4 gap-x-6"&gt;Gaps between cells&lt;/div&gt;
+
+&lt;!-- Space-between (adds margin to all but the first child) --&gt;
+&lt;div class="space-y-2"&gt;
+  &lt;p&gt;Item one&lt;/p&gt;
+  &lt;p&gt;Item two&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+<p>There are 561 spacing utilities in the catalog (margin plus negatives, padding, gap, space).</p>
+<h3 id="44-sizing">4.4 Sizing</h3>
+<pre><code class="language-html">&lt;div class="w-full max-w-md"&gt;Full width, capped at 28rem&lt;/div&gt;
+&lt;div class="w-1/2 md:w-1/3"&gt;Half width → one third on tablets&lt;/div&gt;
+&lt;div class="h-12 min-h-screen"&gt;Fixed height; at least full viewport&lt;/div&gt;
+&lt;main class="min-h-dvh"&gt;Full dynamic viewport height (mobile-safe)&lt;/main&gt;
+&lt;img class="w-24 h-24 object-cover" src="avatar.jpg" alt="Avatar" /&gt;</code></pre>
+<p>Width and height accept the spacing scale, fractions (<code>1/2 … 11/12</code>), viewport units (<code>h-svh lvh dvh</code>, <code>w-svw …</code>), <code>auto</code>, <code>full</code>, <code>screen</code>, <code>min</code>, <code>max</code>, <code>fit</code>, and arbitrary values (<code>w-[clamp(1rem,5vw,3rem)]</code>).</p>
+<h3 id="45-flexbox">4.5 Flexbox</h3>
+<pre><code class="language-html">&lt;!-- Centering pattern --&gt;
+&lt;div class="flex items-center justify-center min-h-screen"&gt;
+  &lt;p&gt;Perfectly centered&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- Direction, wrap, grow, shrink --&gt;
+&lt;div class="flex flex-col md:flex-row flex-wrap gap-4"&gt;
+  &lt;div class="flex-1"&gt;Grows&lt;/div&gt;
+  &lt;div class="flex-none"&gt;Fixed&lt;/div&gt;
+  &lt;div class="shrink-0"&gt;Never shrinks&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Alignment --&gt;
+&lt;div class="flex items-start justify-between"&gt;
+  &lt;span&gt;Left&lt;/span&gt;
+  &lt;span&gt;Right&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+<p>Available: <code>flex-row col</code> (+ <code>row-reverse col-reverse</code>), <code>flex-wrap nowrap wrap-reverse</code>, <code>items-start center end stretch baseline</code>, <code>justify-start center end between around evenly</code>, <code>flex-1 auto initial none</code>, <code>grow shrink (shrink-0)</code>, <code>order-*</code>, <code>self-*</code>, <code>place-*</code> shortcuts.</p>
+<h3 id="46-grid">4.6 Grid</h3>
+<pre><code class="language-html">&lt;!-- Responsive card grid: 1 → 2 → 3 → 4 → 6 columns --&gt;
+&lt;div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 4xl:grid-cols-6 gap-4"&gt;
+  &lt;div&gt;Cell&lt;/div&gt;
+  &lt;div&gt;Cell&lt;/div&gt;
+  &lt;div&gt;Cell&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Explicit placement --&gt;
+&lt;div class="grid grid-cols-12 gap-4"&gt;
+  &lt;aside class="col-span-12 md:col-span-3"&gt;Sidebar&lt;/aside&gt;
+  &lt;main class="col-span-12 md:col-span-9"&gt;Content&lt;/main&gt;
+&lt;/div&gt;
+
+&lt;!-- Rows and flow --&gt;
+&lt;div class="grid grid-rows-2 grid-flow-col gap-2 auto-cols-fr"&gt;
+  &lt;div&gt;Flows down columns&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<p>Grid utilities cover <code>grid-cols-1…12 none subgrid</code>, <code>grid-rows-*</code>, <code>col-span-* col-start-* col-end-*</code>, <code>row-span-* row-start-* row-end-*</code>, <code>auto-cols auto-rows</code>, <code>grid-flow-*</code>, and <code>place-*</code> alignment.</p>
+<h3 id="47-borders-radius-shadows-and-effects">4.7 Borders, Radius, Shadows, and Effects</h3>
+<pre><code class="language-html">&lt;div class="border border-slate-200 rounded-xl shadow-md"&gt;Standard card surface&lt;/div&gt;
+&lt;div class="border-2 border-dashed border-rose-400 rounded-full"&gt;Dashed pill&lt;/div&gt;
+&lt;button class="shadow-glow rounded-lg"&gt;Nakshora's blue glow shadow&lt;/button&gt;
+&lt;img class="rounded-xs opacity-75 blur-sm" src="photo.jpg" alt="Soft photo" /&gt;
+&lt;div class="backdrop-blur-md bg-white/70"&gt;Frosted overlay (UIT: bg opacity slash)&lt;/div&gt;</code></pre>
+<p>Radius scale: <code>none xs sm md lg xl 2xl 3xl full</code> (+ per-corner <code>rounded-tl-*</code> etc.). Shadow scale: <code>none sm base md lg xl 2xl inner glow</code>. Opacity accepts <code>0–100</code> in theme steps. Filters include <code>blur-* brightness-* contrast-* grayscale invert saturate-* sepia* drop-shadow-*</code> plus <code>backdrop-*</code> twins.</p>
+<h3 id="48-transforms-transitions-and-animations">4.8 Transforms, Transitions, and Animations</h3>
+<pre><code class="language-html">&lt;button class="transition hover:scale-105 active:scale-95 duration-200 ease-out"&gt;
+  Springy button
+&lt;/button&gt;
+&lt;div class="rotate-3 hover:rotate-0 transition-transform"&gt;Tilts upright on hover&lt;/div&gt;
+&lt;div class="animate-spin h-5 w-5 border-2 rounded-full"&gt;Spinner&lt;/div&gt;
+&lt;div class="animate-pulse skeleton-text w-1/2"&gt;Loading line&lt;/div&gt;</code></pre>
+<p>Transforms: <code>scale-* (incl. 175, 200) rotate-* (incl. 135 225 270 315 360) translate-* skew-* origin-*</code>. Transitions: <code>transition(-colors, -opacity, -shadow, -transform) duration-* ease-* (incl. back) delay-*</code>. Animations: <code>animate-spin ping pulse bounce fade slide shimmer</code> with matching <code>@keyframes</code> emitted in the base layer.</p>
+<h3 id="49-complete-example-fully-responsive-page-layout">4.9 Complete Example: Fully Responsive Page Layout</h3>
+<p>This runnable example combines flexbox, grid, spacing, positioning, responsive prefixes, and dark mode. It compiles under JIT when your <code>content</code> globs include the file:</p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;title&gt;Nakshora responsive layout&lt;/title&gt;
+    &lt;link rel="stylesheet" href="dist/nakshora.css" /&gt;
+  &lt;/head&gt;
+  &lt;body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"&gt;
+    &lt;!-- Sticky header --&gt;
+    &lt;header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200 dark:bg-slate-900/90 dark:border-slate-800"&gt;
+      &lt;nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between"&gt;
+        &lt;a href="#" class="font-black text-xl tracking-tight"&gt;NAKSHORA&lt;/a&gt;
+        &lt;div class="hidden md:flex items-center gap-8"&gt;
+          &lt;a href="#" class="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition"&gt;Docs&lt;/a&gt;
+          &lt;a href="#" class="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition"&gt;Themes&lt;/a&gt;
+          &lt;a href="#" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition"&gt;Get started&lt;/a&gt;
+        &lt;/div&gt;
+      &lt;/nav&gt;
+    &lt;/header&gt;
+
+    &lt;!-- Content: sidebar + grid --&gt;
+    &lt;div class="flex-1 w-full max-w-6xl mx-auto px-6 py-10 grid grid-cols-12 gap-6"&gt;
+      &lt;aside class="col-span-12 md:col-span-3"&gt;
+        &lt;div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 md:sticky md:top-24"&gt;
+          &lt;p class="text-xs font-bold uppercase tracking-wider text-slate-400"&gt;Index&lt;/p&gt;
+          &lt;ul class="mt-2 space-y-1 text-sm font-medium"&gt;
+            &lt;li&gt;&lt;a href="#" class="block px-3 py-2 rounded-md bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"&gt;Overview&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" class="block px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition"&gt;Utilities&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" class="block px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition"&gt;Themes&lt;/a&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/div&gt;
+      &lt;/aside&gt;
+
+      &lt;main class="col-span-12 md:col-span-9"&gt;
+        &lt;h1 class="text-3xl md:text-4xl font-black tracking-tight"&gt;Responsive by default&lt;/h1&gt;
+        &lt;p class="mt-2 text-slate-600 dark:text-slate-300 leading-relaxed"&gt;
+          One column on phones, two on large phones, three on laptops, four on desktops.
+        &lt;/p&gt;
+        &lt;div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"&gt;
+          &lt;article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 hover-lift"&gt;
+            &lt;h2 class="text-lg font-bold"&gt;Card one&lt;/h2&gt;
+            &lt;p class="mt-2 text-sm text-slate-600 dark:text-slate-300"&gt;Utilities compose into any design.&lt;/p&gt;
+          &lt;/article&gt;
+          &lt;article class="glass p-6"&gt;
+            &lt;h2 class="text-lg font-bold text-white"&gt;Glass card&lt;/h2&gt;
+            &lt;p class="mt-2 text-sm text-slate-300"&gt;Backdrop blur, zero config.&lt;/p&gt;
+          &lt;/article&gt;
+          &lt;article class="neon-card p-6"&gt;
+            &lt;p class="neon-text font-bold"&gt;NEON CYBER&lt;/p&gt;
+            &lt;p class="mt-2 text-sm text-slate-300"&gt;Glow built in.&lt;/p&gt;
+          &lt;/article&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Show / hide helpers --&gt;
+        &lt;p class="mt-6 text-sm text-slate-500"&gt;
+          &lt;span class="block sm:hidden"&gt;You read this on a phone.&lt;/span&gt;
+          &lt;span class="hidden sm:block"&gt;You read this on a wider screen.&lt;/span&gt;
+          &lt;span class="hidden lg:inline"&gt;You read this on a laptop or larger.&lt;/span&gt;
+        &lt;/p&gt;
+      &lt;/main&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Footer --&gt;
+    &lt;footer class="border-t border-slate-200 dark:border-slate-800"&gt;
+      &lt;div class="max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500"&gt;
+        &lt;p&gt;Built with Nakshora v3.1 — one stylesheet, zero runtime JS.&lt;/p&gt;
+        &lt;div class="flex items-center gap-4"&gt;
+          &lt;a href="#" class="hover:text-slate-900 dark:hover:text-white transition"&gt;Docs&lt;/a&gt;
+          &lt;a href="#" class="hover:text-slate-900 dark:hover:text-white transition"&gt;GitHub&lt;/a&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/footer&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p>Study what this page demonstrates: a sticky positioned header, a 12-column content grid that collapses on mobile, a sidebar that becomes sticky only on <code>md:</code> screens, a card grid that scales 1 → 2 → 3 columns, show/hide helpers, and full dark-mode coverage through <code>dark:</code> variants. Every class above exists in the v3.1 catalog.</p>
+<hr>
+<h2 id="5-component-library-breakdown">5. Component Library Breakdown</h2>
+<p>Nakshora v3.1 ships <strong>19 built-in component classes</strong> organized in six groups. Unlike utilities, you use them as single class names that deliver a complete visual treatment. Key facts from <code>packages/@nakshora/core/src/components.ts</code>:</p>
+<ul>
+<li>Components emit <strong>as-is</strong> (no variant expansion) in <strong>both full and JIT mode</strong>.</li>
+<li>They are small, so <strong>every build includes them</strong> automatically.</li>
+<li>They <strong>combine freely with utilities</strong>: <code>class="glass p-6 rounded-xl"</code> is the intended pattern.</li>
+<li>You can drop the built-ins with <code>corePlugins: { components: false }</code>. Components you register yourself via <code>addComponents</code> / <code>matchComponents</code> always survive.</li>
+</ul>
+<p>There are <strong>no</strong> built-in <code>.btn</code>, <code>.navbar</code>, <code>.modal</code>, or <code>.form</code> classes in v3. You compose those patterns from utilities (§5.7). This is deliberate: the framework owns <em>visual paradigms</em>; you own <em>product components</em>.</p>
+<h3 id="51-glassmorphism">5.1 Glassmorphism</h3>
+<p>Frosted-glass surfaces built on <code>backdrop-filter: blur() saturate()</code>.</p>
+<pre><code class="language-html">&lt;div class="glass p-8"&gt;
+  &lt;h3 class="text-lg font-bold text-white"&gt;Glass card&lt;/h3&gt;
+  &lt;p class="mt-2 text-sm text-slate-300"&gt;Standard glass — translucent white over dark backgrounds.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="glass-light p-8"&gt;
+  &lt;h3 class="text-lg font-bold"&gt;Light glass&lt;/h3&gt;
+  &lt;p class="mt-2 text-sm text-slate-600"&gt;Stronger light tint — best over photography.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="glass-dark p-8"&gt;
+  &lt;h3 class="text-lg font-bold text-white"&gt;Dark glass&lt;/h3&gt;
+  &lt;p class="mt-2 text-sm text-slate-300"&gt;Slate tint — best over dark backgrounds.&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+<div class="tbl"><table><thead><tr>
+<th>Class</th>
+<th>Effect</th>
+</tr></thead><tbody>
+<tr><td><code>.glass</code></td><td>Translucent white (<code>rgba(255,255,255,0.08)</code>), <code>blur(12px) saturate(140%)</code>, subtle border + shadow, light text</td></tr>
+<tr><td><code>.glass-light</code></td><td>Stronger light tint (<code>0.55</code> alpha), <code>blur(16px) saturate(160%)</code>, dark text</td></tr>
+<tr><td><code>.glass-dark</code></td><td>Slate tint (<code>rgba(15,23,42,0.55)</code>), slate border, light text</td></tr>
+</tbody></table></div>
+<p>All three set <code>border-radius: 0.75rem</code> and include the <code>-webkit-</code> prefix for Safari. Override the radius with any <code>rounded-*</code> utility.</p>
+<h3 id="52-neon-cyber">5.2 Neon Cyber</h3>
+<p>High-saturation glowing UI designed for dark backgrounds. Pairs with the <code>neonTheme</code> preset.</p>
+<pre><code class="language-html">&lt;div class="neon-card p-6 text-center"&gt;
+  &lt;p class="neon-text text-lg font-bold tracking-wide"&gt;SYSTEM ONLINE&lt;/p&gt;
+  &lt;p class="mt-2 text-sm text-slate-300"&gt;Glow intensifies when you hover the card.&lt;/p&gt;
+  &lt;button class="neon-btn mt-4"&gt;Engage&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- Apply the glow treatment to any element --&gt;
+&lt;div class="neon-glow bg-slate-900 p-4 rounded-lg"&gt;Custom glowing panel&lt;/div&gt;</code></pre>
+<div class="tbl"><table><thead><tr>
+<th>Class</th>
+<th>Effect</th>
+</tr></thead><tbody>
+<tr><td><code>.neon-card</code></td><td>Deep-navy card (<code>#0a1929</code>), cyan glow border; glow intensifies on hover</td></tr>
+<tr><td><code>.neon-btn</code></td><td>Cyan→pink gradient button (<code>#00d9ff → #ff006e</code>), neon shadow, lifts 1px on hover</td></tr>
+<tr><td><code>.neon-glow</code></td><td>Adds a layered cyan glow shadow to any element</td></tr>
+<tr><td><code>.neon-text</code></td><td>Cyan text with layered <code>text-shadow</code> glow</td></tr>
+</tbody></table></div>
+<h3 id="53-brutalism">5.3 Brutalism</h3>
+<p>Raw, high-contrast, zero ornamentation. Pairs with the <code>brutalistTheme</code> preset.</p>
+<pre><code class="language-html">&lt;div class="brutalist-card p-6"&gt;
+  &lt;h3 class="font-black uppercase tracking-wide"&gt;No frills&lt;/h3&gt;
+  &lt;p class="mt-2 text-sm"&gt;Hard borders. Hard shadows. Zero rounding.&lt;/p&gt;
+  &lt;button class="brutalist-btn mt-4"&gt;Smash&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+<div class="tbl"><table><thead><tr>
+<th>Class</th>
+<th>Effect</th>
+</tr></thead><tbody>
+<tr><td><code>.brutalist-card</code></td><td>White card, 3px black border, <code>border-radius: 0</code>, hard <code>8px 8px 0 #000</code> offset shadow; shifts and turns the shadow red on hover</td></tr>
+<tr><td><code>.brutalist-btn</code></td><td>Yellow block button (<code>#facc15</code>), 3px border, hard shadow, uppercase black type; turns red on hover and physically "presses" (<code>translate(5px,5px)</code>, shadow collapses) on <code>:active</code></td></tr>
+</tbody></table></div>
+<h3 id="54-minimalism">5.4 Minimalism</h3>
+<p>Quiet, professional surfaces. Pairs with the <code>minimalistTheme</code> preset.</p>
+<pre><code class="language-html">&lt;div class="minimalist-card p-6"&gt;
+  &lt;h3 class="text-lg font-semibold"&gt;Simple&lt;/h3&gt;
+  &lt;p class="mt-2 text-sm text-slate-600"&gt;Hairline border. Barely-there shadow.&lt;/p&gt;
+  &lt;button class="minimalist-btn mt-4"&gt;Continue&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+<div class="tbl"><table><thead><tr>
+<th>Class</th>
+<th>Effect</th>
+</tr></thead><tbody>
+<tr><td><code>.minimalist-card</code></td><td>White card, 1px <code>#e5e7eb</code> border, <code>0.5rem</code> radius, minimal shadow; border darkens slightly on hover</td></tr>
+<tr><td><code>.minimalist-btn</code></td><td>Dark pill button (<code>#111827</code>); inverts to light background with dark text on hover</td></tr>
+</tbody></table></div>
+<h3 id="55-skeletons-loading-states">5.5 Skeletons (Loading States)</h3>
+<p>Shimmer placeholders for content that has not loaded yet. All three run the built-in <code>shimmer</code> keyframe animation (<code>background-position</code> sweep, 1.5s linear infinite).</p>
+<pre><code class="language-html">&lt;div class="bg-white rounded-xl border border-slate-200 p-6 flex items-start gap-4"&gt;
+  &lt;div class="skeleton-circle w-12 h-12 shrink-0"&gt;&lt;/div&gt;
+  &lt;div class="flex-1 space-y-2 py-1"&gt;
+    &lt;div class="skeleton-text w-3/4"&gt;&lt;/div&gt;
+    &lt;div class="skeleton-text w-1/2"&gt;&lt;/div&gt;
+    &lt;div class="skeleton-text w-5/6"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<div class="tbl"><table><thead><tr>
+<th>Class</th>
+<th>Effect</th>
+</tr></thead><tbody>
+<tr><td><code>.skeleton-rect</code></td><td>Rounded-rectangle shimmer — set <code>w-*</code> / <code>h-*</code> on the element</td></tr>
+<tr><td><code>.skeleton-circle</code></td><td>Circular shimmer for avatars (<code>border-radius: 9999px</code>)</td></tr>
+<tr><td><code>.skeleton-text</code></td><td>Text-line shimmer with <code>height: 1em</code>, so it matches surrounding type size</td></tr>
+</tbody></table></div>
+<h3 id="56-helpers">5.6 Helpers</h3>
+<p>Single-purpose treatments that lift any element:</p>
+<pre><code class="language-html">&lt;div class="bg-white rounded-xl shadow-md p-6 hover-lift"&gt;
+  Lifts 4px with a deeper shadow on hover.
+&lt;/div&gt;
+
+&lt;h1 class="text-4xl font-black gradient-text"&gt;Gradient headline&lt;/h1&gt;
+
+&lt;div class="gradient-neon p-8 rounded-xl"&gt;Dark navy diagonal background&lt;/div&gt;
+&lt;div class="gradient-pastel p-8 rounded-xl"&gt;Soft pink → blue → green background&lt;/div&gt;
+&lt;div class="gradient-nature p-8 rounded-xl"&gt;Deep forest background&lt;/div&gt;
+&lt;div class="gradient-brutalist p-8"&gt;Yellow → red background&lt;/div&gt;</code></pre>
+<div class="tbl"><table><thead><tr>
+<th>Class</th>
+<th>Effect</th>
+</tr></thead><tbody>
+<tr><td><code>.hover-lift</code></td><td><code>translateY(-4px)</code> + deeper shadow on hover, 200ms transition</td></tr>
+<tr><td><code>.gradient-text</code></td><td>Blue → purple → pink text via <code>background-clip: text</code></td></tr>
+<tr><td><code>.gradient-neon</code></td><td>Dark navy diagonal gradient background</td></tr>
+<tr><td><code>.gradient-pastel</code></td><td>Soft pink → blue → green gradient background</td></tr>
+<tr><td><code>.gradient-nature</code></td><td>Deep forest gradient background</td></tr>
+<tr><td><code>.gradient-brutalist</code></td><td>Yellow → red gradient background</td></tr>
+</tbody></table></div>
+<h3 id="57-utility-composed-patterns-buttons-cards-forms-modals-navbars">5.7 Utility-Composed Patterns: Buttons, Cards, Forms, Modals, Navbars</h3>
+<p>These patterns use <strong>only documented utilities</strong> — no built-in component classes. Copy them directly; each compiles under JIT.</p>
+<p><strong>Buttons</strong> — six treatments, one grammar:</p>
+<pre><code class="language-html">&lt;!-- Primary --&gt;
+&lt;button
+  class="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 active:scale-95 transition shadow-md"
+&gt;
+  Primary
+&lt;/button&gt;
+
+&lt;!-- Glass --&gt;
+&lt;button class="glass px-5 py-2.5 text-white font-medium rounded-lg hover:bg-white/20 transition"&gt;
+  Glass
+&lt;/button&gt;
+
+&lt;!-- Neon / Brutalist / Minimal (built-in components) --&gt;
+&lt;button class="neon-btn"&gt;Neon&lt;/button&gt;
+&lt;button class="brutalist-btn"&gt;Brutal&lt;/button&gt;
+&lt;button class="minimalist-btn"&gt;Minimal&lt;/button&gt;
+
+&lt;!-- Ghost --&gt;
+&lt;button class="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md font-medium transition"&gt;
+  Ghost
+&lt;/button&gt;
+
+&lt;!-- Disabled state --&gt;
+&lt;button
+  class="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg opacity-50 disabled:cursor-not-allowed"
+  disabled
+&gt;
+  Disabled
+&lt;/button&gt;</code></pre>
+<p><strong>Cards</strong> — standard, dark-mode-aware, and loading variants:</p>
+<pre><code class="language-html">&lt;!-- Standard --&gt;
+&lt;div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 hover-lift dark:bg-slate-800 dark:border-slate-700"&gt;
+  &lt;h3 class="text-lg font-semibold text-slate-900 dark:text-white"&gt;Title&lt;/h3&gt;
+  &lt;p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed"&gt;
+    Body copy with comfortable line height.
+  &lt;/p&gt;
+  &lt;a href="#" class="inline-block mt-4 text-blue-500 hover:text-blue-600 font-medium"&gt;Learn more →&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;!-- Glass --&gt;
+&lt;div class="glass p-6"&gt;
+  &lt;h3 class="text-lg font-bold text-white"&gt;Glass card&lt;/h3&gt;
+  &lt;p class="mt-2 text-slate-300 text-sm"&gt;Frosted surface over any background.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- Neon --&gt;
+&lt;div class="neon-card p-6"&gt;
+  &lt;p class="neon-text font-bold tracking-wide"&gt;SYSTEM ONLINE&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+<p><strong>Forms</strong> — accessible inputs composed from border, spacing, and focus variants:</p>
+<pre><code class="language-html">&lt;form class="max-w-md space-y-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm"&gt;
+  &lt;div&gt;
+    &lt;label for="email" class="block text-sm font-semibold text-slate-700"&gt;Email&lt;/label&gt;
+    &lt;input
+      id="email"
+      type="email"
+      placeholder="you@example.com"
+      class="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    /&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;label for="role" class="block text-sm font-semibold text-slate-700"&gt;Role&lt;/label&gt;
+    &lt;select
+      id="role"
+      class="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+    &gt;
+      &lt;option&gt;Student&lt;/option&gt;
+      &lt;option&gt;Developer&lt;/option&gt;
+      &lt;option&gt;Teacher&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+  &lt;label class="flex items-center gap-2 text-sm text-slate-600"&gt;
+    &lt;input type="checkbox" class="peer h-4 w-4 rounded border-slate-300" /&gt;
+    &lt;span&gt;Email me the course notes&lt;/span&gt;
+  &lt;/label&gt;
+  &lt;button
+    type="submit"
+    class="w-full px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 active:scale-[0.98] transition"
+  &gt;
+    Enroll
+  &lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<p><strong>Modal</strong> — fixed overlay plus centered panel, no JavaScript required for the styling:</p>
+<pre><code class="language-html">&lt;!-- Overlay --&gt;
+&lt;div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm"&gt;
+  &lt;!-- Panel --&gt;
+  &lt;div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-6"&gt;
+    &lt;h2 class="text-xl font-bold text-slate-900 dark:text-white"&gt;Confirm enrollment&lt;/h2&gt;
+    &lt;p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed"&gt;
+      You are about to enroll in the Nakshora CSS course module. Continue?
+    &lt;/p&gt;
+    &lt;div class="mt-6 flex justify-end gap-3"&gt;
+      &lt;button class="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition"&gt;
+        Cancel
+      &lt;/button&gt;
+      &lt;button class="px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition"&gt;
+        Confirm
+      &lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<p><strong>Navbar</strong> — sticky glass header that collapses links on mobile:</p>
+<pre><code class="language-html">&lt;header class="sticky top-0 z-50 glass-dark"&gt;
+  &lt;nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between"&gt;
+    &lt;a class="text-white font-black text-xl tracking-tight" href="#"&gt;NAKSHORA&lt;/a&gt;
+    &lt;div class="hidden md:flex items-center gap-8"&gt;
+      &lt;a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#"&gt;Docs&lt;/a&gt;
+      &lt;a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#"&gt;Themes&lt;/a&gt;
+      &lt;a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#"&gt;Blog&lt;/a&gt;
+      &lt;a
+        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition"
+        href="#"
+        &gt;Get started&lt;/a
+      &gt;
+    &lt;/div&gt;
+    &lt;button class="md:hidden text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-white/10 transition"&gt;
+      Menu
+    &lt;/button&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;</code></pre>
+<hr>
+<h2 id="6-interactive-practical-learning-lab-exercises">6. Interactive Practical Learning Lab (Exercises)</h2>
+<p>Work through these exercises in order. Each states a goal, lists acceptance criteria, and then gives the complete solution so you can verify your work. Use any integration path; the CLI path (<code>nakshora dev</code>) gives the fastest feedback loop.</p>
+<p><strong>Lab setup (all exercises):</strong></p>
+<pre><code class="language-bash">mkdir nakshora-lab &amp;&amp; cd nakshora-lab
+npm install -D @nakshora/cli
+nakshora init
+# point content at your files in nakshora.config.js:
+# content: ['./*.html']
+nakshora dev nakshora.css -o dist/nakshora.css</code></pre>
+<p>Link <code>dist/nakshora.css</code> from each exercise file and rebuild (watch mode rebuilds automatically — median 1.3 ms incremental).</p>
+<h3 id="61-exercise-1-responsive-profile-card">6.1 Exercise 1: Responsive Profile Card</h3>
+<p><strong>Goal.</strong> Build a profile card that stacks vertically on phones and switches to a horizontal layout on tablets and larger.</p>
+<p><strong>Requirements:</strong></p>
+<ol>
+<li>Card container: white surface, <code>rounded-xl</code>, border, shadow, <code>hover-lift</code>, max width <code>max-w-md</code>, padding <code>p-6</code>.</li>
+<li>Avatar: use <code>skeleton-circle</code> sized <code>w-16 h-16</code> as a placeholder (swap in an <code>&lt;img&gt;</code> with the same sizing later).</li>
+<li>Name (<code>text-xl font-bold</code>), role (<code>text-sm</code> in <code>text-slate-500</code>), and a two-line bio (<code>text-sm leading-relaxed</code>).</li>
+<li>A primary follow button (<code>bg-blue-500</code>, hover darkens, presses down on <code>:active</code>).</li>
+<li>Layout: <code>flex-col</code> by default, <code>sm:flex-row</code> with <code>sm:items-center</code> and <code>gap-4</code>.</li>
+<li>Dark mode: card turns <code>dark:bg-slate-800</code>, text adapts. Test by toggling <code>class="dark"</code> on <code>&lt;html&gt;</code>.</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;title&gt;Exercise 1 — Profile card&lt;/title&gt;
+    &lt;link rel="stylesheet" href="dist/nakshora.css" /&gt;
+  &lt;/head&gt;
+  &lt;body class="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-6"&gt;
+    &lt;article
+      class="w-full max-w-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-md p-6 hover-lift flex flex-col sm:flex-row sm:items-center gap-4"
+    &gt;
+      &lt;div class="skeleton-circle w-16 h-16 shrink-0"&gt;&lt;/div&gt;
+      &lt;div class="flex-1"&gt;
+        &lt;h2 class="text-xl font-bold text-slate-900 dark:text-white"&gt;Ayesha Rahman&lt;/h2&gt;
+        &lt;p class="text-sm text-slate-500 dark:text-slate-400"&gt;Front-end developer · Dhaka&lt;/p&gt;
+        &lt;p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed"&gt;
+          Builds responsive interfaces with utility-first CSS. Learning Nakshora one component at a time.
+        &lt;/p&gt;
+        &lt;button
+          class="mt-4 px-5 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600 active:scale-95 transition"
+        &gt;
+          Follow
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p><strong>Check your work:</strong> narrow the window below 640px — the avatar stacks above the text. Widen it — the card turns horizontal. Add <code>class="dark"</code> to <code>&lt;html&gt;</code> — the card, text, and page background all switch. If any variant fails, run <code>nakshora doctor</code> and confirm your <code>content</code> glob includes this file (state and screen variants need JIT).</p>
+<h3 id="62-exercise-2-navigation-bar">6.2 Exercise 2: Navigation Bar</h3>
+<p><strong>Goal.</strong> Build a sticky navbar with a brand mark, three links, and a call-to-action button. Links show on <code>md:</code> screens and larger; a compact menu button shows below <code>md:</code>.</p>
+<p><strong>Requirements:</strong></p>
+<ol>
+<li><code>header</code> is <code>sticky top-0 z-50</code> with the <code>glass-dark</code> treatment.</li>
+<li>Inner <code>nav</code>: centered (<code>max-w-6xl mx-auto</code>), padded (<code>px-6</code>), fixed height (<code>h-16</code>), flex with <code>items-center justify-between</code>.</li>
+<li>Brand: <code>font-black text-xl tracking-tight text-white</code>.</li>
+<li>Link group: <code>hidden md:flex items-center gap-8</code>; links are <code>text-sm font-medium text-slate-300 hover:text-white transition</code>.</li>
+<li>CTA button: <code>bg-blue-500 hover:bg-blue-600</code>, white semibold text, <code>rounded-lg</code>, padding <code>px-4 py-2</code>.</li>
+<li>Mobile menu button: visible only below <code>md:</code> (<code>md:hidden</code>), subtle hover background (<code>hover:bg-white/10</code>).</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;title&gt;Exercise 2 — Navbar&lt;/title&gt;
+    &lt;link rel="stylesheet" href="dist/nakshora.css" /&gt;
+  &lt;/head&gt;
+  &lt;body class="min-h-screen bg-slate-950"&gt;
+    &lt;header class="sticky top-0 z-50 glass-dark"&gt;
+      &lt;nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between"&gt;
+        &lt;a class="text-white font-black text-xl tracking-tight" href="#"&gt;NAKSHORA&lt;/a&gt;
+        &lt;div class="hidden md:flex items-center gap-8"&gt;
+          &lt;a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#"&gt;Docs&lt;/a&gt;
+          &lt;a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#"&gt;Themes&lt;/a&gt;
+          &lt;a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#"&gt;Blog&lt;/a&gt;
+          &lt;a
+            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition"
+            href="#"
+            &gt;Get started&lt;/a
+          &gt;
+        &lt;/div&gt;
+        &lt;button
+          class="md:hidden text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-white/10 transition"
+        &gt;
+          Menu
+        &lt;/button&gt;
+      &lt;/nav&gt;
+    &lt;/header&gt;
+
+    &lt;main class="max-w-6xl mx-auto px-6 py-16"&gt;
+      &lt;div class="glass p-8 text-center"&gt;
+        &lt;h1 class="text-3xl font-bold text-white"&gt;Scroll — the header stays.&lt;/h1&gt;
+        &lt;p class="mt-2 text-slate-300"&gt;Sticky positioning + glassmorphism, zero custom CSS.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class="h-[120vh]"&gt;&lt;/div&gt;
+    &lt;/main&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p><strong>Check your work:</strong> resize across the 768px boundary — links and the menu button swap. Scroll the tall page — the header sticks. Hover each link — the color transitions to white. Run <code>nakshora inspect "md:flex"</code> to see the exact <code>@media (min-width: 768px)</code> rule the compiler emits.</p>
+<h3 id="63-exercise-3-stretch-dark-mode-feature-grid-with-loading-state">6.3 Exercise 3 (Stretch): Dark-Mode Feature Grid with Loading State</h3>
+<p><strong>Goal.</strong> Combine everything: a responsive grid, dark mode, a gradient headline, and a skeleton loader.</p>
+<p><strong>Requirements:</strong></p>
+<ol>
+<li>Page: <code>min-h-screen bg-slate-50 dark:bg-slate-950</code>, centered content column (<code>max-w-5xl mx-auto px-6 py-12</code>).</li>
+<li>Headline uses <code>gradient-text</code> at <code>text-3xl md:text-4xl font-black</code>.</li>
+<li>Grid: <code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6</code>.</li>
+<li>Three cards: one standard utility card, one <code>.glass</code> card, one <code>.neon-card</code> — each dark-mode-aware where utilities allow.</li>
+<li>Below the grid, a skeleton loader row (one <code>skeleton-circle</code> + two <code>skeleton-text</code> lines) inside a bordered panel.</li>
+<li>A toggle button that adds/removes <code>dark</code> on <code>&lt;html&gt;</code> (three lines of vanilla JS — styling stays pure Nakshora).</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;title&gt;Exercise 3 — Feature grid&lt;/title&gt;
+    &lt;link rel="stylesheet" href="dist/nakshora.css" /&gt;
+  &lt;/head&gt;
+  &lt;body class="min-h-screen bg-slate-50 dark:bg-slate-950"&gt;
+    &lt;main class="max-w-5xl mx-auto px-6 py-12"&gt;
+      &lt;div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"&gt;
+        &lt;h1 class="text-3xl md:text-4xl font-black gradient-text"&gt;Ship responsive UIs fast&lt;/h1&gt;
+        &lt;button
+          id="theme-toggle"
+          class="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+        &gt;
+          Toggle dark mode
+        &lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"&gt;
+        &lt;article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 hover-lift"&gt;
+          &lt;h2 class="text-lg font-bold text-slate-900 dark:text-white"&gt;Utility-first&lt;/h2&gt;
+          &lt;p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed"&gt;
+            11,417 utilities across 35 categories. Compose any design in markup.
+          &lt;/p&gt;
+          &lt;a href="#" class="inline-block mt-4 text-sm font-medium text-blue-500 hover:text-blue-600"&gt;Learn more →&lt;/a&gt;
+        &lt;/article&gt;
+
+        &lt;article class="glass p-6"&gt;
+          &lt;h2 class="text-lg font-bold text-white"&gt;Glassmorphism&lt;/h2&gt;
+          &lt;p class="mt-2 text-sm text-slate-300 leading-relaxed"&gt;Backdrop blur, zero config.&lt;/p&gt;
+          &lt;button class="mt-4 px-4 py-2 text-sm font-medium text-white rounded-lg hover:bg-white/20 transition"&gt;
+            Preview
+          &lt;/button&gt;
+        &lt;/article&gt;
+
+        &lt;article class="neon-card p-6"&gt;
+          &lt;p class="neon-text font-bold tracking-wide"&gt;NEON CYBER&lt;/p&gt;
+          &lt;p class="mt-2 text-sm text-slate-300 leading-relaxed"&gt;Glow built in for dark UIs.&lt;/p&gt;
+          &lt;button class="neon-btn mt-4"&gt;Engage&lt;/button&gt;
+        &lt;/article&gt;
+      &lt;/div&gt;
+
+      &lt;div class="mt-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 flex items-center gap-4"&gt;
+        &lt;div class="skeleton-circle w-12 h-12 shrink-0"&gt;&lt;/div&gt;
+        &lt;div class="flex-1 space-y-2"&gt;
+          &lt;div class="skeleton-text w-3/4"&gt;&lt;/div&gt;
+          &lt;div class="skeleton-text w-1/2"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+
+    &lt;script&gt;
+      document
+        .getElementById('theme-toggle')
+        .addEventListener('click', () =&gt; document.documentElement.classList.toggle('dark'));
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p><strong>Check your work:</strong> click the toggle — every <code>dark:</code> variant flips at once. Resize through 640px and 1024px — the grid gains columns. Inspect the built CSS with <code>nakshora build --stats</code> — note how small the JIT output is compared with the 5.98 MB full build. You now think in utilities.</p>
+<hr>
+<h2 id="7-conclusion-and-review-questions">7. Conclusion and Review Questions</h2>
+<h3 id="71-summary-of-architectural-paradigms">7.1 Summary of Architectural Paradigms</h3>
+<p>You learned five paradigms that define Nakshora v3.1:</p>
+<ol>
+<li><strong>Utility-first composition.</strong> Small classes map to CSS declarations. You design in the <code>class</code> attribute instead of writing stylesheets.</li>
+<li><strong>Mobile-first responsive design.</strong> Base styles apply everywhere; ten screen prefixes (<code>xxs:</code> → <code>5xl:</code>, 200px → 5000px) layer overrides upward, with <code>max-*</code> twins for desktop-first exceptions and container queries (<code>@md:</code>) for component-relative breakpoints.</li>
+<li><strong>Just-in-time compilation.</strong> The engine extracts class candidates from your <code>content</code> files and emits only used CSS (median 18.2 ms warm build, 1.3 ms incremental). State variants exist only in JIT mode.</li>
+<li><strong>Token-driven theming.</strong> One resolved theme (colors, spacing, type, shadows, radii, breakpoints, motion) feeds every utility, generates <code>:root</code> CSS variables, and accepts presets, deep overrides, plugins, and CSS-first <code>@theme</code> blocks.</li>
+<li><strong>Paradigm components.</strong> Nineteen built-in classes deliver complete glass, neon, brutalist, minimalist, skeleton, and gradient treatments — always composable with utilities, never a replacement for them.</li>
+</ol>
+<p>The framework's measurable shape: <strong>11,417 utilities · 35 categories · 22 palettes × 11 shades · 10 screens · 155 variants · 5 presets · 0 bytes of runtime JavaScript · MIT license.</strong></p>
+<h3 id="72-concept-check-questions">7.2 Concept-Check Questions</h3>
+<p>Answer from memory, then verify against the section cited.</p>
+<ol>
+<li><strong>Modes.</strong> You add <code>hover:bg-blue-600</code> to a page built with the CDN link, but the hover style never applies. What causes this, and what are two ways to fix it? (§2.6, §3.1)</li>
+<li><strong>Breakpoints.</strong> Your design needs one column on phones, two columns on tablets, and four columns on desktops. Write the single <code>class</code> value for the grid container. At which exact pixel widths do the changes trigger? (§3.6, §4.6)</li>
+<li><strong>Variants.</strong> Explain the difference between <code>group-hover:</code> and <code>peer-focus:</code>. Where do you place the <code>group</code> and <code>peer</code> classes in each pattern? (§3.7)</li>
+<li><strong>Theming.</strong> You must add a brand color <code>#6d28d9</code> as <code>brand-500</code> so that <code>bg-brand-500</code>, <code>text-brand-500</code>, and <code>border-brand-500</code> all work. Show the config change and explain why all three utilities appear automatically. (§3.4)</li>
+<li><strong>Architecture.</strong> Contrast JIT mode with full mode: what triggers each, what each emits, and when you would choose one over the other. Include the approximate output sizes. (§3.1, §2.5)</li>
+</ol>
+<p><strong>Answer key:</strong></p>
+<ol>
+<li>State variants (<code>hover:</code>, <code>dark:</code>, <code>group-*</code>, …) emit <strong>only in JIT mode</strong>; the CDN file carries base + responsive utilities alone. Fix it by (a) adopting any compiler path — Vite, PostCSS, or CLI with <code>content</code> configured — or (b) writing the hover rule as custom CSS. Verify with <code>nakshora doctor</code> and <code>nakshora inspect "hover:bg-blue-600"</code>.</li>
+<li><code>class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"</code>. Changes trigger at <code>md</code> = <strong>768px</strong> and <code>xl</code> = <strong>1280px</strong> (mobile-first <code>min-width</code> queries; <code>sm</code>–<code>2xl</code> match Tailwind exactly).</li>
+<li><code>group-hover:</code> styles a <strong>descendant</strong> when an <strong>ancestor</strong> is hovered — place <code>group</code> on the ancestor, <code>group-hover:*</code> on the child. <code>peer-focus:</code> styles a <strong>later sibling</strong> when an <strong>earlier sibling</strong> gains focus — place <code>peer</code> on the earlier sibling, <code>peer-focus:*</code> on the later one (<code>~</code> combinator).</li>
+<li>Add <code>theme: { colors: { brand: { 500: '#6d28d9' } } }</code> to <code>nakshora.config.js</code>. Every color entry automatically generates the <code>text-*</code>, <code>bg-*</code>, <code>border-*</code>, <code>from-*</code>, <code>via-*</code>, <code>to-*</code> families plus a <code>--color-brand-500</code> variable, because the generator derives all six families from the resolved <code>colors</code> scale.</li>
+<li><strong>JIT:</strong> triggered by <code>content</code> globs (or <code>--mode jit</code>); emits only used classes + <code>safelist</code>, including all state variants — typically <strong>5–20 KB</strong>. <strong>Full:</strong> triggered by absent <code>content</code> (or <code>--mode full</code>); emits all base + responsive utilities + components, no state variants — <strong>~5.98 MB raw / ~133 KB Brotli</strong>. Choose JIT for every project with a build step; choose full/CDN only for zero-tooling pages.</li>
+</ol>
+<h3 id="73-quick-reference-cheat-sheet">7.3 Quick-Reference Cheat Sheet</h3>
+<div class="tbl"><table><thead><tr>
+<th>Task</th>
+<th>Classes / commands</th>
+</tr></thead><tbody>
+<tr><td>Center content</td><td><code>flex items-center justify-center</code> or <code>text-center</code></td></tr>
+<tr><td>Card surface</td><td><code>bg-white rounded-xl shadow-md border border-slate-200 p-6</code></td></tr>
+<tr><td>Hover effect</td><td><code>hover:bg-blue-600 transition</code></td></tr>
+<tr><td>Responsive grid</td><td><code>grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6</code></td></tr>
+<tr><td>Show / hide by screen</td><td><code>hidden md:block</code>, <code>max-md:hidden</code></td></tr>
+<tr><td>Dark mode</td><td><code>&lt;html class="dark"&gt;</code> + <code>dark:bg-slate-900 dark:text-white</code></td></tr>
+<tr><td>Sticky header</td><td><code>sticky top-0 z-50</code></td></tr>
+<tr><td>Truncate text</td><td><code>truncate</code></td></tr>
+<tr><td>Loading state</td><td><code>skeleton-text</code> / <code>skeleton-circle</code></td></tr>
+<tr><td>Gradient text</td><td><code>gradient-text</code></td></tr>
+<tr><td>Glass panel</td><td><code>glass p-6</code> (+ <code>rounded-xl</code>)</td></tr>
+<tr><td>Diagnose project</td><td><code>nakshora doctor</code></td></tr>
+<tr><td>Preview one class</td><td><code>nakshora inspect "md:hover:bg-blue-600"</code></td></tr>
+<tr><td>Build with stats</td><td><code>nakshora build nakshora.css -o dist/nakshora.css --stats</code></td></tr>
+</tbody></table></div>
+<h3 id="74-next-steps-for-learners">7.4 Next Steps for Learners</h3>
+<ul>
+<li>Read the <a href="https://docs.nakshora.bsdc.info.bd/v3.1/hub/utilities/" rel="noopener">Utilities Reference</a> hub (129 pages) and the <a href="https://docs.nakshora.bsdc.info.bd/v3.1/hub/colors/" rel="noopener">Colors</a> hub (361 pages) on the official docs platform.</li>
+<li>Work the <a href="https://docs.nakshora.bsdc.info.bd/v3.1/hub/tutorials/" rel="noopener">Tutorials</a> and <a href="https://docs.nakshora.bsdc.info.bd/v3.1/hub/recipes/" rel="noopener">Recipes</a> collections for guided practice.</li>
+<li>Study <code>docs/CONFIGURATION.md</code>, <code>docs/JIT.md</code>, and <code>docs/RESPONSIVE.md</code> in the repository for compiler internals.</li>
+<li>Experiment in the <a href="https://nakshora.bsdc.info.bd/playground/" rel="noopener">Playground</a>, which compiles classes live in the browser with the same engine and no build step.</li>
+</ul>
+<hr>
+<h2 id="8-references">8. References</h2>
+<p>Real publications and primary sources about the Nakshora CSS framework, consulted for this guide:</p>
+<ol>
+<li><strong>RRC Development — Global launch announcement (press release, September 13, 2026).</strong> "RRC Development Announces the Global Launch of Nakshora: A Next-Generation, Open-Source Utility Frontend CSS Framework Built for the Semantic Web." Published on openPR. Describes the utility-first paradigm shift, the Sylhet-based team's goals, and the open-source release. <a href="https://www.openpr.com/news/4630229/rrc-devolopment-announces-the-global-launch-of-nakshora">https://www.openpr.com/news/4630229/rrc-devolopment-announces-the-global-launch-of-nakshora</a></li>
+<li><strong>Rizwan Rahim Chowdhury — "I built a sub-4ms JIT CSS framework with native Glassmorphism and built-in LLM training files" (DEV Community, September 2026).</strong> The author's technical account of the zero-dependency JIT engine, the utility catalog, Vite/PostCSS/CLI integrations, and the <code>llms.txt</code> + corpus + SFT-dataset strategy for AI-assisted development. <a href="https://dev.to/debatesylhetbd/i-built-a-sub-4ms-jit-css-framework-with-native-glassmorphism-and-built-in-llm-training-files-3aah">https://dev.to/debatesylhetbd/i-built-a-sub-4ms-jit-css-framework-with-native-glassmorphism-and-built-in-llm-training-files-3aah</a></li>
+<li><strong>Official documentation platform — Nakshora Docs.</strong> Versioned guides, utility reference, recipes, and tutorials for v1.0–v3.1 (9,375+ articles). The v3.1 hub documents 11,417 utilities, 10 breakpoints, 155 variants, and the 2026-09-14 release. <a href="https://docs.nakshora.bsdc.info.bd/">https://docs.nakshora.bsdc.info.bd/</a> · <a href="https://docs.nakshora.bsdc.info.bd/v3.1/">https://docs.nakshora.bsdc.info.bd/v3.1/</a></li>
+<li><strong>Source repository — <code>nakshora/nakshora</code> (GitHub, MIT license).</strong> Monorepo with <code>packages/@nakshora/{core,cli,postcss,vite-plugin}</code>, full <code>docs/</code> collection, benchmarks, and test suites. <a href="https://github.com/nakshora/nakshora">https://github.com/nakshora/nakshora</a></li>
+<li><strong>Project website and live playground.</strong> Framework overview and in-browser JIT compilation demo. <a href="https://nakshora.bsdc.info.bd">https://nakshora.bsdc.info.bd</a> · <a href="https://nakshora.bsdc.info.bd/playground/">https://nakshora.bsdc.info.bd/playground/</a></li>
+<li><strong>npm registry — <code>@nakshora/core</code>, <code>@nakshora/cli</code>, <code>@nakshora/postcss</code>, <code>@nakshora/vite-plugin</code> (v3.1.0).</strong> Published packages with provenance; GitHub Packages mirror. <a href="https://www.npmjs.com/package/@nakshora/core">https://www.npmjs.com/package/@nakshora/core</a></li>
+</ol>
+<hr>
+<p><em>End of module. Version covered: 3.1.0 · License of the framework: MIT · Author of the framework: Rizwan Rahim Chowdhury (RRC Development).</em></p>
+<footer>Converted from <code>docs/WIKIVERSITY_GUIDE.md</code>
+(Nakshora v3.1 guide). Framework: MIT by Rizwan Rahim Chowdhury,
+RRC Development.</footer>
+</main>
+</body>
+</html>
