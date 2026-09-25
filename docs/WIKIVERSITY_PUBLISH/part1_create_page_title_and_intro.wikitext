@@ -1,0 +1,77 @@
+<!-- PART 1 of 7 — CREATE the page with this text, then Publish. No external links inside, safe for new accounts. -->
+= Nakshora CSS Framework Guide (Version 3.1) =
+
+<blockquote>
+'''Course module:''' Open-source textbook chapter for students and developers learning utility-first web design.
+
+'''Scope:''' Nakshora v3.1 — 11,417 utilities, 35 categories, 22 color palettes, 10 breakpoints, 155 stackable variants, zero runtime JavaScript.
+
+'''Sources:''' This guide derives every class name, value, and behavior from the framework source code (<code>packages/@nakshora/core/src/</code>), the repository documentation (<code>docs/</code>), and the official documentation platform at docs.nakshora.bsdc.info.bd (docs.nakshora.bsdc.info.bd/). Release facts cite the project's public announcements (see References).
+
+</blockquote>
+
+----
+
+== Table of Contents ==
+
+# [[#1. Introduction to Nakshora CSS (v3.1)|Introduction to Nakshora CSS (v3.1)]]
+# [[#2. Installation and Integration|Installation and Integration]]
+# [[#3. Core Architecture and Configuration|Core Architecture and Configuration]]
+# [[#4. Detailed Layout and Utility System Guide|Detailed Layout and Utility System Guide]]
+# [[#5. Component Library Breakdown|Component Library Breakdown]]
+# [[#6. Interactive Practical Learning Lab (Exercises)|Interactive Practical Learning Lab (Exercises)]]
+# [[#7. Conclusion and Review Questions|Conclusion and Review Questions]]
+# [[#8. References|References]]
+
+----
+
+== 1. Introduction to Nakshora CSS (v3.1) ==
+
+=== 1.1 What Nakshora Is ===
+
+Nakshora (নক্ষত্র — "star" in Bangla) is an '''open-source, utility-first CSS framework''' with a '''Just-In-Time (JIT) compiler''', created by '''Rizwan Rahim Chowdhury''' and developed by '''RRC Development'''. The project lives at github.com/nakshora/nakshora (github.com/nakshora/nakshora), ships under the '''MIT license''', and publishes its documentation at docs.nakshora.bsdc.info.bd (docs.nakshora.bsdc.info.bd/) (2,050 articles for v3.1 alone, released 2026-09-14).
+
+Nakshora follows a '''hybrid architecture''':
+
+* '''Utility-first at its core.''' You style elements by composing small, single-purpose classes in HTML. Each class maps to one CSS declaration or a tight group of declarations. Example: <code>px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg</code>.
+* '''Component layer on top.''' A small set of ready-made design-paradigm classes (<code>.glass</code>, <code>.neon-card</code>, <code>.brutalist-btn</code>, and others) provides complete visual treatments. You combine them freely with utilities.
+* '''Compiler-driven output.''' A JIT engine scans your source files, finds the class names you actually use, and emits only that CSS. A typical project ships roughly 5–20 KB of CSS instead of hundreds of kilobytes. No JavaScript runs in the browser at all.
+
+=== 1.2 Core Design Philosophy ===
+
+Study these five principles. They explain every design decision in the codebase:
+
+# '''Markup, not ceremony.''' You describe the design directly in the <code>class</code> attribute. You rarely open a stylesheet.
+# '''Mobile-first responsiveness.''' Base classes apply to all viewports. Prefixed classes (<code>sm:</code>, <code>md:</code>, <code>lg:</code>) override them from a minimum width upward.
+# '''Pay only for what you use.''' The catalog holds 11,417 utilities, but the JIT compiler emits only the classes found in your files (plus an explicit <code>safelist</code>).
+# '''Design tokens drive everything.''' Colors, spacing, type sizes, shadows, radii, and breakpoints live in one resolved theme. Change a token once; every utility that references it updates.
+# '''Compatibility without lock-in.''' Version 3.1 verifies byte-identical output against Tailwind CSS v3.4 for shared classes, accepts Tailwind-style configuration (<code>theme.screens</code>, <code>plugin()</code>), and supports official Tailwind plugins (<code>typography</code>, <code>forms</code>, <code>aspect-ratio</code>, <code>container-queries</code>). You can migrate existing Tailwind knowledge directly.
+
+=== 1.3 How v3.1 Differs from Earlier Releases ===
+
+{| class="wikitable"
+! Release !! Architecture !! Key facts
+|-
+| '''1.0''' (legacy) || Single static stylesheet || One batteries-included CSS file; frozen copy kept at <code>minified-version/v1.0.0.css</code>
+|-
+| '''2.0''' (legacy) || TypeScript rewrite || Programmatic CSS generation, five themes, npm-ready
+|-
+| '''3.0''' || pnpm monorepo + JIT || Four packages (<code>core</code>, <code>cli</code>, <code>postcss</code>, <code>vite-plugin</code>); AI-ready docs
+|-
+| '''3.1''' (current) || 3.0 + parity + tooling || Tailwind 3.4 parity oracle, 10 breakpoints, 155 variants, language server (<code>nakshora lsp</code>), CSS-first config (<code>@theme</code> / <code>@utility</code> / <code>@custom-variant</code>), dependency-free dev server
+|}
+
+=== 1.4 Prerequisites for Learners ===
+
+Before you start, you need:
+
+* '''HTML basics.''' Elements, attributes, nesting, and the <code>class</code> attribute.
+* '''The CSS box model.''' Content, padding, border, margin — and how <code>box-sizing: border-box</code> changes width math. (Nakshora's preflight reset applies <code>border-box</code> globally, so trust it.)
+* '''Basic command-line skills.''' Run <code>node -v</code> and <code>npm -v</code>. Install packages. (Only required for the compiler-based paths; the CDN path needs no tooling.)
+* '''Helpful but optional:''' CSS flexbox and grid concepts, media-query syntax, and basic JavaScript module imports.
+
+=== 1.5 What You Will Be Able to Do ===
+
+After completing this module, you will install Nakshora through any of its five integration paths, read and write its utility grammar fluently, configure the theme, build responsive layouts with the 10-screen system, apply state variants, use the built-in components, and verify your setup with the CLI's doctor and inspect tools.
+
+----

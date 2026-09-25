@@ -1,0 +1,90 @@
+<!-- PART7_CONCLUSION_REFERENCES — EDIT the page, paste this AT THE very END, then Publish. -->
+== 7. Conclusion and Review Questions ==
+
+=== 7.1 Summary of Architectural Paradigms ===
+
+You learned five paradigms that define Nakshora v3.1:
+
+# '''Utility-first composition.''' Small classes map to CSS declarations. You design in the <code>class</code> attribute instead of writing stylesheets.
+# '''Mobile-first responsive design.''' Base styles apply everywhere; ten screen prefixes (<code>xxs:</code> → <code>5xl:</code>, 200px → 5000px) layer overrides upward, with <code>max-*</code> twins for desktop-first exceptions and container queries (<code>@md:</code>) for component-relative breakpoints.
+# '''Just-in-time compilation.''' The engine extracts class candidates from your <code>content</code> files and emits only used CSS (median 18.2 ms warm build, 1.3 ms incremental). State variants exist only in JIT mode.
+# '''Token-driven theming.''' One resolved theme (colors, spacing, type, shadows, radii, breakpoints, motion) feeds every utility, generates <code>:root</code> CSS variables, and accepts presets, deep overrides, plugins, and CSS-first <code>@theme</code> blocks.
+# '''Paradigm components.''' Nineteen built-in classes deliver complete glass, neon, brutalist, minimalist, skeleton, and gradient treatments — always composable with utilities, never a replacement for them.
+
+The framework's measurable shape: '''11,417 utilities · 35 categories · 22 palettes × 11 shades · 10 screens · 155 variants · 5 presets · 0 bytes of runtime JavaScript · MIT license.'''
+
+=== 7.2 Concept-Check Questions ===
+
+Answer from memory, then verify against the section cited.
+
+# '''Modes.''' You add <code>hover:bg-blue-600</code> to a page built with the CDN link, but the hover style never applies. What causes this, and what are two ways to fix it? (§2.6, §3.1)
+# '''Breakpoints.''' Your design needs one column on phones, two columns on tablets, and four columns on desktops. Write the single <code>class</code> value for the grid container. At which exact pixel widths do the changes trigger? (§3.6, §4.6)
+# '''Variants.''' Explain the difference between <code>group-hover:</code> and <code>peer-focus:</code>. Where do you place the <code>group</code> and <code>peer</code> classes in each pattern? (§3.7)
+# '''Theming.''' You must add a brand color <code>#6d28d9</code> as <code>brand-500</code> so that <code>bg-brand-500</code>, <code>text-brand-500</code>, and <code>border-brand-500</code> all work. Show the config change and explain why all three utilities appear automatically. (§3.4)
+# '''Architecture.''' Contrast JIT mode with full mode: what triggers each, what each emits, and when you would choose one over the other. Include the approximate output sizes. (§3.1, §2.5)
+
+'''Answer key:'''
+
+# State variants (<code>hover:</code>, <code>dark:</code>, <code>group-*</code>, …) emit '''only in JIT mode'''; the CDN file carries base + responsive utilities alone. Fix it by (a) adopting any compiler path — Vite, PostCSS, or CLI with <code>content</code> configured — or (b) writing the hover rule as custom CSS. Verify with <code>nakshora doctor</code> and <code>nakshora inspect "hover:bg-blue-600"</code>.
+# <code>class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"</code>. Changes trigger at <code>md</code> = '''768px''' and <code>xl</code> = '''1280px''' (mobile-first <code>min-width</code> queries; <code>sm</code>–<code>2xl</code> match Tailwind exactly).
+# <code>group-hover:</code> styles a '''descendant''' when an '''ancestor''' is hovered — place <code>group</code> on the ancestor, <code>group-hover:*</code> on the child. <code>peer-focus:</code> styles a '''later sibling''' when an '''earlier sibling''' gains focus — place <code>peer</code> on the earlier sibling, <code>peer-focus:*</code> on the later one (<code>~</code> combinator).
+# Add <code>theme: { colors: { brand: { 500: '#6d28d9' } } }</code> to <code>nakshora.config.js</code>. Every color entry automatically generates the <code>text-*</code>, <code>bg-*</code>, <code>border-*</code>, <code>from-*</code>, <code>via-*</code>, <code>to-*</code> families plus a <code>--color-brand-500</code> variable, because the generator derives all six families from the resolved <code>colors</code> scale.
+# '''JIT:''' triggered by <code>content</code> globs (or <code>--mode jit</code>); emits only used classes + <code>safelist</code>, including all state variants — typically '''5–20 KB'''. '''Full:''' triggered by absent <code>content</code> (or <code>--mode full</code>); emits all base + responsive utilities + components, no state variants — '''~5.98 MB raw / ~133 KB Brotli'''. Choose JIT for every project with a build step; choose full/CDN only for zero-tooling pages.
+
+=== 7.3 Quick-Reference Cheat Sheet ===
+
+{| class="wikitable"
+! Task !! Classes / commands
+|-
+| Center content || <code>flex items-center justify-center</code> or <code>text-center</code>
+|-
+| Card surface || <code>bg-white rounded-xl shadow-md border border-slate-200 p-6</code>
+|-
+| Hover effect || <code>hover:bg-blue-600 transition</code>
+|-
+| Responsive grid || <code>grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6</code>
+|-
+| Show / hide by screen || <code>hidden md:block</code>, <code>max-md:hidden</code>
+|-
+| Dark mode || <code>&lt;html class="dark"&gt;</code> + <code>dark:bg-slate-900 dark:text-white</code>
+|-
+| Sticky header || <code>sticky top-0 z-50</code>
+|-
+| Truncate text || <code>truncate</code>
+|-
+| Loading state || <code>skeleton-text</code> / <code>skeleton-circle</code>
+|-
+| Gradient text || <code>gradient-text</code>
+|-
+| Glass panel || <code>glass p-6</code> (+ <code>rounded-xl</code>)
+|-
+| Diagnose project || <code>nakshora doctor</code>
+|-
+| Preview one class || <code>nakshora inspect "md:hover:bg-blue-600"</code>
+|-
+| Build with stats || <code>nakshora build nakshora.css -o dist/nakshora.css --stats</code>
+|}
+
+=== 7.4 Next Steps for Learners ===
+
+* Read the Utilities Reference (docs.nakshora.bsdc.info.bd/v3.1/hub/utilities/) hub (129 pages) and the Colors (docs.nakshora.bsdc.info.bd/v3.1/hub/colors/) hub (361 pages) on the official docs platform.
+* Work the Tutorials (docs.nakshora.bsdc.info.bd/v3.1/hub/tutorials/) and Recipes (docs.nakshora.bsdc.info.bd/v3.1/hub/recipes/) collections for guided practice.
+* Study <code>docs/CONFIGURATION.md</code>, <code>docs/JIT.md</code>, and <code>docs/RESPONSIVE.md</code> in the repository for compiler internals.
+* Experiment in the Playground (nakshora.bsdc.info.bd/playground/), which compiles classes live in the browser with the same engine and no build step.
+
+----
+
+== 8. References ==
+
+Real publications and primary sources about the Nakshora CSS framework, consulted for this guide:
+
+# '''RRC Development — Global launch announcement (press release, September 13, 2026).''' "RRC Development Announces the Global Launch of Nakshora: A Next-Generation, Open-Source Utility Frontend CSS Framework Built for the Semantic Web." Published on openPR. Describes the utility-first paradigm shift, the Sylhet-based team's goals, and the open-source release. www.openpr.com/news/4630229/rrc-devolopment-announces-the-global-launch-of-nakshora
+# '''Rizwan Rahim Chowdhury — "I built a sub-4ms JIT CSS framework with native Glassmorphism and built-in LLM training files" (DEV Community, September 2026).''' The author's technical account of the zero-dependency JIT engine, the utility catalog, Vite/PostCSS/CLI integrations, and the <code>llms.txt</code> + corpus + SFT-dataset strategy for AI-assisted development. dev.to/debatesylhetbd/i-built-a-sub-4ms-jit-css-framework-with-native-glassmorphism-and-built-in-llm-training-files-3aah
+# '''Official documentation platform — Nakshora Docs.''' Versioned guides, utility reference, recipes, and tutorials for v1.0–v3.1 (9,375+ articles). The v3.1 hub documents 11,417 utilities, 10 breakpoints, 155 variants, and the 2026-09-14 release. docs.nakshora.bsdc.info.bd/ · docs.nakshora.bsdc.info.bd/v3.1/
+# '''Source repository — <code>nakshora/nakshora</code> (GitHub, MIT license).''' Monorepo with <code>packages/@nakshora/{core,cli,postcss,vite-plugin}</code>, full <code>docs/</code> collection, benchmarks, and test suites. github.com/nakshora/nakshora
+# '''Project website and live playground.''' Framework overview and in-browser JIT compilation demo. nakshora.bsdc.info.bd · nakshora.bsdc.info.bd/playground/
+# '''npm registry — <code>@nakshora/core</code>, <code>@nakshora/cli</code>, <code>@nakshora/postcss</code>, <code>@nakshora/vite-plugin</code> (v3.1.0).''' Published packages with provenance; GitHub Packages mirror. www.npmjs.com/package/@nakshora/core
+
+----
+
+''End of module. Version covered: 3.1.0 · License of the framework: MIT · Author of the framework: Rizwan Rahim Chowdhury (RRC Development).''

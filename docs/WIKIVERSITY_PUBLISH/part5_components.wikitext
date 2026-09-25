@@ -1,0 +1,316 @@
+<!-- PART5_COMPONENTS — EDIT the page, paste this AT THE very END, then Publish. -->
+== 5. Component Library Breakdown ==
+
+Nakshora v3.1 ships '''19 built-in component classes''' organized in six groups. Unlike utilities, you use them as single class names that deliver a complete visual treatment. Key facts from <code>packages/@nakshora/core/src/components.ts</code>:
+
+* Components emit '''as-is''' (no variant expansion) in '''both full and JIT mode'''.
+* They are small, so '''every build includes them''' automatically.
+* They '''combine freely with utilities''': <code>class="glass p-6 rounded-xl"</code> is the intended pattern.
+* You can drop the built-ins with <code>corePlugins: { components: false }</code>. Components you register yourself via <code>addComponents</code> / <code>matchComponents</code> always survive.
+
+There are '''no''' built-in <code>.btn</code>, <code>.navbar</code>, <code>.modal</code>, or <code>.form</code> classes in v3. You compose those patterns from utilities (§5.7). This is deliberate: the framework owns ''visual paradigms''; you own ''product components''.
+
+=== 5.1 Glassmorphism ===
+
+Frosted-glass surfaces built on <code>backdrop-filter: blur() saturate()</code>.
+
+<syntaxhighlight lang="html">
+<div class="glass p-8">
+  <h3 class="text-lg font-bold text-white">Glass card</h3>
+  <p class="mt-2 text-sm text-slate-300">Standard glass — translucent white over dark backgrounds.</p>
+</div>
+
+<div class="glass-light p-8">
+  <h3 class="text-lg font-bold">Light glass</h3>
+  <p class="mt-2 text-sm text-slate-600">Stronger light tint — best over photography.</p>
+</div>
+
+<div class="glass-dark p-8">
+  <h3 class="text-lg font-bold text-white">Dark glass</h3>
+  <p class="mt-2 text-sm text-slate-300">Slate tint — best over dark backgrounds.</p>
+</div>
+</syntaxhighlight>
+
+{| class="wikitable"
+! Class !! Effect
+|-
+| <code>.glass</code> || Translucent white (<code>rgba(255,255,255,0.08)</code>), <code>blur(12px) saturate(140%)</code>, subtle border + shadow, light text
+|-
+| <code>.glass-light</code> || Stronger light tint (<code>0.55</code> alpha), <code>blur(16px) saturate(160%)</code>, dark text
+|-
+| <code>.glass-dark</code> || Slate tint (<code>rgba(15,23,42,0.55)</code>), slate border, light text
+|}
+
+All three set <code>border-radius: 0.75rem</code> and include the <code>-webkit-</code> prefix for Safari. Override the radius with any <code>rounded-*</code> utility.
+
+=== 5.2 Neon Cyber ===
+
+High-saturation glowing UI designed for dark backgrounds. Pairs with the <code>neonTheme</code> preset.
+
+<syntaxhighlight lang="html">
+<div class="neon-card p-6 text-center">
+  <p class="neon-text text-lg font-bold tracking-wide">SYSTEM ONLINE</p>
+  <p class="mt-2 text-sm text-slate-300">Glow intensifies when you hover the card.</p>
+  <button class="neon-btn mt-4">Engage</button>
+</div>
+
+<!-- Apply the glow treatment to any element -->
+<div class="neon-glow bg-slate-900 p-4 rounded-lg">Custom glowing panel</div>
+</syntaxhighlight>
+
+{| class="wikitable"
+! Class !! Effect
+|-
+| <code>.neon-card</code> || Deep-navy card (<code>#0a1929</code>), cyan glow border; glow intensifies on hover
+|-
+| <code>.neon-btn</code> || Cyan→pink gradient button (<code>#00d9ff → #ff006e</code>), neon shadow, lifts 1px on hover
+|-
+| <code>.neon-glow</code> || Adds a layered cyan glow shadow to any element
+|-
+| <code>.neon-text</code> || Cyan text with layered <code>text-shadow</code> glow
+|}
+
+=== 5.3 Brutalism ===
+
+Raw, high-contrast, zero ornamentation. Pairs with the <code>brutalistTheme</code> preset.
+
+<syntaxhighlight lang="html">
+<div class="brutalist-card p-6">
+  <h3 class="font-black uppercase tracking-wide">No frills</h3>
+  <p class="mt-2 text-sm">Hard borders. Hard shadows. Zero rounding.</p>
+  <button class="brutalist-btn mt-4">Smash</button>
+</div>
+</syntaxhighlight>
+
+{| class="wikitable"
+! Class !! Effect
+|-
+| <code>.brutalist-card</code> || White card, 3px black border, <code>border-radius: 0</code>, hard <code>8px 8px 0 #000</code> offset shadow; shifts and turns the shadow red on hover
+|-
+| <code>.brutalist-btn</code> || Yellow block button (<code>#facc15</code>), 3px border, hard shadow, uppercase black type; turns red on hover and physically "presses" (<code>translate(5px,5px)</code>, shadow collapses) on <code>:active</code>
+|}
+
+=== 5.4 Minimalism ===
+
+Quiet, professional surfaces. Pairs with the <code>minimalistTheme</code> preset.
+
+<syntaxhighlight lang="html">
+<div class="minimalist-card p-6">
+  <h3 class="text-lg font-semibold">Simple</h3>
+  <p class="mt-2 text-sm text-slate-600">Hairline border. Barely-there shadow.</p>
+  <button class="minimalist-btn mt-4">Continue</button>
+</div>
+</syntaxhighlight>
+
+{| class="wikitable"
+! Class !! Effect
+|-
+| <code>.minimalist-card</code> || White card, 1px <code>#e5e7eb</code> border, <code>0.5rem</code> radius, minimal shadow; border darkens slightly on hover
+|-
+| <code>.minimalist-btn</code> || Dark pill button (<code>#111827</code>); inverts to light background with dark text on hover
+|}
+
+=== 5.5 Skeletons (Loading States) ===
+
+Shimmer placeholders for content that has not loaded yet. All three run the built-in <code>shimmer</code> keyframe animation (<code>background-position</code> sweep, 1.5s linear infinite).
+
+<syntaxhighlight lang="html">
+<div class="bg-white rounded-xl border border-slate-200 p-6 flex items-start gap-4">
+  <div class="skeleton-circle w-12 h-12 shrink-0"></div>
+  <div class="flex-1 space-y-2 py-1">
+    <div class="skeleton-text w-3/4"></div>
+    <div class="skeleton-text w-1/2"></div>
+    <div class="skeleton-text w-5/6"></div>
+  </div>
+</div>
+</syntaxhighlight>
+
+{| class="wikitable"
+! Class !! Effect
+|-
+| <code>.skeleton-rect</code> || Rounded-rectangle shimmer — set <code>w-*</code> / <code>h-*</code> on the element
+|-
+| <code>.skeleton-circle</code> || Circular shimmer for avatars (<code>border-radius: 9999px</code>)
+|-
+| <code>.skeleton-text</code> || Text-line shimmer with <code>height: 1em</code>, so it matches surrounding type size
+|}
+
+=== 5.6 Helpers ===
+
+Single-purpose treatments that lift any element:
+
+<syntaxhighlight lang="html">
+<div class="bg-white rounded-xl shadow-md p-6 hover-lift">
+  Lifts 4px with a deeper shadow on hover.
+</div>
+
+<h1 class="text-4xl font-black gradient-text">Gradient headline</h1>
+
+<div class="gradient-neon p-8 rounded-xl">Dark navy diagonal background</div>
+<div class="gradient-pastel p-8 rounded-xl">Soft pink → blue → green background</div>
+<div class="gradient-nature p-8 rounded-xl">Deep forest background</div>
+<div class="gradient-brutalist p-8">Yellow → red background</div>
+</syntaxhighlight>
+
+{| class="wikitable"
+! Class !! Effect
+|-
+| <code>.hover-lift</code> || <code>translateY(-4px)</code> + deeper shadow on hover, 200ms transition
+|-
+| <code>.gradient-text</code> || Blue → purple → pink text via <code>background-clip: text</code>
+|-
+| <code>.gradient-neon</code> || Dark navy diagonal gradient background
+|-
+| <code>.gradient-pastel</code> || Soft pink → blue → green gradient background
+|-
+| <code>.gradient-nature</code> || Deep forest gradient background
+|-
+| <code>.gradient-brutalist</code> || Yellow → red gradient background
+|}
+
+=== 5.7 Utility-Composed Patterns: Buttons, Cards, Forms, Modals, Navbars ===
+
+These patterns use '''only documented utilities''' — no built-in component classes. Copy them directly; each compiles under JIT.
+
+'''Buttons''' — six treatments, one grammar:
+
+<syntaxhighlight lang="html">
+<!-- Primary -->
+<button
+  class="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 active:scale-95 transition shadow-md"
+>
+  Primary
+</button>
+
+<!-- Glass -->
+<button class="glass px-5 py-2.5 text-white font-medium rounded-lg hover:bg-white/20 transition">
+  Glass
+</button>
+
+<!-- Neon / Brutalist / Minimal (built-in components) -->
+<button class="neon-btn">Neon</button>
+<button class="brutalist-btn">Brutal</button>
+<button class="minimalist-btn">Minimal</button>
+
+<!-- Ghost -->
+<button class="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md font-medium transition">
+  Ghost
+</button>
+
+<!-- Disabled state -->
+<button
+  class="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg opacity-50 disabled:cursor-not-allowed"
+  disabled
+>
+  Disabled
+</button>
+</syntaxhighlight>
+
+'''Cards''' — standard, dark-mode-aware, and loading variants:
+
+<syntaxhighlight lang="html">
+<!-- Standard -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 hover-lift dark:bg-slate-800 dark:border-slate-700">
+  <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Title</h3>
+  <p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+    Body copy with comfortable line height.
+  </p>
+  <a href="#" class="inline-block mt-4 text-blue-500 hover:text-blue-600 font-medium">Learn more →</a>
+</div>
+
+<!-- Glass -->
+<div class="glass p-6">
+  <h3 class="text-lg font-bold text-white">Glass card</h3>
+  <p class="mt-2 text-slate-300 text-sm">Frosted surface over any background.</p>
+</div>
+
+<!-- Neon -->
+<div class="neon-card p-6">
+  <p class="neon-text font-bold tracking-wide">SYSTEM ONLINE</p>
+</div>
+</syntaxhighlight>
+
+'''Forms''' — accessible inputs composed from border, spacing, and focus variants:
+
+<syntaxhighlight lang="html">
+<form class="max-w-md space-y-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+  <div>
+    <label for="email" class="block text-sm font-semibold text-slate-700">Email</label>
+    <input
+      id="email"
+      type="email"
+      placeholder="you@example.com"
+      class="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    />
+  </div>
+  <div>
+    <label for="role" class="block text-sm font-semibold text-slate-700">Role</label>
+    <select
+      id="role"
+      class="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option>Student</option>
+      <option>Developer</option>
+      <option>Teacher</option>
+    </select>
+  </div>
+  <label class="flex items-center gap-2 text-sm text-slate-600">
+    <input type="checkbox" class="peer h-4 w-4 rounded border-slate-300" />
+    <span>Email me the course notes</span>
+  </label>
+  <button
+    type="submit"
+    class="w-full px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 active:scale-[0.98] transition"
+  >
+    Enroll
+  </button>
+</form>
+</syntaxhighlight>
+
+'''Modal''' — fixed overlay plus centered panel, no JavaScript required for the styling:
+
+<syntaxhighlight lang="html">
+<!-- Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+  <!-- Panel -->
+  <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-6">
+    <h2 class="text-xl font-bold text-slate-900 dark:text-white">Confirm enrollment</h2>
+    <p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+      You are about to enroll in the Nakshora CSS course module. Continue?
+    </p>
+    <div class="mt-6 flex justify-end gap-3">
+      <button class="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition">
+        Cancel
+      </button>
+      <button class="px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition">
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+</syntaxhighlight>
+
+'''Navbar''' — sticky glass header that collapses links on mobile:
+
+<syntaxhighlight lang="html">
+<header class="sticky top-0 z-50 glass-dark">
+  <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a class="text-white font-black text-xl tracking-tight" href="#">NAKSHORA</a>
+    <div class="hidden md:flex items-center gap-8">
+      <a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#">Docs</a>
+      <a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#">Themes</a>
+      <a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#">Blog</a>
+      <a
+        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition"
+        href="#"
+        >Get started</a
+      >
+    </div>
+    <button class="md:hidden text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-white/10 transition">
+      Menu
+    </button>
+  </nav>
+</header>
+</syntaxhighlight>
+
+----

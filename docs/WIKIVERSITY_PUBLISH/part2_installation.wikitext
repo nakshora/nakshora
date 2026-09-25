@@ -1,0 +1,381 @@
+<!-- PART2_INSTALLATION — EDIT the page, paste this AT THE very END, then Publish. -->
+== 2. Installation and Integration ==
+
+Nakshora v3.1 ships '''four packages''' and supports '''five integration paths'''. Pick exactly one path per project.
+
+=== 2.1 The Four Packages ===
+
+{| class="wikitable"
+! Package !! Purpose !! Runtime needs !! Install
+|-
+| <code>@nakshora/core</code> || JIT compiler and engine || None — runs in Node ≥ 18 and in the browser (~71 KB gzip ESM) || <code>npm i @nakshora/core</code>
+|-
+| <code>@nakshora/cli</code> || <code>nakshora init / build / dev / inspect / export:ai</code> commands || Node ≥ 18 || <code>npm i -D @nakshora/cli</code>
+|-
+| <code>@nakshora/postcss</code> || PostCSS plugin (<code>@nakshora source;</code> at-rules) || <code>postcss ^8.4</code>, Node ≥ 18 || <code>npm i -D @nakshora/postcss</code>
+|-
+| <code>@nakshora/vite-plugin</code> || Vite plugin (virtual module + HMR) || `vite ^5 \ || \ || ^6 \ || \ || ^7 \ || \ || ^8` || <code>npm i -D @nakshora/vite-plugin</code>
+|}
+
+'''Requirements:''' Node.js ≥ 18 (22 LTS recommended). TypeScript config files (<code>nakshora.config.ts</code>) need Node ≥ 22.18; on older Node runtimes use <code>.js</code>, <code>.mjs</code>, or <code>.json</code> configs.
+
+=== 2.2 Package Managers and Registries ===
+
+Nakshora publishes to '''two registries''':
+
+'''npm (primary):'''
+
+<syntaxhighlight lang="bash">
+# npm
+npm install @nakshora/core
+npm install -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin
+
+# pnpm (also the monorepo's own manager; pnpm >= 9)
+pnpm add @nakshora/core
+pnpm add -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin
+
+# yarn
+yarn add @nakshora/core
+yarn add -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin
+
+# bun (npm-compatible registry API)
+bun add @nakshora/core
+bun add -D @nakshora/cli @nakshora/postcss @nakshora/vite-plugin
+</syntaxhighlight>
+
+'''GitHub Packages (mirror):'''
+
+<syntaxhighlight lang="bash">
+# ~/.npmrc
+@nakshora:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=<your GitHub token>
+</syntaxhighlight>
+
+<syntaxhighlight lang="bash">
+npm install @nakshora/core
+</syntaxhighlight>
+
+Releases follow an automated pipeline: a version bump merges, then GitHub Actions publishes to npm with provenance, mirrors to GitHub Packages, and cuts a GitHub Release with tarballs.
+
+=== 2.3 Path A — Vite (Recommended) ===
+
+The Vite plugin gives you a virtual CSS module, PostCSS <code>@nakshora</code> support, and hot-module replacement (HMR) when your class usage changes.
+
+'''Step 1 — Create a Vite project:'''
+
+<syntaxhighlight lang="bash">
+npm create vite@latest my-app -- --template vanilla
+cd my-app
+</syntaxhighlight>
+
+'''Step 2 — Install Nakshora:'''
+
+<syntaxhighlight lang="bash">
+npm install -D @nakshora/vite-plugin
+</syntaxhighlight>
+
+'''Step 3 — Register the plugin:'''
+
+<syntaxhighlight lang="js">
+// vite.config.js
+import { defineConfig } from 'vite';
+import { nakshora } from '@nakshora/vite-plugin';
+
+export default defineConfig({
+  plugins: [
+    nakshora({
+      // JIT: scan these files for class names — only used classes compile
+      content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,vue}'],
+      config: {
+        theme: {},
+        safelist: [],
+      },
+    }),
+  ],
+});
+</syntaxhighlight>
+
+'''Step 4 — Import the stylesheet:'''
+
+<syntaxhighlight lang="js">
+// src/main.js
+import 'nakshora'; // injects the compiled Nakshora CSS
+</syntaxhighlight>
+
+Alternatively, create <code>src/nakshora.css</code> containing <code>@nakshora source;</code> and import that file instead.
+
+'''Step 5 — Run and build:'''
+
+<syntaxhighlight lang="bash">
+npm run dev     # dev server with HMR
+npm run build   # production bundle
+npm run preview # preview the production build
+</syntaxhighlight>
+
+Edit any class in your source files. The browser refreshes automatically.
+
+=== 2.4 Path B — PostCSS (Webpack, Next.js, Laravel, Gulp) ===
+
+Use this path with any tool that runs PostCSS.
+
+'''Step 1 — Install:'''
+
+<syntaxhighlight lang="bash">
+npm install -D @nakshora/postcss postcss
+</syntaxhighlight>
+
+'''Step 2 — Configure:'''
+
+<syntaxhighlight lang="js">
+// postcss.config.js
+module.exports = {
+  plugins: [
+    require('@nakshora/postcss')({
+      config: {
+        content: ['./src/**/*.{html,js,ts,jsx,tsx}'], // JIT mode
+        safelist: ['lg:flex'],
+      },
+      minify: false, // let your bundler minify
+    }),
+  ],
+};
+</syntaxhighlight>
+
+'''Step 3 — Write the entry CSS:'''
+
+<syntaxhighlight lang="css">
+/* src/nakshora.css */
+@nakshora source; /* base + variables + keyframes + utilities + components */
+
+/* Or control each layer yourself: */
+@nakshora base;
+@nakshora variables;
+@nakshora keyframes;
+@nakshora utilities; /* JIT when content is configured */
+@nakshora components;
+</syntaxhighlight>
+
+'''Step 4 — Import the entry CSS in your application.''' Your bundler handles the rest.
+
+'''Next.js (App Router) variant:'''
+
+<syntaxhighlight lang="bash">
+npm install -D @nakshora/postcss postcss
+</syntaxhighlight>
+
+<syntaxhighlight lang="js">
+// postcss.config.mjs
+import nakshora from '@nakshora/postcss';
+
+export default {
+  plugins: {
+    nakshora: nakshora({
+      config: {
+        content: ['./app/**/*.{js,jsx,ts,tsx,mdx}'],
+      },
+    }),
+  },
+};
+</syntaxhighlight>
+
+<syntaxhighlight lang="css">
+/* app/globals.css */
+@nakshora source;
+</syntaxhighlight>
+
+<syntaxhighlight lang="js">
+// app/layout.js
+import './globals.css';
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+</syntaxhighlight>
+
+=== 2.5 Path C — CLI Only (Plain HTML, No Bundler) ===
+
+Use this path for static sites or any environment without a bundler.
+
+'''Step 1 — Install:'''
+
+<syntaxhighlight lang="bash">
+npm install -g @nakshora/cli
+# or locally: npm install -D @nakshora/cli
+</syntaxhighlight>
+
+'''Step 2 — Scaffold:'''
+
+<syntaxhighlight lang="bash">
+mkdir my-site && cd my-site
+nakshora init
+</syntaxhighlight>
+
+This creates two files:
+
+<syntaxhighlight lang="text">
+my-site/
+├── nakshora.config.js   # content globs, theme, plugins
+└── nakshora.css         # @nakshora source; @nakshora utilities;
+</syntaxhighlight>
+
+Useful flags: <code>nakshora init --json</code> writes a JSON config; <code>nakshora init --force</code> overwrites existing files.
+
+'''Step 3 — Write markup:'''
+
+<syntaxhighlight lang="html">
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nakshora site</title>
+    <link rel="stylesheet" href="dist/nakshora.css" />
+  </head>
+  <body>
+    <div class="min-h-screen flex items-center justify-center bg-slate-900">
+      <div class="glass p-8 text-center">
+        <h1 class="text-3xl font-bold text-white">Hello, Nakshora</h1>
+        <button class="neon-btn mt-6">Wow</button>
+      </div>
+    </div>
+  </body>
+</html>
+</syntaxhighlight>
+
+'''Step 4 — Build:'''
+
+<syntaxhighlight lang="bash">
+nakshora build nakshora.css -o dist/nakshora.css --minify
+</syntaxhighlight>
+
+The compiler replaces the at-rules with only the classes it found in your content globs (JIT). For watch mode, run:
+
+<syntaxhighlight lang="bash">
+nakshora dev nakshora.css -o dist/nakshora.css
+</syntaxhighlight>
+
+'''Full CLI command reference:'''
+
+{| class="wikitable"
+! Command !! Purpose
+|-
+| <code>nakshora init</code> || Scaffold config + entry CSS
+|-
+| <code>nakshora build [input]</code> || Compile CSS (full build to stdout by default; `--mode full\ || jit<code>, </code>--watch<code>, </code>--minify<code>, </code>--content<code>, </code>--safelist<code>, </code>--source-map<code>, </code>--stats<code>, </code>--diff`)
+|-
+| <code>nakshora dev [input]</code> || <code>build --watch</code> plus an optional dependency-free dev server
+|-
+| <code>nakshora inspect &lt;class&gt;</code> || Show the CSS a class (or variant stack) compiles to
+|-
+| <code>nakshora doctor</code> || Diagnose config, content globs, safelist, and dependency problems
+|-
+| <code>nakshora lsp</code> || Start the language server (completion, hover, diagnostics, color previews)
+|-
+| <code>nakshora export:ai</code> || Regenerate <code>ai/corpus.json</code> from source so LLM assets never drift
+|-
+| <code>nakshora migrate</code> || Migrate configs from v1/v2 or Tailwind
+|}
+
+'''Build-mode selection logic''' (memorize this order):
+
+# <code>--mode</code> wins when provided.
+# <code>content</code> (or legacy <code>purge</code>) configured → '''JIT mode''' (only used classes, including all state variants).
+# Otherwise → '''full mode''' (all base + responsive utilities + components).
+
+=== 2.6 Path D — Plain HTML + CDN (No Build at All) ===
+
+Add one <code>&lt;link&gt;</code> tag. No Node.js, no terminal, no build step.
+
+<syntaxhighlight lang="html">
+<!-- Full build, latest main branch -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@main/dist/css/nakshora.min.css"
+/>
+</syntaxhighlight>
+
+Pin an exact version for production stability:
+
+<syntaxhighlight lang="html">
+<!-- Pinned, immutable release -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/nakshora/nakshora@v3.0.0/dist/css/nakshora.min.css"
+/>
+</syntaxhighlight>
+
+Know the limits of the CDN file:
+
+* It contains '''base + responsive utilities''' only. '''State variants''' (<code>hover:</code>, <code>dark:</code>, <code>group-hover:</code>, …) require the JIT compiler.
+* The full build uses the classic five screens (<code>sm</code>–<code>2xl</code>) by default. JIT mode supports all ten.
+* jsDelivr negotiates compression automatically: the file is ~5.98 MB on disk but transfers at ~133 KB over Brotli and ~576 KB over gzip.
+
+=== 2.7 Path E — Self-Hosting (Local File Hosting) ===
+
+Download the prebuilt files and serve them yourself:
+
+{| class="wikitable"
+! File !! Bytes !! Purpose
+|-
+| <code>dist/css/nakshora.min.css</code> || 5,982,603 || Full minified stylesheet
+|-
+| <code>dist/css/nakshora.min.css.br</code> || 132,967 || Brotli sidecar (quality 11)
+|-
+| <code>dist/css/nakshora.min.css.gz</code> || 575,520 || Gzip sidecar (level 9)
+|}
+
+A test in the repository decompresses both sidecars and asserts byte-for-byte equality with the main file. Serve them with static-compression support:
+
+* '''nginx:''' <code>brotli_static on; gzip_static on;</code>
+* '''Apache:''' <code>mod_brotli</code> + <code>MultiViews</code>
+* '''Netlify / Cloudflare Pages / Vercel:''' automatic sidecar handling
+* '''S3 + CloudFront:''' upload the <code>.br</code> file with <code>Content-Encoding: br</code>
+
+Rule of thumb: use the full build only for zero-tooling pages. Any project with a build step should use JIT (typically 5–20 KB; the framework's own landing page ships 3,936 B gzipped).
+
+=== 2.8 Verifying Your Setup ===
+
+Run these checks after any installation:
+
+<syntaxhighlight lang="bash">
+# 1. Diagnose the whole project (content globs, safelist, missing at-rules, deps)
+nakshora doctor
+
+# 2. Inspect what one class compiles to
+nakshora inspect "md:hover:bg-blue-600"
+
+# 3. Build with statistics (time, class counts, sizes, unknown candidates)
+nakshora build nakshora.css -o dist/nakshora.css --stats
+</syntaxhighlight>
+
+Then render this smoke-test page. If the button turns blue on hover and the grid gains columns as you widen the window, your setup works:
+
+<syntaxhighlight lang="html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nakshora smoke test</title>
+    <link rel="stylesheet" href="dist/nakshora.css" />
+  </head>
+  <body class="p-6">
+    <button
+      class="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+    >
+      Hover me
+    </button>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      <div class="bg-slate-100 p-4 rounded-lg">One</div>
+      <div class="bg-slate-100 p-4 rounded-lg">Two</div>
+      <div class="bg-slate-100 p-4 rounded-lg">Three</div>
+    </div>
+  </body>
+</html>
+</syntaxhighlight>
+
+----

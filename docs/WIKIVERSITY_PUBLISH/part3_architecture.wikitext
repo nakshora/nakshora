@@ -1,0 +1,386 @@
+<!-- PART3_ARCHITECTURE — EDIT the page, paste this AT THE very END, then Publish. -->
+== 3. Core Architecture and Configuration ==
+
+=== 3.1 The Engine: How the JIT Compiler Works ===
+
+The heart of Nakshora is <code>@nakshora/core</code>, a dependency-free engine written in strict TypeScript. Learn its pipeline in four stages:
+
+# '''Extract.''' The extractor scans every file matched by <code>content</code> globs (or raw strings you pass directly) with a class-candidate regex. You can override the pattern with <code>extractorPattern</code>.
+# '''Resolve.''' Each candidate parses into ''variants + base utility + modifier'' (for example, <code>md:hover:bg-blue-600/80</code> → screens <code>md</code>, state <code>hover</code>, color <code>blue-600</code>, opacity modifier <code>80</code>). The engine validates the base against its registry of 11,417 utilities across 35 categories.
+# '''Generate.''' Matched utilities compile to CSS rules. Screen variants wrap rules in <code>@media</code> queries; state variants append pseudo-classes or ancestor selectors. Stacked media variants collapse into '''one''' <code>@media</code> query (configurable with <code>combineMedia</code>).
+# '''Emit.''' Output assembles in three sections — '''base''' (preflight reset, CSS variables, keyframes), '''components''', '''utilities''' — optionally wrapped in real cascade layers (<code>@layer base, components, utilities</code>) when you set <code>layers: true</code>.
+
+Two build modes exist:
+
+{| class="wikitable"
+! Mode !! Trigger !! Output
+|-
+| '''JIT''' || <code>content</code> configured (or <code>--mode jit</code>) || Only used classes + <code>safelist</code>, '''including all state variants'''
+|-
+| '''Full''' || No <code>content</code> (or <code>--mode full</code>) || All base + responsive utilities + components; state variants excluded
+|}
+
+Measured performance (pinned in <code>perf/baseline.json</code>; CI fails on regressions over 10%):
+
+{| class="wikitable"
+! Operation !! Median time
+|-
+| JIT build (200 lines of HTML, warm) || 18.2 ms
+|-
+| JIT rebuild after one file changes (500 files) || 1.3 ms
+|-
+| Full build (11,417 utilities, sm–2xl) || 371 ms
+|-
+| Full build + minify || 302 ms
+|}
+
+=== 3.2 Global Reset (Preflight) ===
+
+Every build starts with a preflight reset (Tailwind-compatible): margins collapse to zero, <code>box-sizing</code> becomes <code>border-box</code>, headings inherit font sizes, images become block-level responsive elements, and button backgrounds turn transparent. Disable it per project with top-level <code>preflight: false</code> or <code>corePlugins: { base: false }</code>.
+
+=== 3.3 The Configuration File ===
+
+Nakshora auto-discovers <code>nakshora.config.{ts,js,mjs,cjs,json}</code> by walking up from the working directory. Here is the complete option surface with defaults:
+
+<syntaxhighlight lang="js">
+// nakshora.config.js
+export default {
+  content: './**/*.{html,js,ts,jsx,tsx,vue,astro,svelte,md}', // JIT mode trigger
+  purge: [], // legacy alias of content
+  safelist: [], // classes always included (variants allowed: 'lg:flex')
+  blocklist: [], // classes never emitted in JIT
+  theme: {}, // deep-merged overrides (see §3.4)
+  presets: [], // configs merged before theme
+  variants: {}, // variant toggles (see §3.7)
+  corePlugins: {}, // utility-group toggles (see §3.8)
+  darkMode: 'class', // 'class' | 'media' | 'selector' | ['selector', sel] | ['variant', sel] | false
+  prefix: '', // e.g. 'nk-' turns .flex into .nk-flex
+  important: false, // true adds !important; '#app' scopes every rule under #app
+  preflight: true, // include the reset in base
+  layers: false, // wrap output in real @layer blocks
+  combineMedia: true, // print:md:flex → one '@media print and (min-width: 768px)'
+  plugins: [], // plugin functions / objects / Tailwind plugins
+  extractorPattern: undefined, // custom class-extractor regex
+};
+</syntaxhighlight>
+
+'''CSS-first configuration (v3.1).''' You can extend the theme without touching JavaScript:
+
+<syntaxhighlight lang="css">
+@theme {
+  --color-brand-500: #6d28d9;
+}
+
+@utility tab-4 {
+  tab-size: 1rem;
+}
+
+@custom-variant hocus (&:hover, &:focus);
+</syntaxhighlight>
+
+=== 3.4 Design Tokens: The Theme System ===
+
+The resolved theme is Tailwind-3.4-shaped (<code>theme.colors</code>, <code>theme.spacing</code>, <code>theme.fontSize</code>, <code>theme.screens</code>, …) so Tailwind configs and plugins work unchanged. Nakshora's historical aliases (<code>typography.fontSize</code>, <code>breakpoints</code>, <code>shadows</code>, <code>duration</code>, <code>easing</code>) map onto the same keys automatically.
+
+'''Token sections and defaults:'''
+
+{| class="wikitable"
+! Section !! Default keys !! Notes
+|-
+| <code>colors</code> || 22 palettes × shades 50–950 || Override one shade (<code>blue: {500: '#hex'}</code>) or add a palette (<code>brand: {...}</code>)
+|-
+| <code>spacing</code> || <code>0 px 0.5 1 … 96</code> || Key → CSS length; shared by margin, padding, gap, sizing, inset
+|-
+| <code>typography.fontSize</code> || <code>xs sm base lg xl 2xl … 9xl</code> || Value or <code>[size, lineHeight]</code> tuple
+|-
+| <code>typography.fontWeight</code> || <code>thin … black</code> || 100–900
+|-
+| <code>typography.lineHeight</code> || <code>none tight snug base relaxed loose</code> || <code>base</code> (1.5) is a Nakshora addition
+|-
+| <code>typography.letterSpacing</code> || <code>tighter tight normal wide wider widest</code> || 
+|-
+| <code>fontFamily</code> || <code>sans</code>, <code>mono</code> || System stacks by default
+|-
+| <code>breakpoints</code> || <code>xxs:200 xs:400 sm:640 md:768 lg:1024 xl:1280 2xl:1536 3xl:1920 4xl:2560 5xl:5000</code> || px; merged + re-sorted; <code>null</code> removes
+|-
+| <code>shadows</code> || <code>none sm base md lg xl 2xl inner glow</code> || <code>glow</code> (blue) is a Nakshora addition
+|-
+| <code>borderRadius</code> || <code>none xs sm md lg xl 2xl 3xl full</code> || <code>xs</code> is a Nakshora addition
+|-
+| <code>zIndex</code> || <code>auto hide 0 10 20 30 40 50</code> || <code>hide</code> (−1) is a Nakshora addition
+|-
+| <code>opacity</code> || <code>0 5 10 20 … 100</code> || 
+|-
+| <code>duration</code> || <code>0 75 100 150 200 300 500 700 1000</code> || milliseconds
+|-
+| <code>easing</code> || <code>linear in out in-out back</code> || <code>back</code> (spring overshoot) is a Nakshora addition
+|-
+| <code>animation</code> || <code>spin ping pulse bounce fade slide shimmer</code> || name → shorthand
+|-
+| <code>keyframes</code> || matches the animation names || name → keyframe body
+|}
+
+'''Example — extend the theme:'''
+
+<syntaxhighlight lang="js">
+// nakshora.config.js
+export default {
+  theme: {
+    colors: {
+      brand: {
+        50: '#f5f3ff',
+        500: '#8b5cf6',
+        900: '#4c1d95',
+      },
+    },
+    breakpoints: { tablet: 900, xxs: null }, // add tablet:, drop xxs:
+    animation: { wiggle: 'wiggle 1s ease-in-out infinite' },
+    keyframes: {
+      wiggle: '0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); }',
+    },
+  },
+};
+</syntaxhighlight>
+
+Every new color automatically generates <code>text-*</code>, <code>bg-*</code>, <code>border-*</code>, <code>from-*</code>, <code>via-*</code>, <code>to-*</code> utilities plus <code>--color-*</code> CSS variables. Every new breakpoint gains a matching <code>max-*</code> twin.
+
+'''All tokens surface as CSS variables on <code>:root</code>:'''
+
+<syntaxhighlight lang="css">
+:root {
+  --color-brand-500: #8b5cf6;
+  --spacing-4: 1rem;
+  --text-base: 1rem;
+}
+</syntaxhighlight>
+
+Disable the variable block with <code>corePlugins: { variables: false }</code>.
+
+=== 3.5 Color Palettes ===
+
+Nakshora ships '''22 palettes × 11 shades (50–950)''':
+
+<syntaxhighlight lang="text">
+slate gray zinc neutral stone red orange amber yellow lime
+emerald green teal cyan sky blue indigo violet purple fuchsia pink rose
+</syntaxhighlight>
+
+Each <code>palette-shade</code> pair generates six utility families automatically:
+
+<syntaxhighlight lang="html">
+<p class="text-blue-500">Colored text</p>
+<div class="bg-slate-900">Colored background</div>
+<div class="border border-rose-400">Colored border</div>
+<div class="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600">
+  Gradient with three stops
+</div>
+</syntaxhighlight>
+
+Five '''theme presets''' (<code>neonTheme</code>, <code>pastelTheme</code>, <code>brutalistTheme</code>, <code>minimalistTheme</code>, <code>natureTheme</code>, imported from <code>@nakshora/core</code>) replace the palette and typography for a complete visual direction. Apply one preset like this:
+
+<syntaxhighlight lang="js">
+// nakshora.config.js
+import { neonTheme } from '@nakshora/core';
+
+export default {
+  theme: {
+    colors: neonTheme.colors,
+    typography: neonTheme.typography,
+    shadows: neonTheme.shadows,
+  },
+};
+</syntaxhighlight>
+
+=== 3.6 Responsive Modifiers: The 10-Breakpoint System ===
+
+Nakshora is '''mobile-first''': unprefixed classes apply everywhere; a screen prefix overrides from that width upward. Version 3.1 defines '''10 screens''' from wearables to video walls:
+
+{| class="wikitable"
+! Prefix !! Min-width !! <code>max-*</code> twin (max-width) !! Typical devices
+|-
+| ''(none)'' || 0 || — || everything
+|-
+| <code>xxs:</code> || 200px || <code>max-xxs:</code> → 199.98px || tiny / folded screens, wearables
+|-
+| <code>xs:</code> || 400px || <code>max-xs:</code> → 399.98px || small phones
+|-
+| <code>sm:</code> || 640px || <code>max-sm:</code> → 639.98px || large phones
+|-
+| <code>md:</code> || 768px || <code>max-md:</code> → 767.98px || tablets
+|-
+| <code>lg:</code> || 1024px || <code>max-lg:</code> → 1023.98px || laptops
+|-
+| <code>xl:</code> || 1280px || <code>max-xl:</code> → 1279.98px || desktops
+|-
+| <code>2xl:</code> || 1536px || <code>max-2xl:</code> → 1535.98px || large desktops
+|-
+| <code>3xl:</code> || 1920px || <code>max-3xl:</code> → 1919.98px || Full HD monitors, TVs
+|-
+| <code>4xl:</code> || 2560px || <code>max-4xl:</code> → 2559.98px || QHD / 2K monitors
+|-
+| <code>5xl:</code> || 5000px || <code>max-5xl:</code> → 4999.98px || 4K+, video walls, ultra-wide
+|}
+
+Screens <code>sm</code>–<code>2xl</code> match Tailwind CSS v3 exactly. The other five are purely additive — no existing class changes meaning.
+
+<syntaxhighlight lang="html">
+<div class="text-base sm:text-lg md:text-xl 3xl:text-2xl">Grows with the viewport</div>
+<nav class="max-md:hidden">Hidden on tablets and below</nav>
+<div class="min-[900px]:flex max-[900px]:hidden">Arbitrary breakpoint widths</div>
+</syntaxhighlight>
+
+Learn the combination rules (all pinned by <code>responsive.test.ts</code>):
+
+* Screens emit '''ascending''' (200 → 5000) so the widest matching screen wins the cascade. <code>max-*</code> blocks emit '''descending''' so the narrowest wins.
+* A screen plus any other '''media''' variant collapses into '''one''' query: <code>print:md:flex</code> → <code>@media print and (min-width: 768px)</code>. Set <code>combineMedia: false</code> for nested queries instead.
+* Stacking two screens keeps the '''tighter''' bound: <code>lg:xl:flex</code> → <code>(min-width: 1280px)</code>; <code>md:max-xl:flex</code> → <code>(min-width: 768px) and (max-width: 1279.98px)</code> (a range).
+* '''Container queries''' (element-relative breakpoints) use Tailwind v4 grammar: <code>@container</code>, <code>@md:flex</code>, <code>@min-md:flex</code>, <code>@max-md:flex</code>, <code>@lg/card:flex</code>, <code>@[30rem]:flex</code>.
+
+The <code>.container</code> class sets <code>width: 100%</code> plus one <code>max-width</code> per screen — but only for <code>sm</code>…<code>2xl</code> by default, since a 200px or 5000px container is never useful. Widen the range with <code>theme.container.minScreen</code> / <code>maxScreen</code>.
+
+=== 3.7 State Variants ===
+
+Variants apply utilities in specific states or contexts. '''State variants emit in JIT mode only''' — configure <code>content</code> so the compiler can see your class names. Version 3.1 supports 155 stackable variants; these are the core set:
+
+'''State variants:'''
+
+{| class="wikitable"
+! Prefix !! Generated CSS !! When it applies
+|-
+| <code>hover:</code> || <code>.hover\:x:hover</code> || pointer is over the element
+|-
+| <code>focus:</code> || <code>.focus\:x:focus</code> || element has focus
+|-
+| <code>focus-visible:</code> || <code>.focus-visible\:x:focus-visible</code> || keyboard focus
+|-
+| <code>focus-within:</code> || <code>.focus-within\:x:focus-within</code> || element or a descendant has focus
+|-
+| <code>active:</code> || <code>.active\:x:active</code> || element is pressed
+|-
+| <code>visited:</code> || <code>.visited\:x:visited</code> || link was visited
+|-
+| <code>disabled:</code> || <code>.disabled\:x:disabled</code> || element is disabled
+|-
+| <code>first:</code> || <code>.first\:x:first-child</code> || first child
+|-
+| <code>last:</code> || <code>.last\:x:last-child</code> || last child
+|}
+
+'''Group variants (parent → child):''' add <code>group</code> to the parent, then target children with <code>group-hover:</code> / <code>group-focus:</code>.
+
+<syntaxhighlight lang="html">
+<a class="group flex items-center gap-2">
+  <span class="text-slate-700">Docs</span>
+  <span class="opacity-0 group-hover:opacity-100 transition">→</span>
+</a>
+</syntaxhighlight>
+
+'''Peer variants (sibling → sibling):''' add <code>peer</code> to the earlier sibling, then target later siblings with <code>peer-hover:</code> / <code>peer-focus:</code>.
+
+<syntaxhighlight lang="html">
+<input type="text" class="peer border rounded px-3 py-2" placeholder="Type here" />
+<p class="hidden peer-focus:block text-sm text-slate-500">You are typing…</p>
+</syntaxhighlight>
+
+'''Dark mode:''' class-based by default. Add <code>dark</code> to any ancestor (convention: <code>&lt;html class="dark"&gt;</code>), then use <code>dark:</code> variants:
+
+<syntaxhighlight lang="html">
+<div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+  Adapts automatically.
+</div>
+</syntaxhighlight>
+
+This compiles to <code>.dark .dark\:bg-slate-900 { background-color: #0f172a; }</code>. Switch strategies with <code>darkMode: 'media'</code> (<code>prefers-color-scheme</code>), <code>'selector'</code>, <code>['selector', '[data-theme="dark]']</code>, or disable it with <code>false</code>.
+
+'''Stacking:''' combine screens and states freely in any order:
+
+<syntaxhighlight lang="html">
+<button class="bg-blue-500 hover:bg-blue-600 md:hover:bg-indigo-600">…</button>
+</syntaxhighlight>
+
+<syntaxhighlight lang="css">
+@media (min-width: 768px) {
+  .md\:hover\:bg-indigo-600:hover {
+    background-color: #4f46e5;
+  }
+}
+</syntaxhighlight>
+
+'''Disable any variant''' to shrink builds:
+
+<syntaxhighlight lang="js">
+export default {
+  variants: {
+    visited: false,
+    dark: false,
+    responsive: false, // no screen prefixes at all
+    maxResponsive: false, // keep md: but drop max-md:
+    containerQueries: false,
+  },
+};
+</syntaxhighlight>
+
+=== 3.8 Core Plugin Toggles ===
+
+Disable whole utility groups to shrink builds:
+
+<syntaxhighlight lang="js">
+export default {
+  corePlugins: {
+    transforms: false,
+    whitespace: false,
+    components: false, // drops .glass, .neon-btn, .brutalist-card, … (built-ins only)
+  },
+};
+</syntaxhighlight>
+
+Available groups: <code>base, variables, animations, components, backgrounds, borderColor, borderRadius, borders, cursors, display, effects, filters, flex, gap, grid, inset, margin, opacity, padding, position, sizing, shadows, textColor, textDecoration, transforms, transitions, typography, whitespace, zIndex, overflow, visibility, gradients, plugin</code>. Note that <code>components: false</code> never removes components you register yourself with <code>addComponents</code> / <code>matchComponents</code>.
+
+=== 3.9 Typography Handling ===
+
+Typography utilities read directly from the <code>typography</code> tokens:
+
+<syntaxhighlight lang="html">
+<h1 class="text-4xl font-black tracking-tight leading-none">Headline</h1>
+<p class="text-base font-normal leading-relaxed tracking-normal text-slate-600">
+  Body copy. Each text-* size sets a matching line-height automatically:
+  text-base → 1rem / 1.5rem.
+</p>
+<code class="font-mono text-sm">Monospace for code</code>
+<p class="truncate">Long single-line text clips with an ellipsis…</p>
+</syntaxhighlight>
+
+Font-size scale (size / line-height): <code>xs</code> 0.75/1rem · <code>sm</code> 0.875/1.25rem · <code>base</code> 1/1.5rem · <code>lg</code> 1.125/1.75rem · <code>xl</code> 1.25/1.75rem · <code>2xl</code> 1.5/2rem · <code>3xl</code> 1.875/2.25rem · <code>4xl</code> 2.25/2.5rem · <code>5xl</code> 3rem/1 · <code>6xl</code> 3.75rem/1 · <code>7xl</code> 4.5rem/1 · <code>8xl</code> 6rem/1 · <code>9xl</code> 8rem/1.
+
+Weights map <code>thin</code>→100 through <code>black</code>→900. Line heights: <code>leading-none tight snug base relaxed loose</code>. Letter spacing: <code>tracking-tighter tight normal wide wider widest</code>.
+
+=== 3.10 The Plugin API ===
+
+Plugins extend the framework programmatically. A plugin is a function <code>(api) =&gt; void</code>, an object <code>{ name, config?, handler }</code>, or a Tailwind <code>plugin()</code> object:
+
+<syntaxhighlight lang="js">
+// nakshora.config.js
+export default {
+  plugins: [
+    function (api) {
+      // Static utility — takes every variant automatically
+      api.addUtilities({ '.content-auto': { 'content-visibility': 'auto' } });
+      // Dynamic utility: tab-4 (theme) and tab-[3] (arbitrary)
+      api.matchUtilities({ tab: (v) => ({ tabSize: v }) }, { values: api.theme('spacing') });
+      // Component with nesting
+      api.addComponents({
+        '.card': { padding: api.theme('spacing.4'), '&:hover': { opacity: '0.9' } },
+      });
+      // Base-layer rule
+      api.addBase({ h1: { fontSize: api.theme('fontSize.2xl')[0] } });
+      // Custom variants: hocus:flex, nth-[3]:flex
+      api.addVariant('hocus', ['&:hover', '&:focus']);
+      api.matchVariant('nth', (v) => `&:nth-child(${v})`, { values: { 1: '1' } });
+    },
+  ],
+};
+</syntaxhighlight>
+
+Numeric values gain <code>px</code> automatically unless the property is unitless (<code>lineHeight</code>, <code>zIndex</code>, <code>opacity</code>, …) — Tailwind semantics.
+
+----

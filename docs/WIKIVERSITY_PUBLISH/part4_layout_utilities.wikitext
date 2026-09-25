@@ -1,0 +1,236 @@
+<!-- PART4_LAYOUT_UTILITIES — EDIT the page, paste this AT THE very END, then Publish. -->
+== 4. Detailed Layout and Utility System Guide ==
+
+=== 4.1 Reading the Utility Grammar ===
+
+Every Nakshora class follows predictable patterns. Memorize these five rules and you can guess hundreds of classes correctly:
+
+# '''Color:''' <code>&lt;utility&gt;-&lt;palette&gt;-&lt;shade&gt;</code> → <code>text-blue-500</code>, <code>bg-slate-900</code>, <code>border-rose-400</code>, <code>from-cyan-500</code>.
+# '''Spacing:''' <code>&lt;utility&gt;-&lt;key&gt;</code> → <code>p-4</code>, <code>mt-2</code>, <code>gap-x-6</code>. Keys: <code>0 px 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 14 16 20 24 28 32 36 40 44 48 56 64 72 80 96</code>.
+# '''Responsive:''' <code>&lt;screen&gt;:&lt;utility&gt;</code> → <code>md:grid-cols-2</code>, <code>max-md:hidden</code>, <code>@md:flex</code> (container query).
+# '''State (JIT):''' <code>&lt;variant&gt;:&lt;utility&gt;</code> → <code>hover:bg-blue-600</code>, <code>dark:text-white</code>, <code>group-hover:opacity-100</code>.
+# '''Stacking (JIT):''' chain freely → <code>md:hover:bg-blue-600</code>, <code>print:md:flex</code>, <code>portrait:max-md:dark:flex</code>.
+
+=== 4.2 Display, Position, Inset, and Stacking ===
+
+<syntaxhighlight lang="html">
+<!-- Display -->
+<div class="block">Block</div>
+<div class="inline-block">Inline block</div>
+<div class="flex">Flex container</div>
+<div class="grid">Grid container</div>
+<div class="hidden md:block">Hidden on mobile, block on tablets and up</div>
+
+<!-- Position + inset -->
+<header class="sticky top-0 z-50">Sticky header, always on top</header>
+<div class="relative">
+  <span class="absolute top-2 right-2">Badge</span>
+</div>
+<div class="fixed inset-0">Full-viewport overlay</div>
+
+<!-- z-index scale: auto hide(-1) 0 10 20 30 40 50 -->
+<div class="z-10">Above default content</div>
+
+<!-- Overflow and visibility -->
+<div class="overflow-hidden">Clips children</div>
+<div class="overflow-x-auto">Horizontal scroll when needed</div>
+<div class="invisible">Occupies space but hides</div>
+</syntaxhighlight>
+
+Inset utilities (<code>top-* right-* bottom-* left-* inset-* inset-x-* inset-y-*</code>) accept the full spacing scale plus fractions and <code>auto</code>. Logical-property twins (<code>start-* end-*</code>) support right-to-left layouts.
+
+=== 4.3 Spacing: Margin, Padding, Gap, and Space ===
+
+All spacing utilities share the spacing scale, where one step equals <code>0.25rem</code> (4px at default root size). Key <code>4</code> → <code>1rem</code>; key <code>px</code> → <code>1px</code>.
+
+<syntaxhighlight lang="html">
+<!-- Margin: m t r b l x y s e + scale key; negatives with a dash prefix -->
+<div class="m-4">Margin 1rem on all sides</div>
+<div class="mt-2 mb-6 mx-auto max-w-md">Top, bottom, centered</div>
+<div class="-mt-4">Negative top margin pulls upward</div>
+
+<!-- Padding: p t r b l x y s e + scale key -->
+<div class="p-6 px-8 py-2">Padding variants</div>
+
+<!-- Gap (flex/grid): gap x y + scale key -->
+<div class="grid grid-cols-3 gap-4 gap-x-6">Gaps between cells</div>
+
+<!-- Space-between (adds margin to all but the first child) -->
+<div class="space-y-2">
+  <p>Item one</p>
+  <p>Item two</p>
+</div>
+</syntaxhighlight>
+
+There are 561 spacing utilities in the catalog (margin plus negatives, padding, gap, space).
+
+=== 4.4 Sizing ===
+
+<syntaxhighlight lang="html">
+<div class="w-full max-w-md">Full width, capped at 28rem</div>
+<div class="w-1/2 md:w-1/3">Half width → one third on tablets</div>
+<div class="h-12 min-h-screen">Fixed height; at least full viewport</div>
+<main class="min-h-dvh">Full dynamic viewport height (mobile-safe)</main>
+<img class="w-24 h-24 object-cover" src="avatar.jpg" alt="Avatar" />
+</syntaxhighlight>
+
+Width and height accept the spacing scale, fractions (<code>1/2 … 11/12</code>), viewport units (<code>h-svh lvh dvh</code>, <code>w-svw …</code>), <code>auto</code>, <code>full</code>, <code>screen</code>, <code>min</code>, <code>max</code>, <code>fit</code>, and arbitrary values (<code>w-[clamp(1rem,5vw,3rem)]</code>).
+
+=== 4.5 Flexbox ===
+
+<syntaxhighlight lang="html">
+<!-- Centering pattern -->
+<div class="flex items-center justify-center min-h-screen">
+  <p>Perfectly centered</p>
+</div>
+
+<!-- Direction, wrap, grow, shrink -->
+<div class="flex flex-col md:flex-row flex-wrap gap-4">
+  <div class="flex-1">Grows</div>
+  <div class="flex-none">Fixed</div>
+  <div class="shrink-0">Never shrinks</div>
+</div>
+
+<!-- Alignment -->
+<div class="flex items-start justify-between">
+  <span>Left</span>
+  <span>Right</span>
+</div>
+</syntaxhighlight>
+
+Available: <code>flex-row col</code> (+ <code>row-reverse col-reverse</code>), <code>flex-wrap nowrap wrap-reverse</code>, <code>items-start center end stretch baseline</code>, <code>justify-start center end between around evenly</code>, <code>flex-1 auto initial none</code>, <code>grow shrink (shrink-0)</code>, <code>order-*</code>, <code>self-*</code>, <code>place-*</code> shortcuts.
+
+=== 4.6 Grid ===
+
+<syntaxhighlight lang="html">
+<!-- Responsive card grid: 1 → 2 → 3 → 4 → 6 columns -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 4xl:grid-cols-6 gap-4">
+  <div>Cell</div>
+  <div>Cell</div>
+  <div>Cell</div>
+</div>
+
+<!-- Explicit placement -->
+<div class="grid grid-cols-12 gap-4">
+  <aside class="col-span-12 md:col-span-3">Sidebar</aside>
+  <main class="col-span-12 md:col-span-9">Content</main>
+</div>
+
+<!-- Rows and flow -->
+<div class="grid grid-rows-2 grid-flow-col gap-2 auto-cols-fr">
+  <div>Flows down columns</div>
+</div>
+</syntaxhighlight>
+
+Grid utilities cover <code>grid-cols-1…12 none subgrid</code>, <code>grid-rows-*</code>, <code>col-span-* col-start-* col-end-*</code>, <code>row-span-* row-start-* row-end-*</code>, <code>auto-cols auto-rows</code>, <code>grid-flow-*</code>, and <code>place-*</code> alignment.
+
+=== 4.7 Borders, Radius, Shadows, and Effects ===
+
+<syntaxhighlight lang="html">
+<div class="border border-slate-200 rounded-xl shadow-md">Standard card surface</div>
+<div class="border-2 border-dashed border-rose-400 rounded-full">Dashed pill</div>
+<button class="shadow-glow rounded-lg">Nakshora's blue glow shadow</button>
+<img class="rounded-xs opacity-75 blur-sm" src="photo.jpg" alt="Soft photo" />
+<div class="backdrop-blur-md bg-white/70">Frosted overlay (UIT: bg opacity slash)</div>
+</syntaxhighlight>
+
+Radius scale: <code>none xs sm md lg xl 2xl 3xl full</code> (+ per-corner <code>rounded-tl-*</code> etc.). Shadow scale: <code>none sm base md lg xl 2xl inner glow</code>. Opacity accepts <code>0–100</code> in theme steps. Filters include <code>blur-* brightness-* contrast-* grayscale invert saturate-* sepia* drop-shadow-*</code> plus <code>backdrop-*</code> twins.
+
+=== 4.8 Transforms, Transitions, and Animations ===
+
+<syntaxhighlight lang="html">
+<button class="transition hover:scale-105 active:scale-95 duration-200 ease-out">
+  Springy button
+</button>
+<div class="rotate-3 hover:rotate-0 transition-transform">Tilts upright on hover</div>
+<div class="animate-spin h-5 w-5 border-2 rounded-full">Spinner</div>
+<div class="animate-pulse skeleton-text w-1/2">Loading line</div>
+</syntaxhighlight>
+
+Transforms: <code>scale-* (incl. 175, 200) rotate-* (incl. 135 225 270 315 360) translate-* skew-* origin-*</code>. Transitions: <code>transition(-colors, -opacity, -shadow, -transform) duration-* ease-* (incl. back) delay-*</code>. Animations: <code>animate-spin ping pulse bounce fade slide shimmer</code> with matching <code>@keyframes</code> emitted in the base layer.
+
+=== 4.9 Complete Example: Fully Responsive Page Layout ===
+
+This runnable example combines flexbox, grid, spacing, positioning, responsive prefixes, and dark mode. It compiles under JIT when your <code>content</code> globs include the file:
+
+<syntaxhighlight lang="html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nakshora responsive layout</title>
+    <link rel="stylesheet" href="dist/nakshora.css" />
+  </head>
+  <body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <!-- Sticky header -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200 dark:bg-slate-900/90 dark:border-slate-800">
+      <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href="#" class="font-black text-xl tracking-tight">NAKSHORA</a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#" class="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition">Docs</a>
+          <a href="#" class="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition">Themes</a>
+          <a href="#" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition">Get started</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Content: sidebar + grid -->
+    <div class="flex-1 w-full max-w-6xl mx-auto px-6 py-10 grid grid-cols-12 gap-6">
+      <aside class="col-span-12 md:col-span-3">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 md:sticky md:top-24">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Index</p>
+          <ul class="mt-2 space-y-1 text-sm font-medium">
+            <li><a href="#" class="block px-3 py-2 rounded-md bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">Overview</a></li>
+            <li><a href="#" class="block px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition">Utilities</a></li>
+            <li><a href="#" class="block px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition">Themes</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <main class="col-span-12 md:col-span-9">
+        <h1 class="text-3xl md:text-4xl font-black tracking-tight">Responsive by default</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300 leading-relaxed">
+          One column on phones, two on large phones, three on laptops, four on desktops.
+        </p>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 hover-lift">
+            <h2 class="text-lg font-bold">Card one</h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Utilities compose into any design.</p>
+          </article>
+          <article class="glass p-6">
+            <h2 class="text-lg font-bold text-white">Glass card</h2>
+            <p class="mt-2 text-sm text-slate-300">Backdrop blur, zero config.</p>
+          </article>
+          <article class="neon-card p-6">
+            <p class="neon-text font-bold">NEON CYBER</p>
+            <p class="mt-2 text-sm text-slate-300">Glow built in.</p>
+          </article>
+        </div>
+
+        <!-- Show / hide helpers -->
+        <p class="mt-6 text-sm text-slate-500">
+          <span class="block sm:hidden">You read this on a phone.</span>
+          <span class="hidden sm:block">You read this on a wider screen.</span>
+          <span class="hidden lg:inline">You read this on a laptop or larger.</span>
+        </p>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800">
+      <div class="max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500">
+        <p>Built with Nakshora v3.1 — one stylesheet, zero runtime JS.</p>
+        <div class="flex items-center gap-4">
+          <a href="#" class="hover:text-slate-900 dark:hover:text-white transition">Docs</a>
+          <a href="#" class="hover:text-slate-900 dark:hover:text-white transition">GitHub</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
+</syntaxhighlight>
+
+Study what this page demonstrates: a sticky positioned header, a 12-column content grid that collapses on mobile, a sidebar that becomes sticky only on <code>md:</code> screens, a card grid that scales 1 → 2 → 3 columns, show/hide helpers, and full dark-mode coverage through <code>dark:</code> variants. Every class above exists in the v3.1 catalog.
+
+----

@@ -1,0 +1,206 @@
+<!-- PART6_EXERCISES — EDIT the page, paste this AT THE very END, then Publish. -->
+== 6. Interactive Practical Learning Lab (Exercises) ==
+
+Work through these exercises in order. Each states a goal, lists acceptance criteria, and then gives the complete solution so you can verify your work. Use any integration path; the CLI path (<code>nakshora dev</code>) gives the fastest feedback loop.
+
+'''Lab setup (all exercises):'''
+
+<syntaxhighlight lang="bash">
+mkdir nakshora-lab && cd nakshora-lab
+npm install -D @nakshora/cli
+nakshora init
+# point content at your files in nakshora.config.js:
+# content: ['./*.html']
+nakshora dev nakshora.css -o dist/nakshora.css
+</syntaxhighlight>
+
+Link <code>dist/nakshora.css</code> from each exercise file and rebuild (watch mode rebuilds automatically — median 1.3 ms incremental).
+
+=== 6.1 Exercise 1: Responsive Profile Card ===
+
+'''Goal.''' Build a profile card that stacks vertically on phones and switches to a horizontal layout on tablets and larger.
+
+'''Requirements:'''
+
+# Card container: white surface, <code>rounded-xl</code>, border, shadow, <code>hover-lift</code>, max width <code>max-w-md</code>, padding <code>p-6</code>.
+# Avatar: use <code>skeleton-circle</code> sized <code>w-16 h-16</code> as a placeholder (swap in an <code>&lt;img&gt;</code> with the same sizing later).
+# Name (<code>text-xl font-bold</code>), role (<code>text-sm</code> in <code>text-slate-500</code>), and a two-line bio (<code>text-sm leading-relaxed</code>).
+# A primary follow button (<code>bg-blue-500</code>, hover darkens, presses down on <code>:active</code>).
+# Layout: <code>flex-col</code> by default, <code>sm:flex-row</code> with <code>sm:items-center</code> and <code>gap-4</code>.
+# Dark mode: card turns <code>dark:bg-slate-800</code>, text adapts. Test by toggling <code>class="dark"</code> on <code>&lt;html&gt;</code>.
+
+'''Solution:'''
+
+<syntaxhighlight lang="html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exercise 1 — Profile card</title>
+    <link rel="stylesheet" href="dist/nakshora.css" />
+  </head>
+  <body class="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-6">
+    <article
+      class="w-full max-w-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-md p-6 hover-lift flex flex-col sm:flex-row sm:items-center gap-4"
+    >
+      <div class="skeleton-circle w-16 h-16 shrink-0"></div>
+      <div class="flex-1">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Ayesha Rahman</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Front-end developer · Dhaka</p>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Builds responsive interfaces with utility-first CSS. Learning Nakshora one component at a time.
+        </p>
+        <button
+          class="mt-4 px-5 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600 active:scale-95 transition"
+        >
+          Follow
+        </button>
+      </div>
+    </article>
+  </body>
+</html>
+</syntaxhighlight>
+
+'''Check your work:''' narrow the window below 640px — the avatar stacks above the text. Widen it — the card turns horizontal. Add <code>class="dark"</code> to <code>&lt;html&gt;</code> — the card, text, and page background all switch. If any variant fails, run <code>nakshora doctor</code> and confirm your <code>content</code> glob includes this file (state and screen variants need JIT).
+
+=== 6.2 Exercise 2: Navigation Bar ===
+
+'''Goal.''' Build a sticky navbar with a brand mark, three links, and a call-to-action button. Links show on <code>md:</code> screens and larger; a compact menu button shows below <code>md:</code>.
+
+'''Requirements:'''
+
+# <code>header</code> is <code>sticky top-0 z-50</code> with the <code>glass-dark</code> treatment.
+# Inner <code>nav</code>: centered (<code>max-w-6xl mx-auto</code>), padded (<code>px-6</code>), fixed height (<code>h-16</code>), flex with <code>items-center justify-between</code>.
+# Brand: <code>font-black text-xl tracking-tight text-white</code>.
+# Link group: <code>hidden md:flex items-center gap-8</code>; links are <code>text-sm font-medium text-slate-300 hover:text-white transition</code>.
+# CTA button: <code>bg-blue-500 hover:bg-blue-600</code>, white semibold text, <code>rounded-lg</code>, padding <code>px-4 py-2</code>.
+# Mobile menu button: visible only below <code>md:</code> (<code>md:hidden</code>), subtle hover background (<code>hover:bg-white/10</code>).
+
+'''Solution:'''
+
+<syntaxhighlight lang="html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exercise 2 — Navbar</title>
+    <link rel="stylesheet" href="dist/nakshora.css" />
+  </head>
+  <body class="min-h-screen bg-slate-950">
+    <header class="sticky top-0 z-50 glass-dark">
+      <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a class="text-white font-black text-xl tracking-tight" href="#">NAKSHORA</a>
+        <div class="hidden md:flex items-center gap-8">
+          <a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#">Docs</a>
+          <a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#">Themes</a>
+          <a class="text-slate-300 hover:text-white text-sm font-medium transition" href="#">Blog</a>
+          <a
+            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition"
+            href="#"
+            >Get started</a
+          >
+        </div>
+        <button
+          class="md:hidden text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-white/10 transition"
+        >
+          Menu
+        </button>
+      </nav>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-16">
+      <div class="glass p-8 text-center">
+        <h1 class="text-3xl font-bold text-white">Scroll — the header stays.</h1>
+        <p class="mt-2 text-slate-300">Sticky positioning + glassmorphism, zero custom CSS.</p>
+      </div>
+      <div class="h-[120vh]"></div>
+    </main>
+  </body>
+</html>
+</syntaxhighlight>
+
+'''Check your work:''' resize across the 768px boundary — links and the menu button swap. Scroll the tall page — the header sticks. Hover each link — the color transitions to white. Run <code>nakshora inspect "md:flex"</code> to see the exact <code>@media (min-width: 768px)</code> rule the compiler emits.
+
+=== 6.3 Exercise 3 (Stretch): Dark-Mode Feature Grid with Loading State ===
+
+'''Goal.''' Combine everything: a responsive grid, dark mode, a gradient headline, and a skeleton loader.
+
+'''Requirements:'''
+
+# Page: <code>min-h-screen bg-slate-50 dark:bg-slate-950</code>, centered content column (<code>max-w-5xl mx-auto px-6 py-12</code>).
+# Headline uses <code>gradient-text</code> at <code>text-3xl md:text-4xl font-black</code>.
+# Grid: <code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6</code>.
+# Three cards: one standard utility card, one <code>.glass</code> card, one <code>.neon-card</code> — each dark-mode-aware where utilities allow.
+# Below the grid, a skeleton loader row (one <code>skeleton-circle</code> + two <code>skeleton-text</code> lines) inside a bordered panel.
+# A toggle button that adds/removes <code>dark</code> on <code>&lt;html&gt;</code> (three lines of vanilla JS — styling stays pure Nakshora).
+
+'''Solution:'''
+
+<syntaxhighlight lang="html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exercise 3 — Feature grid</title>
+    <link rel="stylesheet" href="dist/nakshora.css" />
+  </head>
+  <body class="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <main class="max-w-5xl mx-auto px-6 py-12">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <h1 class="text-3xl md:text-4xl font-black gradient-text">Ship responsive UIs fast</h1>
+        <button
+          id="theme-toggle"
+          class="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+        >
+          Toggle dark mode
+        </button>
+      </div>
+
+      <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 hover-lift">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Utility-first</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            11,417 utilities across 35 categories. Compose any design in markup.
+          </p>
+          <a href="#" class="inline-block mt-4 text-sm font-medium text-blue-500 hover:text-blue-600">Learn more →</a>
+        </article>
+
+        <article class="glass p-6">
+          <h2 class="text-lg font-bold text-white">Glassmorphism</h2>
+          <p class="mt-2 text-sm text-slate-300 leading-relaxed">Backdrop blur, zero config.</p>
+          <button class="mt-4 px-4 py-2 text-sm font-medium text-white rounded-lg hover:bg-white/20 transition">
+            Preview
+          </button>
+        </article>
+
+        <article class="neon-card p-6">
+          <p class="neon-text font-bold tracking-wide">NEON CYBER</p>
+          <p class="mt-2 text-sm text-slate-300 leading-relaxed">Glow built in for dark UIs.</p>
+          <button class="neon-btn mt-4">Engage</button>
+        </article>
+      </div>
+
+      <div class="mt-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 flex items-center gap-4">
+        <div class="skeleton-circle w-12 h-12 shrink-0"></div>
+        <div class="flex-1 space-y-2">
+          <div class="skeleton-text w-3/4"></div>
+          <div class="skeleton-text w-1/2"></div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document
+        .getElementById('theme-toggle')
+        .addEventListener('click', () => document.documentElement.classList.toggle('dark'));
+    </script>
+  </body>
+</html>
+</syntaxhighlight>
+
+'''Check your work:''' click the toggle — every <code>dark:</code> variant flips at once. Resize through 640px and 1024px — the grid gains columns. Inspect the built CSS with <code>nakshora build --stats</code> — note how small the JIT output is compared with the 5.98 MB full build. You now think in utilities.
+
+----
